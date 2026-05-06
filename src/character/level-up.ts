@@ -1,0 +1,167 @@
+// character/level-up.ts
+// 角色升级 — 根据DND 2024规则应用等级变化
+// 对应 HLD §6.2 + S16
+
+import type { AbilityName } from '../types/ability';
+import type { Character, DieType } from '../types/character';
+import type { DataLoader } from '../data/loader';
+import type { ResetType } from '../types/resource';
+
+import { getModifier, getTotalScore } from '../engine/ability-modifier';
+import { getHitDieFixedValue } from '../engine/hp-calculator';
+import { getProficiencyBonus } from '../engine/proficiency-bonus';
+import { extractResources, getFeaturesAtLevel } from './create';
+
+// ── 公共接口 ────────────────────────────────────────────────────
+
+export interface LevelUpOptions {
+  classId: string;                     // which class to level (MVP = only class)
+  subclassId?: string;                 // if reached subclass level
+  hpChoice: 'fixed' | 'roll';          // HP increment method
+  asiOrFeat?: {                        // ASI/Feat choice (at levels 4/8/12/16/19)
+    type: 'asi' | 'feat';
+    asi?: Partial<Record<AbilityName, number>>;
+    featId?: string;
+  };
+  newSpells?: string[];                // new spells for spellcasters
+}
+
+export interface RandomProvider {
+  d(max: number): number;
+}
+
+// ── 主函数 ──────────────────────────────────────────────────────
+
+export function levelUp(
+  char: Character,
+  options: LevelUpOptions,
+  data: DataLoader,
+  rng?: RandomProvider,
+): Character {
+  // Validate class exists on character
+  const classIdx = char.classes.findIndex(c => c.classId === options.classId);
+  if (classIdx === -1) {
+    throw new Error(`Class ${options.classId} not found on character`);
+  }
+
+  const charClass = char.classes[classIdx]!;
+  const newLevel = charClass.level + 1;
+
+  // Validate class exists in data
+  const classData = data.getClass(options.classId);
+  if (!classData) {
+    throw new Error(`Class ${options.classId} not found in data`);
+  }
+
+  // 1. Update class level
+  const newClasses = char.classes.map((c, i) => {
+    if (i === classIdx) {
+      return {
+        ...c,
+        level: newLevel,
+        subclassId: options.subclassId ?? c.subclassId,
+        subclassLevel: options.subclassId ? newLevel : c.subclassLevel,
+        hitDice: { ...c.hitDice },
+      };
+    }
+    return c;
+  });
+
+  // 2. HP increase
+  const conMod = getModifier(getTotalScore(char.abilityScores, 'Constitution'));
+  let hpIncrease: number;
+  if (options.hpChoice === 'roll' && rng) {
+    hpIncrease = rng.d(getDieMax(classData.hitDie)) + conMod;
+  } else {
+    hpIncrease = getHitDieFixedValue(classData.hitDie) + conMod;
+  }
+  hpIncrease = Math.max(1, hpIncrease); // HP increase is at least 1 per level
+  const newMaxHP = char.hitPoints.max + hpIncrease;
+
+  // 3. ASI or Feat
+  let newAbilityScores = { ...char.abilityScores };
+  let newFeats = [...char.feats];
+  if (options.asiOrFeat) {
+    if (options.asiOrFeat.type === 'asi' && options.asiOrFeat.asi) {
+      const newFeatBonuses = { ...newAbilityScores.featBonuses };
+      for (const [ability, bonus] of Object.entries(options.asiOrFeat.asi)) {
+        if (bonus !== undefined) {
+          newFeatBonuses[ability as AbilityName] = (newFeatBonuses[ability as AbilityName] ?? 0) + bonus;
+        }
+      }
+      newAbilityScores = { ...newAbilityScores, featBonuses: newFeatBonuses };
+    } else if (options.asiOrFeat.type === 'feat' && options.asiOrFeat.featId) {
+      newFeats = [...newFeats, options.asiOrFeat.featId];
+    }
+  }
+
+  // 4. New spells
+  let newSpells = { ...char.spells };
+  if (options.newSpells && options.newSpells.length > 0) {
+    newSpells = {
+      ...newSpells,
+      knownSpells: [...newSpells.knownSpells, ...options.newSpells],
+    };
+  }
+
+  // 5. New resources from features at new level
+  const levelResources = extractResources(classData, newLevel);
+  const newResources = [...char.resources];
+  for (const resource of levelResources) {
+    if (!newResources.some(r => r.id === resource.id)) {
+      newResources.push(resource);
+    }
+  }
+
+  // 6. Calculate new total level and proficiency bonus
+  const totalLevel = newClasses.reduce((sum, c) => sum + c.level, 0);
+  const newProficiencyBonus = getProficiencyBonus(totalLevel);
+
+  // Build result
+  let result: Character = {
+    ...char,
+    classes: newClasses,
+    abilityScores: newAbilityScores,
+    feats: newFeats,
+    spells: newSpells,
+    resources: newResources,
+    hitPoints: {
+      ...char.hitPoints,
+      max: newMaxHP,
+      current: char.hitPoints.current + hpIncrease,
+    },
+    combatStats: {
+      ...char.combatStats,
+      proficiencyBonus: newProficiencyBonus,
+    },
+    updatedAt: new Date().toISOString(),
+  };
+
+  // Cap current HP at max
+  result = {
+    ...result,
+    hitPoints: {
+      ...result.hitPoints,
+      current: Math.min(result.hitPoints.current, result.hitPoints.max),
+    },
+  };
+
+  return result;
+}
+
+// ── Helper Functions ────────────────────────────────────────────
+
+/**
+ * 获取骰子最大值
+ */
+function getDieMax(die: DieType): number {
+  const map: Record<DieType, number> = {
+    d4: 4,
+    d6: 6,
+    d8: 8,
+    d10: 10,
+    d12: 12,
+    d20: 20,
+  };
+  return map[die];
+}

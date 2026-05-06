@@ -1,0 +1,106 @@
+// types/character.ts
+// Character 及其相关类型（零依赖）
+
+// 骰子类型 — 用于生命骰和武器伤害骰
+export type DieType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20';
+
+// 角色核心接口 — 所有字段均为 readonly（不可变）
+export interface Character {
+  readonly schemaVersion: string;
+  readonly name: string;
+  readonly species: string;                    // Species.id
+  readonly speciesSubtype: string | null;      // 物种变体（如 "Mountain Dwarf"）
+  readonly background: string;                 // Background.id
+  readonly classes: readonly CharacterClass[];  // 支持多维职业
+  readonly abilityScores: import('./ability').AbilityScores;
+  readonly skills: Record<string, import('./skill').SkillEntry>;
+  readonly feats: readonly string[];            // Feat.id 列表
+  readonly equipment: readonly import('./equipment').EquipmentItem[];
+  readonly spells: import('./spell').CharacterSpells;
+  readonly resources: readonly import('./resource').Resource[];
+  readonly hitPoints: HitPoints;
+  readonly combatStats: CombatStats;
+  readonly currency: Currency;
+  readonly conditions: readonly ActiveCondition[];
+  readonly notes: string;
+  readonly createdAt: string;                  // ISO 8601
+  readonly updatedAt: string;                  // ISO 8601
+}
+
+// 角色职业条目（支持多维职业）
+export interface CharacterClass {
+  readonly classId: string;          // Class.id
+  readonly level: number;
+  readonly subclassId: string | null;
+  readonly subclassLevel: number | null;  // 获得子职业的等级
+  readonly hitDice: { readonly die: DieType; readonly used: number };
+}
+
+// 生命值
+export interface HitPoints {
+  readonly max: number;
+  readonly current: number;
+  readonly temporary: number;
+  readonly deathSaves: DeathSaves;
+}
+
+// 死亡豁免
+export interface DeathSaves {
+  readonly successes: number;    // 0-3
+  readonly failures: number;     // 0-3
+  readonly isStable: boolean;
+}
+
+// 战斗统计（派生值，由 recomputeDerivedStats 计算）
+export interface CombatStats {
+  readonly AC: number;
+  readonly initiative: number;
+  readonly speed: number;
+  readonly passivePerception: number;
+  readonly proficiencyBonus: number;
+  readonly attacks: readonly Attack[];
+}
+
+// 攻击条目（游戏模式中显示）
+export interface Attack {
+  readonly name: string;
+  readonly attackBonus: number;
+  readonly damage: string;           // 如 "1d8+4"
+  readonly damageType: string;       // 如 "Slashing"
+  readonly mastery: readonly string[]; // Weapon Mastery 属性
+}
+
+// 活跃状态（当前施加于角色的状态）
+export interface ActiveCondition {
+  readonly id: ConditionName;
+  readonly source: string;       // 来源（如 "Player A", "Hold Person"）
+  readonly appliedAt: string;     // ISO 8601
+}
+
+// 金币
+export type ConditionName =
+  | 'Blinded'
+  | 'Charmed'
+  | 'Deafened'
+  | 'Exhaustion'      // 特殊：有等级 1-6
+  | 'Frightened'
+  | 'Grappled'
+  | 'Incapacitated'
+  | 'Invisible'
+  | 'Paralyzed'
+  | 'Petrified'
+  | 'Poisoned'
+  | 'Prone'
+  | 'Restrained'
+  | 'Stunned'
+  | 'Unconscious'
+  | 'Concentrating';  // 非官方但需追踪（专注）
+
+// 金币
+export interface Currency {
+  readonly cp: number;  // Copper Piece
+  readonly sp: number;  // Silver Piece
+  readonly ep: number;  // Electrum Piece
+  readonly gp: number;  // Gold Piece
+  readonly pp: number;  // Platinum Piece
+}

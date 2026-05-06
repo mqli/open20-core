@@ -1,0 +1,651 @@
+[
+  {
+    "id": "Dwarf",
+    "source": "2024 PHB",
+    "description": "Stout and resilient, dwarves are known for their craftsmanship, endurance, and connection to stone and metal.",
+    "size": "Medium",
+    "speed": 30,
+    "languages": [
+      "Common",
+      "Dwarvish"
+    ],
+    "abilityBonuses": {
+      "Constitution": 2
+    },
+    "baseTraits": [
+      {
+        "name": "Darkvision",
+        "description": "Accustomed to life underground, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light."
+      },
+      {
+        "name": "Dwarven Resilience",
+        "description": "You have advantage on saving throws against poison and resistance to poison damage."
+      },
+      {
+        "name": "Stonecunning",
+        "description": "You gain advantage on ability checks to discern the origin of stonework.",
+        "grants": {
+          "skillProficiencies": [
+            "History"
+          ]
+        }
+      }
+    ],
+    "subtypes": [
+      {
+        "id": "Hill Dwarf",
+        "name": "Hill Dwarf",
+        "description": "Hill dwarves are sturdy and resilient, with a strong connection to the earth.",
+        "traits": [
+          {
+            "name": "Wisdom Ability Score Increase",
+            "description": "Your Wisdom score increases by 1."
+          },
+          {
+            "name": "Dwarven Toughness",
+            "description": "Your hit point maximum increases by 1, and it increases by 1 every time you gain a level.",
+            "grants": {
+              "hpPerLevel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "Mountain Dwarf",
+        "name": "Mountain Dwarf",
+        "description": "Mountain dwarves are strong and hardy, skilled in the arts of war and metalworking.",
+        "traits": [
+          {
+            "name": "Strength Ability Score Increase",
+            "description": "Your Strength score increases by 2."
+          },
+          {
+            "name": "Armor Training",
+            "description": "You have proficiency with light and medium armor.",
+            "grants": {
+              "armorTraining": [
+                "light",
+                "medium"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "darkvision": 60
+  },
+  {
+    "id": "Elf",
+    "source": "2024 PHB",
+    "description": "Graceful and perceptive, elves have keen senses, natural magic, and immunity to magical sleep.",
+    "size": "Medium",
+    "speed": 30,
+    "languages": [
+      "Common",
+      "Elvish"
+    ],
+    "abilityBonuses": {
+      "Dexterity": 2
+    },
+    "baseTraits": [
+      {
+        "name": "Darkvision",
+        "description": "Accustomed to twilit forests and the night sky, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light."
+      },
+      {
+        "name": "Fey Ancestry",
+        "description": "You have advantage on saving throws against being charmed, and magic can't put you to sleep."
+      },
+      {
+        "name": "Trance",
+        "description": "You don't need to sleep. Instead, you meditate deeply, remaining semiconscious, for 4 hours a day."
+      },
+      {
+        "name": "Keen Senses",
+        "description": "You have proficiency in the Perception skill.",
+        "grants": {
+          "skillProficiencies": [
+            "Perception"
+          ]
+        }
+      }
+    ],
+    "subtypes": [
+      {
+        "id": "High Elf",
+        "name": "High Elf",
+        "description": "High elves have keen minds and a mastery of arcane magic, with a connection to the Feywild.",
+        "traits": [
+          {
+            "name": "Intelligence Ability Score Increase",
+            "description": "Your Intelligence score increases by 1."
+          },
+          {
+            "name": "Keen Mind",
+            "description": "You have advantage on Intelligence (History) checks about arcane matters. You also always know which way is north and the number of hours left before the next sunrise."
+          },
+          {
+            "name": "Cantrip",
+            "description": "You know one cantrip of your choice from the wizard spell list. Intelligence is your spellcasting ability for this cantrip."
+          }
+        ]
+      },
+      {
+        "id": "Wood Elf",
+        "name": "Wood Elf",
+        "description": "Wood elves are quick, stealthy, and in harmony with nature, often living deep in ancient forests.",
+        "traits": [
+          {
+            "name": "Wisdom Ability Score Increase",
+            "description": "Your Wisdom score increases by 1."
+          },
+          {
+            "name": "Fleet of Foot",
+            "description": "Your base walking speed increases by 5 feet.",
+            "grants": {
+              "speedBonus": 5
+            }
+          },
+          {
+            "name": "Mask of the Wild",
+            "description": "You can attempt to hide even when you are only lightly obscured by foliage, heavy rain, falling snow, mist, and other natural phenomena."
+          }
+        ]
+      },
+      {
+        "id": "Drow",
+        "name": "Drow",
+        "description": "Drow are elves with a connection to the Underdark, wielding innate faerie magic and living in subterranean cities.",
+        "traits": [
+          {
+            "name": "Charisma Ability Score Increase",
+            "description": "Your Charisma score increases by 1."
+          },
+          {
+            "name": "Superior Darkvision",
+            "description": "Your Darkvision has a range of 120 feet."
+          },
+          {
+            "name": "Drow Magic",
+            "description": "You know the Dancing Lights cantrip. At 3rd level, you can cast Faerie Fire once per day. At 5th level, you can cast Darkness once per day. Charisma is your spellcasting ability."
+          }
+        ]
+      }
+    ],
+    "darkvision": 60
+  },
+  {
+    "id": "Halfling",
+    "source": "2024 PHB",
+    "description": "Small and nimble, halflings are known for their luck, bravery, and ability to move through tight spaces.",
+    "size": "Small",
+    "speed": 25,
+    "languages": [
+      "Common",
+      "Halfling"
+    ],
+    "abilityBonuses": {
+      "Dexterity": 2
+    },
+    "baseTraits": [
+      {
+        "name": "Lucky",
+        "description": "When you roll a 1 on the d20 for a saving throw or an attack roll, you can reroll the die and must use the new roll."
+      },
+      {
+        "name": "Brave",
+        "description": "You have advantage on saving throws against being frightened."
+      },
+      {
+        "name": "Halfling Nimbleness",
+        "description": "You can move through the space of any creature that is of a size larger than yours."
+      }
+    ],
+    "subtypes": [
+      {
+        "id": "Lightfoot",
+        "name": "Lightfoot",
+        "description": "Lightfoot halflings are stealthy and charming, able to blend into crowds and avoid notice.",
+        "traits": [
+          {
+            "name": "Charisma Ability Score Increase",
+            "description": "Your Charisma score increases by 1."
+          },
+          {
+            "name": "Naturally Stealthy",
+            "description": "You can attempt to hide even when you are obscured only by a creature that is at least one size larger than you."
+          }
+        ]
+      },
+      {
+        "id": "Stout",
+        "name": "Stout",
+        "description": "Stout halflings are resilient and hardy, with resistance to poison and advantage against poison.",
+        "traits": [
+          {
+            "name": "Constitution Ability Score Increase",
+            "description": "Your Constitution score increases by 1."
+          },
+          {
+            "name": "Stout Resilience",
+            "description": "You have advantage on saving throws against poison and resistance to poison damage."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "Human",
+    "source": "2024 PHB",
+    "description": "Versatile and adaptable, humans are the most diverse of the common species, with the ability to excel in any field.",
+    "size": "Medium",
+    "speed": 30,
+    "languages": [
+      "Common"
+    ],
+    "abilityBonuses": {
+      "Strength": 1,
+      "Dexterity": 1,
+      "Constitution": 1,
+      "Intelligence": 1,
+      "Wisdom": 1,
+      "Charisma": 1
+    },
+    "baseTraits": [
+      {
+        "name": "Resourceful",
+        "description": "You gain proficiency in one skill and one tool of your choice.",
+        "grants": {
+          "skillProficiencies": [
+            "Choose one skill"
+          ],
+          "toolProficiencies": [
+            "Choose one tool"
+          ]
+        }
+      },
+      {
+        "name": "Heroic Inspiration",
+        "description": "You start with Heroic Inspiration. Whenever you finish a Long Rest, you gain Heroic Inspiration."
+      }
+    ],
+    "subtypes": []
+  },
+  {
+    "id": "Dragonborn",
+    "source": "2024 PHB",
+    "description": "Born of dragons, dragonborn bear draconic ancestry and can unleash breath weapons tied to their heritage.",
+    "size": "Medium",
+    "speed": 30,
+    "languages": [
+      "Common",
+      "Draconic"
+    ],
+    "abilityBonuses": {
+      "Strength": 2
+    },
+    "baseTraits": [
+      {
+        "name": "Draconic Ancestry",
+        "description": "You choose one type of dragon as your ancestor. Your breath weapon and damage resistance are determined by your ancestry."
+      },
+      {
+        "name": "Breath Weapon",
+        "description": "You can use your action to exhale destructive energy. The size, shape, and damage type depend on your draconic ancestry."
+      },
+      {
+        "name": "Damage Resistance",
+        "description": "You have resistance to the damage type associated with your draconic ancestry."
+      }
+    ],
+    "subtypes": [
+      {
+        "id": "Black Dragon Ancestry",
+        "name": "Black Dragon Ancestry",
+        "description": "Your breath weapon is a line of acid, and you have resistance to acid damage.",
+        "traits": []
+      },
+      {
+        "id": "Blue Dragon Ancestry",
+        "name": "Blue Dragon Ancestry",
+        "description": "Your breath weapon is a line of lightning, and you have resistance to lightning damage.",
+        "traits": []
+      },
+      {
+        "id": "Brass Dragon Ancestry",
+        "name": "Brass Dragon Ancestry",
+        "description": "Your breath weapon is a line of fire, and you have resistance to fire damage.",
+        "traits": []
+      },
+      {
+        "id": "Bronze Dragon Ancestry",
+        "name": "Bronze Dragon Ancestry",
+        "description": "Your breath weapon is a line of lightning, and you have resistance to lightning damage.",
+        "traits": []
+      },
+      {
+        "id": "Copper Dragon Ancestry",
+        "name": "Copper Dragon Ancestry",
+        "description": "Your breath weapon is a line of acid, and you have resistance to acid damage.",
+        "traits": []
+      },
+      {
+        "id": "Gold Dragon Ancestry",
+        "name": "Gold Dragon Ancestry",
+        "description": "Your breath weapon is a cone of fire, and you have resistance to fire damage.",
+        "traits": []
+      },
+      {
+        "id": "Green Dragon Ancestry",
+        "name": "Green Dragon Ancestry",
+        "description": "Your breath weapon is a cone of poison, and you have resistance to poison damage.",
+        "traits": []
+      },
+      {
+        "id": "Red Dragon Ancestry",
+        "name": "Red Dragon Ancestry",
+        "description": "Your breath weapon is a cone of fire, and you have resistance to fire damage.",
+        "traits": []
+      },
+      {
+        "id": "Silver Dragon Ancestry",
+        "name": "Silver Dragon Ancestry",
+        "description": "Your breath weapon is a cone of cold, and you have resistance to cold damage.",
+        "traits": []
+      },
+      {
+        "id": "White Dragon Ancestry",
+        "name": "White Dragon Ancestry",
+        "description": "Your breath weapon is a cone of cold, and you have resistance to cold damage.",
+        "traits": []
+      }
+    ]
+  },
+  {
+    "id": "Gnome",
+    "source": "2024 PHB",
+    "description": "Small and inventive, gnomes are known for their curiosity, intelligence, and connection to the natural and arcane worlds.",
+    "size": "Small",
+    "speed": 30,
+    "languages": [
+      "Common",
+      "Gnomish"
+    ],
+    "abilityBonuses": {
+      "Intelligence": 2
+    },
+    "baseTraits": [
+      {
+        "name": "Darkvision",
+        "description": "Accustomed to life underground, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light."
+      },
+      {
+        "name": "Gnome Cunning",
+        "description": "You have advantage on Intelligence, Wisdom, and Charisma saving throws against magic."
+      }
+    ],
+    "subtypes": [
+      {
+        "id": "Forest Gnome",
+        "name": "Forest Gnome",
+        "description": "Forest gnomes are stealthy and connected to nature, with the ability to create minor illusions.",
+        "traits": [
+          {
+            "name": "Dexterity Ability Score Increase",
+            "description": "Your Dexterity score increases by 1."
+          },
+          {
+            "name": "Natural Illusionist",
+            "description": "You know the Minor Illusion cantrip. Intelligence is your spellcasting ability for this cantrip."
+          },
+          {
+            "name": "Speak with Small Beasts",
+            "description": "You can communicate with Small or smaller beasts."
+          }
+        ]
+      },
+      {
+        "id": "Rock Gnome",
+        "name": "Rock Gnome",
+        "description": "Rock gnomes are sturdy and inventive, with a talent for engineering and tinkering.",
+        "traits": [
+          {
+            "name": "Constitution Ability Score Increase",
+            "description": "Your Constitution score increases by 1."
+          },
+          {
+            "name": "Artificer's Lore",
+            "description": "You have proficiency in the History skill and can add double your proficiency bonus to checks to identify or recall information about magical objects, alchemical substances, or technological devices."
+          },
+          {
+            "name": "Tinker",
+            "description": "You have proficiency with artisan's tools (tinker's tools) and can use them to create small mechanical devices."
+          }
+        ]
+      }
+    ],
+    "darkvision": 60
+  },
+  {
+    "id": "Tiefling",
+    "source": "2024 PHB",
+    "description": "Tieflings bear the mark of Asmodeus, with infernal heritage granting resistance to fire and the ability to wield hellish magic.",
+    "size": "Medium",
+    "speed": 30,
+    "languages": [
+      "Common",
+      "Infernal"
+    ],
+    "abilityBonuses": {
+      "Intelligence": 1,
+      "Charisma": 2
+    },
+    "baseTraits": [
+      {
+        "name": "Darkvision",
+        "description": "Thanks to your infernal heritage, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light."
+      },
+      {
+        "name": "Hellish Resistance",
+        "description": "You have resistance to fire damage."
+      },
+      {
+        "name": "Infernal Legacy",
+        "description": "You know the Thaumaturgy cantrip. At 3rd level, you can cast Hellish Rebuke once per day. At 5th level, you can cast Darkness once per day. Charisma is your spellcasting ability."
+      }
+    ],
+    "darkvision": 60,
+    "subtypes": []
+  },
+  {
+    "id": "Orc",
+    "source": "2024 PHB",
+    "description": "Born in the wild and possessed of great strength, orcs are fierce warriors with a connection to the primal world.",
+    "size": "Medium",
+    "speed": 30,
+    "languages": [
+      "Common",
+      "Orc"
+    ],
+    "abilityBonuses": {
+      "Strength": 2,
+      "Constitution": 1
+    },
+    "baseTraits": [
+      {
+        "name": "Darkvision",
+        "description": "You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light."
+      },
+      {
+        "name": "Aggressive",
+        "description": "As a bonus action, you can move up to your speed toward an enemy of your choice that you can see or hear. You must end this move closer to the enemy than you started."
+      },
+      {
+        "name": "Relentless Endurance",
+        "description": "When you are reduced to 0 hit points but not killed outright, you can drop to 1 hit point instead. You can't use this trait again until you finish a Long Rest."
+      },
+      {
+        "name": "Powerful Build",
+        "description": "You count as one size larger when determining your carrying capacity and the weight you can push, drag, or lift."
+      }
+    ],
+    "darkvision": 60,
+    "subtypes": []
+  },
+  {
+    "id": "Goliath",
+    "source": "2024 PHB",
+    "description": "Strong and resilient, goliaths are mountain-dwelling nomads known for their stoicism and connection to stone.",
+    "size": "Medium",
+    "speed": 30,
+    "languages": [
+      "Common",
+      "Giant"
+    ],
+    "abilityBonuses": {
+      "Strength": 2,
+      "Constitution": 1
+    },
+    "baseTraits": [
+      {
+        "name": "Stone's Endurance",
+        "description": "You can focus yourself to occasionally shrug off injury. When you take damage, you can use your reaction to roll a d12 and reduce the damage by the number rolled plus your Constitution modifier. After using this trait, you can't use it again until you finish a Short or Long Rest."
+      },
+      {
+        "name": "Powerful Build",
+        "description": "You count as one size larger when determining your carrying capacity and the weight you can push, drag, or lift."
+      },
+      {
+        "name": "Mountain Born",
+        "description": "You have resistance to cold damage. You also have a natural aptitude for climbing."
+      }
+    ],
+    "subtypes": []
+  },
+  {
+    "id": "Half-Elf",
+    "source": "2014 PHB",
+    "description": "Charismatic and versatile, half-elves combine human adaptability with elven grace and keen senses.",
+    "size": "Medium",
+    "speed": 30,
+    "languages": [
+      "Common",
+      "Elvish"
+    ],
+    "abilityBonuses": {
+      "Charisma": 2
+    },
+    "baseTraits": [
+      {
+        "name": "Darkvision",
+        "description": "Thanks to your elven heritage, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light."
+      },
+      {
+        "name": "Fey Ancestry",
+        "description": "You have advantage on saving throws against being charmed, and magic can't put you to sleep."
+      },
+      {
+        "name": "Skill Versatility",
+        "description": "You gain proficiency in two skills of your choice."
+      }
+    ],
+    "subtypes": [
+      {
+        "id": "Half-Elf Ability Choice",
+        "name": "Ability Score Increase",
+        "description": "Choose two ability scores other than Charisma to increase by 1 each.",
+        "traits": []
+      }
+    ],
+    "darkvision": 60
+  },
+  {
+    "id": "Half-Orc",
+    "source": "2014 PHB",
+    "description": "Strong and enduring, half-orcs combine orcish toughness with human adaptability, often serving as bridges between cultures.",
+    "size": "Medium",
+    "speed": 30,
+    "languages": [
+      "Common",
+      "Orc"
+    ],
+    "abilityBonuses": {
+      "Strength": 2,
+      "Constitution": 1
+    },
+    "baseTraits": [
+      {
+        "name": "Darkvision",
+        "description": "Thanks to your orc blood, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light."
+      },
+      {
+        "name": "Relentless Endurance",
+        "description": "When you are reduced to 0 hit points but not killed outright, you can drop to 1 hit point instead. You can't use this trait again until you finish a Long Rest."
+      },
+      {
+        "name": "Savage Attacks",
+        "description": "When you score a critical hit with a melee weapon attack, you can roll one of the weapon's damage dice one additional time and add it to the extra damage of the critical hit."
+      }
+    ],
+    "darkvision": 60,
+    "subtypes": []
+  },
+  {
+    "id": "Aasimar",
+    "source": "2014 PHB",
+    "description": "Touched by the divine, aasimar are celestially blessed with healing abilities and a radiant spirit.",
+    "size": "Medium",
+    "speed": 30,
+    "languages": [
+      "Common",
+      "Celestial"
+    ],
+    "abilityBonuses": {
+      "Charisma": 2,
+      "Wisdom": 1
+    },
+    "baseTraits": [
+      {
+        "name": "Darkvision",
+        "description": "You have a mystical connection to light, granting you superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light."
+      },
+      {
+        "name": "Celestial Resistance",
+        "description": "You have resistance to necrotic and radiant damage."
+      },
+      {
+        "name": "Healing Hands",
+        "description": "As an action, you can touch a creature and cause it to regain a number of hit points equal to your level. Once you use this trait, you can't use it again until you finish a Long Rest."
+      },
+      {
+        "name": "Light Bearer",
+        "description": "You know the Light cantrip. Charisma is your spellcasting ability for this cantrip."
+      }
+    ],
+    "subtypes": [
+      {
+        "id": "Protector Aasimar",
+        "name": "Protector Aasimar",
+        "description": "Protector aasimar are blessed with radiant wings and the ability to heal allies.",
+        "traits": [
+          {
+            "name": "Radiant Soul",
+            "description": "Starting at 3rd level, you can use your action to unleash the divine energy within yourself, gaining wings and a flying speed of 30 feet for 1 minute."
+          }
+        ]
+      },
+      {
+        "id": "Scourge Aasimar",
+        "name": "Scourge Aasimar",
+        "description": "Scourge aasimar burn with inner fire, dealing radiant damage to nearby enemies.",
+        "traits": [
+          {
+            "name": "Radiant Consumption",
+            "description": "Starting at 3rd level, you can use your action to unleash the divine energy within yourself, dealing radiant damage to nearby enemies."
+          }
+        ]
+      }
+    ],
+    "darkvision": 60
+  }
+]
