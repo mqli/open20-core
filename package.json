@@ -1,5 +1,5 @@
 {
-  "name": "@dnd2024/core",
+  "name": "open20-core",
   "version": "0.1.0",
   "description": "DND 2024 Character Sheet — Headless Core (TypeScript, zero UI dependency)",
   "type": "module",
