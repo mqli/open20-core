@@ -11,7 +11,8 @@
     "./data": "./dist/data/index.js",
     "./engine": "./dist/engine/index.js",
     "./character": "./dist/character/index.js",
-    "./storage": "./dist/storage/index.js"
+    "./storage": "./dist/storage/index.js",
+    "./browser": "./dist/browser-index.js"
   },
   "scripts": {
     "build": "tsc",

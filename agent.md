@@ -8,7 +8,7 @@
 
 **Project**: DND 2024 Character Sheet App - Headless Core
 **Goal**: A TypeScript library for managing D&D 2024 rules character sheets. No UI - pure logic, testable via unit tests, usable by CLI or web apps later.
-**Status**: S1-S19 complete (375 tests passing), S12 partially complete (data files), S20 not started.
+**Status**: S1-S20 complete (415 tests passing)
 
 ### Key Design Decisions
 - **Headless**: Zero UI dependency. Pure functions, immutable state.
@@ -40,11 +40,13 @@ types  ←  data  ←  engine  ←  character  ←  storage
 ## 3. Directory Structure
 
 ```
-dnd2024-character-sheet/
+open20-core/
 ├── agent.md                    # This file
 ├── package.json                # ESM, vitest, typescript
 ├── tsconfig.json               # Strict, noUncheckedIndexedAccess
 ├── vitest.config.ts            # Test config
+├── scripts/
+│   └── bundle.mjs             # Browser bundle builder (esbuild)
 ├── spec/
 │   ├── high-level-design.md    # HLD v1.1 (S1-S20, status tracking)
 │   └── data-model.md           # TypeScript interfaces & JSON schema
@@ -56,18 +58,20 @@ dnd2024-character-sheet/
 │   ├── backgrounds.json        # 16 backgrounds
 │   ├── classes.json            # 12 classes
 │   ├── subclasses.json         # Subclasses for all classes
-│   ├── feats.json              # 75 feats (PARTIAL - only 2 feats)
-│   ├── weapons.json            # ~40 weapons (PARTIAL - only 2)
-│   ├── armor.json              # ~20 armors (PARTIAL - only 2)
-│   ├── gear.json               # ~50 gear items (PARTIAL - only 1)
-│   └── spells.json             # ~391 spells (PARTIAL - only 2)
+│   ├── feats.json              # 75 feats
+│   ├── weapons.json            # ~40 weapons
+│   ├── armor.json              # ~20 armors
+│   ├── gear.json               # ~50 gear items
+│   └── spells.json             # ~391 spells
 ├── src/
-│   ├── index.ts                # Top-level barrel export
+│   ├── index.ts                # Node.js barrel export (includes storage)
+│   ├── browser-index.ts        # Browser barrel export (excludes Node.js storage)
 │   ├── types/
 │   │   └── index.ts           # All TypeScript interfaces/types
 │   ├── data/
 │   │   ├── loader.ts          # DataLoader interface (20+ methods)
-│   │   └── default-loader.ts  # JSON file implementation
+│   │   ├── browser-loader.ts  # Browser-compatible DataLoader (bundles JSON)
+│   │   └── default-loader.ts  # Node.js JSON file implementation
 │   ├── engine/
 │   │   ├── ability-modifier.ts
 │   │   ├── proficiency-bonus.ts
@@ -93,10 +97,16 @@ dnd2024-character-sheet/
 │       ├── memory.ts           # InMemoryStorage (for tests)
 │       ├── json-file.ts        # JsonFileStorage (file system)
 │       └── index.ts           # Barrel export
+├── dist/                      # Build output
+│   ├── index.js               # Node.js bundle
+│   ├── open20-core.js         # Browser UMD bundle
+│   └── open20-core.esm.js     # Browser ESM bundle
 └── tests/
-    ├── engine/*.test.ts        # 10 test files, 201 tests
-    ├── character/*.test.ts      # 6 test files, 144 tests
-    └── storage/*.test.ts       # 1 test file, 20 tests
+    ├── engine/*.test.ts        # 11 test files
+    ├── character/*.test.ts      # 6 test files
+    ├── storage/*.test.ts       # 1 test file
+    ├── data/*.test.ts          # 1 test file
+    └── integration/*.test.ts   # 1 test file
 ```
 
 ---
@@ -220,7 +230,7 @@ spellSlots: Record<string, Record<number, readonly number[]>>;
 ## 6. How to Run Tests & Build
 
 ```bash
-cd /workspace/dnd2024-character-sheet
+cd /workspaces/open20-core
 
 # Install dependencies (first time only)
 npm install
@@ -236,6 +246,9 @@ npx tsc --noEmit
 
 # Run tests with coverage
 npx vitest run --coverage
+
+# Build browser bundles
+npm run build:browser
 ```
 
 **Target**: 100% coverage for `engine/` and `character/` modules.
@@ -267,19 +280,42 @@ npx vitest run --coverage
 
 ---
 
-## 8. Data Filling Guidelines (S12 Remaining Tasks)
+## 8. Browser Integration (S20+)
 
 ### Current Status
+All static data has been populated:
 - ✅ `lookup-tables.json` (complete)
-- ✅ `species.json` (12 species, complete)
-- ✅ `backgrounds.json` (16 backgrounds, complete)
-- ✅ `classes.json` (12 classes, complete)
+- ✅ `species.json` (12 species)
+- ✅ `backgrounds.json` (16 backgrounds)
+- ✅ `classes.json` (12 classes)
 - ✅ `subclasses.json` (complete)
-- 📋 `feats.json` (2/75 feats - NEEDS WORK)
-- 📋 `weapons.json` (2/~40 weapons - NEEDS WORK)
-- 📋 `armor.json` (2/~20 armors - NEEDS WORK)
-- 📋 `gear.json` (1/~50 gear - NEEDS WORK)
-- 📋 `spells.json` (2/~391 spells - NEEDS WORK)
+- ✅ `feats.json` (75 feats)
+- ✅ `weapons.json` (~40 weapons)
+- ✅ `armor.json` (~20 armors)
+- ✅ `gear.json` (~50 gear items)
+- ✅ `spells.json` (~391 spells)
+
+### Browser Build Files
+- **`src/browser-index.ts`**: Browser-compatible barrel export (excludes Node.js `fs`/`path`)
+- **`src/data/browser-loader.ts`**: Browser DataLoader that bundles JSON via esbuild
+- **`scripts/bundle.mjs`**: esbuild script producing:
+  - `dist/open20-core.js` — UMD bundle for `<script>` tags
+  - `dist/open20-core.esm.js` — ESM bundle for `<script type="module">`
+
+### Browser Usage Example
+```html
+<!-- Option 1: UMD (global variable) -->
+<script src="dist/open20-core.js"></script>
+<script>
+  const loader = Open20Core.createBrowserDataLoader(lookupTables);
+  const char = Open20Core.createCharacter(params, loader);
+</script>
+
+<!-- Option 2: ESM -->
+<script type="module">
+  import { createBrowserDataLoader, createCharacter } from './dist/open20-core.esm.js';
+</script>
+```
 
 ### Data Format Rules
 1. **Ability names**: Use full names ("Strength", not "Str")
@@ -288,12 +324,7 @@ npx vitest run --coverage
 4. **Weapon mastery**: Single value `mastery: "Push"` not array `masteryProperties: [...]`
 5. **Backgrounds**: Use `originFeatId` (string), not `originFeat` (object)
 
-### Priority Order for Data Filling
-1. **`feats.json`** (75 feats) - Many engine functions reference feats
-2. **`weapons.json`** (~40 weapons) - `calculateAttacks()` needs real weapons
-3. **`armor.json`** (~20 armors) - `calculateAC()` needs real armor
-4. **`gear.json`** (~50 items) - Equipment system needs this
-5. **`spells.json`** (~391 spells) - Largest task, can be incremental
+All data has been populated. No further filling needed.
 
 ---
 

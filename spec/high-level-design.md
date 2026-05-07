@@ -31,7 +31,7 @@
 
 ```
 ┌──────────────────────────────────────────────────┐
-│                  @dnd2024/core                    │
+│                  open20-core                      │
 │                   (本包全部)                       │
 ├──────────┬──────────┬──────────┬─────────────────┤
 │  types   │   data   │  engine  │   character     │
@@ -69,7 +69,7 @@ types ← data ← engine ← character ← storage
 ## 3. 目录结构
 
 ```
-dnd2024-character-sheet/
+open20-core/
 ├── src/
 │   ├── types/                    # A1: 类型定义（零依赖）
 │   │   ├── character.ts          #   Character, CharacterClass, HitPoints, DeathSaves,
@@ -863,7 +863,7 @@ export function createWarlock(level?: number, overrides?: ...): Character;
 
 ```json
 {
-  "name": "@dnd2024/core",
+  "name": "open20-core",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -874,15 +874,19 @@ export function createWarlock(level?: number, overrides?: ...): Character;
     "./data": "./dist/data/index.js",
     "./engine": "./dist/engine/index.js",
     "./character": "./dist/character/index.js",
-    "./storage": "./dist/storage/index.js"
+    "./storage": "./dist/storage/index.js",
+    "./browser": "./dist/browser-index.js"
   },
   "scripts": {
     "build": "tsc",
+    "bundle": "node scripts/bundle.mjs",
+    "build:bundle": "npm run build && npm run bundle",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix"
   }
 }
 ```
@@ -1018,7 +1022,7 @@ import {
   calculateAC, shortRest, longRest,
   validateCharacter, serialize, deserialize,
   InMemoryStorage
-} from '@dnd2024/core';
+} from 'open20-core';
 
 // 1. 加载规则数据
 const data = createDataLoader();
@@ -1106,6 +1110,7 @@ Agent应按以下顺序实现，每步完成后运行测试确认：
 | **S10** | `src/engine/spell-slots.ts` | S2, S5 | `calculateSpellSlots()`, `calculatePactMagic()`, `getMulticlassSpellcasterLevel()`, `calculateMulticlassSpellSlots()` | ✅ |
 | **S11** | `src/engine/initiative.ts` + `passive-perception.ts` + `attack-calculator.ts` | S4, S5 | + 测试 | ✅ |
 | **S12** | `static/*.json` — 填充静态规则数据 | S3 | 所有JSON数据（feats/weapons/armor/gear/spells 已填充） | ✅ |
+| **S12 Browser** | 浏览器适配层 | S12 | `browser-index.ts`, `browser-loader.ts`, `scripts/bundle.mjs` | ✅ |
 | **S13** | `src/character/create.ts` | S4-S11, S12 | `createCharacter()` + 测试 | 📋 |
 | **S14** | `src/character/mutate.ts` | S13 | 所有mutate函数 + 测试 | 📋 |
 | **S15** | `src/character/rest.ts` | S14 | `shortRest()`, `longRest()` + 测试 | 📋 |
