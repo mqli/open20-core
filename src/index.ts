@@ -1,7 +1,7 @@
 // src/index.ts
 // Top-level barrel export — public API per HLD §12.1
 
-// ── Types ────────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────
 export type { Character, CharacterClass, HitPoints, DeathSaves, Currency } from './types';
 export type { AbilityName, AbilityScores } from './types';
 export type { Species, SpeciesTrait, SpeciesSubtype } from './types';
@@ -14,11 +14,11 @@ export type { Resource, ResetType } from './types';
 export type { CombatStats, Attack, ActiveCondition, ConditionName } from './types';
 export type { DieType } from './types';
 
-// ── Data ──────────────────────────────────────────────────────────
+// ── Data ──────────────────────────────────────────────────
 export type { DataLoader, LookupTables } from './data';
 export { createDataLoader } from './data';
 
-// ── Engine (pure functions) ──────────────────────────────────────
+// ── Engine (pure functions) ─────────────────────────────
 export { getModifier, getTotalScore } from './engine';
 export { getProficiencyBonus } from './engine';
 export { getSkillBonus, getAllSkillBonuses } from './engine';
@@ -31,7 +31,7 @@ export { calculateInitiative } from './engine';
 export { calculatePassivePerception } from './engine';
 export { calculateAttacks } from './engine';
 
-// ── Character (state management) ─────────────────────────────────
+// ── Character (state management) ────────────────────────
 export { createCharacter } from './character';
 export { levelUp } from './character';
 export { shortRest, longRest } from './character';
@@ -44,7 +44,18 @@ export {
 export { validateCharacter } from './character';
 export { recomputeDerivedStats } from './character';
 
-// ── Storage ──────────────────────────────────────────────────────
+// ── Spells (query functions) ────────────────────────────
+export type { SpellFilter } from './spells';
+export {
+  getSpell as getSpellData,
+  searchSpells,
+  getSpellsForCharacter,
+  getPreparedSpells,
+  isSpellPrepared,
+  knowsSpell,
+} from './spells';
+
+// ── Storage ──────────────────────────────────────────────
 export type { ICharacterStorage, CharacterSummary } from './storage';
 export { InMemoryStorage } from './storage';
 export { JsonFileStorage } from './storage';

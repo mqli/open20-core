@@ -1,5 +1,5 @@
 // character/create.ts
-// 角色创建 — 根据参数和规则数据构建完整的1级角色
+// 角色创建 — 根据参数和规则数据构建完整的角色（支持多维职业）
 // 对应 HLD §6.2
 
 import type { AbilityName, AbilityScores } from '../types/ability';
@@ -13,14 +13,14 @@ import type { DataLoader } from '../data/loader';
 
 import { getModifier, getTotalScore } from '../engine/ability-modifier';
 import { getProficiencyBonus } from '../engine/proficiency-bonus';
-import { calculateHPAtLevel1 } from '../engine/hp-calculator';
+import { calculateHPAtLevel1, calculateHPIncrement } from '../engine/hp-calculator';
 import { calculateAC } from '../engine/ac-calculator';
 import { calculateInitiative } from '../engine/initiative';
 import { calculatePassivePerception } from '../engine/passive-perception';
-import { calculateSpellSlots, calculatePactMagic } from '../engine/spell-slots';
+import { calculateSpellSlots, calculatePactMagic, getMulticlassSpellcasterLevel, calculateMulticlassSpellSlots } from '../engine/spell-slots';
 import { calculateAttacks } from '../engine/attack-calculator';
 
-// ── 公共接口 ────────────────────────────────────────────────────
+// ── 公共接口 ────────────────────────────────────────────
 
 export interface CreateCharacterParams {
   name: string;
@@ -31,9 +31,14 @@ export interface CreateCharacterParams {
   abilityScores: Record<AbilityName, number>;
   featIds?: string[];
   skillChoices?: string[];
+  // Multiclassing support (optional)
+  additionalClasses?: Array<{
+    classId: string;
+    level: number;
+  }>;
 }
 
-// ── 主函数 ──────────────────────────────────────────────────────
+// ── 主函数 ──────────────────────────────────────────────
 
 export function createCharacter(
   params: CreateCharacterParams,
@@ -55,6 +60,15 @@ export function createCharacter(
     throw new Error(`Invalid classId: "${params.classId}" not found in data`);
   }
 
+  // Validate additional classes (multiclassing)
+  const additionalClasses = params.additionalClasses ?? [];
+  for (const additional of additionalClasses) {
+    const additionalClassData = data.getClass(additional.classId);
+    if (!additionalClassData) {
+      throw new Error(`Invalid classId: "${additional.classId}" not found in data`);
+    }
+  }
+
   // 2. Build AbilityScores
   const abilityScores: AbilityScores = {
     base: params.abilityScores,
@@ -63,25 +77,52 @@ export function createCharacter(
     temporaryBonuses: {},
   };
 
-  // 3. Build CharacterClass
-  const charClass: CharacterClass = {
-    classId: params.classId,
-    level: 1,
-    subclassId: null,
-    subclassLevel: null,
-    hitDice: { die: classData.hitDie, used: 0 },
-  };
+  // 3. Build CharacterClass array
+  const charClasses: CharacterClass[] = [
+    {
+      classId: params.classId,
+      level: 1,
+      subclassId: null,
+      subclassLevel: null,
+      hitDice: { die: classData.hitDie, used: 0 },
+    },
+    ...additionalClasses.map((ac) => {
+      const acData = data.getClass(ac.classId)!;
+      return {
+        classId: ac.classId,
+        level: ac.level,
+        subclassId: null,
+        subclassLevel: null,
+        hitDice: { die: acData.hitDie, used: 0 },
+      };
+    }),
+  ];
 
-  // 4. Build Skills
+  // Calculate total level
+  const totalLevel = charClasses.reduce((sum, c) => sum + c.level, 0);
+
+  // 4. Build Skills (use primary class for skill proficiencies)
   const skills = buildSkills(
     backgroundData.skillProficiencies,
     classData,
     params.skillChoices ?? [],
   );
 
-  // 5. Calculate HP
+  // 5. Calculate HP (sum from all classes)
   const conMod = getModifier(getTotalScore(abilityScores, 'Constitution'));
-  const maxHP = calculateHPAtLevel1(classData.hitDie, conMod);
+  let maxHP = calculateHPAtLevel1(classData.hitDie, conMod);
+  
+  // Add HP from additional classes
+  for (const additional of additionalClasses) {
+    const acData = data.getClass(additional.classId)!;
+    // First level of each additional class: max hit die + Con mod
+    maxHP += calculateHPAtLevel1(acData.hitDie, conMod);
+    // Additional levels: fixed value + Con mod for each level beyond 1
+    for (let lv = 2; lv <= additional.level; lv++) {
+      maxHP += calculateHPIncrement(acData.hitDie, conMod);
+    }
+  }
+
   const hitPoints: HitPoints = {
     max: maxHP,
     current: maxHP,
@@ -89,24 +130,37 @@ export function createCharacter(
     deathSaves: { successes: 0, failures: 0, isStable: false },
   };
 
-  // 6. Build Resources
-  const resources = extractResources(classData, 1);
+  // 6. Build Resources (extract from all classes)
+  let resources: Resource[] = extractResources(classData, 1);
+  for (const additional of additionalClasses) {
+    const acData = data.getClass(additional.classId)!;
+    const additionalResources = extractResources(acData, additional.level);
+    resources = [...resources, ...additionalResources];
+  }
 
-  // 7. Build Spells
-  const spells: CharacterSpells = classData.spellcasting
-    ? buildInitialSpells(classData, abilityScores, data)
-    : emptyCharacterSpells();
+  // 7. Build Spells (handle multiclass spell slots)
+  let spells: CharacterSpells;
+  
+  if (totalLevel === 1 && !additionalClasses.length) {
+    // Single class level 1
+    spells = classData.spellcasting
+      ? buildInitialSpells(classData, abilityScores, data)
+      : emptyCharacterSpells();
+  } else {
+    // Multiclassing - calculate spell slots using multiclass rules
+    spells = buildMulticlassSpells(charClasses, abilityScores, data);
+  }
 
   // 8. Calculate CombatStats
-  const pb = getProficiencyBonus(1);
-  const features = getFeaturesAtLevel(classData, 1);
+  const pb = getProficiencyBonus(totalLevel);
+  const allFeatures = gatherAllFeatures(charClasses, data);
   const combatStats: CombatStats = {
-    AC: calculateAC(abilityScores, [], features, data),
-    initiative: calculateInitiative(abilityScores, params.featIds ?? [], features),
+    AC: calculateAC(abilityScores, [], allFeatures, data),
+    initiative: calculateInitiative(abilityScores, params.featIds ?? [], allFeatures),
     speed: species.speed,
     passivePerception: calculatePassivePerception(abilityScores, skills, pb, []),
     proficiencyBonus: pb,
-    attacks: calculateAttacks(abilityScores, [], pb, features, data),
+    attacks: calculateAttacks(abilityScores, [], pb, allFeatures, data),
   };
 
   // 9. Build Currency
@@ -126,7 +180,7 @@ export function createCharacter(
     species: params.speciesId,
     speciesSubtype: params.speciesSubtypeId ?? null,
     background: params.backgroundId,
-    classes: [charClass],
+    classes: charClasses,
     abilityScores,
     skills,
     feats: params.featIds ?? [],
@@ -143,7 +197,7 @@ export function createCharacter(
   };
 }
 
-// ── Helper Functions ────────────────────────────────────────────
+// ── Helper Functions ──────────────────────────────────────────
 
 /**
  * 提取指定等级的特性列表
@@ -324,4 +378,82 @@ function buildResource(resourceId: string, level: number): Resource | null {
     resetOn: def.resetOn,
     displayName: def.displayName,
   };
+}
+
+// ── Helper Functions for Multiclassing ─────────────────────────
+
+/** Gather all features from all classes */
+function gatherAllFeatures(
+  classes: CharacterClass[],
+  data: DataLoader,
+): Feature[] {
+  const features: Feature[] = [];
+  for (const charClass of classes) {
+    const classData = data.getClass(charClass.classId);
+    if (!classData) continue;
+    
+    for (let lv = 1; lv <= charClass.level; lv++) {
+      features.push(...getFeaturesAtLevel(classData, lv));
+    }
+    
+    // Add subclass features
+    if (charClass.subclassId) {
+      const subclass = data.getSubclass(charClass.subclassId);
+      if (subclass) {
+        for (let lv = 1; lv <= charClass.level; lv++) {
+          const subFeatures = subclass.featuresByLevel.get(lv);
+          if (subFeatures) features.push(...subFeatures);
+        }
+      }
+    }
+  }
+  return features;
+}
+
+/** Build spells for multiclass characters */
+function buildMulticlassSpells(
+  classes: CharacterClass[],
+  abilityScores: AbilityScores,
+  data: DataLoader,
+): CharacterSpells {
+  // Check if any class is a spellcaster
+  const hasSpellcaster = classes.some((c) => {
+    const classData = data.getClass(c.classId);
+    return classData?.spellcasting;
+  });
+
+  if (!hasSpellcaster) {
+    return emptyCharacterSpells();
+  }
+
+  // Calculate multiclass spell slots
+  const totalSpellcastingLevel = getMulticlassSpellcasterLevel(classes, data);
+  
+  if (totalSpellcastingLevel > 0) {
+    // Use multiclass spell slot table
+    const spellSlots = calculateMulticlassSpellSlots(totalSpellcastingLevel, data);
+    const primaryClassId = classes.find((c) => data.getClass(c.classId)?.spellcasting)?.classId;
+    if (!primaryClassId) {
+      return emptyCharacterSpells();
+    }
+    const primaryClass = data.getClass(primaryClassId);
+    if (!primaryClass) {
+      return emptyCharacterSpells();
+    }
+    const ability = primaryClass.spellcasting?.ability ?? 'Intelligence';
+    const pb = getProficiencyBonus(classes.reduce((sum, c) => sum + c.level, 0));
+    const abilityMod = getModifier(getTotalScore(abilityScores, ability));
+    
+    return {
+      spellcastingAbility: ability,
+      spellSaveDC: 8 + pb + abilityMod,
+      spellAttackBonus: pb + abilityMod,
+      knownSpells: [],
+      preparedSpells: [],
+      spellSlots,
+      pactMagicSlots: null,
+    };
+  }
+
+  return emptyCharacterSpells();
 }

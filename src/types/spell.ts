@@ -1,6 +1,8 @@
 // types/spell.ts
 // 法术相关类型定义（零依赖）
 
+import type { AbilityName } from './ability';
+
 // 法术等级
 export type SpellLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
@@ -41,18 +43,36 @@ export type CastingTime =
 // 法术成分
 export type SpellComponent = 'V' | 'S' | 'M';
 
-// 法术法术模板（静态数据）
+// Spell damage/effect data
+export interface SpellDamage {
+  readonly dice: string;       // e.g., "1d6"
+  readonly type: string;        // e.g., "Fire"
+  readonly higherLevel?: readonly string[];
+}
+
+export interface SpellHeal {
+  readonly dice: string;
+  readonly higherLevel?: readonly string[];
+}
+
+// Spell template (static data from JSON)
 export interface Spell {
   readonly id: string;
+  readonly name: string;
   readonly level: SpellLevel;
   readonly school: SpellSchool;
   readonly castingTime: CastingTime;
   readonly range: string;
   readonly components: readonly SpellComponent[];
-  readonly materialDescription?: string;
   readonly duration: string;
+  readonly concentration: boolean;
+  readonly ritual: boolean;
   readonly description: string;         // 来自SRD
-  readonly source: '2024 PHB' | '2014 PHB' | 'SRD';
+  readonly damage?: SpellDamage;
+  readonly heal?: SpellHeal;
+  readonly save?: AbilityName;
+  readonly attack?: boolean;
+  readonly source: string;               // '2024 PHB' | '2014 PHB' | 'SRD' | 'Player\'s Handbook (2024)'
   readonly upcast?: string;              // 升环施法说明
 }
 
