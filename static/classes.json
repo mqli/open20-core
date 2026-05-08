@@ -518,7 +518,9 @@
           {
             "name": "Second Wind",
             "description": "You can use a Bonus Action to regain Hit Points equal to 1d10 + your Fighter level. You can use this feature a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
-            "resourceId": "Second Wind"
+            "resourceId": "Second Wind",
+            "resourceResetOn": "Short Rest",
+            "resourceScaleWithPB": true
           },
           {
             "name": "Weapon Mastery",
@@ -532,7 +534,9 @@
           {
             "name": "Action Surge",
             "description": "You can push yourself beyond your normal limits for a moment. On your turn, you can take one additional Action, and you can do so a number of times per Long Rest equal to your Proficiency Bonus.",
-            "resourceId": "Action Surge"
+            "resourceId": "Action Surge",
+            "resourceResetOn": "Short Rest",
+            "resourceScaleWithPB": true
           },
           {
             "name": "Tactical Mind",
@@ -576,7 +580,10 @@
         "features": [
           {
             "name": "Indomitable",
-            "description": "You can reroll a saving throw that you fail. If you do so, you must use the new roll, and you can't use this feature again until you finish a Long Rest. You can use this feature a number of times equal to your Proficiency Bonus."
+            "description": "You can reroll a saving throw that you fail. If you do so, you must use the new roll, and you can't use this feature again until you finish a Long Rest. You can use this feature a number of times equal to your Proficiency Bonus.",
+            "resourceId": "Indomitable",
+            "resourceResetOn": "Long Rest",
+            "resourceScaleWithPB": true
           },
           {
             "name": "Tactical Master",

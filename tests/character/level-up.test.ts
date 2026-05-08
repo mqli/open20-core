@@ -26,6 +26,7 @@ function makeFighterClass(): Class {
   ]);
   return {
     id: 'Fighter',
+    name: 'Fighter',
     source: '2024 PHB',
     hitDie: 'd10',
     savingThrowProficiencies: ['Strength', 'Constitution'],
@@ -44,6 +45,7 @@ function makeWizardClass(): Class {
   featuresByLevel.set(2, [{ name: 'Scholar', description: 'Gain expertise in a skill' }]);
   return {
     id: 'Wizard',
+    name: 'Wizard',
     source: '2024 PHB',
     hitDie: 'd6',
     savingThrowProficiencies: ['Intelligence', 'Wisdom'],
@@ -169,10 +171,11 @@ function makeLevel1Fighter(overrides?: Partial<Character>): Character {
     },
     currency: { cp: 0, sp: 0, ep: 0, gp: 10, pp: 0 },
     conditions: [],
+    damageDefenses: { resistances: [], immunities: [], vulnerabilities: [] },
     notes: '',
     createdAt: '2025-01-01T00:00:00.000Z',
     updatedAt: '2025-01-01T00:00:00.000Z',
-  } as Character;
+  } as unknown as Character;
 }
 
 function makeLevel1Wizard(): Character {
@@ -233,10 +236,11 @@ function makeLevel1Wizard(): Character {
     },
     currency: { cp: 0, sp: 0, ep: 0, gp: 10, pp: 0 },
     conditions: [],
+    damageDefenses: { resistances: [], immunities: [], vulnerabilities: [] },
     notes: '',
     createdAt: '2025-01-01T00:00:00.000Z',
     updatedAt: '2025-01-01T00:00:00.000Z',
-  } as Character;
+  } as unknown as Character;
 }
 
 // ── Tests ────────────────────────────────────────────────────────

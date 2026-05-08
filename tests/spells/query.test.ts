@@ -217,7 +217,7 @@ describe('searchSpells', () => {
       data
     );
     expect(results.length).toBe(1);
-    expect(results[0].id).toBe('healing-word');
+    expect(results[0]!.id).toBe('healing-word');
   });
 });
 
@@ -246,7 +246,7 @@ describe('getSpellsForCharacter', () => {
     };
     const results = getSpellsForCharacter(char as any, data);
     expect(results.length).toBe(1);
-    expect(results[0].id).toBe('fireball');
+    expect(results[0]!.id).toBe('fireball');
   });
 });
 

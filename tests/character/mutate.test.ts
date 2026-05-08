@@ -62,6 +62,7 @@ const FIGHTER_FEATURES_L1: Feature[] = [
 
 const FIGHTER_CLASS: Class = {
   id: 'Fighter',
+  name: 'Fighter',
   source: '2024 PHB',
   hitDie: 'd10',
   savingThrowProficiencies: ['Strength', 'Constitution'],
@@ -83,6 +84,7 @@ const WIZARD_FEATURES_L1: Feature[] = [
 
 const WIZARD_CLASS: Class = {
   id: 'Wizard',
+  name: 'Wizard',
   source: '2024 PHB',
   hitDie: 'd6',
   savingThrowProficiencies: ['Intelligence', 'Wisdom'],
@@ -283,7 +285,7 @@ describe('setTemporaryHP', () => {
 describe('consumeResource', () => {
   it('consumes existing resource: used increments', () => {
     const char = makeFighter();
-    // Fighter has Second Wind (max: 1, used: 0)
+    // Fighter has Second Wind (max: 2 at level 1, used: 0)
     const result = consumeResource(char, 'Second Wind');
     const sw = result.resources.find(r => r.id === 'Second Wind');
     expect(sw!.used).toBe(1);
@@ -291,11 +293,13 @@ describe('consumeResource', () => {
 
   it('consumes already-maxed resource: no change', () => {
     const char = makeFighter();
-    const consumed = consumeResource(char, 'Second Wind');
-    // Second Wind max=1, used=1 after first consume
+    // Second Wind max=2, consume twice to reach max
+    let consumed = consumeResource(char, 'Second Wind');
+    consumed = consumeResource(consumed, 'Second Wind');
+    // Second Wind max=2, used=2 after two consumes
     const result = consumeResource(consumed, 'Second Wind');
     const sw = result.resources.find(r => r.id === 'Second Wind');
-    expect(sw!.used).toBe(1); // still 1
+    expect(sw!.used).toBe(2); // still 2 (maxed)
   });
 
   it('consumes non-existent resource: no change', () => {
@@ -370,9 +374,9 @@ describe('toggleCondition', () => {
     const char = makeFighter();
     const result = toggleCondition(char, 'Prone' as ConditionName);
     expect(result.conditions).toHaveLength(1);
-    expect(result.conditions[0].id).toBe('Prone');
-    expect(result.conditions[0].source).toBe('');
-    expect(result.conditions[0].appliedAt).toBeTruthy();
+    expect(result.conditions[0]!.id).toBe('Prone');
+    expect(result.conditions[0]!.source).toBe('');
+    expect(result.conditions[0]!.appliedAt).toBeTruthy();
   });
 
   it('removes condition: disappears from conditions array', () => {
@@ -455,7 +459,7 @@ describe('addEquipment / removeEquipment', () => {
     const char = makeFighter();
     const result = addEquipment(char, SWORD);
     expect(result.equipment).toHaveLength(1);
-    expect(result.equipment[0].id).toBe('longsword-1');
+    expect(result.equipment[0]!.id).toBe('longsword-1');
   });
 
   it('removes item: disappears from equipment array', () => {

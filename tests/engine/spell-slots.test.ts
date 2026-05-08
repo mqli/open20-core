@@ -120,8 +120,8 @@ function createMockDataLoader(): DataLoader {
     },
 
     // 职业相关
-    getClass(id: string): { spellcasting?: object } | undefined {
-      return classData[id];
+    getClass(id: string): import('../../src/types/class').Class | undefined {
+      return classData[id] as import('../../src/types/class').Class | undefined;
     },
 
     // 以下方法在测试中不会被调用，返回默认值
@@ -212,7 +212,7 @@ function makeClass(classId: string, level: number): CharacterClass {
 
 /** 获取法术位总数（用于断言） */
 function getSlotTotal(result: Record<number, SpellSlotEntry>, level: number): number {
-  return result[level]?.total ?? 0;
+  return result[level]!?.total ?? 0;
 }
 
 // ── 测试用例 ─────────────────────────────────────────────────────
@@ -268,16 +268,16 @@ describe('calculateSpellSlots', () => {
   it('should always set used to 0 after calculation', () => {
     const result = calculateSpellSlots('Wizard', 5, data);
     for (let level = 1; level <= 9; level++) {
-      expect(result[level].used).toBe(0);
+      expect(result[level]!.used).toBe(0);
     }
   });
 
   it('should return all 9 levels in result', () => {
     const result = calculateSpellSlots('Wizard', 1, data);
     for (let level = 1; level <= 9; level++) {
-      expect(result[level]).toBeDefined();
-      expect(result[level]).toHaveProperty('total');
-      expect(result[level]).toHaveProperty('used');
+      expect(result[level]!).toBeDefined();
+      expect(result[level]!).toHaveProperty('total');
+      expect(result[level]!).toHaveProperty('used');
     }
   });
 });
@@ -437,7 +437,7 @@ describe('calculateMulticlassSpellSlots', () => {
   it('should always set used to 0 after calculation', () => {
     const result = calculateMulticlassSpellSlots(5, data);
     for (let level = 1; level <= 9; level++) {
-      expect(result[level].used).toBe(0);
+      expect(result[level]!.used).toBe(0);
     }
   });
 
@@ -453,9 +453,9 @@ describe('calculateMulticlassSpellSlots', () => {
   it('should return all 9 levels in result', () => {
     const result = calculateMulticlassSpellSlots(3, data);
     for (let level = 1; level <= 9; level++) {
-      expect(result[level]).toBeDefined();
-      expect(result[level]).toHaveProperty('total');
-      expect(result[level]).toHaveProperty('used');
+      expect(result[level]!).toBeDefined();
+      expect(result[level]!).toHaveProperty('total');
+      expect(result[level]!).toHaveProperty('used');
     }
   });
 });

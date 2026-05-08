@@ -7,11 +7,11 @@ import type {
   AbilityScores,
   Weapon,
   Armor,
-  DataLoader,
   Feature,
   EquipmentItem,
   Attack,
 } from '../../src/types';
+import type { DataLoader } from '../../src/data/loader';
 
 // ── Helper Functions ──────────────────────────────────────────────
 
@@ -268,9 +268,9 @@ describe('calculateAttacks', () => {
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe('Longsword');
-    expect(result[0].attackBonus).toBe(5); // proficiency (3) + Str mod (2)
-    expect(result[0].damage).toBe('d8(d10)+2'); // versatile damage included
+    expect(result[0]!.name).toBe('Longsword');
+    expect(result[0]!.attackBonus).toBe(5); // proficiency (3) + Str mod (2)
+    expect(result[0]!.damage).toBe('d8(d10)+2'); // versatile damage included
   });
 
   // Test 3a: Finesse weapon - should use higher of Str/Dex (Dex higher)
@@ -280,9 +280,9 @@ describe('calculateAttacks', () => {
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe('Dagger');
-    expect(result[0].attackBonus).toBe(6); // proficiency (3) + Dex mod (3)
-    expect(result[0].damage).toBe('d4+3');
+    expect(result[0]!.name).toBe('Dagger');
+    expect(result[0]!.attackBonus).toBe(6); // proficiency (3) + Dex mod (3)
+    expect(result[0]!.damage).toBe('d4+3');
   });
 
   // Test 3b: Finesse weapon - should use Strength when Str > Dex
@@ -292,8 +292,8 @@ describe('calculateAttacks', () => {
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].attackBonus).toBe(6); // proficiency (3) + Str mod (3)
-    expect(result[0].damage).toBe('d4+3');
+    expect(result[0]!.attackBonus).toBe(6); // proficiency (3) + Str mod (3)
+    expect(result[0]!.damage).toBe('d4+3');
   });
 
   // Test 4: Ranged weapon (Shortbow) - Dex-based
@@ -303,9 +303,9 @@ describe('calculateAttacks', () => {
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe('Shortbow');
-    expect(result[0].attackBonus).toBe(6); // proficiency (3) + Dex mod (3)
-    expect(result[0].damage).toBe('d6+3');
+    expect(result[0]!.name).toBe('Shortbow');
+    expect(result[0]!.attackBonus).toBe(6); // proficiency (3) + Dex mod (3)
+    expect(result[0]!.damage).toBe('d6+3');
   });
 
   // Test 5: Two-handed versatile weapon - damage string includes versatile damage
@@ -316,7 +316,7 @@ describe('calculateAttacks', () => {
 
     expect(result).toHaveLength(1);
     // Versatile weapons show both damage dice: "d8(d10)"
-    expect(result[0].damage).toBe('d8(d10)+2');
+    expect(result[0]!.damage).toBe('d8(d10)+2');
   });
 
   // Test 5b: Quarterstaff versatile damage
@@ -326,7 +326,7 @@ describe('calculateAttacks', () => {
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].damage).toBe('d6(d8)+2');
+    expect(result[0]!.damage).toBe('d6(d8)+2');
   });
 
   // Test 6: Weapon with mastery - mastery array includes the property
@@ -336,7 +336,7 @@ describe('calculateAttacks', () => {
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].mastery).toContain('Topple');
+    expect(result[0]!.mastery).toContain('Topple');
   });
 
   // Test 6b: Dagger has Nick mastery
@@ -345,7 +345,7 @@ describe('calculateAttacks', () => {
     const equipment = [makeEquippedWeapon('Dagger')];
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
-    expect(result[0].mastery).toContain('Nick');
+    expect(result[0]!.mastery).toContain('Nick');
   });
 
   // Test 7: Multiple equipped weapons - returns all in array
@@ -359,9 +359,9 @@ describe('calculateAttacks', () => {
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
     expect(result).toHaveLength(3);
-    expect(result[0].name).toBe('Longsword');
-    expect(result[1].name).toBe('Dagger');
-    expect(result[2].name).toBe('Shortbow');
+    expect(result[0]!.name).toBe('Longsword');
+    expect(result[1]!.name).toBe('Dagger');
+    expect(result[2]!.name).toBe('Shortbow');
   });
 
   // Test 8: Non-weapon equipment (Armor) should be ignored
@@ -371,7 +371,7 @@ describe('calculateAttacks', () => {
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe('Longsword');
+    expect(result[0]!.name).toBe('Longsword');
   });
 
   // Test 9: Unequipped weapons should be ignored
@@ -384,7 +384,7 @@ describe('calculateAttacks', () => {
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe('Dagger');
+    expect(result[0]!.name).toBe('Dagger');
   });
 
   // Test 10: Damage modifier >= 0 (never negative per 2024 rules)
@@ -395,7 +395,7 @@ describe('calculateAttacks', () => {
 
     expect(result).toHaveLength(1);
     // Damage mod should be max(0, abilityMod) = max(0, -1) = 0
-    expect(result[0].damage).toBe('d8(d10)+0');
+    expect(result[0]!.damage).toBe('d8(d10)+0');
   });
 
   // Test 10b: Negative Dex mod should also be clamped to 0 for damage
@@ -405,7 +405,7 @@ describe('calculateAttacks', () => {
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].damage).toBe('d6+0');
+    expect(result[0]!.damage).toBe('d6+0');
   });
 
   // Test 11: Attack name matches weapon id
@@ -414,7 +414,7 @@ describe('calculateAttacks', () => {
     const equipment = [makeEquippedWeapon('Longsword')];
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
-    expect(result[0].name).toBe('Longsword');
+    expect(result[0]!.name).toBe('Longsword');
   });
 
   // Test 11b: Dagger name matches
@@ -423,7 +423,7 @@ describe('calculateAttacks', () => {
     const equipment = [makeEquippedWeapon('Dagger')];
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
-    expect(result[0].name).toBe('Dagger');
+    expect(result[0]!.name).toBe('Dagger');
   });
 
   // Additional Test: Unknown weapon id should be filtered out
@@ -433,7 +433,7 @@ describe('calculateAttacks', () => {
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe('Longsword');
+    expect(result[0]!.name).toBe('Longsword');
   });
 
   // Additional Test: Attack bonus with different proficiency bonuses
@@ -443,11 +443,11 @@ describe('calculateAttacks', () => {
 
     // Test with PB +2
     const result1 = calculateAttacks(scores, equipment, 2, emptyFeatures, mockData);
-    expect(result1[0].attackBonus).toBe(5); // 2 + 3
+    expect(result1[0]!.attackBonus).toBe(5); // 2 + 3
 
     // Test with PB +4
     const result2 = calculateAttacks(scores, equipment, 4, emptyFeatures, mockData);
-    expect(result2[0].attackBonus).toBe(7); // 4 + 3
+    expect(result2[0]!.attackBonus).toBe(7); // 4 + 3
   });
 
   // Additional Test: Quarterstaff with versatile damage
@@ -457,9 +457,9 @@ describe('calculateAttacks', () => {
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe('Quarterstaff');
-    expect(result[0].attackBonus).toBe(5); // 3 + 2
-    expect(result[0].damage).toBe('d6(d8)+2');
-    expect(result[0].mastery).toContain('Sap');
+    expect(result[0]!.name).toBe('Quarterstaff');
+    expect(result[0]!.attackBonus).toBe(5); // 3 + 2
+    expect(result[0]!.damage).toBe('d6(d8)+2');
+    expect(result[0]!.mastery).toContain('Sap');
   });
 });

@@ -62,7 +62,7 @@ describe('D&D Player Behavior - Character Progression', () => {
         dataLoader
       );
 
-      expect(levelUpResult.classes[0].level).toBe(2);
+      expect(levelUpResult.classes[0]!.level).toBe(2);
       expect(levelUpResult.abilityScores.featBonuses['Intelligence']).toBe(1);
       const totalInt =
         levelUpResult.abilityScores.base['Intelligence'] +

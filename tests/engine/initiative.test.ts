@@ -3,7 +3,8 @@
 
 import { describe, it, expect } from 'vitest';
 import { calculateInitiative } from '../../src/engine/initiative';
-import type { AbilityName, AbilityScores, Feature } from '../../src/types/ability';
+import type { AbilityName, AbilityScores } from '../../src/types/ability';
+import type { Feature } from '../../src/types/class';
 import { ABILITY_NAMES } from '../../src/types/ability';
 
 // Helper: create AbilityScores with given base values

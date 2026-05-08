@@ -93,6 +93,11 @@ const FIGHTER_FEATURES_L1: Feature[] = [
   { name: 'Weapon Mastery', description: 'Master weapons', level: 1 },
 ];
 
+const FIGHTER_FEATURES_L2: Feature[] = [
+  { name: 'Action Surge', description: 'Take an extra action', resourceId: 'Action Surge', level: 2 },
+  { name: 'Tactical Mind', description: 'Turn failure to success', level: 2 },
+];
+
 const BARBARIAN_FEATURES_L1: Feature[] = [
   { name: 'Rage', description: 'Enter a rage', resourceId: 'Rage', level: 1 },
   { name: 'Unarmored Defense', description: 'AC = 10 + Dex + Con', level: 1 },
@@ -111,17 +116,22 @@ const WIZARD_FEATURES_L1: Feature[] = [
 
 const FIGHTER_CLASS: Class = {
   id: 'Fighter',
+  name: 'Fighter',
   source: '2024 PHB',
   hitDie: 'd10',
   savingThrowProficiencies: ['Strength', 'Constitution'],
   armorTraining: ['Light', 'Medium', 'Heavy', 'Shield'],
   weaponMastery: true,
-  featuresByLevel: new Map([[1, FIGHTER_FEATURES_L1]]),
+  featuresByLevel: new Map([
+    [1, FIGHTER_FEATURES_L1],
+    [2, FIGHTER_FEATURES_L2],
+  ]),
   spellcasting: null,
 };
 
 const BARBARIAN_CLASS: Class = {
   id: 'Barbarian',
+  name: 'Barbarian',
   source: '2024 PHB',
   hitDie: 'd12',
   savingThrowProficiencies: ['Strength', 'Constitution'],
@@ -133,6 +143,7 @@ const BARBARIAN_CLASS: Class = {
 
 const WIZARD_CLASS: Class = {
   id: 'Wizard',
+  name: 'Wizard',
   source: '2024 PHB',
   hitDie: 'd6',
   savingThrowProficiencies: ['Intelligence', 'Wisdom'],
@@ -144,6 +155,7 @@ const WIZARD_CLASS: Class = {
 
 const ROGUE_CLASS: Class = {
   id: 'Rogue',
+  name: 'Rogue',
   source: '2024 PHB',
   hitDie: 'd8',
   savingThrowProficiencies: ['Dexterity', 'Intelligence'],
@@ -333,16 +345,16 @@ describe('createCharacter', () => {
       const char = createCharacter(params, data);
 
       // Background skills
-      expect(char.skills['Athletics'].proficient).toBe(true);
-      expect(char.skills['Intimidation'].proficient).toBe(true);
+      expect(char.skills['Athletics']!.proficient).toBe(true);
+      expect(char.skills['Intimidation']!.proficient).toBe(true);
       // Chosen class skills
-      expect(char.skills['Perception'].proficient).toBe(true);
-      expect(char.skills['Survival'].proficient).toBe(true);
+      expect(char.skills['Perception']!.proficient).toBe(true);
+      expect(char.skills['Survival']!.proficient).toBe(true);
       // Non-proficient skills
-      expect(char.skills['Arcana'].proficient).toBe(false);
-      expect(char.skills['Stealth'].proficient).toBe(false);
+      expect(char.skills['Arcana']!.proficient).toBe(false);
+      expect(char.skills['Stealth']!.proficient).toBe(false);
       // No expertise at level 1
-      expect(char.skills['Athletics'].expertise).toBe(false);
+      expect(char.skills['Athletics']!.expertise).toBe(false);
     });
 
     it('has proficiency bonus of 2', () => {
@@ -370,7 +382,8 @@ describe('createCharacter', () => {
       const char = createCharacter(params, data);
       const secondWind = char.resources.find(r => r.id === 'Second Wind');
       expect(secondWind).toBeDefined();
-      expect(secondWind!.max).toBe(1);
+      // 2024 PHB: Second Wind scales with Proficiency Bonus (PB at level 1 = 2)
+      expect(secondWind!.max).toBe(2);
       expect(secondWind!.used).toBe(0);
     });
 
@@ -385,12 +398,12 @@ describe('createCharacter', () => {
 
       const char = createCharacter(params, data);
       expect(char.classes).toHaveLength(1);
-      expect(char.classes[0].classId).toBe('Fighter');
-      expect(char.classes[0].level).toBe(1);
-      expect(char.classes[0].subclassId).toBeNull();
-      expect(char.classes[0].subclassLevel).toBeNull();
-      expect(char.classes[0].hitDice.die).toBe('d10');
-      expect(char.classes[0].hitDice.used).toBe(0);
+      expect(char.classes[0]!.classId).toBe('Fighter');
+      expect(char.classes[0]!.level).toBe(1);
+      expect(char.classes[0]!.subclassId).toBeNull();
+      expect(char.classes[0]!.subclassLevel).toBeNull();
+      expect(char.classes[0]!.hitDice.die).toBe('d10');
+      expect(char.classes[0]!.hitDice.used).toBe(0);
     });
 
     it('has no spellcasting', () => {
@@ -533,9 +546,9 @@ describe('createCharacter', () => {
       };
 
       const char = createCharacter(params, data);
-      expect(char.spells.spellSlots[1].total).toBe(2);
-      expect(char.spells.spellSlots[1].used).toBe(0);
-      expect(char.spells.spellSlots[2].total).toBe(0);
+      expect(char.spells.spellSlots[0]!.total).toBe(2);
+      expect(char.spells.spellSlots[0]!.used).toBe(0);
+      expect(char.spells.spellSlots[0]!.total).toBe(0);
     });
 
     it('calculates correct spellSaveDC = 8 + PB + Int mod', () => {
@@ -578,9 +591,9 @@ describe('createCharacter', () => {
       };
 
       const char = createCharacter(params, data);
-      expect(char.skills['Arcana'].proficient).toBe(true);
-      expect(char.skills['History'].proficient).toBe(true);
-      expect(char.skills['Athletics'].proficient).toBe(false);
+      expect(char.skills['Arcana']!.proficient).toBe(true);
+      expect(char.skills['History']!.proficient).toBe(true);
+      expect(char.skills['Athletics']!.proficient).toBe(false);
     });
 
     it('calculates correct HP for d6 hit die', () => {
@@ -762,10 +775,10 @@ describe('createCharacter', () => {
 
       const char = createCharacter(params, data);
       // Only background skills are proficient
-      expect(char.skills['Athletics'].proficient).toBe(true);
-      expect(char.skills['Intimidation'].proficient).toBe(true);
+      expect(char.skills['Athletics']!.proficient).toBe(true);
+      expect(char.skills['Intimidation']!.proficient).toBe(true);
       // Other skills not proficient
-      expect(char.skills['Perception'].proficient).toBe(false);
+      expect(char.skills['Perception']!.proficient).toBe(false);
     });
 
     it('handles species with subtypes', () => {
@@ -827,8 +840,14 @@ describe('getFeaturesAtLevel', () => {
     expect(features.map(f => f.name)).toContain('Second Wind');
   });
 
-  it('returns empty array for level with no features', () => {
+  it('returns features at level 2', () => {
     const features = getFeaturesAtLevel(FIGHTER_CLASS, 2);
+    expect(features).toHaveLength(2);
+    expect(features.map(f => f.name)).toContain('Action Surge');
+  });
+
+  it('returns empty array for level with no features', () => {
+    const features = getFeaturesAtLevel(FIGHTER_CLASS, 3);
     expect(features).toEqual([]);
   });
 });
@@ -896,16 +915,17 @@ describe('extractResources', () => {
   it('extracts Second Wind from Fighter level 1', () => {
     const resources = extractResources(FIGHTER_CLASS, 1);
     expect(resources).toHaveLength(1);
-    expect(resources[0].id).toBe('Second Wind');
-    expect(resources[0].max).toBe(1);
-    expect(resources[0].used).toBe(0);
+    expect(resources[0]!.id).toBe('Second Wind');
+    // 2024 PHB: Second Wind scales with Proficiency Bonus (PB at level 1 = 2)
+    expect(resources[0]!.max).toBe(2);
+    expect(resources[0]!.used).toBe(0);
   });
 
   it('extracts Rage from Barbarian level 1', () => {
     const resources = extractResources(BARBARIAN_CLASS, 1);
     expect(resources).toHaveLength(1);
-    expect(resources[0].id).toBe('Rage');
-    expect(resources[0].max).toBe(2);
+    expect(resources[0]!.id).toBe('Rage');
+    expect(resources[0]!.max).toBe(2);
   });
 
   it('returns empty array for level with no resource features', () => {
@@ -914,8 +934,14 @@ describe('extractResources', () => {
     expect(resources).toHaveLength(0);
   });
 
-  it('returns empty array for level with no features', () => {
+  it('extracts all resources from Fighter level 2 (cumulative)', () => {
     const resources = extractResources(FIGHTER_CLASS, 2);
-    expect(resources).toHaveLength(0);
+    // Level 2 includes resources from level 1 (Second Wind) and level 2 (Action Surge)
+    expect(resources).toHaveLength(2);
+    const resourceIds = resources.map(r => r.id).sort();
+    expect(resourceIds).toEqual(['Action Surge', 'Second Wind']);
+    // 2024 PHB: Resources scale with Proficiency Bonus (PB at level 2 = 2)
+    const actionSurge = resources.find(r => r.id === 'Action Surge');
+    expect(actionSurge!.max).toBe(2);
   });
 });

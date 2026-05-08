@@ -13,6 +13,7 @@ import type { Class, Feature, Subclass } from '../../src/types/class';
 import type { AbilityName } from '../../src/types/ability';
 import type { Character } from '../../src/types/character';
 import type { Feat } from '../../src/types/feat';
+import { ResetType } from '../../src/types/resource';
 
 // ── Mock Data ──────────────────────────────────────────────────
 
@@ -47,6 +48,7 @@ const FIGHTER_FEATURES_L1: Feature[] = [
 
 const FIGHTER_CLASS: Class = {
   id: 'Fighter',
+  name: 'Fighter',
   source: '2024 PHB',
   hitDie: 'd10',
   savingThrowProficiencies: ['Strength', 'Constitution'],
@@ -68,6 +70,7 @@ const WIZARD_FEATURES_L1: Feature[] = [
 
 const WIZARD_CLASS: Class = {
   id: 'Wizard',
+  name: 'Wizard',
   source: '2024 PHB',
   hitDie: 'd6',
   savingThrowProficiencies: ['Intelligence', 'Wisdom'],
@@ -342,7 +345,7 @@ describe('validateCharacter', () => {
   it('returns error for resource used > max', () => {
     const char = createValidCharacter(data);
     mutate(char).resources = [
-      { id: 'Second Wind', name: 'Second Wind', max: 1, used: 3, resetOn: 'Short Rest' as const },
+      { id: 'Second Wind', name: 'Second Wind', max: 1, used: 3, resetOn: ResetType.ShortRest },
     ];
     const result = validateCharacter(char, data);
     expect(result.valid).toBe(false);

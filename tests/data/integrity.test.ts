@@ -3,16 +3,26 @@ import { createRequire } from 'node:module';
 import { createDataLoader } from '../../src/data/loader';
 
 const require = createRequire(import.meta.url);
-const lookupTables = require('../../static/lookup-tables.json');
-const species = require('../../static/species.json');
-const backgrounds = require('../../static/backgrounds.json');
-const classes = require('../../static/classes.json');
-const subclasses = require('../../static/subclasses.json');
-const feats = require('../../static/feats.json');
-const weapons = require('../../static/weapons.json');
-const armors = require('../../static/armor.json');
-const gear = require('../../static/gear.json');
-const spells = require('../../static/spells.json');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const lookupTables: any = require('../../static/lookup-tables.json');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const species: any = require('../../static/species.json');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const backgrounds: any = require('../../static/backgrounds.json');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const classes: any = require('../../static/classes.json');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const subclasses: any = require('../../static/subclasses.json');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const feats: any = require('../../static/feats.json');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const weapons: any = require('../../static/weapons.json');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const armors: any = require('../../static/armor.json');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const gear: any = require('../../static/gear.json');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const spells: any = require('../../static/spells.json');
 
 const dataLoader = createDataLoader(lookupTables);
 
@@ -112,7 +122,7 @@ describe('Data Integrity Tests', () => {
       ];
       for (const spec of species) {
         for (const field of requiredFields) {
-          expect(spec[field]).toBeDefined(`Species ${spec.id} missing ${field}`);
+          expect(spec[field]).toBeDefined();
         }
       }
     });
@@ -192,7 +202,7 @@ describe('Data Integrity Tests', () => {
       ];
       for (const cls of classes) {
         for (const field of requiredFields) {
-          expect(cls[field]).toBeDefined(`Class ${cls.id} missing ${field}`);
+          expect(cls[field]).toBeDefined();
         }
       }
     });
@@ -218,16 +228,16 @@ describe('Data Integrity Tests', () => {
 
   describe('subclasses.json', () => {
     it('should have subclasses for all 12 classes', () => {
-      const classIds = classes.map(c => c.id);
+      const classIds = (classes as { id: string }[]).map(c => c.id);
       for (const classId of classIds) {
-        const subclassList = subclasses.filter(s => s.parentClass === classId);
+        const subclassList = (subclasses as { parentClass: string }[]).filter(s => s.parentClass === classId);
         expect(subclassList.length).toBeGreaterThan(0);
       }
     });
 
     it('should have parentClass matching a valid class', () => {
-      const classIds = classes.map(c => c.id);
-      for (const sub of subclasses) {
+      const classIds = (classes as { id: string }[]).map(c => c.id);
+      for (const sub of subclasses as { parentClass: string }[]) {
         expect(classIds).toContain(sub.parentClass);
       }
     });
@@ -242,7 +252,7 @@ describe('Data Integrity Tests', () => {
       const requiredFields = ['id', 'source', 'name', 'description', 'category'];
       for (const feat of feats) {
         for (const field of requiredFields) {
-          expect(feat[field]).toBeDefined(`Feat ${feat.name} missing ${field}`);
+          expect(feat[field]).toBeDefined();
         }
       }
     });
@@ -264,7 +274,7 @@ describe('Data Integrity Tests', () => {
       const requiredFields = ['id', 'name', 'category', 'damage', 'properties'];
       for (const weapon of weapons) {
         for (const field of requiredFields) {
-          expect(weapon[field]).toBeDefined(`Weapon ${weapon.name} missing ${field}`);
+          expect(weapon[field]).toBeDefined();
         }
       }
     });
@@ -286,7 +296,7 @@ describe('Data Integrity Tests', () => {
       const requiredFields = ['id', 'name', 'category', 'ac'];
       for (const armor of armors) {
         for (const field of requiredFields) {
-          expect(armor[field]).toBeDefined(`Armor ${armor.name} missing ${field}`);
+          expect(armor[field]).toBeDefined();
         }
       }
     });
@@ -310,7 +320,7 @@ describe('Data Integrity Tests', () => {
       ];
       for (const spell of spells) {
         for (const field of requiredFields) {
-          expect(spell[field]).toBeDefined(`Spell ${spell.name} missing ${field}`);
+          expect(spell[field]).toBeDefined();
         }
       }
     });

@@ -122,18 +122,18 @@ export function levelUp(
     };
   }
 
-  // 5. New resources from features at new level
-  const levelResources = extractResources(classData, newLevel);
+  // 5. Calculate new total level and proficiency bonus
+  const totalLevel = newClasses.reduce((sum, c) => sum + c.level, 0);
+  const newProficiencyBonus = getProficiencyBonus(totalLevel);
+
+  // 6. New resources from features at new level (pass PB for scaling resources)
+  const levelResources = extractResources(classData, newLevel, newProficiencyBonus);
   const newResources = [...char.resources];
   for (const resource of levelResources) {
     if (!newResources.some(r => r.id === resource.id)) {
       newResources.push(resource);
     }
   }
-
-  // 6. Calculate new total level and proficiency bonus
-  const totalLevel = newClasses.reduce((sum, c) => sum + c.level, 0);
-  const newProficiencyBonus = getProficiencyBonus(totalLevel);
 
   // Build result
   let result: Character = {
@@ -205,9 +205,9 @@ function addNewClass(
   const totalLevel = newClasses.reduce((sum, c) => sum + c.level, 0);
   const newProficiencyBonus = getProficiencyBonus(totalLevel);
 
-  // Add resources from new class
+  // Add resources from new class (pass total PB for scaling resources)
   const newResources = [...char.resources];
-  const classResources = extractResources(classData, 1);
+  const classResources = extractResources(classData, 1, newProficiencyBonus);
   for (const resource of classResources) {
     if (!newResources.some(r => r.id === resource.id)) {
       newResources.push(resource);

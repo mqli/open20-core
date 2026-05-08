@@ -16,7 +16,7 @@ import type { SkillEntry, SkillName } from '../types/skill';
 import { SKILL_NAMES } from '../types/skill';
 import type { CharacterSpells, SpellLevel, SpellSlotEntry, PactMagicSlots } from '../types/spell';
 import type { Feature, Class } from '../types/class';
-import type { Resource, ResetType } from '../types/resource';
+import { Resource, ResetType } from '../types/resource';
 import type { DataLoader } from '../data/loader';
 
 import { getModifier, getTotalScore } from '../engine/ability-modifier';
@@ -43,6 +43,8 @@ export interface CreateCharacterParams {
   classId: string;
   /** Level for primary class (defaults to 1, useful for multiclass creation) */
   classLevel?: number;
+  /** Subclass ID (e.g., 'Champion', 'Eldritch Knight') - defaults to none */
+  subclassId?: string;
   abilityScores: Record<AbilityName, number>;
   featIds?: string[];
   skillChoices?: string[];
@@ -50,6 +52,7 @@ export interface CreateCharacterParams {
   additionalClasses?: Array<{
     classId: string;
     level: number;
+    subclassId?: string;
   }>;
 }
 
@@ -95,8 +98,8 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
     {
       classId: params.classId,
       level: primaryLevel,
-      subclassId: null,
-      subclassLevel: null,
+      subclassId: params.subclassId ?? null,
+      subclassLevel: params.subclassId ? primaryLevel : null,
       hitDice: { die: classData.hitDie, used: 0 },
     },
     ...additionalClasses.map(ac => {
@@ -104,8 +107,8 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
       return {
         classId: ac.classId,
         level: ac.level,
-        subclassId: null,
-        subclassLevel: null,
+        subclassId: ac.subclassId ?? null,
+        subclassLevel: ac.subclassId ? ac.level : null,
         hitDice: { die: acData.hitDie, used: 0 },
       };
     }),
@@ -149,10 +152,14 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
   };
 
   // 6. Build Resources (extract from all classes)
-  let resources: Resource[] = extractResources(classData, primaryLevel);
+  // 计算熟练加值用于资源数量（某些资源如Action Surge随PB变化）
+  const pb = getProficiencyBonus(totalLevel);
+  let resources: Resource[] = extractResources(classData, primaryLevel, pb);
   for (const additional of additionalClasses) {
     const acData = data.getClass(additional.classId)!;
-    const additionalResources = extractResources(acData, additional.level);
+    // 多职业时使用总等级计算PB
+    const additionalPB = getProficiencyBonus(additional.level);
+    const additionalResources = extractResources(acData, additional.level, additionalPB);
     resources = [...resources, ...additionalResources];
   }
 
@@ -169,8 +176,7 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
     spells = buildMulticlassSpells(charClasses, abilityScores, data);
   }
 
-  // 8. Calculate CombatStats
-  const pb = getProficiencyBonus(totalLevel);
+  // 8. Calculate CombatStats (pb already calculated above for resources)
   const allFeatures = gatherAllFeatures(charClasses, data);
   const combatStats: CombatStats = {
     AC: calculateAC(abilityScores, [], allFeatures, data),
@@ -350,18 +356,28 @@ export function emptyCharacterSpells(): CharacterSpells {
 
 /**
  * 从职业特性中提取资源
+ * @param classData - 职业数据
+ * @param level - 职业等级（会提取1到该等级的所有资源特性）
+ * @param proficiencyBonus - 熟练加值（用于计算资源数量）
  */
-export function extractResources(classData: Class, level: number): Resource[] {
-  const features = getFeaturesAtLevel(classData, level);
+export function extractResources(classData: Class, level: number, proficiencyBonus?: number): Resource[] {
   const resources: Resource[] = [];
 
-  for (const feature of features) {
-    if (!feature.resourceId) continue;
+  // 收集从1级到指定等级的所有资源特性
+  for (let lv = 1; lv <= level; lv++) {
+    const features = getFeaturesAtLevel(classData, lv);
 
-    // 根据资源ID确定资源属性
-    const resource = buildResource(feature.resourceId, level);
-    if (resource) {
-      resources.push(resource);
+    for (const feature of features) {
+      if (!feature.resourceId) continue;
+
+      // 避免重复添加相同资源（如果低等级已有该资源）
+      if (resources.some(r => r.id === feature.resourceId)) continue;
+
+      // 根据特性定义构建资源（优先使用特性中的定义，否则使用RESOURCE_DEFS）
+      const resource = buildResource(feature, level, proficiencyBonus);
+      if (resource) {
+        resources.push(resource);
+      }
     }
   }
 
@@ -369,41 +385,53 @@ export function extractResources(classData: Class, level: number): Resource[] {
 }
 
 /**
- * 根据资源ID构建Resource对象
- * 包含2024各职业1级资源的默认值
+ * 根据特性中的资源定义构建Resource对象
+ * 优先使用特性中定义的资源属性，否则回退到RESOURCE_DEFS
  */
-function buildResource(resourceId: string, level: number): Resource | null {
-  // 资源定义表（1级默认值）
-  const RESOURCE_DEFS: Record<
-    string,
-    {
-      max: number;
-      resetOn: ResetType;
-      displayName?: string;
-    }
-  > = {
-    'Second Wind': { max: 1, resetOn: 'Short Rest' as ResetType },
-    Rage: { max: 2, resetOn: 'Long Rest' as ResetType },
-    'Lay on Hands': { max: 5, resetOn: 'Long Rest' as ResetType },
-    'Bardic Inspiration': { max: 1, resetOn: 'Long Rest' as ResetType },
-    'Channel Divinity': { max: 1, resetOn: 'Short Rest' as ResetType },
-    'Wild Shape': { max: 2, resetOn: 'Short Rest' as ResetType },
-    'Sorcery Points': { max: 1, resetOn: 'Long Rest' as ResetType },
-    'Action Surge': { max: 1, resetOn: 'Short Rest' as ResetType },
-    Indomitable: { max: 1, resetOn: 'Long Rest' as ResetType },
-    'Focus Points': { max: 1, resetOn: 'Short Rest' as ResetType },
+function buildResource(feature: Feature, level: number, proficiencyBonus?: number): Resource | null {
+  const resourceId = feature.resourceId!;
+
+  // 资源默认值表（当特性中未定义时使用）
+  // scaleWithPBByDefault: 某些资源即使特性中未标记，也默认随PB变化（如2024 PHB的Second Wind）
+  const RESOURCE_DEFS: Record<string, { max: number; resetOn: ResetType; scaleWithPBByDefault?: boolean }> = {
+    'Second Wind': { max: 1, resetOn: ResetType.ShortRest, scaleWithPBByDefault: true },
+    Rage: { max: 2, resetOn: ResetType.LongRest },
+    'Lay on Hands': { max: 5, resetOn: ResetType.LongRest },
+    'Bardic Inspiration': { max: 1, resetOn: ResetType.LongRest },
+    'Channel Divinity': { max: 1, resetOn: ResetType.ShortRest },
+    'Wild Shape': { max: 2, resetOn: ResetType.ShortRest },
+    'Sorcery Points': { max: 1, resetOn: ResetType.LongRest },
+    'Focus Points': { max: 1, resetOn: ResetType.ShortRest },
+    'Action Surge': { max: 1, resetOn: ResetType.ShortRest, scaleWithPBByDefault: true },
+    Indomitable: { max: 1, resetOn: ResetType.LongRest, scaleWithPBByDefault: true },
   };
 
+  // 计算熟练加值
+  const pb = proficiencyBonus ?? (2 + Math.floor((level - 1) / 4));
+
+  // 查找资源默认值
   const def = RESOURCE_DEFS[resourceId];
-  if (!def) return null;
+  if (!def) {
+    // 未知资源，跳过
+    return null;
+  }
+
+  // 优先使用特性中定义的资源属性，否则使用默认值
+  const max = feature.resourceMax !== undefined ? feature.resourceMax : def.max;
+  const resetOn = feature.resourceResetOn ?? def.resetOn;
+
+  // 判断是否随PB变化：
+  // 1. 特性中显式定义 resourceScaleWithPB
+  // 2. 或者默认值标记 scaleWithPBByDefault
+  const scaleWithPB = feature.resourceScaleWithPB ?? def.scaleWithPBByDefault ?? false;
+  const finalMax = scaleWithPB ? pb : max;
 
   return {
     id: resourceId,
     name: resourceId,
-    max: def.max,
+    max: finalMax,
     used: 0,
-    resetOn: def.resetOn,
-    displayName: def.displayName,
+    resetOn,
   };
 }
 

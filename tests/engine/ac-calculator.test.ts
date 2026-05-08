@@ -59,6 +59,7 @@ function createMockDataLoader(armorData: Record<string, Armor> = {}): DataLoader
 // ── 标准护甲数据 ──────────────────────────────────────
 const LEATHER_ARMOR: Armor = {
   id: 'Leather Armor',
+  name: 'Leather Armor',
   type: 'armor',
   category: 'Light',
   baseAC: 11,
@@ -70,6 +71,7 @@ const LEATHER_ARMOR: Armor = {
 
 const CHAIN_MAIL: Armor = {
   id: 'Chain Mail',
+  name: 'Chain Mail',
   type: 'armor',
   category: 'Heavy',
   baseAC: 16,
@@ -83,6 +85,7 @@ const CHAIN_MAIL: Armor = {
 
 const HALF_PLATE: Armor = {
   id: 'Half Plate',
+  name: 'Half Plate',
   type: 'armor',
   category: 'Medium',
   baseAC: 15,
@@ -96,6 +99,7 @@ const HALF_PLATE: Armor = {
 
 const SHIELD: Armor = {
   id: 'Shield',
+  name: 'Shield',
   type: 'armor',
   category: 'Shield',
   baseAC: 2,

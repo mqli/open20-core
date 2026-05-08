@@ -1,6 +1,8 @@
 // types/class.ts
 // 职业与子职业相关类型（零依赖）
 
+import type { ResetType } from './resource';
+
 // 法术施法方式
 export interface Spellcasting {
   readonly ability: import('./ability').AbilityName; // 施法关键属性
@@ -13,6 +15,10 @@ export interface Feature {
   readonly description: string;
   readonly resourceId?: string; // 关联的资源ID（如有）
   readonly level?: number; // 获得该特性的等级
+  // 资源属性（可选，如果定义则优先使用）
+  readonly resourceMax?: number; // 资源最大使用次数
+  readonly resourceResetOn?: ResetType; // 重置时机
+  readonly resourceScaleWithPB?: boolean; // 是否随熟练加值变化
 }
 
 // 职业类型

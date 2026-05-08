@@ -33,8 +33,8 @@ describe('D&D Player Behavior - Character Creation', () => {
 
       expect(char.name).toBe('Tordek');
       expect(char.species).toBe('Human');
-      expect(char.classes[0].classId).toBe('Fighter');
-      expect(char.classes[0].level).toBe(1);
+      expect(char.classes[0]!.classId).toBe('Fighter');
+      expect(char.classes[0]!.level).toBe(1);
       expect(char.hitPoints.current).toBeGreaterThan(0);
     });
 

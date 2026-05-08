@@ -271,8 +271,8 @@ describe('getActiveDamageDefenses', () => {
       expect(defenses.resistances).toContain('Poison');
       expect(defenses.resistances).toHaveLength(1);
       expect(sources).toHaveLength(1);
-      expect(sources[0].source).toContain('Dwarf');
-      expect(sources[0].type).toBe('species');
+      expect(sources[0]!.source).toContain('Dwarf');
+      expect(sources[0]!.type).toBe('species');
     });
 
     it('should aggregate defenses from Hill Dwarf correctly', () => {
