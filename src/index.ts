@@ -38,7 +38,8 @@ export { shortRest, longRest } from './character';
 export {
   modifyHP, setTemporaryHP, consumeResource, recoverResource,
   consumeSpellSlot, recoverSpellSlot, toggleCondition,
-  equipItem, unequipItem, prepareSpell, unprepareSpell,
+  equipItem, unequipItem, equipItemAndRecompute, unequipItemAndRecompute,
+  prepareSpell, unprepareSpell,
   addEquipment, removeEquipment, modifyCurrency,
 } from './character';
 export { validateCharacter } from './character';

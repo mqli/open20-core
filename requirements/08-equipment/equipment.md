@@ -92,11 +92,17 @@ function addEquipment(char: Character, item: EquipmentItem): Character;
 // Remove equipment from character
 function removeEquipment(char: Character, itemId: string): Character;
 
-// Equip item
+// Equip item (just the item, recomputeDerivedStats must be called separately)
 function equipItem(char: Character, itemId: string): Character;
 
-// Unequip item
+// Unequip item (just the item, recomputeDerivedStats must be called separately)
 function unequipItem(char: Character, itemId: string): Character;
+
+// Equip item AND recalculate derived stats (AC, attacks)
+function equipItemAndRecompute(char: Character, itemId: string, data: DataLoader): Character;
+
+// Unequip item AND recalculate derived stats
+function unequipItemAndRecompute(char: Character, itemId: string, data: DataLoader): Character;
 
 // Modify currency
 function modifyCurrency(char: Character, changes: Partial<Currency>): Character;

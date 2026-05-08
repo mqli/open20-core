@@ -13,7 +13,7 @@ import { calculateInitiative } from '../engine/initiative';
 import { calculatePassivePerception } from '../engine/passive-perception';
 import { calculateAttacks } from '../engine/attack-calculator';
 import { calculateMaxHP } from '../engine/hp-calculator';
-import { calculateSpellSlots, calculatePactMagic } from '../engine/spell-slots';
+import { calculateSpellSlots, calculateSpellSlotsFromClasses, calculatePactMagic } from '../engine/spell-slots';
 import { getFeaturesAtLevel } from './create';
 
 /**
@@ -99,45 +99,43 @@ export function recomputeDerivedStats(
     };
   }
 
-  // Recalculate spell slots (single class MVP)
-  if (char.classes.length === 1) {
-    const charClass = char.classes[0]!;
-    if (charClass.classId === 'Warlock') {
-      const pactResult = calculatePactMagic(charClass.level, data);
-      if (pactResult && newSpells.pactMagicSlots) {
-        newSpells = {
-          ...newSpells,
-          pactMagicSlots: {
-            ...newSpells.pactMagicSlots,
-            total: pactResult.slots,
-          },
-        };
-      }
-    } else {
-      const newSlots = calculateSpellSlots(
-        charClass.classId,
-        charClass.level,
-        data,
-      );
-      // Preserve used counts, update totals
-      const updatedSlots = { ...newSpells.spellSlots };
-      for (let level = 1; level <= 9; level++) {
-        const newEntry = newSlots[level];
-        if (newEntry) {
-          const oldUsed =
-            updatedSlots[level as SpellLevel]?.used ?? 0;
-          updatedSlots[level as SpellLevel] = {
-            total: newEntry.total,
-            used: Math.min(oldUsed, newEntry.total),
-          };
-        }
-      }
+  // Recalculate spell slots (handles both single class and multiclass)
+  const hasWarlock = char.classes.some(c => c.classId === 'Warlock');
+  
+  if (hasWarlock) {
+    // Handle Warlock pact magic
+    const warlockLevel = char.classes.find(c => c.classId === 'Warlock')!.level;
+    const pactResult = calculatePactMagic(warlockLevel, data);
+    if (pactResult && newSpells.pactMagicSlots) {
       newSpells = {
         ...newSpells,
-        spellSlots: updatedSlots as typeof char.spells.spellSlots,
+        pactMagicSlots: {
+          ...newSpells.pactMagicSlots,
+          total: pactResult.slots,
+          level: pactResult.slotLevel,
+        },
       };
     }
   }
+  
+  // Recalculate regular spell slots (using multiclass rules if multiple classes)
+  const newSlots = calculateSpellSlotsFromClasses(char.classes, data);
+  // Preserve used counts, update totals
+  const updatedSlots = { ...newSpells.spellSlots };
+  for (let level = 1; level <= 9; level++) {
+    const newEntry = newSlots[level];
+    if (newEntry) {
+      const oldUsed = updatedSlots[level as SpellLevel]?.used ?? 0;
+      updatedSlots[level as SpellLevel] = {
+        total: newEntry.total,
+        used: Math.min(oldUsed, newEntry.total),
+      };
+    }
+  }
+  newSpells = {
+    ...newSpells,
+    spellSlots: updatedSlots as typeof char.spells.spellSlots,
+  };
 
   return {
     ...char,

@@ -14,6 +14,7 @@ export {
 } from './hp-calculator';
 export {
   calculateSpellSlots,
+  calculateSpellSlotsFromClasses,
   calculatePactMagic,
   getMulticlassSpellcasterLevel,
   calculateMulticlassSpellSlots,

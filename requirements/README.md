@@ -24,11 +24,11 @@
 | R14 | Character — Spell slot tracking | - | `src/character/mutate.ts` | P0 | ✅ S13 done |
 | R15 | Character — Resource tracking | - | `src/character/mutate.ts` | P0 | ✅ S13 done |
 | R16 | Character — Level up | - | `src/character/level-up.ts` | P0 | ✅ S15 done |
-| R17 | Equipment — Weapon/Armor/Gear | - | `src/character/mutate.ts` + `recompute.ts` | P0 | 🔄 Data done |
+| R17 | Equipment — Weapon/Armor/Gear | - | `src/character/mutate.ts` + `recompute.ts` | P0 | ✅ Done |
 | R18 | Engine — Weapon Mastery | - | `src/engine/attack-calculator.ts` | P0 | ✅ S11 done |
 | R19 | Storage — Save/Export/Import | - | `src/storage/*` | P0 | ✅ S17 done |
 | R20 | Character — Conditions | - | `src/character/mutate.ts` | P0 | ✅ S13 done |
-| R21 | Multiclassing | - | `src/engine/spell-slots.ts` + `create.ts` | P1 | 🔄 Engine done |
+| R21 | Multiclassing | - | `src/engine/spell-slots.ts` + `recompute.ts` | P1 | ✅ Done |
 
 ---
 
@@ -36,7 +36,7 @@
 
 | # | Requirement | Description | Status |
 |---|---|---|---|
-| R21 | Multiclassing | `calculateMulticlassSpellSlots()` implemented | 🔄 Engine done |
+| R21 | Multiclassing | Full multiclass support with spell slot recalculation | ✅ Done |
 | R22 | 2014 Legacy | Half-Elf/Half-Orc + legacy subclasses/feats | 📋 |
 | R23 | Homebrew support | Data structures for homebrew content | 📋 |
 | R24 | Multiple character management | Character list + quick switch | 📋 |

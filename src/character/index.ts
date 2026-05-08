@@ -20,6 +20,8 @@ export {
   toggleCondition,
   equipItem,
   unequipItem,
+  equipItemAndRecompute,
+  unequipItemAndRecompute,
   addEquipment,
   removeEquipment,
   prepareSpell,

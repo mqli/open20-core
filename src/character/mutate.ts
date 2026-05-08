@@ -5,6 +5,7 @@
 import type { Character, ConditionName, Currency, ActiveCondition, DamageType, DamageDefenses, DamageResult } from '../types/character';
 import type { EquipmentItem } from '../types/equipment';
 import type { SpellLevel } from '../types/spell';
+import type { DataLoader } from '../data/loader';
 import { calculateTypedDamage } from '../engine/damage-calculator';
 
 // ── Helper ──────────────────────────────────────────────────────
@@ -211,6 +212,32 @@ export function unequipItem(char: Character, itemId: string): Character {
   newEquipment[idx] = { ...item, equipped: false };
 
   return withUpdate(char, { equipment: newEquipment });
+}
+
+/**
+ * Equip an item and recalculate derived stats (AC, attacks)
+ * Use this for UI actions where stats need immediate update
+ */
+export function equipItemAndRecompute(char: Character, itemId: string, data: DataLoader): Character {
+  const updatedChar = equipItem(char, itemId);
+  if (updatedChar === char) return char;
+  
+  // Lazy import to avoid circular dependency
+  const { recomputeDerivedStats } = require('./recompute');
+  return recomputeDerivedStats(updatedChar, data);
+}
+
+/**
+ * Unequip an item and recalculate derived stats (AC, attacks)
+ * Use this for UI actions where stats need immediate update
+ */
+export function unequipItemAndRecompute(char: Character, itemId: string, data: DataLoader): Character {
+  const updatedChar = unequipItem(char, itemId);
+  if (updatedChar === char) return char;
+  
+  // Lazy import to avoid circular dependency
+  const { recomputeDerivedStats } = require('./recompute');
+  return recomputeDerivedStats(updatedChar, data);
 }
 
 export function addEquipment(char: Character, item: EquipmentItem): Character {

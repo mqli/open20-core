@@ -51,6 +51,28 @@ export function calculateSpellSlots(
 }
 
 /**
+ * 计算法术位（支持单职业或多维职业）
+ *
+ * @param classes - 职业列表（单个或多个）
+ * @param data - DataLoader
+ * @returns 法术位 Map
+ *
+ * @example
+ * // 单职业: 5级 Wizard
+ * calculateSpellSlotsFromClasses([{ classId: 'Wizard', level: 5 }], data)
+ *
+ * // 多维职业: Wizard 5 / Fighter 2
+ * calculateSpellSlotsFromClasses([{ classId: 'Wizard', level: 5 }, { classId: 'Fighter', level: 2 }], data)
+ */
+export function calculateSpellSlotsFromClasses(
+  classes: readonly CharacterClass[],
+  data: DataLoader,
+): Record<number, SpellSlotEntry> {
+  const totalLevel = getMulticlassSpellcasterLevel(classes, data);
+  return calculateMulticlassSpellSlots(totalLevel, data);
+}
+
+/**
  * 计算Warlock Pact Magic
  *
  * Warlock的法术位特殊：短休恢复，且等级随Warlock等级提升
