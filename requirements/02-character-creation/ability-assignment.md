@@ -1,148 +1,106 @@
-# 需求：属性分配 (Ability Assignment)
+# Requirement: Ability Score Assignment
 
-## 1. 需求描述
-
-玩家在角色创建过程中分配6项属性值（力量、敏捷、体质、智力、感知、魅力）。
-
-**2024规则变更：**
-- 标准数组固定为：15, 14, 13, 12, 10, 8（不可调整）
-- 点买法成本表保持不变
-- 手动输入范围：8-15（2014遗留角色可到20）
-
-**重要说明：**
-- 物种加值（racialBonuses）不在此处输入，由物种选择后自动应用
-- 专长加值（featBonuses）不在此处输入，获得专长时自动应用
-- 最终属性值 = base + racialBonuses + featBonuses
+> Corresponds to PRD §4.1
 
 ---
 
-## 2. 验收标准
+## Description
 
-### 2.1 通用要求
-- [ ] 支持三种分配方式：标准数组 / 点买法 / 手动输入
-- [ ] 三种方式可切换，切换时保留已输入的数值（如适用）
-- [ ] 完成分配后写入 `Character.abilityScores.base`
-- [ ] 界面显示6个属性的当前值、调整加值（modifier）、物种加值、专长加值、最终值
+Player assigns 6 ability scores (Str, Dex, Con, Int, Wis, Cha) during character creation.
 
-### 2.2 标准数组模式
-- [ ] 显示固定的6个数字卡片：15, 14, 13, 12, 10, 8
-- [ ] 支持拖拽分配到6个属性
-- [ ] 支持点击选择属性后点击数字（触屏兼容）
-- [ ] 6个数字必须全部分配，不能重复
-- [ ] 未分配的数组数字高亮提示
+**2024 Rule Changes:**
+- Standard array fixed at: 15, 14, 13, 12, 10, 8 (not adjustable)
+- Point buy cost table unchanged
+- Manual input range: 8-15 (2014 legacy characters can go to 20)
 
-### 2.3 点买法模式
-- [ ] 显示当前总点数（初始27点）
-- [ ] 实时计算剩余点数
-- [ ] 显示点买成本表（8=0, 9=1, 10=2, 11=3, 12=4, 13=5, 14=7, 15=9）
-- [ ] 每个属性可在8-15之间调整（按钮+/-）
-- [ ] 剩余点数不足时禁用+按钮
-- [ ] 总花费超过27点时禁用确认按钮
-
-### 2.4 手动输入模式
-- [ ] 每个属性显示数字输入框
-- [ ] 输入范围限制：8-15（2014遗留角色可到20，需检测）
-- [ ] 实时校验：超出范围显示错误提示
-- [ ] 支持键盘上下箭头微调（+1/-1）
-- [ ] 6个属性可设置不同数值（不要求唯一）
-
-### 2.5 数据持久化
-- [ ] 点击"确认"后写入 `Character.abilityScores.base`
-- [ ] 自动计算并写入 `Character.abilityScores.modifier`
-- [ ] 支持暂存（临时保存未完成的分配）
-- [ ] 返回上一步时保留已输入数据
+**Important Notes:**
+- Racial bonuses (`racialBonuses`) not input here, auto-applied after species selection
+- Feat bonuses (`featBonuses`) not input here, auto-applied when gaining feats
+- Final ability score = base + racialBonuses + featBonuses
 
 ---
 
-## 3. 数据模型
+## Acceptance Criteria
 
-引用 `spec/data-model.md` 中的定义：
+### General Requirements
+- [x] Support 3 assignment methods: Standard Array / Point Buy / Manual Input
+- [x] Can switch between methods, preserving entered values (where applicable)
+- [x] On confirmation, write to `Character.abilityScores.base`
+- [x] Display current value, modifier, racial bonuses, feat bonuses, final value
 
-```javascript
-Character.abilityScores = {
-  "base": {
-    "Strength": 15,      // 基础值（本需求输出）
-    "Dexterity": 12,
-    "Constitution": 13,
-    "Intelligence": 10,
-    "Wisdom": 14,
-    "Charisma": 8
-  },
-  "racialBonuses": {     // 不在此处输入，自动应用
-    "Strength": 2,
-    "Constitution": 1
-  },
-  "featBonuses": {       // 不在此处输入，获得专长时自动应用
-    "Strength": 1
-  },
-  "modifier": {          // 自动计算：(值-10)/2 向下取整
-    "Strength": 2,
-    "Dexterity": 1,
-    "Constitution": 1,
-    "Intelligence": 0,
-    "Wisdom": 2,
-    "Charisma": -1
-  },
-  "total": {             // 自动计算：base + racialBonuses + featBonuses
-    "Strength": 18,
-    "Dexterity": 12,
-    "Constitution": 14,
-    "Intelligence": 10,
-    "Wisdom": 16,
-    "Charisma": 8
-  }
+### Standard Array Mode
+- [x] Display 6 fixed number cards: 15, 14, 13, 12, 10, 8
+- [x] Support drag-and-drop to 6 ability slots
+- [x] Support click-to-select (touchscreen compatible)
+- [x] All 6 numbers must be assigned, no duplicates
+- [x] Unassigned numbers highlighted
+
+### Point Buy Mode
+- [x] Display current total points (initial 27)
+- [x] Real-time remaining points calculation
+- [x] Point buy cost table displayed
+- [x] Each ability adjustable between 8-15 (buttons +/-)
+- [x] Disable + button when insufficient points remain
+- [x] Disable confirm button when total cost > 27 points
+
+### Manual Input Mode
+- [x] Numeric input field for each ability
+- [x] Input range limit: 8-15 (2014 legacy can go to 20, needs detection)
+- [x] Real-time validation: out-of-range shows error
+- [x] Support keyboard up/down arrows (+1/-1)
+- [x] 6 abilities can have different values (uniqueness not required)
+
+### Data Persistence
+- [x] On "Confirm", write to `Character.abilityScores.base`
+- [x] Auto-calculate and write `Character.abilityScores.modifier`
+- [x] Support temporary save (incomplete assignment)
+- [x] Preserve entered data when going back
+
+---
+
+## Data Model
+
+See `../../spec/data-model.md` → `AbilityScores`
+
+```typescript
+interface AbilityScores {
+  readonly base: {
+    readonly Strength: number;    // Base value (output of this requirement)
+    readonly Dexterity: number;
+    readonly Constitution: number;
+    readonly Intelligence: number;
+    readonly Wisdom: number;
+    readonly Charisma: number;
+  };
+  readonly racialBonuses: Record<string, number>;     // Auto-applied after species selection
+  readonly featBonuses: Record<string, number>;       // Auto-applied when gaining feats
+  readonly modifier: Record<string, number>;          // Auto-calculated: (value-10)/2 floor
+  readonly total: Record<string, number>;             // Auto-calculated: base + racial + feat
 }
 ```
 
-**点买法成本表（常量）：**
+**Point Buy Cost Table** (constant):
 
-| 属性值 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
-|-------|---|---|----|----|----|----|----|----|
-| 成本  | 0 | 1 | 2  | 3  | 4  | 5  | 7  | 9  |
-
----
-
-## 4. 边界情况
-
-### 4.1 输入验证
-- **标准数组**：如果只分配了部分属性，提示"请分配所有6个属性"
-- **点买法**：如果剩余点数不为0，允许确认（2024规则不强制花光）
-- **手动输入**：输入非数字字符时自动过滤，显示0或上次有效值
-- **手动输入**：粘贴多位数字时只取第一位（如粘贴"123"变为"1"）
-
-### 4.2 数据兼容性
-- **2014遗留角色**：检测 `Character.version === "2014"`，手动输入上限改为20
-- **2024新角色**：手动输入上限为15（标准数组/点买法上限）
-- **导入角色**：从D&D Beyond导入时，保留原始属性值，不强制符合2024规则
-
-### 4.3 UI交互
-- **拖拽冲突**：如果属性已被分配，新拖入的数字替换旧数字，旧数字回到待分配区
-- **触屏设备**：拖拽不可用时的降级方案（点击选择→点击属性）
-- **撤销操作**：支持Ctrl+Z撤销最后一次分配（所有模式）
-
-### 4.4 计算精度
-- **调整加值计算**：`Math.floor((score - 10) / 2)`，确保负数正确（如8→-1）
-- **浮点数问题**：所有计算使用整数运算，避免0.5类浮点误差
-
-### 4.5 并发与状态
-- **中途退出**：玩家退出角色创建时，已分配的属性暂存到LocalStorage
-- **恢复状态**：重新进入时恢复上次分配状态，显示提示"已恢复未完成的属性分配"
-- **多设备冲突**：同一角色在不同设备编辑时，以最后保存为准（覆盖策略）
+| Ability Score | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
+|---|---|---|---|---|---|---|---|---|
+| Cost | 0 | 1 | 2 | 3 | 4 | 5 | 7 | 9 |
 
 ---
 
-## 5. 参考资料
+## Edge Cases
 
-- **PRD v4.0 §4.1 角色创建** - 属性分配需求定义
-- **2024 PHB p.20 属性分配规则** - 标准数组和点买法规则
-- **2024 PHB p.21 属性调整加值表** - 调整加值计算公式
-- **2014 PHB p.13 属性分配** - 对比2014规则差异
-- **D&D Beyond 属性分配界面** - UI设计参考（https://www.dndbeyond.com/）
-- **Roll20 属性分配** - 交互设计参考
+| Situation | Handling |
+|---|---|
+| Switching methods mid-assignment | Preserve ability values, recalculate remaining points |
+| Point buy exceeds 27 | Disable confirm, show error "Cost exceeds 27 points" |
+| Manual input out of range | Show error, disable confirm |
+| 2014 legacy character | Allow scores up to 20, detect via `schemaVersion` |
+| Species/Feat bonuses applied | Recalculate `total` and `modifier` automatically |
 
 ---
 
-**优先级**：P0（MVP必须）  
-**依赖**：物种选择（用于racialBonuses）、专长选择（用于featBonuses）  
-**前置需求**：species.md、background.md  
-**后续需求**：无
+## References
+
+- PRD §4.1 Character Creation
+- 2024 PHB p. 20-21 Ability Scores
+- 2024 PHB p. 22 Point Buy Rules

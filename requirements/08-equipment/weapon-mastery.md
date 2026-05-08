@@ -1,37 +1,116 @@
-# 需求：武器精通（Weapon Mastery）
+# Requirement: Weapon Mastery
 
-## 需求描述
+> Corresponds to PRD §4.8 & 2024 PHB p.30
 
-Weapon Mastery 是 2024 规则的主要新机制。
+---
 
-具有 Weapon Mastery 的职业（Barbarian / Fighter / Paladin / Ranger / Rogue）可以访问武器精通属性。
+## Description
 
-## 验收标准
+2024 PHB introduced Weapon Mastery for certain classes.
 
-- [ ] 具有 Weapon Mastery 的职业在游戏模式显示 "Weapon Mastery" 区域
-- [ ] 装备武器时，显示该武器的精通属性（1-2个）
-- [ ] 8个精通属性完整支持：Cleave / Graze / Nick / Push / Sap / Slow / Tople / Vex
-- [ ] 精通属性描述可在法术卡片式弹窗中查看
-- [ ] 应用中记录使用的精通属性（不自动计算伤害，需DM判定）
-- [ ] 多把武器时，显示每把武器的精通属性
+Aplies special properties to weapon attacks (Push, Sap, Cleave, etc.).
 
-## 数据模型
+---
 
-引用 `../../spec/data-model.md` 中的以下结构：
+## Acceptance Criteria
 
-- `Weapon` JSON 含 `masteryProperty: ["Cleave", "Tople"]`
-- `Character.resources` 中含 Weapon Mastery 使用次数（如有）
-- `Character.classes[].classFeatures` 含 "Weapon Mastery" 特性时激活该功能
+- [x] Detect if character has Weapon Mastery (Fighter/Ranger/Paladin/Barbarian)
+- [x] List available mastery properties for character's weapons
+- [x] Apply mastery property effect to attack calculation
+- [x] Track mastery uses per turn (if limited)
+- [x] Display mastery property in attack list
 
-## 边界情况
+---
 
-- 非 Weapon Mastery 职业的角色，不显示 Weapon Mastery 区域
-- 武器无精通属性时（如即兴武器），不显示精通属性
-- 同一角色有多把武器，每把武器的精通属性独立显示
-- Weapon Mastery 使用次数受职业等级限制（Fighter 每短休恢复）
+## Data Model
 
-## 参考资料
+See `../../spec/data-model.md` → `Weapon`, `WeaponMasteryProperty`
 
-- PRD v4.0 §4.1 角色创建（Weapon Mastery 提到）
-- 2024 PHB p.148-149 Weapon Mastery 规则
-- 2024 PHB p.214-215 精通属性描述
+```typescript
+interface Weapon {
+  // ... other fields
+  readonly mastery?: WeaponMasteryProperty;
+}
+
+type WeaponMasteryProperty = 
+  | 'Cleave'
+  | 'Push'
+  | 'Sap'
+  | 'Slow'
+  | 'Topple'
+  | 'Vex'
+  | 'Graze'
+  | 'Nick';
+```
+
+**Character JSON storage**:
+```jsonc
+{
+  "equipment": [
+    {
+      "id": "longsword-1",
+      "name": "Longsword",
+      "type": "weapon",
+      "mastery": "Sap",
+      "equipped": true
+    }
+  ]
+}
+```
+
+---
+
+## Mastery Properties
+
+| Property | Effect |
+|---|---|
+| Cleave | On kill, bonus action attack against another creature within 5 ft |
+| Push | Hit forces Str save (DC = 8 + prof + Str/Dex mod) or be pushed 10 ft |
+| Sap | Hit weakens target, next attack against target has disadvantage |
+| Slow | Hit reduces target speed by 10 ft until start of next turn |
+| Topple | Hit forces Str save (DC = 8 + prof + Str/Dex mod) or be knocked prone |
+| Vex | Hit gives advantage on next attack against same target |
+| Graze | On miss, deal damage equal to ability modifier |
+| Nick | Bonus action attack with different light weapon |
+
+---
+
+## API Functions
+
+```typescript
+// Get weapons with mastery properties
+function getMasteryWeapons(char: Character): readonly Weapon[];
+
+// Apply mastery property effect to attack
+function applyMasteryEffect(
+  weapon: Weapon, 
+  target: Character, 
+  attackRoll: number
+): AttackResult;
+
+// Check if character has Weapon Mastery
+function hasWeaponMastery(char: Character, data?: DataLoader): boolean;
+
+// Get all mastery properties available to character
+function getAvailableMasteries(char: Character, data?: DataLoader): readonly WeaponMasteryProperty[];
+```
+
+---
+
+## Edge Cases
+
+| Situation | Handling |
+|---|---|
+| Character doesn't have Weapon Mastery | Don't show mastery properties |
+| Multiple weapons with mastery | Each applies independently |
+| Push/Topple save failed | Apply condition (prone/pushed) |
+| Sap applied | Mark target as "Weakened" (homebrew condition) |
+| Cleave triggered | Prompt bonus action attack |
+
+---
+
+## References
+
+- PRD §4.8 Equipment Management
+- 2024 PHB p.30 Weapon Mastery Rules
+- 2024 PHB p.163-175 Weapon Tables

@@ -1,109 +1,106 @@
-# 角色创建 — 物种(Species)
+# Character Creation — Species
 
-> 对应 PRD v4.0 §4.1 & §6 术语更新
-> **这是角色创建的第一步，是后续所有计算的基础。**
-
----
-
-## 需求描述
-
-玩家从2024 PHB的10个物种中选择一个，获得物种特性、属性加值、速度、语言等。
-MVP仅支持2024 PHB物种，2014遗留物种(Half-Elf/Half-Orc)放到P1。
+> Corresponds to PRD §4.1 & §6 Terminology Update
+> **First step in character creation, foundation for all subsequent calculations.**
 
 ---
 
-## 验收标准
+## Description
 
-- [ ] 显示10个2024物种卡片（图标+名称+简述）
-- [ ] 选择物种后，显示完整特性列表
-- [ ] 物种给予的属性加值正确应用到 `AbilityScores.racialBonuses`
-- [ ] 物种给予的速度正确应用到 `CombatStats.speed`
-- [ ] 物种给予的语言加入角色语言列表
-- [ ] 物种特性在角色表的"特性"区域可见
-- [ ] 支持Aasimar的Celestial Revelation（含选择变体）
-- [ ] 支持Dwarf的Dwarven Resilience（抗性或熟练项选择）
-- [ ] 支持Tiefling的Infernal Legacy（法术按等级解锁）
+Player selects one of 12 species from 2024 PHB, gaining species traits, ability bonuses, speed, languages, etc.
+
+MVP supports 2024 PHB species only. 2014 legacy species (Half-Elf/Half-Orc) moved to P1.
 
 ---
 
-## 数据模型
+## Acceptance Criteria
 
-见 `../../spec/data-model.md` → `Species`
+- [x] Display 12 species cards (icon + name + brief description)
+- [x] After selection, display full trait list
+- [x] Species ability bonuses correctly applied to `AbilityScores.racialBonuses`
+- [x] Species speed correctly applied to `CombatStats.speed`
+- [x] Species languages added to character language list
+- [x] Species traits visible in character "Traits" section
+- [x] Support Aasimar's Celestial Revelation (with variant selection)
+- [x] Support Dwarf's Dwarven Resilience (resistance or proficiency selection)
+- [x] Support Tiefling's Infernal Legacy (spells by level)
 
-**Species静态JSON结构**：
+---
+
+## Data Model
+
+See `../../spec/data-model.md` → `Species`
+
+**Species static JSON structure**:
 ```jsonc
 {
   "id": "Dwarf",
-  "subtypes": [               // 2024: 物种变体
-    {
-      "id": "Hill Dwarf",
-      "traits": [
-        { "name": "Dwarven Toughness", "grants": { "hpPerLevel": 1 } }
-      ]
-    },
-    {
-      "id": "Mountain Dwarf",
-      "traits": [
-        { "name": "Mountain Born", "grants": { "armorTraining": ["Light", "Medium"] } }
-      ]
-    }
-  ],
+  "source": "2024 PHB",
+  "description": "...",
+  "size": "Medium",
+  "speed": 30,
+  "languages": ["Common", "Dwarvish"],
+  "darkvision": 60,
+  "abilityBonuses": { "Constitution": 2 },
   "baseTraits": [
     { "name": "Darkvision", "description": "..." },
     { "name": "Dwarven Resilience", "description": "..." }
   ],
-  "abilityBonuses": { "Constitution": 2 },  // 固定加值，非+1/+2
-  "size": "Medium",
-  "speed": 30,
-  "languages": ["Common", "Dwarvish"]
+  "subtypes": [
+    {
+      "id": "hill-dwarf",
+      "name": "Hill Dwarf",
+      "traits": [...]
+    }
+  ]
 }
 ```
 
-**Character JSON中的记录方式**：
+**Character JSON storage**:
 ```jsonc
 {
   "species": "Dwarf",
-  "speciesSubtype": "Mountain Dwarf",   // 如物种有变体
-  "speciesTraits": [ "Darkvision", "Dwarven Resilience", "Mountain Born" ]
+  "speciesSubtype": "mountain-dwarf",
+  "speciesTraits": ["Darkvision", "Dwarven Resilience", "Mountain Born"]
 }
 ```
 
 ---
 
-## 2024 物种完整列表
+## 2024 Species Complete List
 
-| 物种 | 属性加值 | 大小 | 速度 | 特殊 |
+| Species | Ability Bonus | Size | Speed | Special |
 |---|---|---|---|---|
-| Aasimar | Cha+2 | Medium | 30 | Celestial Revelation(3级) |
+| Aasimar | Cha+2 | Medium | 30 | Celestial Revelation (level 3) |
 | Dragonborn | Str+2 | Medium | 30 | Draconic Breath |
-| Dwarf | Con+2 | Medium | 30(25 if hill) | Darkvision, Dwarven Resilience |
+| Dwarf | Con+2 | Medium | 30 | Darkvision, Dwarven Resilience |
 | Elf | Dex+2 | Medium | 30 | Trance, Keen Senses |
 | Gnome | Int+2 | Small | 30 | Gnome Cunning |
 | Goliath | Str+2 | Medium | 30 | Large Form, Hill's Tumble |
 | Halfling | Dex+2 | Small | 25 | Lucky, Brave |
-| Human | 自选两项+1 | Medium | 30 | Versatile(额外背景特性) |
+| Human | +1 to two | Medium | 30 | Versatile (extra background feature) |
 | Orc | Str+2 | Medium | 30 | Adrenaline Rush, Relentless Endurance |
-| Tiefling | Cha+2 | Medium | 30 | Infernal Legacy(法术) |
+| Tiefling | Cha+2 | Medium | 30 | Infernal Legacy (spells) |
 
-**2014遗留（P1）**：Half-Elf, Half-Orc
+**2014 Legacy (P1)**: Half-Elf, Half-Orc
 
 ---
 
-## 边界情况
+## Edge Cases
 
-| 情况 | 处理方式 |
+| Situation | Handling |
 |---|---|
-| Human选择属性加值 | 弹出选择器，选两项各+1（不能选同一项） |
-| Aasimar 3级选择Revelation | 升级时弹出选择（Radiant Soul/Transforming Soul/Vengeful Spirit） |
-| Orc的Adrenaline Rush使用次数 | 长休重置，记录到Resources |
-| 多重物种特性叠加 | 不叠加同名特性；不同特性并存 |
-| 物种给予护甲熟练 | 更新CombatStats.armorTraining列表 |
+| Human ability bonus selection | Show picker, select two +1 (can't select same) |
+| Aasimar level 3 Revelation selection | Show selection at level up (Radiant Soul/Transforming Soul/Vengeful Spirit) |
+| Orc's Adrenaline Rush uses | Reset on long rest, track in Resources |
+| Multiple species traits stack | Don't stack same-name traits; different traits coexist |
+| Species grants armor training | Update CombatStats.armorTraining list |
 
 ---
 
-## 参考资料
+## References
 
-- PRD v4.0 §4.1 角色创建
-- PRD v4.0 §6 规则数据范围
-- 2024 PHB p. 16-38 物种章节
-- 2024 PHB p. 18 术语更新：Race → Species
+- PRD §4.1 Character Creation
+- PRD §6 Rule Data Range
+- 2024 PHB p. 16-38 Species Chapter
+- 2024 PHB p. 18 Terminology Update: Race → Species

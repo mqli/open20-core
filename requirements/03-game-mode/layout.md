@@ -1,124 +1,55 @@
-# 游戏模式 — 布局与交互
+# Game Mode — Layout & Interaction (REMOVED)
 
-> 对应 PRD v4.0 §4.3
-> **这是整个app最重要的视图。** 玩家90%的使用时间在这里。
-
----
-
-## 需求描述
-
-游戏模式是打开app的**默认视图**，一屏展示所有战斗关键信息，大字体、高对比度，支持黑暗模式。玩家在游戏桌上单手可操作。
+> **This requirement is no longer applicable.**
 
 ---
 
-## 验收标准
+## Status: REMOVED (v5.0)
 
-### 布局
-- [ ] 打开app默认进入游戏模式（非角色列表/创建页）
-- [ ] 所有关键信息**一屏显示**，不需要向下滚动
-- [ ] 大字体（最小16pt），关键数据（AC/HP）≥ 24pt
-- [ ] 高对比度（黑暗模式默认）
-- [ ] 按钮尺寸≥ 44×44pt（手机单手可点）
+As of v5.0, Open20 Core is a **headless TypeScript engine** with no UI components.
 
-### 必显信息
-- [ ] 角色名 + 物种 + 职业 + 等级
-- [ ] AC（醒目显示）
-- [ ] HP（当前/最大，醒目显示）
-- [ ] 临时HP（如有，单独显示）
-- [ ] 先攻加值
-- [ ] 被动感知
-- [ ] 常用技能加值（3-5个，玩家可自定义置顶）
-- [ ] 武器装备（名称 + 攻击加值 + 伤害）
-- [ ] 资源计数器（如Rage/Second Wind，有即显示）
-- [ ] 法术位（施法者显示，非施法者隐藏）
-- [ ] 状态标记（当前状态图标，可点击切换）
-
-### 交互
-- [ ] 点击HP区域 → 弹出HP修改面板（+/-/直接输入）
-- [ ] 点击技能 → 复制 `1d20+加值` 到剪贴板
-- [ ] 点击资源 → 消耗/恢复（+/-）
-- [ ] 点击法术位 → 消耗/恢复
-- [ ] [短休] 按钮 → 重置短休资源 + 消耗生命骰恢复HP
-- [ ] [长休] 按钮 → 重置所有资源 + 恢复全部HP + 恢复法术位
-- [ ] [完整表] 按钮 → 跳转到详细角色表
-- [ ] [编辑] 按钮 → 跳转到角色编辑模式
-
-### 黑暗模式
-- [ ] 默认黑暗模式（黑底白字/亮色强调）
-- [ ] 支持切换到浅色模式（用户偏好持久化）
-- [ ] 高对比度模式（可选，适合投影仪）
+This requirement described UI layout for a character sheet app, which is now out of scope.
 
 ---
 
-## 线框图
+## Replacement (v5.0)
 
-```
-┌──────────┐
-│  ┌────┐  Borin Ironforge        │
-│  │🛡️ │  Dwarf Fighter 5         │
-│  └────┘  AC 18    HP 38/42        │
-│           Init +2   PP 13           │
-├──────────┤
-│  ⚔️ Longsword +7  1d8+4(Cleave) │
-│  ⚔️ Hand Axe  +7  1d6+4         │
-├──────────┤
-│  Skills         Bonus              │
-│  Athletics  ⚡   +7 [tap→copy]  │
-│  Intimidation    +4                  │
-│  Perception   ≈  +3 [tap→copy]  │
-│  [Show More Skills...]             │
-├──────────┤
-│  Resources                       │
-│  Second Wind   ●○○ [tap +/-]     │
-│  Action Surge  ●○  [tap +/-]     │
-│  Weapon Mastery: Cleave, Topple  │
-├──────────┤
-│  Spell Slots (Fighter 5, none)  │
-├──────────┤
-│  [🌀 Short Rest] [🌙 Long Rest] │
-│  [📋 Full Sheet]  [✏️ Edit]     │
-└──────────┘
+Instead of game mode UI, the engine provides:
 
-状态栏（可横向滚动）:
-  [🟢 Healthy] [+Concentrating] [+Prone] [+Grappled]...
+### Derived Stats API
+```typescript
+import { 
+  calculateAC, 
+  calculateHP, 
+  calculateInitiative,
+  calculatePassivePerception 
+} from '@open20/core/engine';
+
+const ac = calculateAC(character, equipment, data);
+const hp = calculateHP(character, data);
+const init = calculateInitiative(character, data);
+const pp = calculatePassivePerception(character, data);
 ```
 
----
+### Combat Stats
+```typescript
+interface CombatStats {
+  readonly armorClass: number;
+  readonly hitPoints: HitPoints;
+  readonly initiative: number;
+  readonly passivePerception: number;
+  readonly attacks: readonly Attack[];
+  readonly conditions: readonly ActiveCondition[];
+}
+```
 
-## 数据绑定
-
-游戏模式是 `Character` 对象的**只读展示**，除HP/资源/法术位外不修改数据。
-
-| 显示字段 | 数据来源 |
-|---|---|
-| AC | `CombatStats.AC` |
-| HP | `HitPoints.current / HitPoints.max` |
-| 临时HP | `HitPoints.temporary` |
-| 先攻 | `CombatStats.initiative` |
-| 被动感知 | `CombatStats.passivePerception` |
-| 技能加值 | `Skills[].bonus`（计算后） |
-| 武器装备 | `Equipment[]`（过滤 `equipped=true`） |
-| 资源 | `Resources[]` |
-| 法术位 | `Spells.spellSlots` |
-| 状态 | `conditions[]` |
+### Consumer Implementation
+UI implementation is left to consumers (web app, CLI, mobile app, VTT).
 
 ---
 
-## 边界情况
+## References
 
-| 情况 | 处理方式 |
-|---|---|
-| HP降至0 | 自动展开死亡豁免追踪器（3成功/3失败） |
-| 临时HP > 0 | 在HP区域用不同颜色显示（如蓝色底色） |
-| 无武器装备 | 显示"无甲 AC: X"（计算无甲AC） |
-| 非施法者 | 隐藏法术位区域 |
-| 资源全部满 | 资源区域可折叠隐藏 |
-| 屏幕宽度<375px | 武器列表换行显示，优先显示攻击加值 |
-
----
-
-## 参考资料
-
-- PRD v4.0 §4.3 游戏模式
-- PRD v4.0 §4.2 自动计算（AC/HP/技能加值来源）
-- PRD v4.0 §9 设计原则（速度优先、黑暗模式、单手操作）
+- PRD v5.0 §4.1 Engine Module
+- `src/engine/*` — Pure calculation functions
+- `src/character/recompute.ts` — Recompute all derived stats

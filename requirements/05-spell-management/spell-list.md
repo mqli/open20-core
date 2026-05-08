@@ -1,69 +1,116 @@
-# 需求 4.5.1：法术列表与法术卡片
+# Requirement 4.5.1: Spell List & Spell Cards
 
-## 1. 需求描述
-
-法术管理是施法者角色表的核心功能。施法者需要查看已知法术列表、准备法术（Wizard/Cleric等）、查看法术卡片（含SRD描述）。
+> Corresponds to PRD §4.5
 
 ---
 
-## 2. 验收标准
+## Description
 
-- [ ] 施法者显示已知法术列表（按等级分组）
-- [ ] 准备法术职业（Wizard/Cleric/Druid/Paladin）显示"已准备"复选框
-- [ ] 长休后准备法术清空（需重新准备）
-- [ ] 点击法术显示法术卡片：名称、等级、学校、施法时间、射程、成分、持续时间、SRD描述
-- [ ] 法术可以按等级、学校、是否准备过滤
-- [ ] 非施法者隐藏法术区域
-- [ ] 支持从SRD加载法术描述文本
+Spell management is core functionality for spellcasting characters. Casters need to view known spell list, prepare spells (Wizard/Cleric/etc.), and view spell cards (with SRD descriptions).
 
 ---
 
-## 3. 数据模型
+## Acceptance Criteria
 
-引用 `../../spec/data-model.md` 中的结构：
+- [x] Casters display known spells list (grouped by level)
+- [x] Preparation casters (Wizard/Cleric/Druid/Paladin) show "Prepared" checkbox
+- [x] Prepared spells cleared after long rest (need re-preparation)
+- [x] Click spell to show spell card: name, level, school, casting time, range, components, duration, SRD description
+- [x] Spells can be filtered by level, school, prepared status
+- [x] Non-casters hide spell area
+- [x] Support loading spell descriptions from SRD static data
+- [x] Query functions: `getSpell()`, `searchSpells()`, `getSpellsByClass()`
+
+---
+
+## Data Model
+
+See `../../spec/data-model.md` → `Spell`
 
 ```typescript
 // Character.spells
 interface CharacterSpells {
-  knownSpells: string[];        // ["Fireball", "Shield", ...]
-  preparedSpells: string[];     // ["Fireball", ...]
-  spellcastingAbility: string;  // "Intelligence" | "Wisdom" | "Charisma"
+  knownSpells: string[];        // ["fire-bolt", "mage-hand", "shield"]
+  preparedSpells: string[];     // ["shield", "magic-missile"]
+  spellcastingAbility: string;   // "Intelligence" | "Wisdom" | "Charisma"
+  spellSlots: Record<number, SpellSlotEntry>;
+  pactMagicSlots: PactMagicSlots | null;
 }
 ```
 
-法术详情从 SRD 静态数据加载：
+Spell details loaded from static data (`static/spells.json`):
 
 ```typescript
-interface SRDSpell {
+interface Spell {
+  id: string;                    // kebab-case
   name: string;
-  level: number;
-  school: string;
+  level: number;                 // 0-9 (0 = cantrip)
+  school: SpellSchool;
   castingTime: string;
   range: string;
-  components: { V: boolean; S: boolean; M?: string };
+  components: SpellComponents;
   duration: string;
-  description: string;   // SRD 描述文本
-  classes: string[];     // 可获取该法术的职业
+  concentration: boolean;
+  ritual: boolean;
+  description: string;           // SRD description text
+  higherLevel?: string;
+  damage?: SpellDamage;
+  heal?: SpellHeal;
+  save?: Ability;
+  attack?: 'ranged' | 'melee';
+  source: string;
+  classes: string[];             // Which classes have this in spell list
 }
 ```
 
 ---
 
-## 4. 边界情况
+## Query Functions
 
-| 场景 | 处理方式 |
-|------|----------|
-| 非施法者职业 | 完全隐藏法术区域，不渲染任何法术相关 UI |
-| Wizard（准备施法者） | 显示"已准备"复选框，长休后清空 preparedSpells |
-| Sorcerer/Warlock（已知施法者） | 不显示"已准备"复选框，knownSpells 即全部可用 |
-| 法术描述在 SRD 中不存在 | 显示"描述暂不可用"，不阻断 UI |
-| 过滤后无匹配法术 | 显示"无匹配法术"，而非空白 |
-| 法术等级 0（戏法） | 按等级 0 分组，不消耗法术位 |
+```typescript
+// Get single spell by ID
+function getSpell(id: string): Spell | undefined;
+
+// Search/filter spells
+function searchSpells(filter: SpellFilter): Spell[];
+
+// Get class spell list
+function getSpellsByClass(className: string): Spell[];
+
+// Get spells for character (known/prepared)
+function getSpellsForCharacter(char: Character): Spell[];
+```
+
+**SpellFilter Interface**:
+```typescript
+interface SpellFilter {
+  name?: string;
+  level?: number[];
+  school?: SpellSchool;
+  concentration?: boolean;
+  ritual?: boolean;
+  classes?: string[];
+  source?: string;
+}
+```
 
 ---
 
-## 5. 参考资料
+## Edge Cases
 
-- PRD v4.0 §4.5 法术管理
-- 2024 PHB p.30-33 施法规则
-- SRD 5.2 Spell List（法术描述文本来源）
+| Scenario | Handling |
+|---|---|
+| Non-spellcasting class | Completely hide spell area, don't render any spell-related UI |
+| Wizard (preparation caster) | Show "Prepared" checkbox, preparedSpells cleared after long rest |
+| Sorcerer/Warlock (known caster) | Don't show "Prepared" checkbox, knownSpells = all available |
+| Spell description not in SRD | Show "Description not available", don't block UI |
+| No spells match filter | Show "No matching spells", not blank |
+| Cantrips (level 0) | Grouped under level 0, don't consume spell slots |
+
+---
+
+## References
+
+- PRD §4.5 Spell Management
+- 2024 PHB p.30-33 Spellcasting Rules
+- SRD 5.1 Spell List (spell description text source)

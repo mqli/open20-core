@@ -1,51 +1,49 @@
-# HP追踪 — 当前HP/临时HP/死亡豁免
+# HP Tracking — Current HP/Temporary HP/Death Saves
 
-> 对应 PRD v4.0 §4.4
-> **D&D核心机制，战斗中几乎每轮都可能用到。**
-
----
-
-## 需求描述
-
-追踪角色当前HP、临时HP、死亡豁免计数。
-HP≤0时自动进入死亡豁免流程。
+> Corresponds to PRD §4.4
 
 ---
 
-## 验收标准
+## Description
 
-### HP修改
-- [ ] 点击HP区域 → 弹出修改面板
-- [ ] 面板含：直接输入数字、+/-按钮（+5/-5大步）
-- [ ] 修改后自动保存到 `HitPoints.current`
-- [ ] HP > maxHP时，自动截断为maxHP
+Track character current HP, temporary HP, and death save counts.
 
-### 临时HP
-- [ ] 单独显示临时HP字段（与current HP视觉区分）
-- [ ] 临时HP不叠加（取高者），只替换
-- [ ] 临时HP被伤害消耗时，先扣临时HP再扣current HP
-- [ ] 长休后临时HP清除
-
-### 死亡豁免
-- [ ] HP降至0或以下时，自动展开死亡豁免追踪器
-- [ ] 显示：成功 ○○○ / 失败 ○○○
-- [ ] 点击成功 → 点亮一个●；点击失败 → 点亮一个●
-- [ ] 3次成功 → 角色稳定（isStable=true），清除失败计数
-- [ ] 3次失败 → 角色死亡，提示"角色已死亡"
-- [ ] 恢复HP（任何>0）→ 清除死亡豁免，isStable=false
-
-### 短休/长休
-- [ ] [短休] 按钮 → 提示消耗生命骰恢复HP
-- [ ] 短休恢复HP = 掷生命骰 + Con调整值（或取固定值）
-- [ ] 短休后 `hitDice.used` +1（上限=总等级）
-- [ ] [长休] 按钮 → currentHP恢复为maxHP
-- [ ] 长休后 `hitDice.used` 恢复一半（向下取整，最少1个）
+When HP ≤ 0, automatically enter death save flow.
 
 ---
 
-## 数据模型
+## Acceptance Criteria
 
-见 `../../spec/data-model.md` → `HitPoints`
+### HP Modification
+- [x] `modifyHP(char, delta)` → new Character with updated HP
+- [x] HP > maxHP → clamp to maxHP
+- [x] HP < 0 → continue death save flow
+
+### Temporary HP
+- [x] Separate temporary HP field (visually distinct in data)
+- [x] Temporary HP doesn't stack (take higher)
+- [x] Damage consumes temporary HP first, then current HP
+- [x] Temporary HP cleared after long rest
+
+### Death Saves
+- [x] HP drops to 0 or below → auto-expand death save tracker
+- [x] Display: successes ○○○ / failures ○○○
+- [x] Click success → light one ●; click failure → light one ●
+- [x] 3 successes → character stabilizes (isStable=true), clear failures
+- [x] 3 failures → character dies, show "Character has died"
+- [x] Restore HP (any > 0) → clear death saves, isStable=false
+
+### Short/Long Rest
+- [x] `shortRest(char)` → recover HP using hit dice
+- [x] Short rest consumes 1 hit die (increment `hitDice.used`)
+- [x] `longRest(char)` → restore currentHP to maxHP
+- [x] Long rest recovers hit dice (half total level, round up, minimum 1)
+
+---
+
+## Data Model
+
+See `../../spec/data-model.md` → `HitPoints`
 
 ```jsonc
 {
@@ -54,7 +52,7 @@ HP≤0时自动进入死亡豁免流程。
   "temporary": 0,
   "hitDice": {
     "die": "d10",
-    "total": 5,       // = 总等级
+    "total": 5,
     "used": 2
   },
   "deathSaves": {
@@ -67,22 +65,49 @@ HP≤0时自动进入死亡豁免流程。
 
 ---
 
-## 边界情况
+## Edge Cases
 
-| 情况 | 处理方式 |
+| Situation | Handling |
 |---|---|
-| HP修改后为负数 | 正常记录（如 -5），继续死亡豁免流程 |
-| 临时HP与current HP同时修改 | 先处理临时HP，再处理伤害/治疗 |
-| 死亡豁免中恢复HP（如治疗术） | 清除deathSaves，isStable=false |
-| 长休时hitDice.used > total | 截断为0（不应该发生，防御性处理） |
-| 同时有多个临时HP来源 | 取最高值，不叠加（2024规则） |
+| HP modified to negative | Record normally (e.g., -5), continue death save flow |
+| Temporary HP & current HP modified simultaneously | Process temporary HP first, then damage/healing |
+| Death saves in progress, then healed | Clear deathSaves, isStable=false |
+| Long rest when hitDice.used > total | Clamp to 0 (shouldn't happen, defensive) |
+| Multiple temporary HP sources | Take highest value, don't stack (2024 rules) |
 
 ---
 
-## 参考资料
+## API Functions
 
-- PRD v4.0 §4.4 HP追踪
-- PRD v4.0 §10 附录E HP计算规则
-- 2024 PHB p.22-23 生命值规则
-- 2024 PHB p.25 短休/长休规则
-- 2024 PHB p.30 死亡与死亡豁免
+```typescript
+// Modify HP
+function modifyHP(char: Character, delta: number): Character;
+
+// Set temporary HP
+function setTemporaryHP(char: Character, value: number): Character;
+
+// Consume death save success
+function recordDeathSaveSuccess(char: Character): Character;
+
+// Consume death save failure
+function recordDeathSaveFailure(char: Character): Character;
+
+// Stabilize character
+function stabilize(char: Character): Character;
+
+// Short rest
+function shortRest(char: Character, data?: DataLoader): Character;
+
+// Long rest
+function longRest(char: Character, data?: DataLoader): Character;
+```
+
+---
+
+## References
+
+- PRD §4.4 HP Tracking
+- PRD §10 Appendix E HP Calculation Rules
+- 2024 PHB p.22-23 Hit Points Rules
+- 2024 PHB p.25 Short/Long Rest Rules
+- 2024 PHB p.30 Death and Death Saves

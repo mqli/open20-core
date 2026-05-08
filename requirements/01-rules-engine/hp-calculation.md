@@ -1,76 +1,72 @@
-# 规则引擎 — HP计算
+# Engine — HP Calculation
 
-> 对应 PRD v4.0 §4.2 & §10 附录E
-> **这是最容易算错的规则之一，必须100%准确。**
-
----
-
-## 需求描述
-
-HP(Hit Points)计算分两个阶段：
-1. **1级时**：固定最大值 + Con调整值
-2. **每次升级时**：上一级HP + 固定值(骰面/2向上取整) + Con调整值
+> Corresponds to PRD §4.2 & §10 Appendix E
+> **One of the easiest rules to miscalculate — must be 100% accurate.**
 
 ---
 
-## 验收标准
+## Description
 
-- [ ] 1级HP = 职业生命骰最大值 + Con调整值
-- [ ] 每升一级HP增量 = `ceil(生命骰面 / 2)` + Con调整值
-- [ ] Con调整值为负数时，HP可以降级（但不能低于1）
-- [ ] 升级时玩家可以选择：固定值(推荐) 或 掷骰
-- [ ] 短休时可用消耗生命骰恢复HP（数量=已完成的短休次数，上限=总等级）
-- [ ] 长休后恢复所有HP，且恢复所有消耗的生命骰（总等级的一半，向下取整，最少1个）
-- [ ] 多维职业时，HP累加每个职业的贡献
-- [ ] `hitDice.total` = 总职业等级；`hitDice.used` 追踪消耗的生命骰
+HP (Hit Points) calculation has two phases:
+1. **Level 1**: Max hit die + Con modifier
+2. **Each level up**: Previous HP + fixed value (ceil(hit die/2)) + Con modifier
 
 ---
 
-## 计算公式
+## Acceptance Criteria
 
-### 1级HP
+- [x] Level 1 HP = max hit die + Con modifier
+- [x] HP increment per level = `ceil(hitDieSize / 2)` + Con modifier
+- [x] Negative Con modifier can reduce HP (but total HP can't be < 1)
+- [x] Player can choose: fixed value (recommended) or roll
+- [x] Short rest can recover HP using hit dice (number = number of short rests, cap = total level)
+- [x] Long rest recovers all HP and all hit dice (half total level, round up, minimum 1)
+- [x] Multiclass: HP accumulates from each class
+- [x] `hitDice.total` = total character level; `hitDice.used` tracks consumed hit dice
 
+---
+
+## Calculation Formula
+
+### Level 1 HP
 ```
 hp = hitDieMaximum + conMod
 ```
 
-### 升级HP增量
-
+### Level Up HP Increment
 ```
 hpIncrement = ceil(hitDieSize / 2) + conMod
 ```
 
-**固定值对照表**：
+**Fixed value table**:
 
-| 生命骰 | 固定值 |
+| Hit Die | Fixed Value |
 |---|---|
 | d6 | 4 |
 | d8 | 5 |
 | d10 | 6 |
 | d12 | 7 |
 
-### 总HP计算示例
-
-5级Fighter，Con +3：
+### Total HP Example
+5th level Fighter, Con +3:
 ```
-1级: 10 + 3 = 13
-2级: 13 + 6 + 3 = 22
-3级: 22 + 6 + 3 = 31
-4级: 31 + 6 + 3 = 40
-5级: 40 + 6 + 3 = 49
+Level 1: 10 + 3 = 13
+Level 2: 13 + 6 + 3 = 22
+Level 3: 22 + 6 + 3 = 31
+Level 4: 31 + 6 + 3 = 40
+Level 5: 40 + 6 + 3 = 49
 ```
 
-### 生命骰恢复（长休）
-
+### Hit Dice Recovery (Long Rest)
 ```
-recovered = max(floor(totalLevel / 2), 1)
+recovered = max(ceil(totalLevel / 2), 1)
 ```
 
 ---
 
-## 数据模型
+## Data Model
 
-见 `../../spec/data-model.md` → `HitPoints`
+See `../../spec/data-model.md` → `HitPoints`
 
 ```jsonc
 {
@@ -79,8 +75,8 @@ recovered = max(floor(totalLevel / 2), 1)
   "temporary": 0,
   "hitDice": {
     "die": "d10",
-    "total": 5,      // = 总等级
-    "used": 2         // 短休消耗的数量
+    "total": 5,      // = total level
+    "used": 2         // consumed this long rest cycle
   },
   "deathSaves": {
     "successes": 0,
@@ -92,21 +88,21 @@ recovered = max(floor(totalLevel / 2), 1)
 
 ---
 
-## 边界情况
+## Edge Cases
 
-| 情况 | 处理方式 |
+| Situation | Handling |
 |---|---|
-| Con调整值为负 | HP增量可能<0，允许（但总HP不能<1） |
-| 同时有多个生命骰类型（多维职业） | 每个职业独立记录hitDie，恢复时合并计算 |
-| 倒地后恢复HP | 清除deathSaves，isStable=true |
-| 临时HP | 单独计算，不计入current，过期/替换时清除 |
-| 短休恢复HP | 消耗1个生命骰，掷骰或取固定值+Con |
+| Negative Con modifier | HP increment may be < 0, allowed (but total HP can't be < 1) |
+| Multiple hit die types (multiclass) | Each class tracks hitDie independently, recovery calculated combined |
+| Unconscious then healed | Clear deathSaves, isStable=true |
+| Temporary HP | Tracked separately, doesn't count toward current, expires/replaces |
+| Short rest HP recovery | Consume 1 hit die, roll or fixed value + Con |
 
 ---
 
-## 参考资料
+## References
 
-- PRD v4.0 §4.2 自动计算
-- PRD v4.0 §10 附录E HP计算规则
-- 2024 PHB p.22-23 生命值规则
-- 2024 PHB p.25 短休/长休规则
+- PRD §4.2 Automatic Calculations
+- PRD §10 Appendix E HP Calculation Rules
+- 2024 PHB p.22-23 Hit Points Rules
+- 2024 PHB p.25 Short/Long Rest Rules
