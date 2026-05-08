@@ -1,82 +1,87 @@
-# DND 2024 Character Sheet — High Level Design
+# Open20 Core — High Level Design
 
-**版本**: 1.1  
-**日期**: 2025-05-03  
-**状态**: Active  
-**定位**: Headless Core — 纯TypeScript，零UI依赖，单元测试可验证
-
----
-
-## 0. 一句话架构
-
-> **纯函数规则引擎 + 不可变角色状态 + 可注入依赖 = 任何UI都能驱动的headless核心。**
+**Version**: 2.0 (Headless Engine)
+**Date**: 2026-05-08
+**Status**: Active
+**Positioning**: Headless TypeScript game engine for D&D 5e 2024
 
 ---
 
-## 1. 架构原则
+## 0. One-Sentence Architecture
 
-| # | 原则 | 含义 | 为什么 |
+> **Pure function rule engine + immutable character state + injectable dependencies = headless core usable by any framework.**
+
+---
+
+## 1. Architecture Principles
+
+| # | Principle | Meaning | Why |
 |---|---|---|---|
-| A1 | **Pure Functions** | 规则引擎所有函数：`(input) => output`，无副作用 | 相同输入永远相同输出，天然可测试，天然可缓存 |
-| A2 | **Immutable State** | `Character`对象创建后不修改，变更返回新对象 | 消除状态竞争，支持undo/redo，方便序列化 |
-| A3 | **Dependency Injection** | 所有外部依赖(存储、随机数)通过参数注入 | 测试时替换为mock，运行时替换为真实实现 |
-| A4 | **Schema-First Types** | TypeScript类型是唯一真相源，运行时用Zod校验 | 导入JSON时必须有运行时校验，类型定义同时服务两用 |
-| A5 | **Zero UI Dependency** | 核心包不依赖任何UI框架(React/Vue/etc.) | 核心可以被CLI/Web/Native任何壳子复用 |
-| A6 | **Barrel Exports** | 每个模块通过`index.ts`导出公共API | 模块边界清晰，内部实现可自由重构 |
-| A7 | **Data-Driven Rules** | 规则数据(物种/职业/法术)与逻辑代码分离 | 规则更新只改JSON，不改代码 |
+| A1 | **Pure Functions** | All engine functions: `(input) => output`, no side effects | Same input = same output, naturally testable, naturally cacheable |
+| A2 | **Immutable State** | `Character` object never modified after creation, changes return new object | Eliminates state races, supports undo/redo, easy serialization |
+| A3 | **Dependency Injection** | All external dependencies (storage, random) injected via parameters | Replace with mocks in tests, replace with real implementations at runtime |
+| A4 | **Schema-First Types** | TypeScript types are single source of truth, runtime validation with Zod | JSON imports must have runtime validation, type definitions serve dual purpose |
+| A5 | **Zero UI Dependency** | Core package doesn't depend on any UI framework (React/Vue/etc.) | Core can be reused by CLI/Web/Native any shell |
+| A6 | **Barrel Exports** | Each module exports public API via `index.ts` | Clear module boundaries, internal implementations can be freely refactored |
+| A7 | **Data-Driven Rules** | Rule data (species/classes/spells) separated from logic code | Rule updates only change JSON, not code |
+| A8 | **Headless by Design** | No UI components, no rendering logic, no state management opinions | Framework-agnostic, let consumers choose their stack |
 
 ---
 
-## 2. 模块架构
+## 2. Module Architecture
 
 ```
 ┌──────────────────────────────────────────────────┐
 │                  open20-core                      │
-│                   (本包全部)                       │
+│                   (this package)                 │
 ├──────────┬──────────┬──────────┬─────────────────┤
 │  types   │   data   │  engine  │   character     │
-│ 类型定义  │ 规则数据  │ 纯函数   │  状态管理        │
-│          │          │  计算     │  创建/变更/校验   │
+│  types   │  rules   │  pure    │   state mgmt     │
+│  defs    │  data    │  fns     │   create/mutate  │
 ├──────────┴──────────┴──────────┴─────────────────┤
+│                spells                              │
+│            spell data & queries                    │
+├──────────────────────────────────────────────────┤
 │                   storage                         │
-│            持久化抽象层(接口+实现)                   │
+│            persistence abstraction                 │
 └──────────────────────────────────────────────────┘
          │                              │
          ▼                              ▼
    ┌───────────┐                 ┌───────────┐
    │  CLI App  │                 │  Web App  │
-   │ (未来)    │                 │ (未来)     │
+   │ (future)  │                 │ (future)   │
    └───────────┘                 └───────────┘
 ```
 
-**依赖方向（单向，禁止反向）**：
+**Dependency Direction (unidirectional, reverse prohibited)**:
 
 ```
 types ← data ← engine ← character ← storage
-                   ↑                   │
-                   └───────────────────┘ (character引用engine的函数)
+                ↑                   │
+                └───────────────────┘ (character references engine functions)
 ```
 
-**禁止**：
-- `types` 不得 import 任何其他模块
-- `data` 只能 import `types`
-- `engine` 只能 import `types` 和 `data`
-- `character` 可以 import `types`、`data`、`engine`
-- `storage` 可以 import `types`、`character`
+**Prohibited**:
+- `types` must not import from any other module
+- `data` can only import from `types`
+- `engine` can only import from `types` and `data`
+- `character` can import from `types`, `data`, `engine`
+- `storage` can import from `types`, `character`
+- `spells` can import from `types`, `data`
 
 ---
 
-## 3. 目录结构
+## 3. Directory Structure
 
 ```
 open20-core/
 ├── src/
-│   ├── types/                    # A1: 类型定义（零依赖）
+│   ├── types/                    # A1: Type definitions (zero dependencies)
 │   │   ├── character.ts          #   Character, CharacterClass, HitPoints, DeathSaves,
 │   │   │                         #   CombatStats, Attack, ActiveCondition, ConditionName,
 │   │   │                         #   Currency, DieType
 │   │   ├── species.ts            #   Species, SpeciesTrait, SpeciesGrant, SpeciesSubtype
-│   │   ├── background.ts         #   Background (含 originFeatId)
+│   │   ├── background.ts         #   Background (with originFeatId)
 │   │   ├── class.ts              #   Class, Subclass, Feature, Spellcasting, MulticlassSpellSlotEntry
 │   │   ├── ability.ts            #   AbilityName, AbilityScores, ABILITY_NAMES
 │   │   ├── skill.ts              #   SkillName, SkillEntry, SKILL_ABILITY_MAP
@@ -86,12 +91,13 @@ open20-core/
 │   │   ├── resource.ts           #   Resource, ResetType, DisplayType
 │   │   └── index.ts              #   barrel export
 │   │
-│   ├── data/                     # A7: 规则数据（只依赖types）
-│   │   ├── loader.ts             #   DataLoader 接口 + LookupTables 类型 + createDataLoader 工厂
-│   │   ├── default-loader.ts     #   默认 DataLoader 实现（从 static/*.json 加载）
+│   ├── data/                     # A7: Rule data (depends only on types)
+│   │   ├── loader.ts             #   DataLoader interface + LookupTables type + createDataLoader factory
+│   │   ├── default-loader.ts     #   Default DataLoader implementation (loads from static/*.json)
+│   │   ├── browser-loader.ts     #   Browser-compatible DataLoader (bundles JSON via esbuild)
 │   │   └── index.ts
 │   │
-│   ├── engine/                   # A1: 纯函数计算（无副作用）
+│   ├── engine/                   # A1: Pure function calculations (no side effects)
 │   │   ├── ability-modifier.ts   #   getModifier(score), getTotalScore(...)
 │   │   ├── proficiency-bonus.ts  #   getProficiencyBonus(level)
 │   │   ├── skill-bonus.ts        #   getSkillBonus(char, skillName, data)
@@ -104,11 +110,11 @@ open20-core/
 │   │   ├── attack-calculator.ts  #   calculateAttacks(char, data) → Attack[]
 │   │   └── index.ts
 │   │
-│   ├── character/                # A2+A3: 状态管理（不可变+可注入）
+│   ├── character/                # A2+A3: State management (immutable + injectable)
 │   │   ├── create.ts             #   createCharacter(params) → Character
 │   │   ├── level-up.ts           #   levelUp(char, options, data, rng?) → Character
 │   │   ├── rest.ts               #   shortRest(char, data) → Character; longRest(char, data) → Character
-│   │   ├── mutate.ts             #   所有状态变更函数
+│   │   ├── mutate.ts             #   All state mutation functions
 │   │   │                         #     modifyHP(char, delta) → Character
 │   │   │                         #     setTemporaryHP(char, value) → Character
 │   │   │                         #     consumeResource(char, id) → Character
@@ -124,17 +130,45 @@ open20-core/
 │   │   ├── recompute.ts          #   recomputeDerivedStats(char, data) → Character
 │   │   └── index.ts
 │   │
-│   ├── storage/                  # A3: 持久化（接口+实现分离）
-│   │   ├── interface.ts          #   ICharacterStorage 接口
-│   │   ├── memory.ts             #   InMemoryStorage (测试用)
-│   │   ├── json-file.ts          #   JsonFileStorage (CLI用)
+│   ├── spells/                   # NEW: Spell management module
+│   │   ├── query.ts              #   getSpell(id), searchSpells(filter), getSpellsByClass(class)
+│   │   ├── filter.ts             #   Filter helpers for spell queries
+│   │   ├── types.ts              #   Spell types and interfaces
+│   │   └── index.ts
+│   │
+│   ├── schemas/                  # NEW: Zod schemas for runtime validation
+│   │   ├── character.ts          #   CharacterSchema
+│   │   ├── spell.ts              #   SpellSchema
+│   │   └── index.ts
+│   │
+│   ├── storage/                  # A3: Persistence (interface + implementations)
+│   │   ├── interface.ts          #   ICharacterStorage interface
+│   │   ├── memory.ts             #   InMemoryStorage (for tests)
+│   │   ├── json-file.ts          #   JsonFileStorage (CLI use)
 │   │   ├── serializer.ts         #   serialize(char) → JSON; deserialize(json) → Character
 │   │   └── index.ts
 │   │
-│   └── index.ts                  # 公共API barrel export
+│   ├── index.ts                  # Public API barrel export (Node.js)
+│   └── browser-index.ts          # Public API barrel export (Browser, excludes Node.js storage)
+│
+├── static/                       # Static JSON data files
+│   ├── lookup-tables.json        # Proficiency, HP, spell slots, etc.
+│   ├── species.json              # 12 species (2024 PHB + legacy)
+│   ├── backgrounds.json          # 16 backgrounds (2024 PHB)
+│   ├── classes.json              # 12 classes (2024 PHB)
+│   ├── subclasses.json           # Subclasses for all classes
+│   ├── feats.json                # 75 feats (2024 PHB)
+│   ├── weapons.json              # ~40 weapons (2024 PHB)
+│   ├── armor.json                # ~20 armors (2024 PHB)
+│   ├── gear.json                 # ~50 gear items (2024 PHB)
+│   └── spells.json               # 560+ spells (SRD + 2024 PHB)
+│
+├── scripts/
+│   ├── bundle.mjs                # Browser bundle builder (esbuild)
+│   └── import_srd_spells.py     # Import SRD spells from dnd-data GitHub repo
 │
 ├── tests/
-│   ├── engine/                   # 规则引擎单元测试
+│   ├── engine/                   # Rule engine unit tests
 │   │   ├── ability-modifier.test.ts
 │   │   ├── proficiency-bonus.test.ts
 │   │   ├── skill-bonus.test.ts
@@ -145,984 +179,276 @@ open20-core/
 │   │   ├── initiative.test.ts
 │   │   ├── passive-perception.test.ts
 │   │   └── attack-calculator.test.ts
-│   ├── character/                # 状态管理测试
+│   ├── character/                # State management tests
 │   │   ├── create.test.ts
 │   │   ├── level-up.test.ts
-│   │   ├── rest.test.ts
 │   │   ├── mutate.test.ts
+│   │   ├── rest.test.ts
 │   │   ├── validate.test.ts
 │   │   └── recompute.test.ts
-│   ├── data/                     # 数据完整性测试
-│   │   └── data-integrity.test.ts
-│   └── storage/                  # 存储层测试
-│       ├── serializer.test.ts
-│       └── import-export.test.ts
+│   ├── spells/                   # Spell management tests
+│   │   └── query.test.ts
+│   ├── storage/                  # Persistence tests
+│   │   └── serializer.test.ts
+│   ├── data/                     # Data integrity tests
+│   │   └── spells.test.ts
+│   └── integration/              # Integration tests
+│       └── create-and-calculate.test.ts
 │
-├── package.json
-├── tsconfig.json
-├── vitest.config.ts              # 测试配置
-├── static/                       # A7: 静态规则数据（JSON）
-│   ├── species.json              #   12个物种
-│   ├── backgrounds.json          #   16个背景
-│   ├── classes.json              #   12个职业
-│   ├── subclasses.json           #   所有子职业
-│   ├── feats.json                #   75个专长
-│   ├── spells.json               #   ~391个法术
-│   ├── weapons.json              #   武器列表
-│   ├── armor.json                #   护甲列表
-│   ├── gear.json                 #   冒险装备
-│   └── lookup-tables.json        #   查表数据（熟练加值/法术位/Pact Magic等）
-└── PRD.md                        # 产品需求文档
+├── dist/                         # Build output
+│   ├── index.js                  # Node.js bundle
+│   ├── open20-core.js            # Browser UMD bundle
+│   └── open20-core.esm.js       # Browser ESM bundle
+│
+├── spec/                         # Documentation
+│   ├── high-level-design.md      # This file
+│   ├── data-model.md             # TypeScript interfaces & JSON schema
+│   └── test-plan.md              # Test plan and coverage goals
+│
+├── requirements/                 # Requirements traceability
+│   └── README.md
+│
+├── PRD.md                        # Product Requirements Document
+├── agent.md                      # Developer guide for AI agents
+├── package.json                  # ESM, vitest, typescript
+├── tsconfig.json                 # Strict, noUncheckedIndexedAccess
+└── vitest.config.ts              # Test configuration
 ```
 
 ---
 
-## 4. 命名规范
+## 4. Core Module Specifications
 
-### 4.1 文件命名
+### 4.1 Engine Module (`src/engine/`)
 
-| 规则 | 示例 | 说明 |
+**Purpose**: Pure functions for D&D 5e 2024 rule calculations.
+
+**Design Constraints**:
+- All functions must be pure (no side effects)
+- Accept character state as input, return computed values
+- Support both single-class and multiclass calculations
+- Handle edge cases: Mage Armor, Unarmored Defense, Fighting Styles, etc.
+
+**Functions**:
+
+| Function | Signature | Description |
 |---|---|---|
-| kebab-case | `ac-calculator.ts` | 所有源码文件 |
-| 文件名=模块主职责 | `spell-slots.ts` | 一个文件一个职责 |
-| 测试文件同目录或 `tests/` | `ac-calculator.test.ts` | 与源文件一一对应 |
-| barrel文件 | `index.ts` | 模块公共API |
+| `getModifier` | `(score: number) => number` | `(score - 10) / 2` floor |
+| `getTotalScore` | `(char, ability, data) => number` | Base + racial + equipment bonuses |
+| `getProficiencyBonus` | `(level: number) => number` | PB table by level |
+| `getSkillBonus` | `(char, skill, data) => number` | attr mod + PB (if proficient) + expertise |
+| `getSavingThrowBonus` | `(char, ability, data) => number` | attr mod + PB (if proficient) |
+| `calculateAC` | `(char, equipment, data) => number` | Unarmored/Armored/Mage Armor/Unarmored Defense |
+| `calculateMaxHP` | `(char, data) => number` | 1st level max + per-level fixed value |
+| `calculateSpellSlots` | `(char, data) => SpellSlotMap` | Single/Multiclass + Pact Magic |
+| `calculateInitiative` | `(char, data) => number` | Dex mod + initiative bonuses |
+| `calculatePassivePerception` | `(char, data) => number` | 10 + Perception bonus |
+| `calculateAttacks` | `(char, data) => Attack[]` | Weapon attacks with bonuses |
 
-### 4.2 TypeScript命名
+### 4.2 Character Module (`src/character/`)
 
-| 类别 | 规则 | 示例 |
+**Purpose**: Character creation, validation, and level-up logic.
+
+**Design Constraints**:
+- All mutation functions return new `Character` object (immutable)
+- Use spread operator for updates
+- Validate input parameters
+- Support multiclass characters
+
+**Functions**:
+
+| Function | Signature | Description |
 |---|---|---|
-| **Interface** | PascalCase, 不加I前缀 | `Character`, `Species`, `DataLoader` |
-| **Type Alias** | PascalCase | `AbilityName`, `FeatCategory`, `ResetType` |
-| **Enum** | PascalCase(名), PascalCase(值) | `ResetType.ShortRest` |
-| **Function** | camelCase, 动词开头 | `calculateAC`, `getModifier`, `createCharacter` |
-| **Constant** | SCREAMING_SNAKE_CASE | `PROFICIENCY_BONUS_TABLE`, `HIT_DIE_FIXED_VALUES` |
-| **Generic Parameter** | 单大写字母或有意义名称 | `T`, `TData`, `TCharacter` |
+| `createCharacter` | `(params, data?) => Character` | Create new character |
+| `levelUp` | `(char, options, data?) => Character` | Level up character |
+| `shortRest` | `(char, data?) => Character` | Short rest (recover resources) |
+| `longRest` | `(char, data?) => Character` | Long rest (full recovery) |
+| `validateCharacter` | `(char, data?) => ValidationError[]` | Full rule compliance check |
+| `recomputeDerivedStats` | `(char, data?) => Character` | Recompute all derived stats |
+| `modifyHP` | `(char, delta) => Character` | Modify current HP |
+| `setTemporaryHP` | `(char, value) => Character` | Set temporary HP |
+| `consumeResource` | `(char, id) => Character` | Consume a resource use |
+| `recoverResource` | `(char, id) => Character` | Recover a resource use |
+| `consumeSpellSlot` | `(char, level) => Character` | Consume a spell slot |
+| `recoverSpellSlot` | `(char, level) => Character` | Recover a spell slot |
+| `toggleCondition` | `(char, conditionId) => Character` | Toggle condition on/off |
+| `equipItem` | `(char, itemId) => Character` | Equip an item |
+| `unequipItem` | `(char, itemId) => Character` | Unequip an item |
+| `prepareSpell` | `(char, spellId) => Character` | Mark spell as prepared |
+| `unprepareSpell` | `(char, spellId) => Character` | Unmark spell as prepared |
 
-### 4.3 函数命名约定
+### 4.3 Spells Module (`src/spells/`)
 
-| 前缀 | 含义 | 示例 |
+**Purpose**: Comprehensive spell data and spell-related queries.
+
+**Design Constraints**:
+- Provide query functions for spell data
+- Support filtering by multiple criteria
+- Handle SRD and non-SRD spells appropriately
+- Efficient lookups (consider indexing for large datasets)
+
+**Functions**:
+
+| Function | Signature | Description |
 |---|---|---|
-| `calculate*` | 从输入计算一个派生值 | `calculateAC(char, data)` |
-| `get*` | 简单取值/查表 | `getModifier(score)`, `getProficiencyBonus(level)` |
-| `create*` | 创建新对象 | `createCharacter(params)` |
-| `validate*` | 校验，返回Result | `validateCharacter(char, data)` |
-| `recompute*` | 重算所有派生属性 | `recomputeDerivedStats(char, data)` |
-| `modify*` / `set*` / `toggle*` | 状态变更，返回新对象 | `modifyHP(char, delta)` |
+| `getSpell` | `(id: string) => Spell \| undefined` | Get single spell by ID |
+| `searchSpells` | `(filter: SpellFilter) => Spell[]` | Search/filter spells |
+| `getSpellsByClass` | `(className: string) => Spell[]` | Get class spell list |
+| `getSpellsByLevel` | `(level: number) => Spell[]` | Get spells by level |
+| `getSpellsForCharacter` | `(char, data?) => Spell[]` | Get known/prepared spells for character |
 
-### 4.4 枚举/常量命名
-
+**SpellFilter Interface**:
 ```typescript
-// 属性名 — 字符串字面量联合类型，不用enum
-type AbilityName = 'Strength' | 'Dexterity' | 'Constitution' 
-                  | 'Intelligence' | 'Wisdom' | 'Charisma';
-
-// 重置类型 — 用enum（有限选项，运行时需要反向映射）
-enum ResetType {
-  ShortRest = 'Short Rest',
-  LongRest = 'Long Rest',
-  PerTurn = 'Per Turn',
-  Daily = 'Daily',
-  Never = 'Never',
-}
-
-// 专长类别 — 字符串字面量联合类型
-type FeatCategory = 'Origin' | 'General' | 'Fighting Style' | 'Epic Boon';
-
-// 护甲类别
-type ArmorCategory = 'Light' | 'Medium' | 'Heavy' | 'Shield';
-
-// 武器类别
-type WeaponCategory = 'Simple' | 'Martial';
-
-// 法术学校
-type SpellSchool = 'Abjuration' | 'Conjuration' | 'Divination' | 'Enchantment' 
-                  | 'Evocation' | 'Illusion' | 'Necromancy' | 'Transmutation';
-
-// 条件状态
-type ConditionName = 'Blinded' | 'Charmed' | 'Deafened' | 'Exhaustion' 
-                   | 'Frightened' | 'Grappled' | 'Incapacitated' | 'Invisible' 
-                   | 'Paralyzed' | 'Petrified' | 'Poisoned' | 'Prone' 
-                   | 'Restrained' | 'Stunned' | 'Unconscious';
-```
-
-> **设计决策：什么时候用enum vs 字符串字面量？**
-> - 有限选项且需要运行时遍历 → `enum`（如ResetType）
-> - 有限选项但只做类型检查 → 字符串字面量联合（如AbilityName，更接近JSON数据格式）
-> - 原因：JSON序列化时enum可能产生意外值，字符串字面量天然兼容JSON
-
----
-
-## 5. 核心类型设计
-
-### 5.1 属性(Ability)
-
-```typescript
-// types/ability.ts
-
-export type AbilityName = 'Strength' | 'Dexterity' | 'Constitution' 
-                        | 'Intelligence' | 'Wisdom' | 'Charisma';
-
-export const ABILITY_NAMES: readonly AbilityName[] = [
-  'Strength', 'Dexterity', 'Constitution', 
-  'Intelligence', 'Wisdom', 'Charisma',
-];
-
-export interface AbilityScores {
-  base: Record<AbilityName, number>;        // 玩家分配的原始值
-  racialBonuses: Partial<Record<AbilityName, number>>;  // 物种加值
-  featBonuses: Partial<Record<AbilityName, number>>;    // 专长加值
-  temporaryBonuses: Partial<Record<AbilityName, number>>; // 临时加值（法术等）
+interface SpellFilter {
+  name?: string;
+  level?: number[];
+  school?: SpellSchool;
+  concentration?: boolean;
+  ritual?: boolean;
+  classes?: string[];
+  source?: string;
 }
 ```
 
-### 5.2 角色(Character)
+### 4.4 Schemas Module (`src/schemas/`)
 
-```typescript
-// types/character.ts
+**Purpose**: Zod schemas for runtime validation of all data structures.
 
-export interface Character {
-  readonly schemaVersion: string;
-  readonly name: string;
-  readonly species: string;                    // Species.id
-  readonly speciesSubtype: string | null;      // 物种变体
-  readonly background: string;                 // Background.id
-  readonly classes: readonly CharacterClass[];  // 支持多维职业
-  readonly abilityScores: AbilityScores;
-  readonly skills: Record<string, SkillEntry>;
-  readonly feats: readonly string[];            // Feat.id 列表
-  readonly equipment: readonly EquipmentItem[];
-  readonly spells: CharacterSpells;
-  readonly resources: readonly Resource[];
-  readonly hitPoints: HitPoints;
-  readonly combatStats: CombatStats;
-  readonly currency: Currency;
-  readonly conditions: readonly ActiveCondition[];
-  readonly notes: string;
-  readonly createdAt: string;
-  readonly updatedAt: string;
-}
+**Design Constraints**:
+- All data structures must have corresponding Zod schema
+- Schemas used for JSON import validation
+- Schemas exported for consumer use
+- Error messages should be helpful
 
-export interface CharacterClass {
-  readonly classId: string;          // Class.id
-  readonly level: number;
-  readonly subclassId: string | null;
-  readonly subclassLevel: number | null;
-  readonly hitDice: { readonly die: DieType; readonly used: number };
-}
+**Schemas**:
 
-export type DieType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20';
-
-export interface HitPoints {
-  readonly max: number;
-  readonly current: number;
-  readonly temporary: number;
-  readonly deathSaves: DeathSaves;
-}
-
-export interface DeathSaves {
-  readonly successes: number;  // 0-3
-  readonly failures: number;   // 0-3
-  readonly isStable: boolean;
-}
-
-export interface Currency {
-  readonly cp: number;
-  readonly sp: number;
-  readonly ep: number;
-  readonly gp: number;
-  readonly pp: number;
-}
-```
-
-> **设计决策：`readonly` everywhere？**
-> 是的。Character及其所有子字段标记`readonly`，强制不可变。修改通过`character/mutate.ts`中的函数完成，返回新对象。这样：
-> - 类型系统阻止意外修改
-> - 支持undo栈（保存旧引用即可）
-> - 序列化安全（对象不会被其他代码偷偷改掉）
-
-### 5.3 规则数据接口
-
-```typescript
-// data/loader.ts
-
-export interface DataLoader {
-  // ── 物种（Species）───
-  getSpecies(id: string): Species | undefined;
-  getSpeciesSubtype(speciesId: string, subtypeId: string): SpeciesSubtype | undefined;
-  getAllSpecies(): Species[];
-
-  // ── 背景（Background）───
-  getBackground(id: string): Background | undefined;
-  getAllBackgrounds(): Background[];
-
-  // ── 职业（Class）/ 子职业（Subclass）───
-  getClass(id: string): Class | undefined;
-  getAllClasses(): Class[];
-  getSubclass(id: string): Subclass | undefined;
-  getSubclassesForClass(classId: string): Subclass[];
-  getAllSubclasses(): Subclass[];
-
-  // ── 专长（Feat）───
-  getFeat(id: string): Feat | undefined;
-  getFeatsByCategory(category: FeatCategory): Feat[];
-  getAllFeats(): Feat[];
-
-  // ── 装备 / 武器 / 护甲 ──────────────────────────────
-  getWeapon(id: string): Weapon | undefined;
-  getAllWeapons(): Weapon[];
-  getArmor(id: string): Armor | undefined;
-  getAllArmor(): Armor[];
-  getGearItem(id: string): GearItem | undefined;
-  getAllGear(): GearItem[];
-
-  // ── 法术（Spell）───
-  getSpell(id: string): Spell | undefined;
-  getSpellsByLevel(level: SpellLevel): Spell[];
-  getAllSpells(): Spell[];
-
-  // ── 查表数据（Lookup Tables）────────────────────
-  getProficiencyBonus(level: number): number;
-  getHitDieFixedValue(die: DieType): number;
-  getSpellSlots(classId: string, classLevel: number): Record<number, number>;
-  getMulticlassSpellSlots(totalSpellcastingLevel: number): Record<number, number>;
-  getPactMagicSlots(warlockLevel: number): { slots: number; slotLevel: number };
-  getWeaponMasteryProperties(): readonly string[];
-  getConditionNames(): readonly string[];
-}
-
-// 查表数据辅助类型
-export type SpellLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-
-export interface LookupTables {
-  proficiencyBonus: Record<number, number>;
-  hitDieFixedValue: Record<DieType, number>;
-  spellSlots: Record<string, Record<number, Record<number, number>>>;
-  multiclassSpellSlots: Record<number, Record<number, number>>;
-  pactMagicSlots: Record<number, { slots: number; slotLevel: number }>;
-  weaponMasteryProperties: readonly string[];
-  conditionNames: readonly string[];
-}
-
-// 默认工厂函数 — 接收 LookupTables，返回 DataLoader 实例
-export function createDataLoader(tables: LookupTables): DataLoader;
-```
-
-> **设计决策：为什么用接口而不是直接import JSON？**
-> 1. 测试时可以注入mock数据（比如只加载Fighter相关的数据进行测试）
-> 2. 未来可以从远程API加载（不需要改engine代码）
-> 3. 默认实现从静态JSON加载，但接口允许灵活替换
-
-### 5.4 随机数注入
-
-```typescript
-// character/level-up.ts
-
-export interface RandomProvider {
-  d(max: number): number;  // 掷1-max的骰子
-}
-
-// 默认实现（使用Math.random）
-export const defaultRng: RandomProvider = {
-  d: (max) => Math.floor(Math.random() * max) + 1,
-};
-
-// 确定性实现（测试用）
-export function createDeterministicRng(sequence: number[]): RandomProvider {
-  let index = 0;
-  return {
-    d: (max) => {
-      const value = sequence[index % sequence.length];
-      index++;
-      return Math.min(value, max);
-    },
-  };
-}
-```
-
-> **为什么注入随机数？**
-> 升级HP时玩家可以选择掷骰，测试时需要确定性结果。`RandomProvider`让测试100%可重复。
-
----
-
-## 6. 核心函数签名
-
-### 6.1 Engine模块（纯函数）
-
-```typescript
-// engine/ability-modifier.ts
-export function getModifier(score: number): number;
-export function getTotalScore(scores: AbilityScores, ability: AbilityName): number;
-
-// engine/proficiency-bonus.ts
-export function getProficiencyBonus(totalLevel: number): number;
-
-// engine/skill-bonus.ts
-export function getSkillBonus(
-  scores: AbilityScores, 
-  skill: SkillEntry, 
-  abilityName: AbilityName,
-  proficiencyBonus: number
-): number;
-export function getAllSkillBonuses(
-  scores: AbilityScores,
-  skills: Record<string, SkillEntry>,
-  skillAbilityMap: Record<string, AbilityName>,
-  proficiencyBonus: number
-): Record<string, number>;
-
-// engine/saving-throw.ts
-export function getSavingThrowBonus(
-  scores: AbilityScores,
-  ability: AbilityName,
-  proficientAbilities: readonly AbilityName[],
-  proficiencyBonus: number
-): number;
-
-// engine/ac-calculator.ts
-export function calculateAC(
-  scores: AbilityScores,
-  equipment: readonly EquipmentItem[],
-  features: readonly Feature[],
-  data: DataLoader
-): number;
-
-// engine/hp-calculator.ts
-export function calculateMaxHP(
-  classes: readonly CharacterClass[],
-  conModifier: number,
-  data: DataLoader
-): number;
-export function getHitDieFixedValue(die: DieType): number;
-export function calculateHPAtLevel1(hitDie: DieType, conModifier: number): number;
-export function calculateHPIncrement(hitDie: DieType, conModifier: number): number;
-
-// engine/spell-slots.ts
-export interface SpellSlotEntry { readonly total: number; readonly used: number; }
-export interface PactMagicResult { readonly slotLevel: number; readonly slots: number; }
-
-export function calculateSpellSlots(
-  classId: string,
-  classLevel: number,
-  data: DataLoader
-): Record<number, SpellSlotEntry>;
-export function calculatePactMagic(warlockLevel: number, data: DataLoader): PactMagicResult | null;
-export function getMulticlassSpellcasterLevel(
-  classes: readonly CharacterClass[],
-  data: DataLoader
-): number;
-export function calculateMulticlassSpellSlots(
-  totalSpellcasterLevel: number,
-  data: DataLoader
-): Record<number, SpellSlotEntry>;
-
-// engine/initiative.ts
-export function calculateInitiative(
-  scores: AbilityScores,
-  featIds: readonly string[],
-  features: readonly Feature[]
-): number;
-
-// engine/passive-perception.ts
-export function calculatePassivePerception(
-  scores: AbilityScores,
-  skills: Record<string, SkillEntry>,
-  proficiencyBonus: number,
-  conditions: readonly ActiveCondition[]
-): number;
-
-// engine/attack-calculator.ts
-export function calculateAttacks(
-  scores: AbilityScores,
-  equipment: readonly EquipmentItem[],
-  proficiencyBonus: number,
-  features: readonly Feature[],
-  data: DataLoader
-): Attack[];
-```
-
-**函数签名统一模式**：
-```
-function calculateXxx(char: Character, data: DataLoader): Result
-// 或更精细的（不依赖完整Character）：
-function calculateXxx(specificInput1, specificInput2, ..., data: DataLoader): Result
-```
-
-> **设计决策：为什么有的函数接收`Character`，有的只接收部分字段？**
-> - 如果函数只需要2-3个字段，用具体参数（减少对完整对象的依赖）
-> - 如果函数需要5+个字段，用`Character`整体（减少参数数量）
-> - `data: DataLoader`始终在最后（可选依赖，测试可mock）
-
-### 6.2 Character模块（状态变更）
-
-```typescript
-// character/create.ts
-export function createCharacter(params: CreateCharacterParams, data: DataLoader): Character;
-
-export interface CreateCharacterParams {
-  name: string;
-  speciesId: string;
-  speciesSubtypeId?: string;
-  backgroundId: string;
-  classId: string;
-  abilityScores: Record<AbilityName, number>;  // base值
-  featIds?: string[];    // 初始专长（含Origin Feat）
-  skillChoices?: string[];  // 职业技能选择
-}
-
-// character/mutate.ts — 所有变更函数返回新Character
-export function modifyHP(char: Character, delta: number): Character;
-export function setTemporaryHP(char: Character, value: number): Character;
-export function consumeResource(char: Character, resourceId: string): Character;
-export function recoverResource(char: Character, resourceId: string): Character;
-export function consumeSpellSlot(char: Character, level: number): Character;
-export function recoverSpellSlot(char: Character, level: number): Character;
-export function toggleCondition(char: ConditionName): (char: Character) => Character;
-export function equipItem(char: Character, itemId: string): Character;
-export function unequipItem(char: Character, itemId: string): Character;
-export function prepareSpell(char: Character, spellId: string): Character;
-export function unprepareSpell(char: Character, spellId: string): Character;
-export function addEquipment(char: Character, item: EquipmentItem): Character;
-export function removeEquipment(char: Character, itemId: string): Character;
-export function modifyCurrency(char: Character, currency: Partial<Currency>): Character;
-
-// character/level-up.ts
-export function levelUp(
-  char: Character, 
-  options: LevelUpOptions, 
-  data: DataLoader, 
-  rng?: RandomProvider
-): Character;
-
-export interface LevelUpOptions {
-  classId: string;                     // 升哪个职业(MVP=唯一职业)
-  subclassId?: string;                 // 如达到子职业等级
-  hpChoice: 'fixed' | 'roll';          // HP增量方式
-  asiOrFeat?: {                        // ASI/Feat选择(4/8/12/16级)
-    type: 'asi' | 'feat';
-    asi?: Partial<Record<AbilityName, number>>;
-    featId?: string;
-  };
-  newSpells?: string[];                // 施法者新法术
-}
-
-// character/rest.ts
-export function shortRest(
-  char: Character, 
-  hitDiceToSpend: number,
-  data: DataLoader,
-  rng?: RandomProvider
-): Character;
-
-export function longRest(char: Character, data: DataLoader): Character;
-
-// character/validate.ts
-export function validateCharacter(
-  char: Character, 
-  data: DataLoader
-): ValidationResult;
-
-export interface ValidationResult {
-  valid: boolean;
-  errors: ValidationError[];
-}
-
-export interface ValidationError {
-  field: string;        // 如 'abilityScores.base.Strength'
-  message: string;      // 如 'Strength must be between 8 and 15'
-  severity: 'error' | 'warning';
-}
-
-// character/recompute.ts
-export function recomputeDerivedStats(char: Character, data: DataLoader): Character;
-// 重新计算: combatStats.AC, combatStats.initiative, combatStats.passivePerception,
-//           combatStats.proficiencyBonus, combatStats.attacks, spells.spellSaveDC,
-//           spells.spellAttackBonus, spells.spellSlots
-```
-
-### 6.3 Storage模块
-
-```typescript
-// storage/interface.ts
-
-export interface ICharacterStorage {
-  save(char: Character): Promise<void>;
-  load(id: string): Promise<Character | null>;
-  list(): Promise<CharacterSummary[]>;
-  delete(id: string): Promise<void>;
-}
-
-export interface CharacterSummary {
-  id: string;
-  name: string;
-  classSummary: string;   // "Fighter 5" or "Fighter 5 / Wizard 2"
-  lastModified: string;
-}
-
-// storage/serializer.ts
-export function serialize(char: Character): string;                    // → JSON string
-export function deserialize(json: string): Character;                  // JSON string → Character (含Zod校验)
-export function validateSchemaVersion(json: string): SchemaValidationResult;
-export function sanitizeFilename(name: string): string;                // 角色名 → 安全文件名
-```
-
----
-
-## 7. 关键设计决策
-
-### 7.1 为什么用函数式而不是Class？
-
-```
-❌ class Character { modifyHP(delta) { this.hitPoints.current += delta; } }
-✅ function modifyHP(char: Character, delta: number): Character { ... }
-```
-
-| 对比 | Class | 函数式 |
-|---|---|---|
-| 可测试性 | 需要实例化，隐式this | 纯函数，直接调用 |
-| 不可变性 | 需要手动保护 | TypeScript `readonly` 强制 |
-| 序列化 | 需要toJSON/fromJSON | 对象本身就是数据 |
-| 组合性 | 继承链复杂 | 函数组合简单 |
-| 摇树优化 | Class整体引入 | 函数级引入 |
-
-### 7.2 为什么Character用`readonly`而不是Immutable.js？
-
-```
-✅ 使用 TypeScript readonly + spread operator
-❌ 使用 Immutable.js / Immer
-```
-
-| 对比 | readonly + spread | Immutable.js / Immer |
-|---|---|---|
-| 零依赖 | ✅ | ❌ 引入外部包 |
-| JSON兼容 | ✅ 天然兼容 | ❌ 需要转换 |
-| 调试 | ✅ 普通对象 | ❌ 自定义数据结构 |
-| 学习成本 | ✅ TypeScript原生 | ❌ 需要学习API |
-| 性能 | 足够好(角色数据量小) | 大数据量更优 |
-
-角色数据量极小(几KB)，spread operator的性能完全足够。不需要Immer。
-
-```typescript
-// 修改示例
-function modifyHP(char: Character, delta: number): Character {
-  const newCurrent = Math.max(0, Math.min(char.hitPoints.current + delta, char.hitPoints.max));
-  return {
-    ...char,
-    hitPoints: {
-      ...char.hitPoints,
-      current: newCurrent,
-    },
-    updatedAt: new Date().toISOString(),
-  };
-}
-```
-
-### 7.3 为什么DataLoader用接口而不是直接import？
-
-```typescript
-❌ import { SPECIES } from '../data/species-data';
-✅ function calculateAC(char, data: DataLoader) { ... }
-```
-
-1. **测试隔离**：测试只加载需要的数据（ Fighter测试不需要Bard数据）
-2. **数据替换**：未来可以从API、从用户自定义JSON加载
-3. **明确依赖**：函数签名声明它需要什么数据
-
-### 7.4 Zod校验策略
-
-```typescript
-// 只在边界校验：JSON导入时
-// 内部代码信任TypeScript类型，不做重复校验
-
-import { z } from 'zod';
-
-const CharacterSchema = z.object({
-  schemaVersion: z.string(),
-  name: z.string(),
-  species: z.string(),
-  // ... 完整schema
-});
-
-// storage/serializer.ts
-export function deserialize(json: string): Character {
-  const raw = JSON.parse(json);
-  return CharacterSchema.parse(raw);  // 运行时校验，失败抛ZodError
-}
-```
-
-> **原则**：信任边界内，校验边界外。
-> - 导入JSON → Zod校验（不信任外部数据）
-> - engine函数内部 → 信任TypeScript类型（不重复校验）
-> - validateCharacter() → 专门用于规则合法性校验（不是类型校验）
-
----
-
-## 8. 测试策略
-
-### 8.1 测试分层
-
-```
-┌─────────────────────────────┐
-│      E2E Tests (未来)        │  CLI/Web集成测试
-├─────────────────────────────┤
-│   Integration Tests          │  createCharacter + validate + serialize
-├─────────────────────────────┤
-│     Unit Tests (核心)        │  engine/* + character/mutate + character/rest
-├─────────────────────────────┤
-│     Data Integrity Tests     │  静态数据完整性（ID唯一、引用完整）
-└─────────────────────────────┘
-```
-
-### 8.2 单元测试规范
-
-```typescript
-// tests/engine/ac-calculator.test.ts
-import { describe, it, expect } from 'vitest';
-import { calculateAC } from '@/engine/ac-calculator';
-import { createTestDataLoader } from '@/test-utils/test-data-loader';
-
-describe('calculateAC', () => {
-  const data = createTestDataLoader();  // 轻量测试数据
-
-  it('returns 10 + Dex for unarmored character', () => {
-    const char = createTestCharacter({ 
-      equipment: [], 
-      abilityScores: { base: { Dexterity: 14 } } 
-    });
-    expect(calculateAC(char, data)).toBe(12);  // 10 + 2(Dex)
-  });
-
-  it('adds shield bonus', () => { ... });
-  it('caps Dex for medium armor', () => { ... });
-  // ...
-});
-```
-
-### 8.3 测试数据工具
-
-```typescript
-// test-utils/test-data-loader.ts
-// 提供轻量级DataLoader，只包含测试所需的最小数据集
-
-// test-utils/test-character-factory.ts  
-// 工厂函数，快速创建测试用Character
-export function createTestCharacter(overrides?: Partial<Character>): Character;
-export function createFighter(level?: number, overrides?: ...): Character;
-export function createWizard(level?: number, overrides?: ...): Character;
-export function createWarlock(level?: number, overrides?: ...): Character;
-```
-
-### 8.4 覆盖率要求
-
-| 模块 | 最低覆盖率 | 说明 |
-|---|---|---|
-| `engine/*` | 100% | 纯函数，必须全覆盖 |
-| `character/mutate.ts` | 95% | 状态变更，必须全覆盖 |
-| `character/validate.ts` | 95% | 规则校验，必须全覆盖 |
-| `character/rest.ts` | 90% | 短休/长休逻辑 |
-| `character/level-up.ts` | 85% | 升级逻辑复杂 |
-| `data/*` | 70% | 主要是静态数据，数据完整性测试覆盖 |
-| `storage/*` | 80% | 序列化/反序列化 |
-
----
-
-## 9. 依赖清单
-
-### 9.1 运行时依赖
-
-| 包 | 用途 | 为什么 |
-|---|---|---|
-| `zod` | JSON导入时的运行时类型校验 | 唯一的外部运行时依赖，轻量且类型安全 |
-
-**仅此一个。** 核心包不依赖任何其他运行时包。
-
-### 9.2 开发依赖
-
-| 包 | 用途 |
+| Schema | Validates |
 |---|---|
-| `typescript` | 编译 |
-| `vitest` | 测试框架 |
-| `@vitest/coverage-v8` | 覆盖率 |
-| `prettier` | 代码格式 |
-| `eslint` | 静态分析 |
-| `tsx` | 开发时直接运行TS |
-
-### 9.3 未来UI层依赖（不在本包中）
-
-| 场景 | 包 |
-|---|---|
-| Web UI | `react`, `vite`, `tailwindcss` |
-| CLI | `commander`, `inquirer`, `chalk` |
-| Native | `react-native` |
+| `CharacterSchema` | Character object structure and rules |
+| `SpellSchema` | Spell object structure |
+| `SpeciesSchema` | Species object structure |
+| `ClassSchema` | Class object structure |
+| `FeatSchema` | Feat object structure |
 
 ---
 
-## 10. 构建与发布
+## 5. Implementation Status (S1-S20)
 
-### 10.1 package.json 关键配置
+| Step | Content | Status | Notes |
+|---|---|---|---|
+| S1 | Project scaffolding | ✅ | package.json, tsconfig.json, vitest.config.ts |
+| S2 | Type definitions | ✅ | All types in `src/types/` |
+| S3 | DataLoader interface + implementation | ✅ | `loader.ts`, `default-loader.ts`, `browser-loader.ts` |
+| S4 | Engine: `getModifier()`, `getTotalScore()` | ✅ | `ability-modifier.ts` |
+| S5 | Engine: `getProficiencyBonus()` | ✅ | `proficiency-bonus.ts` |
+| S6 | Engine: `getSkillBonus()`, `getAllSkillBonuses()` | ✅ | `skill-bonus.ts` |
+| S7 | Engine: `getSavingThrowBonus()` | ✅ | `saving-throw.ts` |
+| S8 | Engine: `calculateAC()` | ✅ | `ac-calculator.ts` |
+| S9 | Engine: HP calculation functions | ✅ | `hp-calculator.ts` |
+| S10 | Engine: `calculateSpellSlots()`, `calculatePactMagic()` | ✅ | `spell-slots.ts` |
+| S11 | Engine: `calculateInitiative()`, `calculatePassivePerception()`, `calculateAttacks()` | ✅ | `initiative.ts`, `passive-perception.ts`, `attack-calculator.ts` |
+| S12 | Static rule data population | 🔄 | Spells imported (560+), others need update |
+| S13 | Character: `createCharacter()` | ✅ | `create.ts` |
+| S14 | Character: Mutation functions | ✅ | `mutate.ts` |
+| S15 | Character: `levelUp()` | ✅ | `level-up.ts` |
+| S16 | Character: `shortRest()`, `longRest()` | ✅ | `rest.ts` |
+| S17 | Character: `validateCharacter()`, `recomputeDerivedStats()` | ✅ | `validate.ts`, `recompute.ts` |
+| S18 | Storage: Interface + implementations | ✅ | `storage/` module |
+| S19 | Public API barrel exports | ✅ | `index.ts`, `browser-index.ts` |
+| S20 | Integration tests | ✅ | `tests/integration/` |
 
-```json
-{
-  "name": "open20-core",
-  "version": "0.1.0",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": "./dist/index.js",
-    "./types": "./dist/types/index.js",
-    "./data": "./dist/data/index.js",
-    "./engine": "./dist/engine/index.js",
-    "./character": "./dist/character/index.js",
-    "./storage": "./dist/storage/index.js",
-    "./browser": "./dist/browser-index.js"
-  },
-  "scripts": {
-    "build": "tsc",
-    "bundle": "node scripts/bundle.mjs",
-    "build:bundle": "npm run build && npm run bundle",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix"
-  }
-}
-```
-
-### 10.2 tsconfig.json 关键配置
-
-```json
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "Node16",
-    "moduleResolution": "Node16",
-    "strict": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "tests"]
-}
-```
+**Current Test Status**: **415+ tests passing**, `tsc --noEmit` ✅
 
 ---
 
-## 11. 模块间依赖规则
+## 6. Data Flow Examples
 
-### 11.1 允许的依赖
+### 6.1 Character Creation Flow
 
 ```
-types ← (无依赖)
-data  ← types
-engine ← types, data
-character ← types, data, engine
-storage ← types, character
+User Input (params)
+    ↓
+createCharacter(params, dataLoader)
+    ↓
+1. Validate input parameters
+2. Apply species bonuses
+3. Apply background grants
+4. Apply class features
+5. Calculate derived stats (recomputeDerivedStats)
+6. Return immutable Character object
 ```
 
-### 11.2 禁止的依赖
+### 6.2 Spell Query Flow
 
-| 禁止 | 原因 |
-|---|---|
-| `types` → 任何模块 | 类型定义是基础，不能反向依赖 |
-| `engine` → `character` | 纯函数不应依赖状态管理 |
-| `engine` → `storage` | 纯函数不应依赖IO |
-| 任何模块 → UI框架 | 核心包零UI依赖 |
-| 循环依赖 | 任何形式 |
+```
+searchSpells({ school: 'Evocation', level: [1,2,3] })
+    ↓
+1. Load spells.json (via DataLoader or bundled data)
+2. Filter by school === 'Evocation'
+3. Filter by level in [1,2,3]
+4. Return array of matching Spell objects
+```
 
-### 11.3 ESLint强制执行
+### 6.3 Rule Calculation Flow
 
-```javascript
-// .eslintrc.cjs
-module.exports = {
-  rules: {
-    'no-restricted-imports': ['error', {
-      patterns: [
-        // engine不能import character或storage
-        { group: ['../character/*', '../storage/*'], message: 'engine模块不能依赖character或storage' },
-        // data不能import engine或character或storage
-        { group: ['../engine/*', '../character/*', '../storage/*'], message: 'data模块不能依赖engine/character/storage' },
-        // types不能import任何其他模块
-        { group: ['../data/*', '../engine/*', '../character/*', '../storage/*'], message: 'types模块零依赖' },
-      ],
-    }],
-  },
-};
+```
+calculateAC(character, equipment, dataLoader)
+    ↓
+1. Determine AC base (unarmored vs armored)
+2. Apply Dex modifier (with limits for medium armor)
+3. Apply Mage Armor if active
+4. Apply Unarmored Defense if applicable (Barbarian/Monk)
+5. Apply shield bonus if equipped
+6. Apply magic item bonuses
+7. Return final AC number
 ```
 
 ---
 
-## 12. 公共API设计
+## 7. Testing Strategy
 
-### 12.1 顶层导出
+### 7.1 Unit Tests
+- **Engine functions**: 100% coverage, property-based testing with fast-check
+- **Character mutations**: Test immutability, validation, edge cases
+- **Spell queries**: Test all filter combinations, edge cases
 
-```typescript
-// src/index.ts
+### 7.2 Integration Tests
+- **Create + Calculate**: Create character, calculate all derived stats
+- **Level Up + Validate**: Level up, validate resulting character
+- **Rest + Recover**: Short/long rest, verify resource recovery
 
-// Types
-export type { Character, CharacterClass, HitPoints, DeathSaves, Currency } from './types';
-export type { AbilityName, AbilityScores } from './types';
-export type { Species, SpeciesTrait } from './types';
-export type { Background } from './types';
-export type { Class, Subclass, Feature, Spellcasting } from './types';
-export type { Feat, FeatCategory } from './types';
-export type { Weapon, Armor, Item as GearItem, EquipmentItem } from './types';
-export type { Spell, CharacterSpells, SpellSlotEntry, PactMagicSlots } from './types';
-export type { Resource, ResetType } from './types';
-export type { CombatStats, Attack, ActiveCondition, ConditionName } from './types';
-export type { DieType } from './types';
-
-// Data
-export { DataLoader } from './data';
-export { createDataLoader } from './data';  // 默认实现
-
-// Engine (纯函数)
-export { getModifier, getTotalScore } from './engine';
-export { getProficiencyBonus } from './engine';
-export { getSkillBonus } from './engine';
-export { getSavingThrowBonus } from './engine';
-export { calculateAC } from './engine';
-export { calculateMaxHP, calculateHPAtLevel1, calculateHPIncrement } from './engine';
-export { calculateSpellSlots, calculatePactMagic } from './engine';
-export { calculateInitiative } from './engine';
-export { calculatePassivePerception } from './engine';
-export { calculateAttacks } from './engine';
-
-// Character (状态管理)
-export { createCharacter } from './character';
-export { levelUp } from './character';
-export { shortRest, longRest } from './character';
-export { modifyHP, setTemporaryHP, consumeResource, recoverResource,
-         consumeSpellSlot, recoverSpellSlot, toggleCondition,
-         equipItem, unequipItem, prepareSpell, unprepareSpell,
-         addEquipment, removeEquipment, modifyCurrency } from './character';
-export { validateCharacter } from './character';
-export { recomputeDerivedStats } from './character';
-
-// Storage
-export { ICharacterStorage, CharacterSummary } from './storage';
-export { InMemoryStorage } from './storage';
-export { JsonFileStorage } from './storage';
-export { serialize, deserialize, sanitizeFilename } from './storage';
-```
-
-### 12.2 典型使用流程
-
-```typescript
-import { 
-  createDataLoader, createCharacter, modifyHP, 
-  calculateAC, shortRest, longRest,
-  validateCharacter, serialize, deserialize,
-  InMemoryStorage
-} from 'open20-core';
-
-// 1. 加载规则数据
-const data = createDataLoader();
-
-// 2. 创建角色
-const char = createCharacter({
-  name: 'Borin Ironforge',
-  speciesId: 'Dwarf',
-  backgroundId: 'Soldier',
-  classId: 'Fighter',
-  abilityScores: { Strength: 15, Dexterity: 12, Constitution: 14, 
-                   Intelligence: 10, Wisdom: 13, Charisma: 8 },
-}, data);
-
-// 3. 查看计算结果
-console.log(calculateAC(char, data));  // 16 (Chain Mail)
-console.log(char.hitPoints.max);       // 13 (10 + 3 Con)
-
-// 4. 修改状态
-const hurt = modifyHP(char, -5);
-console.log(hurt.hitPoints.current);   // 8
-
-// 5. 长休
-const rested = longRest(hurt, data);
-console.log(rested.hitPoints.current); // 13 (恢复满)
-
-// 6. 校验
-const result = validateCharacter(char, data);
-console.log(result.valid);  // true
-
-// 7. 序列化
-const json = serialize(char);
-
-// 8. 反序列化
-const restored = deserialize(json);
-
-// 9. 存储
-const storage = new InMemoryStorage();
-await storage.save(char);
-```
+### 7.3 Data Integrity Tests
+- **JSON validation**: All static JSON files valid against schemas
+- **Cross-references**: Feat IDs exist, spell IDs in class lists exist
+- **Completeness**: All required data present
 
 ---
 
-## 13. 与需求文件的映射
+## 8. Performance Considerations
 
-| 需求文件 | 对应源码 | 核心函数 |
+### 8.1 Bundle Size
+- **Target**: < 100KB gzipped for core engine (without spell/species data)
+- **Strategy**: Dynamic imports for large datasets, tree-shaking friendly exports
+
+### 8.2 Runtime Performance
+- **Memoization**: Consider memoizing expensive calculations (AC, spells)
+- **Lazy loading**: Load spell data on-demand, not at startup
+- **Indexing**: Build indexes for frequent queries (spells by class, by level)
+
+---
+
+## 9. Future Enhancements (v1.1+)
+
+| Feature | Priority | Description |
 |---|---|---|
-| `01-rules-engine/ac-calculation.md` | `src/engine/ac-calculator.ts` | `calculateAC()` |
-| `01-rules-engine/hp-calculation.md` | `src/engine/hp-calculator.ts` | `calculateMaxHP()`, `calculateHPAtLevel1()`, `calculateHPIncrement()` |
-| `01-rules-engine/spell-slots.md` | `src/engine/spell-slots.ts` | `calculateSpellSlots()`, `calculatePactMagic()` |
-| `02-character-creation/species.md` | `src/data/species-data.ts` + `src/character/create.ts` | `createCharacter()` |
-| `02-character-creation/background.md` | `src/data/background-data.ts` + `src/character/create.ts` | `createCharacter()` |
-| `02-character-creation/class-subclass.md` | `src/data/class-data.ts` + `src/character/create.ts` | `createCharacter()` |
-| `02-character-creation/ability-assignment.md` | `src/engine/ability-modifier.ts` + `src/character/create.ts` | `getModifier()`, `getTotalScore()` |
-| `02-character-creation/feats.md` | `src/data/feat-data.ts` + `src/character/validate.ts` | `validateCharacter()` |
-| `02-character-creation/skills.md` | `src/engine/skill-bonus.ts` | `getSkillBonus()` |
-| `03-game-mode/layout.md` | **UI层(未来)** — 消费 `Character` + `CombatStats` | `recomputeDerivedStats()` |
-| `04-hp-tracking/hp-tracking.md` | `src/character/mutate.ts` | `modifyHP()`, `setTemporaryHP()` |
-| `04-hp-tracking/conditions.md` | `src/character/mutate.ts` | `toggleCondition()` |
-| `05-spell-management/spell-list.md` | `src/data/spell-data.ts` | `DataLoader.getSpell()`, `getSpellsByLevel()` |
-| `05-spell-management/spell-slots-tracking.md` | `src/character/mutate.ts` | `consumeSpellSlot()`, `recoverSpellSlot()` |
-| `06-resource-tracking/resource-tracking.md` | `src/character/mutate.ts` | `consumeResource()`, `recoverResource()` |
-| `07-level-up/level-up.md` | `src/character/level-up.ts` | `levelUp()` |
-| `08-equipment/equipment.md` | `src/character/mutate.ts` | `equipItem()`, `unequipItem()`, `addEquipment()` |
-| `08-equipment/weapon-mastery.md` | `src/engine/attack-calculator.ts` | `calculateAttacks()` |
-| `09-data-safety/data-export-import.md` | `src/storage/serializer.ts` | `serialize()`, `deserialize()` |
+| Multiclassing | P0 | Full multiclass support with correct spell slot calculations |
+| 2014 Legacy | P1 | Half-Elf, Half-Orc, legacy subclasses and feats |
+| Homebrew Support | P1 | Data structures and validation for homebrew content |
+| Monster Data | P2 | SRD monster statistics and queries |
+| Magic Items | P2 | SRD magic item data |
+| Encounter Builder | P2 | Helper functions for encounter difficulty |
 
 ---
 
-## 14. 实现优先级
-
-Agent应按以下顺序实现，每步完成后运行测试确认：
-
-| 步骤 | 内容 | 前置依赖 | 交付物 | 状态 |
-|---|---|---|---|---|
-| **S1** | 项目脚手架 + tsconfig + vitest | 无 | `package.json`, `tsconfig.json`, `vitest.config.ts` | ✅ |
-| **S2** | `src/types/*` — 全部类型定义 | S1 | 所有interface/type/enum | ✅ |
-| **S3** | `src/data/loader.ts` + `default-loader.ts` — DataLoader接口 + 默认实现 | S2 | 接口+工厂+LookupTables | ✅ |
-| **S4** | `src/engine/ability-modifier.ts` | S2 | `getModifier()`, `getTotalScore()` + 测试 | ✅ |
-| **S5** | `src/engine/proficiency-bonus.ts` | S2 | `getProficiencyBonus()` + 测试 | ✅ |
-| **S6** | `src/engine/skill-bonus.ts` | S4, S5 | `getSkillBonus()`, `getAllSkillBonuses()` | ✅ |
-| **S7** | `src/engine/saving-throw.ts` | S4, S5 | `getSavingThrowBonus()` | ✅ |
-| **S8** | `src/engine/ac-calculator.ts` | S2, S4 | `calculateAC()` + 测试 | ✅ |
-| **S9** | `src/engine/hp-calculator.ts` | S2, S4 | `calculateMaxHP()` + 测试 | ✅ |
-| **S10** | `src/engine/spell-slots.ts` | S2, S5 | `calculateSpellSlots()`, `calculatePactMagic()`, `getMulticlassSpellcasterLevel()`, `calculateMulticlassSpellSlots()` | ✅ |
-| **S11** | `src/engine/initiative.ts` + `passive-perception.ts` + `attack-calculator.ts` | S4, S5 | + 测试 | ✅ |
-| **S12** | `static/*.json` — 填充静态规则数据 | S3 | 所有JSON数据（feats/weapons/armor/gear/spells 已填充） | ✅ |
-| **S12 Browser** | 浏览器适配层 | S12 | `browser-index.ts`, `browser-loader.ts`, `scripts/bundle.mjs` | ✅ |
-| **S13** | `src/character/create.ts` | S4-S11, S12 | `createCharacter()` + 测试 | 📋 |
-| **S14** | `src/character/mutate.ts` | S13 | 所有mutate函数 + 测试 | 📋 |
-| **S15** | `src/character/rest.ts` | S14 | `shortRest()`, `longRest()` + 测试 | 📋 |
-| **S16** | `src/character/level-up.ts` | S14 | `levelUp()` + 测试 | 📋 |
-| **S17** | `src/character/validate.ts` + `recompute.ts` | S13, S14 | `validateCharacter()`, `recomputeDerivedStats()` + 测试 | 📋 |
-| **S18** | `src/storage/*` | S17 | 序列化/反序列化/存储 + 测试 | 📋 |
-| **S19** | `src/index.ts` — barrel export | S18 | 完整公共API | 📋 |
-| **S20** | 数据完整性测试 + 集成测试 | S19 | `tests/data/`, `tests/character/` | ✅ (40 tests) |
-
-**关键路径**：S1 → S2 → S4 → S8/S9 → S13 → S14 → S19  
-**预计耗时**：2-3个agent session（每个session处理5-6个步骤）
-
----
-
-*本文档是技术实现的唯一约束源。任何实现必须遵守本文档中的命名规范、模块边界、依赖规则和函数签名。*
+*Last updated: 2026-05-08*
+*Version: 2.0 (Headless Engine)*

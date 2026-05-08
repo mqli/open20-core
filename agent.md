@@ -1,20 +1,21 @@
 # Agent Context Document
 
-> **Purpose**: This document provides essential context, conventions, and guidelines for AI agents (Codex, Claude, etc.) working on the DND 2024 Character Sheet project. Read this before making any changes.
+> **Purpose**: This document provides essential context, conventions, and guidelines for AI agents (Codex, Claude, etc.) working on the Open20 Core project. Read this before making any changes.
 
 ---
 
 ## 1. Project Overview
 
-**Project**: DND 2024 Character Sheet App - Headless Core
-**Goal**: A TypeScript library for managing D&D 2024 rules character sheets. No UI - pure logic, testable via unit tests, usable by CLI or web apps later.
-**Status**: S1-S20 complete (415 tests passing)
+**Project**: Open20 Core - Headless D&D 5e 2024 Game Engine
+**Goal**: A TypeScript library for D&D 5e 2024 rules engine, spell management, and character management. No UI - pure logic, testable via unit tests, usable by any framework.
+**Status**: S1-S20 complete (415+ tests passing)
 
 ### Key Design Decisions
 - **Headless**: Zero UI dependency. Pure functions, immutable state.
 - **Immutable State**: All Character fields are `readonly`. Modifications return new objects via spread operator. No Immer/Immutable.js.
 - **Dependency Injection**: `DataLoader` interface for testability and future API replacement.
 - **ESM**: Project uses `"type": "module"`. Uses `createRequire` for JSON loading.
+- **Zod Schemas**: Runtime validation for all data structures.
 
 ---
 
@@ -42,14 +43,17 @@ types  ←  data  ←  engine  ←  character  ←  storage
 ```
 open20-core/
 ├── agent.md                    # This file
+├── PRD.md                     # Product Requirements Document
 ├── package.json                # ESM, vitest, typescript
 ├── tsconfig.json               # Strict, noUncheckedIndexedAccess
 ├── vitest.config.ts            # Test config
 ├── scripts/
-│   └── bundle.mjs             # Browser bundle builder (esbuild)
+│   ├── bundle.mjs             # Browser bundle builder (esbuild)
+│   └── import_srd_spells.py   # Import SRD spells from dnd-data repo
 ├── spec/
 │   ├── high-level-design.md    # HLD v1.1 (S1-S20, status tracking)
-│   └── data-model.md           # TypeScript interfaces & JSON schema
+│   ├── data-model.md           # TypeScript interfaces & JSON schema
+│   └── test-plan.md           # Test plan and coverage goals
 ├── requirements/
 │   └── README.md               # R1-R21 requirements traceability
 ├── static/
@@ -62,7 +66,7 @@ open20-core/
 │   ├── weapons.json            # ~40 weapons
 │   ├── armor.json              # ~20 armors
 │   ├── gear.json               # ~50 gear items
-│   └── spells.json             # ~391 spells
+│   └── spells.json             # 560+ spells (SRD + 2024 PHB)
 ├── src/
 │   ├── index.ts                # Node.js barrel export (includes storage)
 │   ├── browser-index.ts        # Browser barrel export (excludes Node.js storage)
@@ -72,7 +76,7 @@ open20-core/
 │   │   ├── loader.ts          # DataLoader interface (20+ methods)
 │   │   ├── browser-loader.ts  # Browser-compatible DataLoader (bundles JSON)
 │   │   └── default-loader.ts  # Node.js JSON file implementation
-│   ├── engine/
+│   ├── engine/                 # Pure functions for rule calculations
 │   │   ├── ability-modifier.ts
 │   │   ├── proficiency-bonus.ts
 │   │   ├── skill-bonus.ts
@@ -83,15 +87,23 @@ open20-core/
 │   │   ├── initiative.ts
 │   │   ├── passive-perception.ts
 │   │   └── attack-calculator.ts
-│   ├── character/
+│   ├── character/              # Character creation & validation
 │   │   ├── create.ts          # createCharacter()
-│   │   ├── mutate.ts          # 14 immutable mutation functions
+│   │   ├── mutate.ts          # Immutable mutation functions
 │   │   ├── rest.ts            # shortRest(), longRest()
 │   │   ├── level-up.ts        # levelUp()
 │   │   ├── validate.ts        # validateCharacter()
 │   │   ├── recompute.ts       # recomputeDerivedStats()
-│   │   └── index.ts          # Barrel export
-│   └── storage/
+│   │   └── index.ts           # Barrel export
+│   ├── spells/                 # Spell data & queries
+│   │   ├── query.ts           # getSpell(), searchSpells(), etc.
+│   │   ├── filter.ts          # Filter helpers
+│   │   └── types.ts           # Spell types
+│   ├── schemas/                # Zod schemas
+│   │   ├── character.ts
+│   │   ├── spell.ts
+│   │   └── index.ts
+│   └── storage/                # Persistence (interface + implementations)
 │       ├── interface.ts        # ICharacterStorage interface
 │       ├── serializer.ts       # JSON serialize/deserialize
 │       ├── memory.ts           # InMemoryStorage (for tests)
@@ -116,7 +128,7 @@ open20-core/
 ### 4.1 Strict Settings
 - `strict: true`
 - `noUncheckedIndexedAccess: true` → **ALL array/object accesses return `T | undefined`**
-- `moduleResolution: "bundler"` (NOT "Node16" - avoids强制 `.js` extensions)
+- `moduleResolution: "bundler"` (NOT "Node16" - avoids forcing `.js` extensions)
 
 ### 4.2 Handling `noUncheckedIndexedAccess`
 **WRONG** (will cause TypeScript error):
@@ -159,6 +171,7 @@ export function modifyHP(char: Character, delta: number): Character {
 - `calculate*` - Derived values (no side effects, pure functions)
 - `get*` - Lookups from data store
 - `create*` - New object creation
+- `search*` - Query/filter operations
 - `modify*` / `set*` / `toggle*` - State mutations (return new Character)
 
 ### 4.5 Export Syntax
@@ -180,7 +193,6 @@ export { value1, value2 } from './types';     // For values
 ### 5.1 ESM JSON Loading
 **Problem**: `require()` doesn't work in ESM.
 **Fix**: Use `createRequire`:
-
 ```typescript
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
@@ -190,7 +202,6 @@ const data = require('./file.json');
 ### 5.2 `ReadonlyMap` Serialization
 **Problem**: `ReadonlyMap` can't be serialized to JSON.
 **Fix**: Store as array in JSON, convert to Map in `default-loader.ts`:
-
 ```typescript
 // JSON format (array of [key, value] tuples)
 "featuresByLevel": [[1, [...]], [2, [...]]]
@@ -208,7 +219,6 @@ function parseFeaturesByLevel(json: any): ReadonlyMap<number, readonly Feature[]
 ### 5.3 Test File Imports
 **Problem**: `@/` path aliases don't work in test files.
 **Fix**: Use relative paths:
-
 ```typescript
 // ❌ WRONG
 import { calculateModifier } from '@/src/engine/ability-modifier';
@@ -259,7 +269,7 @@ npm run build:browser
 
 ### 7.1 Adding a New Engine Function
 1. Create `src/engine/new-function.ts`
-2. Implement as pure function with `calculate*` prefix
+2. Implement as pure function with `calculate*` or `get*` prefix
 3. Add export to `src/engine/index.ts` (if exists) or `src/index.ts`
 4. Write tests in `tests/engine/new-function.test.ts`
 5. Update `spec/high-level-design.md` S-xx status
@@ -278,57 +288,45 @@ npm run build:browser
 4. Update `LookupTables` interface in `src/data/loader.ts`
 5. Write data integrity tests in `tests/data/` (S20)
 
+### 7.4 Adding Spell Data
+1. Use `scripts/import_srd_spells.py` to import from dnd-data repo
+2. Validate imported data against spell schema
+3. Update `static/spells.json`
+4. Write tests for new spell queries
+
 ---
 
-## 8. Browser Integration (S20+)
+## 8. Spell Data Management
 
 ### Current Status
-All static data has been populated:
-- ✅ `lookup-tables.json` (complete)
-- ✅ `species.json` (12 species)
-- ✅ `backgrounds.json` (16 backgrounds)
-- ✅ `classes.json` (12 classes)
-- ✅ `subclasses.json` (complete)
-- ✅ `feats.json` (75 feats)
-- ✅ `weapons.json` (~40 weapons)
-- ✅ `armor.json` (~20 armors)
-- ✅ `gear.json` (~50 gear items)
-- ✅ `spells.json` (~391 spells)
+- ✅ `spells.json` populated with 560+ SRD spells
+- ✅ Import script at `scripts/import_srd_spells.py`
+- ✅ Source: dnd-data GitHub repo (nick-aschenbach/dnd-data)
 
-### Browser Build Files
-- **`src/browser-index.ts`**: Browser-compatible barrel export (excludes Node.js `fs`/`path`)
-- **`src/data/browser-loader.ts`**: Browser DataLoader that bundles JSON via esbuild
-- **`scripts/bundle.mjs`**: esbuild script producing:
-  - `dist/open20-core.js` — UMD bundle for `<script>` tags
-  - `dist/open20-core.esm.js` — ESM bundle for `<script type="module">`
+### Adding New Spells
+```bash
+# Import SRD spells from dnd-data
+python3 scripts/import_srd_spells.py
 
-### Browser Usage Example
-```html
-<!-- Option 1: UMD (global variable) -->
-<script src="dist/open20-core.js"></script>
-<script>
-  const loader = Open20Core.createBrowserDataLoader(lookupTables);
-  const char = Open20Core.createCharacter(params, loader);
-</script>
-
-<!-- Option 2: ESM -->
-<script type="module">
-  import { createBrowserDataLoader, createCharacter } from './dist/open20-core.esm.js';
-</script>
+# Validate imported data
+npx vitest run tests/data/spells.test.ts
 ```
 
-### Data Format Rules
-1. **Ability names**: Use full names ("Strength", not "Str")
-2. **Feature arrays**: `featuresByLevel` is array format in JSON: `[[1, [...]], [2, [...]]]`
-3. **Spell slots**: Arrays, not objects: `[4, 3, 2, 0, 0, 0, 0, 0, 0]` (index 0 = level 1)
-4. **Weapon mastery**: Single value `mastery: "Push"` not array `masteryProperties: [...]`
-5. **Backgrounds**: Use `originFeatId` (string), not `originFeat` (object)
-
-All data has been populated. No further filling needed.
+### Spell Data Format Rules
+1. **ID format**: kebab-case (`fire-bolt`, not `FireBolt`)
+2. **Ability names**: Use full names (`Strength`, not `Str`)
+3. **Components**: `{ V?: boolean; S?: boolean; M?: string | boolean }`
+4. **Damage**: `{ dice?: string; type?: DamageType; scale?: 'cantrip' | 'level' }`
+5. **Source**: Include full source string for attribution
 
 ---
 
 ## 9. How to Update Documents
+
+### When to Update `PRD.md`
+- Project scope or positioning changes
+- New major features added
+- Target audience changes
 
 ### When to Update `spec/high-level-design.md`
 - Added/modified/removed any S1-S20 functionality
@@ -410,6 +408,22 @@ it('should return new object without mutating original', () => {
 });
 ```
 
+### 10.4 Testing Spell Queries
+```typescript
+it('should filter spells by school and level', () => {
+  const spells = searchSpells({ 
+    school: 'Evocation', 
+    level: [1, 2, 3] 
+  });
+  
+  expect(spells.length).toBeGreaterThan(0);
+  spells.forEach(spell => {
+    expect(spell.school).toBe('Evocation');
+    expect(spell.level).toBeLessThanOrEqual(3);
+  });
+});
+```
+
 ---
 
 ## 11. Git Commit Guidelines
@@ -423,8 +437,9 @@ Examples:
 ```
 [S11] Implement attack calculator engine function
 [Fix] Handle undefined access in hp-calculator (noUncheckedIndexedAccess)
-[Docs] Update HLD with actual function signatures
+[Docs] Update PRD to reflect headless engine direction
 [S12] Add species.json with 12 species
+[Spells] Import 560+ SRD spells from dnd-data repo
 ```
 
 ---
@@ -438,9 +453,11 @@ Examples:
 | Run single test | `npx vitest run tests/path/to/test.test.ts` |
 | Install deps | `npm install` |
 | Check coverage | `npx vitest run --coverage` |
+| Import spells | `python3 scripts/import_srd_spells.py` |
 
 | File | Purpose |
 |------|---------|
+| `PRD.md` | Product Requirements Document |
 | `agent.md` | This file - read first! |
 | `spec/high-level-design.md` | Technical architecture (S1-S20) |
 | `spec/data-model.md` | TypeScript interfaces & JSON schema |
@@ -462,5 +479,5 @@ If you're stuck or unsure:
 
 ---
 
-*Last updated: 2025-07-17*
+*Last updated: 2026-05-08*
 *Maintained by: AI agents working on this project*

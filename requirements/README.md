@@ -1,89 +1,89 @@
-# DND 2024 角色表 App — 需求索引
+# Open20 Core — Requirements Index
 
-> 本文档是需求文件的入口。每个需求对应一个独立文件，方便 agent 认领实现。
-
----
-
-## 需求与文件映射
-
-| # | 需求 | 对应文件 | 对应源码 | 优先级 | 状态 |
-|---|---|---|---|---|
-| R1 | 规则引擎 — 属性/技能/豁免计算 | - | `src/engine/ability-modifier.ts`, `skill-bonus.ts`, `saving-throw.ts` | P0 | ✅ S4-S7 已完成 |
-| R2 | 规则引擎 — AC计算 | - | `src/engine/ac-calculator.ts` | P0 | ✅ S8 已完成 |
-| R3 | 规则引擎 — HP计算 | - | `src/engine/hp-calculator.ts` | P0 | ✅ S9 已完成 |
-| R4 | 规则引擎 — 法术位计算 | - | `src/engine/spell-slots.ts` | P0 | ✅ S10 已完成 |
-| R5 | 角色创建 — 物种(Species) | - | `src/data/default-loader.ts` + `src/character/create.ts` | P0 | ✅ S12 已完成 |
-| R6 | 角色创建 — 背景(Background) | - | `src/data/default-loader.ts` + `src/character/create.ts` | P0 | ✅ S12 已完成 |
-| R7 | 角色创建 — 职业(Class) + 子职业 | - | `src/data/default-loader.ts` + `src/character/create.ts` | P0 | ✅ S12 已完成 |
-| R8 | 角色创建 — 属性分配 | - | `src/engine/ability-modifier.ts` + `src/character/create.ts` | P0 | ✅ S12 已完成 |
-| R9 | 角色创建 — 专长(Feats) | - | `src/data/default-loader.ts` + `src/character/validate.ts` | P0 | ✅ S12 已完成 |
-| R10 | 角色创建 — 技能(Skills) | - | `src/engine/skill-bonus.ts` | P0 | ✅ S12 已完成 |
-| R11 | 游戏模式 — 布局与交互 | - | **UI层(未来)** — 消费 Character + CombatStats | P0 | 📋 待开发 |
-| R12 | HP追踪 — 当前HP/临时HP/死亡豁免 | - | `src/character/mutate.ts` | P0 | ✅ S13 已完成 |
-| R13 | 法术管理 — 法术列表/准备 | - | `src/character/mutate.ts` + `recompute.ts` | P0 | ✅ S12/S13 已完成 |
-| R14 | 法术管理 — 法术位追踪 | - | `src/character/mutate.ts` | P0 | ✅ S13 已完成 |
-| R15 | 资源追踪 — 职业资源计数器 | - | `src/character/mutate.ts` | P0 | ✅ S13 已完成 |
-| R16 | 等级提升 — 升级向导 | - | `src/character/level-up.ts` | P0 | ✅ S15 已完成 |
-| R17 | 装备管理 — 武器/护甲/物品/金币 | - | `src/character/mutate.ts` + `recompute.ts` | P0 | 🔄 S12 数据完成 |
-| R18 | 武器精通(Weapon Mastery) | - | `src/engine/attack-calculator.ts` | P0 | ✅ S11 已完成 |
-| R19 | 数据安全 — 保存/导出/导入 | - | `src/storage/*` | P0 | ✅ S17 已完成 |
-| R20 | 状态标记(Conditions) | - | `src/character/mutate.ts` | P0 | ✅ S13 已完成 |
-| R21 | 多职业(Multiclassing) | - | `src/engine/spell-slots.ts` + `src/character/create.ts` | P1 | 🔄 引擎完成 |
+> This document is the entry point for requirements. Each requirement corresponds to a separate file for easy agent implementation.
 
 ---
 
-## P1 需求索引
+## Requirements & File Mapping
 
-| # | 需求 | 说明 | 状态 |
+| # | Requirement | File | Source | Priority | Status |
+|---|---|---|---|---|---|
+| R1 | Engine — Ability/Skill/Save calculation | - | `src/engine/ability-modifier.ts`, `skill-bonus.ts`, `saving-throw.ts` | P0 | ✅ S4-S7 done |
+| R2 | Engine — AC calculation | - | `src/engine/ac-calculator.ts` | P0 | ✅ S8 done |
+| R3 | Engine — HP calculation | - | `src/engine/hp-calculator.ts` | P0 | ✅ S9 done |
+| R4 | Engine — Spell slots calculation | - | `src/engine/spell-slots.ts` | P0 | ✅ S10 done |
+| R5 | Character — Species | - | `src/data/default-loader.ts` + `create.ts` | P0 | ✅ S12 done |
+| R6 | Character — Background | - | `src/data/default-loader.ts` + `create.ts` | P0 | ✅ S12 done |
+| R7 | Character — Class + Subclass | - | `src/data/default-loader.ts` + `create.ts` | P0 | ✅ S12 done |
+| R8 | Character — Ability Scores | - | `src/engine/ability-modifier.ts` + `create.ts` | P0 | ✅ S12 done |
+| R9 | Character — Feats | - | `src/data/default-loader.ts` + `validate.ts` | P0 | ✅ S12 done |
+| R10 | Character — Skills | - | `src/engine/skill-bonus.ts` | P0 | ✅ S12 done |
+| R11 | Spells — Query & filter | - | `src/spells/query.ts` | P0 | ✅ Done |
+| R12 | Spells — Data import (SRD) | - | `scripts/import_srd_spells.py` | P0 | ✅ Done |
+| R13 | Character — State mutations | - | `src/character/mutate.ts` | P0 | ✅ S13 done |
+| R14 | Character — Spell slot tracking | - | `src/character/mutate.ts` | P0 | ✅ S13 done |
+| R15 | Character — Resource tracking | - | `src/character/mutate.ts` | P0 | ✅ S13 done |
+| R16 | Character — Level up | - | `src/character/level-up.ts` | P0 | ✅ S15 done |
+| R17 | Equipment — Weapon/Armor/Gear | - | `src/character/mutate.ts` + `recompute.ts` | P0 | 🔄 Data done |
+| R18 | Engine — Weapon Mastery | - | `src/engine/attack-calculator.ts` | P0 | ✅ S11 done |
+| R19 | Storage — Save/Export/Import | - | `src/storage/*` | P0 | ✅ S17 done |
+| R20 | Character — Conditions | - | `src/character/mutate.ts` | P0 | ✅ S13 done |
+| R21 | Multiclassing | - | `src/engine/spell-slots.ts` + `create.ts` | P1 | 🔄 Engine done |
+
+---
+
+## P1 Requirements
+
+| # | Requirement | Description | Status |
 |---|---|---|---|
-| R21 | 多职业(Multiclassing) | `calculateMulticlassSpellSlots()` 已实现引擎层 | 🔄 引擎完成 |
-| R22 | 2014遗留内容支持 | Half-Elf/Half-Orc + 遗留子职业/专长 | 📋 |
-| R23 | 自定义特性(Homebrew free text) | 允许手动添加特性描述 | 📋 |
-| R24 | 多角色管理 | 角色列表+快速切换 | 📋 |
-| R25 | 快速掷骰复制到剪贴板 | 所有加值字段支持点击复制 | 📋 |
+| R21 | Multiclassing | `calculateMulticlassSpellSlots()` implemented | 🔄 Engine done |
+| R22 | 2014 Legacy | Half-Elf/Half-Orc + legacy subclasses/feats | 📋 |
+| R23 | Homebrew support | Data structures for homebrew content | 📋 |
+| R24 | Multiple character management | Character list + quick switch | 📋 |
+| R25 | Quick roll to clipboard | Copy "1d20+bonus" to clipboard | 📋 |
 
 ---
 
-## 实现进度总览 (HLD S1-S20)
+## Implementation Progress (HLD S1-S20)
 
-| HLD步骤 | 内容 | 状态 |
+| HLD Step | Content | Status |
 |---|---|---|
-| S1 | 项目脚手架 | ✅ |
-| S2 | 类型定义 | ✅ |
-| S3 | DataLoader接口+实现 | ✅ |
-| S4-S11 | Engine纯函数 (8个) | ✅ (201 tests) |
-| S12 | 静态规则数据填充 | 🔄 大部分完成 |
-| S13-S19 | 角色状态管理 | ✅ (144 tests) |
-| S20 | 集成测试 | ✅ (40 tests) |
+| S1 | Project scaffolding | ✅ |
+| S2 | Type definitions | ✅ |
+| S3 | DataLoader interface + implementation | ✅ |
+| S4-S11 | Engine pure functions (11 functions) | ✅ (201 tests) |
+| S12 | Static rule data | 🔄 Most complete |
+| S13-S19 | Character state management | ✅ (144 tests) |
+| S20 | Integration tests | ✅ (40 tests) |
 
-**当前测试状态**: **415 tests passing**, `tsc --noEmit` ✅
+**Current test status**: **415+ tests passing**, `tsc --noEmit` ✅
 
 ---
 
-## 文件命名规范
+## File Naming Convention
 
 ```
-<目录>/<功能名>.md
+<directory>/<feature-name>.md
 ```
 
-示例:
+Example:
 ```
 01-rules-engine/ac-calculation.md
 02-character-creation/species.md
 ```
 
-每个文件包含：
-- **需求描述** — 这个功能做什么
-- **验收标准** — 怎样算做完
-- **数据模型** — 需要什么数据结构
-- **边界情况** — 容易出错的地方
-- **参考资料** — 对应PRD的章节
+Each file contains:
+- **Requirement description** — What this feature does
+- **Acceptance criteria** — How to verify completion
+- **Data model** — Required data structures
+- **Edge cases** — Easy to miss details
+- **References** — Related PRD sections
 
 ---
 
-## Agent 认领规范
+## Agent Assignment Convention
 
-在开始实现某个需求前，请在对应文件的顶部更新状态：
+Before implementing a requirement, update the file header:
 
 ```markdown
 ---
@@ -93,7 +93,7 @@ started: YYYY-MM-DD
 ---
 ```
 
-完成后：
+After completion:
 
 ```markdown
 ---
@@ -106,11 +106,15 @@ finished: YYYY-MM-DD
 
 ---
 
-## 快速导航
+## Quick Navigation
 
-- **PRD主文档**: `PRD.md`（项目根目录）
-- **技术设计(HLD)**: `spec/high-level-design.md`
-- **数据模型**: `spec/data-model.md`
-- **任务拆解**: `tasks/task-list.md`
-- **Agent指南**: `agent.md`
-- **测试计划**: `spec/test-plan.md`
+- **PRD**: `PRD.md` (project root)
+- **Technical Design (HLD)**: `spec/high-level-design.md`
+- **Data Model**: `spec/data-model.md`
+- **Task Breakdown**: `tasks/task-list.md`
+- **Agent Guide**: `agent.md`
+- **Test Plan**: `spec/test-plan.md`
+
+---
+
+*Last updated: 2026-05-08*

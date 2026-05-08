@@ -1,15 +1,18 @@
-# open20-core
+# Open20 Core
 
-A TypeScript library for managing D&D 2024 character sheets. Zero UI dependency — pure logic, testable via unit tests, usable by CLI or web apps.
+A headless TypeScript game engine for D&D 5e 2024 — rule calculations, spell management, and character management. Framework-agnostic, UI-free, test-driven.
 
 ## Features
 
 - **Headless Core**: Pure TypeScript, no UI framework dependencies
 - **Immutable State**: All Character fields are readonly. Modifications return new objects
-- **Rule Engine**: Pure functions for AC, HP, spell slots, initiative, attacks, etc.
+- **Rule Engine**: Pure functions for AC, HP, spell slots, initiative, attacks, skills
+- **Spell Management**: 560+ SRD spells with full metadata and query functions
+- **Character Management**: Create, validate, level up characters with full 2024 PHB support
 - **ESM**: Modern JavaScript module system
 - **TypeScript**: Full type safety with strict mode
-- **Testable**: 415 tests with 100% coverage for engine/character modules
+- **Zod Schemas**: Runtime validation for all data structures
+- **Testable**: 415+ tests with 100% coverage for engine/character modules
 
 ## Installation
 
@@ -20,26 +23,27 @@ npm install open20-core
 ## Quick Start
 
 ```typescript
-import { createDataLoader, createCharacter, calculateAC } from 'open20-core';
-
-// Load rule data
-const loader = createDataLoader();
+import { createCharacter, calculateAC, calculateHP, searchSpells } from 'open20-core';
 
 // Create a character
-const char = createCharacter({
+const character = createCharacter({
   name: 'Borin Ironforge',
-  speciesId: 'Dwarf',
-  backgroundId: 'Soldier',
-  classId: 'Fighter',
-  abilityScores: {
-    Strength: 15, Dexterity: 12, Constitution: 14,
-    Intelligence: 10, Wisdom: 13, Charisma: 8
-  }
-}, loader);
+  species: 'Dwarf',
+  background: 'Soldier',
+  classes: [{ name: 'Fighter', level: 5 }],
+  abilityScores: { str: 16, dex: 12, con: 15, int: 10, wis: 13, cha: 8 },
+  feats: ['Alert'],
+  skills: ['Athletics', 'Intimidation', 'Perception'],
+});
 
-// Calculate stats
-console.log(calculateAC(char, loader));  // AC value
-console.log(char.hitPoints.max);          // Max HP
+// Calculate derived stats
+const ac = calculateAC(character, { armor: 'Chain Mail', shield: true });
+const hp = calculateHP(character);
+const spellSlots = calculateSpellSlots(character);
+
+// Query spells
+const fireball = getSpell('fireball');
+const evocationSpells = searchSpells({ school: 'Evocation', level: [1, 2, 3] });
 ```
 
 ## Browser Usage
@@ -56,12 +60,15 @@ npm run build:browser
 </script>
 ```
 
-## Documentation
+## API Modules
 
-- [agent.md](./agent.md) — Developer guide for AI agents
-- [spec/high-level-design.md](./spec/high-level-design.md) — Technical architecture
-- [spec/data-model.md](./spec/data-model.md) — TypeScript interfaces & JSON schema
-- [requirements/README.md](./requirements/README.md) — Requirements traceability
+| Module | Description |
+|---|---|
+| `@open20/core/engine` | Rule calculations (AC, HP, skills, spell slots, etc.) |
+| `@open20/core/character` | Character creation, validation, level up |
+| `@open20/core/spells` | Spell data and query functions |
+| `@open20/core/data` | Static JSON datasets (species, classes, feats, etc.) |
+| `@open20/core/schemas` | Zod schemas for runtime validation |
 
 ## Development
 
@@ -79,3 +86,15 @@ npm run typecheck
 npm run build
 npm run build:browser
 ```
+
+## Documentation
+
+- [PRD.md](./PRD.md) — Product Requirements Document
+- [agent.md](./agent.md) — Developer guide for AI agents
+- [spec/high-level-design.md](./spec/high-level-design.md) — Technical architecture
+- [spec/data-model.md](./spec/data-model.md) — TypeScript interfaces & JSON schema
+- [requirements/README.md](./requirements/README.md) — Requirements traceability
+
+## License
+
+MIT

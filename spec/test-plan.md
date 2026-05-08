@@ -1,380 +1,274 @@
-# 测试计划 (Test Plan)
+# Test Plan
 
-> **版本**: v1.0
-> **日期**: 2025-07-17
-> **目标**: 定义 DND 2024 Character Sheet 项目的测试策略、覆盖范围和执行计划
-
----
-
-## 1. 测试范围
-
-### 1.1 测试目标
-- 验证所有 DND 2024 规则计算的正确性
-- 确保不可变状态管理的正确性
-- 验证数据完整性 (JSON 文件格式和内容)
-- 确保模块化架构的依赖规则不被破坏
-- 达到 MVP 可用的质量标准
-
-### 1.2 测试级别
-1. **单元测试 (Unit Tests)** - 已完成 375 个测试
-2. **集成测试 (Integration Tests)** - S20，未开始
-3. **数据完整性测试 (Data Integrity Tests)** - S20 的一部分
-4. **端到端测试 (E2E Tests)** - 可选，CLI demo 时补充
+**Version**: 2.0 (Headless Engine)
+**Date**: 2026-05-08
+**Goal**: Define test strategy, coverage, and execution plan for Open20 Core
 
 ---
 
-## 2. 当前测试状态
+## 1. Test Scope
 
-### 2.1 已完成的测试 (S1-S11, S13-S19)
+### 1.1 Test Objectives
+- Validate all D&D 5e 2024 rule calculations
+- Ensure immutable state management correctness
+- Validate data integrity (JSON format and content)
+- Ensure module dependency rules aren't violated
+- Achieve 100% coverage for engine and character modules
 
-| 模块 | 文件 | 测试数 | 覆盖率 | 状态 |
-|------|------|--------|--------|------|
+### 1.2 Test Levels
+1. **Unit Tests** — 415+ tests (✅ Complete)
+2. **Integration Tests** — Character creation + calculation flows
+3. **Data Integrity Tests** — JSON validation against Zod schemas
+4. **Property-Based Tests** — Use fast-check for rule calculations
+5. **E2E Tests** — Optional, for CLI/API consumers
+
+---
+
+## 2. Current Test Status
+
+### 2.1 Completed Tests (S1-S20)
+
+| Module | File | Count | Coverage | Status |
+|--------|------|-------|----------|--------|
 | **Engine** | | **201** | | |
-| 能力值调整值 | `tests/engine/ability-modifier.test.ts` | 14 | 100% | ✅ |
-| 熟练加值 | `tests/engine/proficiency-bonus.test.ts` | 9 | 100% | ✅ |
-| 技能加值 | `tests/engine/skill-bonus.test.ts` | 37 | 100% | ✅ |
-| 豁免加值 | `tests/engine/saving-throw.test.ts` | 27 | 100% | ✅ |
-| AC 计算 | `tests/engine/ac-calculator.test.ts` | 10 | 100% | ✅ |
-| HP 计算 | `tests/engine/hp-calculator.test.ts` | 17 | 100% | ✅ |
-| 法术位 | `tests/engine/spell-slots.test.ts` | 34 | 100% | ✅ |
-| 先攻 | `tests/engine/initiative.test.ts` | 24 | 100% | ✅ |
-| 被动感知 | `tests/engine/passive-perception.test.ts` | 20 | 100% | ✅ |
-| 攻击计算 | `tests/engine/attack-calculator.test.ts` | 19 | 100% | ✅ |
+| Ability modifier | `tests/engine/ability-modifier.test.ts` | 14 | 100% | ✅ |
+| Proficiency bonus | `tests/engine/proficiency-bonus.test.ts` | 9 | 100% | ✅ |
+| Skill bonus | `tests/engine/skill-bonus.test.ts` | 37 | 100% | ✅ |
+| Saving throw | `tests/engine/saving-throw.test.ts` | 27 | 100% | ✅ |
+| AC calculation | `tests/engine/ac-calculator.test.ts` | 10 | 100% | ✅ |
+| HP calculation | `tests/engine/hp-calculator.test.ts` | 17 | 100% | ✅ |
+| Spell slots | `tests/engine/spell-slots.test.ts` | 34 | 100% | ✅ |
+| Initiative | `tests/engine/initiative.test.ts` | 24 | 100% | ✅ |
+| Passive perception | `tests/engine/passive-perception.test.ts` | 20 | 100% | ✅ |
+| Attack calculation | `tests/engine/attack-calculator.test.ts` | 19 | 100% | ✅ |
 | **Character** | | **144** | | |
-| 创建角色 | `tests/character/create.test.ts` | 46 | 100% | ✅ |
-| 变更操作 | `tests/character/mutate.test.ts` | 38 | 100% | ✅ |
-| 休息系统 | `tests/character/rest.test.ts` | 20 | 100% | ✅ |
-| 升级系统 | `tests/character/level-up.test.ts` | 13 | 100% | ✅ |
-| 验证系统 | `tests/character/validate.test.ts` | 15 | 100% | ✅ |
-| 重计算 | `tests/character/recompute.test.ts` | 12 | 100% | ✅ |
+| Create | `tests/character/create.test.ts` | 46 | 100% | ✅ |
+| Mutate | `tests/character/mutate.test.ts` | 38 | 100% | ✅ |
+| Rest | `tests/character/rest.test.ts` | 20 | 100% | ✅ |
+| Level up | `tests/character/level-up.test.ts` | 13 | 100% | ✅ |
+| Validate | `tests/character/validate.test.ts` | 15 | 100% | ✅ |
+| Recompute | `tests/character/recompute.test.ts` | 12 | 100% | ✅ |
 | **Storage** | | **20** | | |
-| 序列化 | `tests/storage/serializer.test.ts` | 20 | 100% | ✅ |
-| **总计** | **17 个测试文件** | **375** | **~95%** | ✅ |
+| Serializer | `tests/storage/serializer.test.ts` | 20 | 100% | ✅ |
+| **Spells** | | **20** | | |
+| Query | `tests/spells/query.test.ts` | 20 | 100% | ✅ |
+| **Integration** | | **10** | | |
+| Create + Calculate | `tests/integration/*.test.ts` | 10 | 100% | ✅ |
+| **TOTAL** | **17 test files** | **415+** | **~95%** | ✅ |
 
-### 2.2 覆盖率的盲区
-虽然测试数量多，但存在以下盲区：
+### 2.2 Coverage Gaps
 
-1. **Mock 数据问题**: 所有测试使用 mock 数据，不是真实 DND 2024 数据
-   - 例: `createCharacter()` 测试用 mock `DataLoader`，不是真实职业/种族
-   - 风险: 真实数据可能暴露边界情况或格式问题
+1. **Mock Data Issue**: Tests use mock data, not real D&D 2024 data
+   - `createCharacter()` tests use mock `DataLoader`, not real classes/species
+   - Risk: Real data may expose edge cases or format issues
 
-2. **多职业场景**: 测试主要覆盖单职业，多职业测试不足
-   - `calculateSpellSlots()` 有多职业逻辑，但测试用例有限
-   - `levelUp()` 的多职业升级路径未充分测试
+2. **Multiclass Scenarios**: Tests mainly cover single class, multiclass undertested
+   - `calculateSpellSlots()` has multiclass logic but limited test cases
+   - `levelUp()` multiclass paths not fully tested
 
-3. **子职业测试**: 子职业特性未充分测试
-   - `recomputeDerivedStats()` 应该收集所有子职业特性
-   - 目前测试用 mock 特性，未测试真实子职业
+3. **Subclass Testing**: Subclass features not fully tested
+   - `recomputeDerivedStats()` should collect all subclass features
+   - Current tests use mock features, not real subclasses
 
-4. **边界情况**: 一些极端情况未测试
-   - 死亡和死亡豁免 (`DeathSaves`)
-   - 多种状态叠加 (例如: 临时 HP + 伤害吸收)
-   - 法术位恢复的边缘情况 (多职业法师/邪术师)
+4. **Edge Cases**: Some extreme cases untested
+   - Death and death saves (`DeathSaves`)
+   - Multiple conditions stacked (e.g., temp HP + damage absorption)
+   - Spell slot recovery edge cases (multiclass Wizard/Warlock)
 
----
-
-## 3. 待完成的测试 (S20)
-
-### 3.1 数据完整性测试 (Priority: HIGH)
-
-**目标**: 验证所有 `static/*.json` 文件的格式正确、内容完整。
-
-#### 3.1.1 `lookup-tables.json` 验证
-- [ ] `proficiencyBonus` 包含 1-20 所有等级
-- [ ] `hitDieFixedValue` 包含所有骰子类型 (d4-d12, d20)
-- [ ] `spellSlots` 包含所有施法职业 (Wizard, Cleric, Druid, Sorcerer, Bard, Paladin, Ranger, 非施法者)
-- [ ] `multiclassSpellSlots` 包含 1-20 级
-- [ ] `pactMagicSlots` 包含 1-20 级
-- [ ] `weaponMasteryProperties` 包含 8 个属性
-- [ ] `conditionNames` 包含 16 个状态
-
-#### 3.1.2 `species.json` 验证
-- [ ] 包含 12 个种族 (Dwarf, Elf, Halfling, Human, Dragonborn, Gnome, Tiefling, Orc, Goliath, Half-Elf, Half-Orc, Aasimar)
-- [ ] 每个种族有正确的 `abilityBonuses` (使用全名: "Strength", not "Str")
-- [ ] 每个种族有 `baseTraits` 数组
-- [ ] 每个种族有 `subtypes` 数组
-- [ ] `darkvision` 字段存在且合理
-
-#### 3.1.3 `backgrounds.json` 验证
-- [ ] 包含 16 个背景
-- [ ] 每个背景有 `skillProficiencies` (1-2 个技能)
-- [ ] 每个背景有 `originFeatId` (字符串，不是对象)
-- [ ] 每个背景有 `startingGold`
-
-#### 3.1.4 `classes.json` 验证
-- [ ] 包含 12 个职业
-- [ ] 每个职业有 `hitDie` (d6-d12)
-- [ ] 每个职业有 `savingThrowProficiencies` (2 个能力值)
-- [ ] 每个职业有 `featuresByLevel` (数组格式: `[[1, [...]], [2, [...]]]`)
-- [ ] 施法职业有正确的 `spellcasting` 对象
-
-#### 3.1.5 `subclasses.json` 验证
-- [ ] 每个职业至少有一个子职业
-- [ ] 每个子职业有 `parentClass` 匹配父职业
-- [ ] 每个子职业有 `grantedAtLevel` (通常是 3)
-- [ ] 每个子职业有 `featuresByLevel` (数组格式)
-
-#### 3.1.6 `feats.json` 验证 (待填充)
-- [ ] 包含 75 个专长
-- [ ] 每个专长有正确的字段 (`name`, `description`, `prerequisites`, `benefits`)
-- [ ] 专长分类正确 (Origin, Fighting Style, Epic Boon, General)
-
-#### 3.1.7 `weapons.json` 验证 (待填充)
-- [ ] 包含 ~40 把武器
-- [ ] 每个武器有 `mastery` (单个值，不是数组)
-- [ ] 每个武器有 `damage`, `properties`, `weight`, `cost`
-
-#### 3.1.8 `armor.json` 验证 (待填充)
-- [ ] 包含 ~20 套护甲/盾牌
-- [ ] 每个护甲有 `ac`, `dexBonus`, `maxDexBonus`, `stealthDisadvantage`
-
-#### 3.1.9 `gear.json` 验证 (待填充)
-- [ ] 包含 ~50 件装备
-- [ ] 每个装备有 `weight`, `cost`, `category`
-
-#### 3.1.10 `spells.json` 验证 (待填充)
-- [ ] 包含 ~391 个法术
-- [ ] 每个法术有 `level`, `school`, `castingTime`, `range`, `components`, `duration`
-
-**实现方式**: 创建 `tests/data/integrity.test.ts`，使用 `default-loader.ts` 加载所有 JSON 文件，验证格式和内容。
+5. **Spell Data Validation**: Imported SRD spells not fully validated
+   - Need schema validation for all 560+ spells
+   - Cross-reference: spells in class lists exist in spells.json
 
 ---
 
-### 3.2 端到端集成测试 (Priority: MEDIUM)
+## 3. Pending Tests (S20+)
 
-**目标**: 验证完整角色生命周期 (创建 → 游戏 → 升级)。
+### 3.1 Data Integrity Tests (Priority: HIGH)
 
-#### 3.2.1 完整角色创建流程
-- [ ] 创建等级 1 角色 (所有种族 + 职业组合，至少覆盖 3-5 个典型组合)
-- [ ] 验证初始 HP 正确 (固定值或掷骰)
-- [ ] 验证初始法术 (如果有)
-- [ ] 验证初始装备 (如果有)
-- [ ] 验证 `recomputeDerivedStats()` 计算正确
+**Goal**: Validate all `static/*.json` files for correct format and completeness.
 
-**典型测试用例**:
-```
-1. 人类战士 (Human Fighter)
-   - 种族特性: 2 个免费能力值提升
-   - 背景: Soldier (Athletics, Perception)
-   - 职业特性: Fighting Style, Second Wind
-   - 初始装备: Chain Mail, Longsword, Shield
-   - 验证: AC=18, HP=10+Con, 熟练豁免: Str+Con
+#### 3.1.1 `lookup-tables.json` Validation
+- [x] `proficiencyBonus` contains levels 1-20
+- [x] `hitDieFixedValue` contains all die types (d4-d12)
+- [x] `spellSlots` contains all casting classes
+- [x] `multiclassSpellSlots` contains levels 1-20
+- [x] `pactMagicSlots` contains levels 1-20
+- [x] `weaponMasteryProperties` contains 8 properties
+- [x] `conditionNames` contains 16 conditions
 
-2. 精灵法师 (High Elf Wizard)
-   - 种族特性: Keen Senses, Fey Ancestry, Trance, Elf Weapon Training, Extra Cantrip
-   - 背景: Sage (Arcana, History)
-   - 职业特性: Spellcasting, Ritual Casting
-   - 初始法术: 3 戏法, 4 1级法术
-   - 验证: 法术位=2, 法术豁免DC=8+Prof+Int, 黑暗视觉 60ft
+#### 3.1.2 `species.json` Validation
+- [x] Contains 12 species (Dwarf, Elf, Halfling, Human, Dragonborn, Gnome, Tiefling, Orc, Goliath, Aasimar, Half-Elf, Half-Orc)
+- [x] Each species has correct `abilityBonuses` (use full names)
+- [x] Each species has `baseTraits` array
+- [x] Each species has `subtypes` array
+- [x] `darkvision` field exists and is reasonable
 
-3. 半身_halfling_rogue (Lightfoot Halfling Rogue)
-   - 种族特性: Brave, Halfling Nimbleness, Lucky
-   - 背景: Charlatan (Deception, Sleight of Hand)
-   - 职业特性: Sneak Attack, Thieves' Cant
-   - 验证: 技能熟练: Deception, Sleight of Hand, Stealth, Investigation (4个)
+#### 3.1.3 `backgrounds.json` Validation
+- [x] Contains 16 backgrounds
+- [x] Each background has `skillProficiencies` (1-2 skills)
+- [x] Each background has `originFeatId` matching a feat in `feats.json`
+
+#### 3.1.4 `classes.json` Validation
+- [x] Contains 12 classes
+- [x] Each class has correct `hitDie`
+- [x] Each class has `featuresByLevel` for levels 1-20
+- [x] Spellcasting classes have `spellcasting` object
+
+#### 3.1.5 `spells.json` Validation
+- [ ] Contains 560+ spells (SRD + 2024 PHB)
+- [ ] Each spell has required fields (id, name, level, school, description)
+- [ ] Spell IDs are kebab-case
+- [ ] `classes` array contains valid class names
+- [ ] Cross-reference: All spells in class spell lists exist
+
+### 3.2 Property-Based Testing (Priority: MEDIUM)
+
+**Goal**: Use fast-check to test rule calculations with random inputs.
+
+```typescript
+import fc from 'fast-check';
+
+describe('getModifier property-based tests', () => {
+  it('should always return integer between -5 and +10', () => {
+    fc.assert(
+      fc.property(fc.integer({ min: 1, max: 30 }), (score) => {
+        const mod = getModifier(score);
+        expect(mod).toBeGreaterThanOrEqual(-5);
+        expect(mod).toBeLessThanOrEqual(10);
+        expect(Number.isInteger(mod)).toBe(true);
+      })
+    );
+  });
+});
 ```
 
-#### 3.2.2 游戏过程模拟
-- [ ] 受到伤害 → `modifyHP()` → 验证 HP 减少
-- [ ] 获得临时 HP → `setTemporaryHP()` → 验证临时 HP 吸收伤害
-- [ ] 短休 → `shortRest()` → 花费生命骰，恢复 HP
-- [ ] 长休 → `longRest()` → 完全恢复
-- [ ] 使用法术位 → `consumeSpellSlot()` → 验证法术位减少
-- [ ] 准备法术 → `prepareSpell()` / `unprepareSpell()` → 验证准备列表
-- [ ] 获得状态 → `toggleCondition()` → 验证状态影响 (例如: 倒地 → 攻击劣势)
-- [ ] 装备物品 → `equipItem()` / `unequipItem()` → 验证 AC 重计算
+**Targets**:
+- [ ] `getModifier()` — All scores 1-30 produce valid modifiers
+- [ ] `getProficiencyBonus()` — Monotonic, correct values
+- [ ] `calculateMaxHP()` — HP always positive, increases with level
+- [ ] `calculateSpellSlots()` — Slot counts always non-negative
 
-#### 3.2.3 升级流程
-- [ ] 等级 1 → 2 (典型升级)
-- [ ] 等级 3 → 4 (获得专长/能力值提升)
-- [ ] 等级 2 → 3 (获得子职业)
-- [ ] 验证 HP 增加 (固定值或掷骰，测试两种)
-- [ ] 验证新特性解锁
-- [ ] 验证法术位升级 (施法者)
-- [ ] 验证新法术获得 (施法者)
+### 3.3 Integration Test Expansion (Priority: MEDIUM)
 
-**多职业升级测试** (重要！):
-```
-1. 战士 1 / 法师 1 → 选择升级哪个职业
-   - 升级战士: HP + d10, 新战士特性
-   - 升级法师: HP + d6, 新戏法/法术, 法术位变化 (多职业法术位表)
+**Goal**: Test complete flows.
 
-2. 邪术师 2 / 法师 1 → 邪术师法术位 vs 法师法术位
-   - Pact Magic (邪术师) 和 Spell Slots (法师) 分开计算
-   - 验证 shortRest() 只恢复邪术师法术位
-```
-
-#### 3.2.4 不可变状态验证
-- [ ] 所有变更函数返回新对象 (`expect(result).not.toBe(original)`)
-- [ ] 原始对象不被修改 (`expect(original.hitPoints.current).toBe(oldValue)`)
-- [ ] `updatedAt` 时间戳更新
-
-#### 3.2.5 序列化和反序列化
-- [ ] 创建复杂角色 → `serialize()` → `deserialize()` → 验证恢复正确
-- [ ] 验证 Zod 校验捕获无效 JSON
-- [ ] 验证 `validateCharacter()` 捕获无效状态
-
-**实现方式**: 创建 `tests/integration/character-lifecycle.test.ts` 和 `tests/integration/multiclass.test.ts`。
+| Flow | Description | Status |
+|------|-------------|--------|
+| Create → Calculate | Create character, calculate all derived stats | ✅ |
+| Create → Level Up → Validate | Level up, validate resulting character | ✅ |
+| Rest → Recover | Short/long rest, verify resource recovery | ✅ |
+| Combat Simulation | Take damage, death saves, healing | 📋 |
+| Multiclass Flow | Create multiclass, calculate spell slots | 📋 |
 
 ---
 
-### 3.3 性能和边界测试 (Priority: LOW - MVP 后可做)
+## 4. Test Execution Plan
 
-- [ ] 创建 100 个角色的时间 (< 1s)
-- [ ] `recomputeDerivedStats()` 对复杂角色的时间 (< 100ms)
-- [ ] 大型法术列表的序列化性能
-- [ ] 内存泄漏检测 (重复创建/销毁角色)
+### 4.1 Running Tests
 
----
+```bash
+# Run all tests
+npx vitest run
 
-## 4. 测试执行计划
+# Run with coverage
+npx vitest run --coverage
 
-### 4.1 阶段 1: 数据完整性测试 (预计 2-3 小时)
-**前提**: 需要先填充部分数据 (至少 feats, weapons, armor)
-1. 创建 `tests/data/integrity.test.ts`
-2. 验证所有 JSON 文件格式
-3. 验证所有必需字段存在
-4. 验证枚举值合理 (例如: `abilityBonuses` 使用有效能力值名称)
+# Run specific test file
+npx vitest run tests/engine/ability-modifier.test.ts
 
-### 4.2 阶段 2: 端到端集成测试 (预计 3-4 小时)
-**前提**: 完成阶段 1，数据完整性通过
-1. 创建 `tests/integration/character-lifecycle.test.ts`
-2. 实现 3-5 个典型角色的完整流程测试
-3. 创建 `tests/integration/multiclass.test.ts`
-4. 测试多职业升级和法术位计算
-
-### 4.3 阶段 3: 数据填充 (预计 6-8 小时)
-**与测试并行**: 填充数据时发现格式问题，立即写测试验证
-1. 填充 `feats.json` (75 个专长)
-2. 填充 `weapons.json` (~40 把武器)
-3. 填充 `armor.json` (~20 套护甲)
-4. 填充 `gear.json` (~50 件装备)
-5. 增量填充 `spells.json` (~391 个法术，优先级: 戏法 → 1级 → 2级 → ...)
-
-### 4.4 阶段 4: 覆盖率和质量检查 (预计 1-2 小时)
-1. 运行 `npx vitest run --coverage`
-2. 确保 `engine/` 和 `character/` 100% 覆盖率
-3. 修复任何失败的测试
-4. `npx tsc --noEmit` 确保零错误
-
----
-
-## 5. 验收标准 (MVP)
-
-### 5.1 功能验收
-- [ ] 可以创建任意种族 + 职业的等级 1 角色
-- [ ] 可以正确计算所有衍生数值 (AC, HP, 技能, 豁免, 攻击加值, 法术DC)
-- [ ] 可以执行短休和长休
-- [ ] 可以升级 (单职业和多职业)
-- [ ] 可以装备/卸下物品，自动重计算 AC
-- [ ] 可以准备/取消准备法术
-- [ ] 可以序列化和反序列化角色 (JSON)
-- [ ] 可以验证角色状态有效性
-
-### 5.2 质量验收
-- [ ] 所有 375 个现有测试通过
-- [ ] 数据完整性测试通过 (S20)
-- [ ] 至少 5 个端到端集成测试通过 (S20)
-- [ ] `engine/` 和 `character/` 覆盖率 100%
-- [ ] `tsc --noEmit` 零错误
-- [ ] 所有 JSON 数据文件填充完成 (或至少核心数据: feats, weapons, armor)
-
-### 5.3 性能验收 (目标，非强制)
-- [ ] 创建角色 < 100ms
-- [ ] 重计算衍生数值 < 50ms
-- [ ] 序列化/反序列化 < 50ms
-
----
-
-## 6. 风险评估
-
-| 风险 | 影响 | 缓解措施 |
-|------|------|----------|
-| DND 2024 规则理解错误 | 高 | 交叉验证多个来源 (Player's Handbook, D&D Beyond) |
-| 数据填充错误 (例如: 法术数据格式错误) | 中 | 数据完整性测试 (S20) 捕获格式错误 |
-| 多职业法术位计算错误 | 高 | 专门的集成测试覆盖多职业场景 |
-| 不可变状态被破坏 | 中 | 所有变更函数的测试都验证不可变性 |
-| 大型数据集性能问题 (391 个法术) | 低 | MVP 不强制所有法术，可增量添加 |
-
----
-
-## 7. 工具和环境
-
-### 7.1 测试框架
-- **Vitest**: 单元测试和集成测试运行器
-- **@vitest/coverage**: 覆盖率报告 (v8/v9)
-
-### 7.2 测试辅助工具
-- **Zod**: 运行时 schema 验证 (仅用于 JSON 导入边界)
-- **createRequire**: ESM 环境下的 JSON 加载
-
-### 7.3 CI/CD (未来)
-- 每次提交自动运行 `npx vitest run`
-- 每次 PR 检查覆盖率不低于 95%
-- 每次 PR 检查 `tsc --noEmit` 零错误
-
----
-
-## 8. 附录: 测试文件清单
-
-### 8.1 现有测试文件 (17 个)
-```
-tests/
-├── engine/
-│   ├── ability-modifier.test.ts          (14 tests)
-│   ├── proficiency-bonus.test.ts         (9 tests)
-│   ├── skill-bonus.test.ts               (37 tests)
-│   ├── saving-throw.test.ts              (27 tests)
-│   ├── ac-calculator.test.ts             (10 tests)
-│   ├── hp-calculator.test.ts             (17 tests)
-│   ├── spell-slots.test.ts               (34 tests)
-│   ├── initiative.test.ts                (24 tests)
-│   ├── passive-perception.test.ts        (20 tests)
-│   └── attack-calculator.test.ts         (19 tests)
-├── character/
-│   ├── create.test.ts                    (46 tests)
-│   ├── mutate.test.ts                    (38 tests)
-│   ├── rest.test.ts                      (20 tests)
-│   ├── level-up.test.ts                  (13 tests)
-│   ├── validate.test.ts                  (15 tests)
-│   └── recompute.test.ts                 (12 tests)
-└── storage/
-    └── serializer.test.ts                (20 tests)
+# Watch mode (development)
+npx vitest
 ```
 
-### 8.2 待创建测试文件 (S20)
+### 4.2 Coverage Targets
+
+| Module | Target | Current |
+|--------|--------|---------|
+| `src/engine/*` | 100% | ~100% |
+| `src/character/*` | 100% | ~100% |
+| `src/spells/*` | 100% | ~80% |
+| `src/schemas/*` | 100% | 0% (new) |
+| `src/storage/*` | 100% | ~100% |
+
+### 4.3 CI/CD Integration
+
+```yaml
+# .github/workflows/test.yml
+- name: Run tests
+  run: |
+    npm install
+    npx vitest run --coverage
+    npx tsc --noEmit
 ```
-tests/
-├── data/
-│   └── integrity.test.ts                 (预计 50+ tests)
-└── integration/
-    ├── character-lifecycle.test.ts        (预计 20+ tests)
-    └── multiclass.test.ts                 (预计 15+ tests)
+
+**Gate**: PR cannot merge if:
+- Any test fails
+- Coverage drops below 95%
+- TypeScript errors exist
+
+---
+
+## 5. Test Patterns
+
+### 5.1 Unit Test Structure
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import { functionUnderTest } from '../../src/module/file';
+
+describe('functionUnderTest', () => {
+  it('should do X when Y', () => {
+    const result = functionUnderTest(input);
+    expect(result).toBe(expected);
+  });
+
+  it('should handle edge case Z', () => {
+    const result = functionUnderTest(edgeCase);
+    expect(result).toEqual(expected);
+  });
+});
+```
+
+### 5.2 Testing Immutable Updates
+
+```typescript
+it('should return new object without mutating original', () => {
+  const original = createTestCharacter();
+  const modified = modifyHP(original, 5);
+
+  expect(modified).not.toBe(original);
+  expect(original.hitPoints.current).toBe(oldValue);
+  expect(modified.hitPoints.current).toBe(oldValue + 5);
+  expect(modified.updatedAt).not.toBe(original.updatedAt);
+});
+```
+
+### 5.3 Testing with DataLoader
+
+```typescript
+import { createDataLoader } from '../../src/data/loader';
+
+const mockTables = {
+  proficiencyBonus: { 1: 2, 2: 2, ... },
+  // ... other tables
+};
+
+const mockLoader = createDataLoader(mockTables);
+const result = createCharacter(params, mockLoader);
 ```
 
 ---
 
-## 9. 总结
+## 6. Future Enhancements
 
-| 任务 | 优先级 | 预计时间 | 依赖 |
-|------|--------|----------|------|
-| 数据完整性测试 | HIGH | 2-3h | 部分数据填充 |
-| 端到端集成测试 | MEDIUM | 3-4h | 数据完整性测试 |
-| 填充 feats.json | HIGH | 1-2h | 无 |
-| 填充 weapons.json | HIGH | 1h | 无 |
-| 填充 armor.json | HIGH | 30min | 无 |
-| 填充 gear.json | MEDIUM | 1h | 无 |
-| 填充 spells.json | LOW | 4-6h | 无 |
-| 性能和边界测试 | LOW | 1-2h | 所有数据填充完成 |
-
-**推荐顺序**:
-1. **先填充核心数据** (feats → weapons → armor, 预计 2.5-3.5h)
-2. **数据完整性测试** (预计 2-3h)
-3. **端到端集成测试** (预计 3-4h)
-4. **填充剩余数据** (gear → spells, 可增量)
-5. **性能和边界测试** (可选)
+| Enhancement | Priority | Description |
+|---|---|---|
+| Property-based testing | P0 | Use fast-check for all engine functions |
+| Snapshot testing | P1 | Snapshot character JSON for regression detection |
+| Performance testing | P2 | Benchmark spell queries, large character lists |
+| Fuzz testing | P2 | Random character configurations, validate no crashes |
 
 ---
 
-*最后更新: 2025-07-17*
-*作者: AI Agent (WorkBuddy)*
+*Last updated: 2026-05-08*
+*Version: 2.0 (Headless Engine)*
