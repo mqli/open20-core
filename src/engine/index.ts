@@ -23,3 +23,25 @@ export type { SpellSlotEntry, PactMagicResult } from './spell-slots';
 export { calculateInitiative } from './initiative';
 export { calculatePassivePerception } from './passive-perception';
 export { calculateAttacks } from './attack-calculator';
+export {
+  rollDie,
+  rollDice,
+  rollWithAdvantage,
+  rollWithDisadvantage,
+  rollAttack,
+  rollSkillCheck,
+  rollSavingThrow,
+  rollWeaponDamage,
+  rollSpellDamage,
+  defaultRandom,
+} from './dice';
+export type {
+  RandomProvider,
+  AttackModifier,
+  AttackRollResult,
+  SkillCheckResult,
+  SavingThrowResult,
+  DamageRollResult,
+  DamageRollEntry,
+  DamageModifier,
+} from './dice';
