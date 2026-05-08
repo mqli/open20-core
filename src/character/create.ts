@@ -28,6 +28,8 @@ export interface CreateCharacterParams {
   speciesSubtypeId?: string;
   backgroundId: string;
   classId: string;
+  /** Level for primary class (defaults to 1, useful for multiclass creation) */
+  classLevel?: number;
   abilityScores: Record<AbilityName, number>;
   featIds?: string[];
   skillChoices?: string[];
@@ -78,10 +80,11 @@ export function createCharacter(
   };
 
   // 3. Build CharacterClass array
+  const primaryLevel = params.classLevel ?? 1;
   const charClasses: CharacterClass[] = [
     {
       classId: params.classId,
-      level: 1,
+      level: primaryLevel,
       subclassId: null,
       subclassLevel: null,
       hitDice: { die: classData.hitDie, used: 0 },
@@ -112,6 +115,11 @@ export function createCharacter(
   const conMod = getModifier(getTotalScore(abilityScores, 'Constitution'));
   let maxHP = calculateHPAtLevel1(classData.hitDie, conMod);
   
+  // Additional levels for primary class
+  for (let lv = 2; lv <= primaryLevel; lv++) {
+    maxHP += calculateHPIncrement(classData.hitDie, conMod);
+  }
+  
   // Add HP from additional classes
   for (const additional of additionalClasses) {
     const acData = data.getClass(additional.classId)!;
@@ -131,7 +139,7 @@ export function createCharacter(
   };
 
   // 6. Build Resources (extract from all classes)
-  let resources: Resource[] = extractResources(classData, 1);
+  let resources: Resource[] = extractResources(classData, primaryLevel);
   for (const additional of additionalClasses) {
     const acData = data.getClass(additional.classId)!;
     const additionalResources = extractResources(acData, additional.level);
@@ -141,7 +149,7 @@ export function createCharacter(
   // 7. Build Spells (handle multiclass spell slots)
   let spells: CharacterSpells;
   
-  if (totalLevel === 1 && !additionalClasses.length) {
+  if (primaryLevel === 1 && !additionalClasses.length) {
     // Single class level 1
     spells = classData.spellcasting
       ? buildInitialSpells(classData, abilityScores, data)

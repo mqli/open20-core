@@ -249,4 +249,89 @@ describe('D&D Player Behavior - Character Lifecycle', () => {
       expect(recomputed.combatStats.proficiencyBonus).toBe(2);
     });
   });
+
+  describe('Session 7: Multiclass Characters', () => {
+    it('should create a Fighter 1 / Wizard 1 multiclass character', () => {
+      const char = createCharacter({
+        name: 'Gand',
+        speciesId: 'Human',
+        backgroundId: 'sage',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 13,
+          Constitution: 14,
+          Intelligence: 15,
+          Wisdom: 12,
+          Charisma: 8
+        },
+        additionalClasses: [
+          { classId: 'Wizard', level: 1 }
+        ]
+      }, dataLoader);
+
+      expect(char.classes).toHaveLength(2);
+      expect(char.classes[0]!.classId).toBe('Fighter');
+      expect(char.classes[0]!.level).toBe(1);
+      expect(char.classes[1]!.classId).toBe('Wizard');
+      expect(char.classes[1]!.level).toBe(1);
+      // Total level = 2
+      expect(char.combatStats.proficiencyBonus).toBe(2);
+    });
+
+    it('should create a Wizard 3 / Fighter 2 with correct spell slots', () => {
+      const char = createCharacter({
+        name: 'Mika',
+        speciesId: 'Elf',
+        backgroundId: 'sage',
+        classId: 'Wizard',
+        classLevel: 3,
+        abilityScores: {
+          Strength: 8,
+          Dexterity: 14,
+          Constitution: 13,
+          Intelligence: 15,
+          Wisdom: 12,
+          Charisma: 10
+        },
+        additionalClasses: [
+          { classId: 'Fighter', level: 2 }
+        ]
+      }, dataLoader);
+
+      expect(char.classes).toHaveLength(2);
+      expect(char.classes[0]!.classId).toBe('Wizard');
+      expect(char.classes[0]!.level).toBe(3);
+      expect(char.classes[1]!.classId).toBe('Fighter');
+      expect(char.classes[1]!.level).toBe(2);
+      // Total level = 5, proficiency bonus = 3
+      expect(char.combatStats.proficiencyBonus).toBe(3);
+      // Multiclass: Wizard 3 + Fighter 2 = 3 effective spellcasting levels
+      // Should have 2nd level spell slots
+      expect(char.spells.spellSlots[2]!.total).toBeGreaterThan(0);
+    });
+
+    it('should validate a multiclass character', () => {
+      const char = createCharacter({
+        name: 'Gand',
+        speciesId: 'Human',
+        backgroundId: 'sage',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 13,
+          Constitution: 14,
+          Intelligence: 15,
+          Wisdom: 12,
+          Charisma: 8
+        },
+        additionalClasses: [
+          { classId: 'Wizard', level: 1 }
+        ]
+      }, dataLoader);
+
+      const result = validateCharacter(char, dataLoader);
+      expect(result.valid).toBe(true);
+    });
+  });
 });

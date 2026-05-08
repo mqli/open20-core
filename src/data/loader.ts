@@ -87,8 +87,8 @@ export interface LookupTables {
   hitDieFixedValue: Record<DieType, number>;   // d6→4, etc.
   spellSlots: Record<string, Record<number, readonly number[]>>;
   // classId → classLevel → [1st, 2nd, 3rd, ...] (index 0 = level 1 slots)
-  multiclassSpellSlots: Record<number, readonly number[]>;
-  // totalSpellcastingLevel → [1st, 2nd, 3rd, ...]
+  multiclassSpellSlots: Record<number, Record<number, number>>;
+  // totalSpellcastingLevel → { "1": count, "2": count, ... }
   pactMagicSlots: Record<number, { slots: number; slotLevel: number }>;
   weaponMasteryProperties: readonly string[];
   conditionNames: readonly string[];

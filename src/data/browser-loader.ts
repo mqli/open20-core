@@ -210,12 +210,15 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
     },
 
     getMulticlassSpellSlots(totalSpellcastingLevel: number): Record<number, number> {
-      const slotsArray = tables.multiclassSpellSlots[totalSpellcastingLevel];
-      if (!slotsArray) return emptySlotRecord();
+      const slotsObj = tables.multiclassSpellSlots[totalSpellcastingLevel];
+      if (!slotsObj) return emptySlotRecord();
 
+      // JSON uses string keys like "1", "2", convert to numeric
       const result: Record<number, number> = {};
-      for (let i = 0; i < slotsArray.length; i++) {
-        result[i + 1] = slotsArray[i] ?? 0;
+      const slotsRecord = slotsObj as Record<string, number>;
+      for (const key of Object.keys(slotsRecord)) {
+        const level = parseInt(key, 10);
+        result[level] = slotsRecord[key] ?? 0;
       }
       return result;
     },
