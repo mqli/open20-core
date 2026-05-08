@@ -25,7 +25,7 @@ export interface Weapon extends EquipmentItem {
 
 // 武器伤害
 export interface WeaponDamage {
-  readonly dice: import('./character').DieType;
+  readonly dice: string; // 如 "1d8", "2d6"
   readonly ability: import('./ability').AbilityName;
   readonly bonus: number;
 }

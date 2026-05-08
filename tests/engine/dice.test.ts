@@ -319,7 +319,7 @@ describe('rollWeaponDamage', () => {
       category: 'Martial',
       weight: 3,
       equipped: true,
-      damage: { dice: 'd8', ability: 'Strength', bonus: 0 },
+      damage: { dice: '1d8', ability: 'Strength', bonus: 0 },
       properties: [],
     };
 
@@ -346,7 +346,7 @@ describe('rollWeaponDamage', () => {
       category: 'Martial',
       weight: 3,
       equipped: true,
-      damage: { dice: 'd8', ability: 'Strength', bonus: 0 },
+      damage: { dice: '1d8', ability: 'Strength', bonus: 0 },
       properties: [],
     };
 

@@ -546,9 +546,8 @@ describe('createCharacter', () => {
       };
 
       const char = createCharacter(params, data);
-      expect(char.spells.spellSlots[0]!.total).toBe(2);
-      expect(char.spells.spellSlots[0]!.used).toBe(0);
-      expect(char.spells.spellSlots[0]!.total).toBe(0);
+      expect(char.spells.spellSlots[1]!.total).toBe(2);
+      expect(char.spells.spellSlots[1]!.used).toBe(0);
     });
 
     it('calculates correct spellSaveDC = 8 + PB + Int mod', () => {
