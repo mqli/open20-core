@@ -3,7 +3,7 @@
 // 对应 HLD §6.2
 
 import type { AbilityName, AbilityScores } from '../types/ability';
-import type { Character, CharacterClass, HitPoints, CombatStats, Currency, DieType } from '../types/character';
+import type { Character, CharacterClass, HitPoints, CombatStats, Currency, DieType, DamageDefenses } from '../types/character';
 import type { SkillEntry, SkillName } from '../types/skill';
 import { SKILL_NAMES } from '../types/skill';
 import type { CharacterSpells, SpellLevel, SpellSlotEntry, PactMagicSlots } from '../types/spell';
@@ -182,6 +182,11 @@ export function createCharacter(
 
   // 10. Return complete Character
   const now = new Date().toISOString();
+  const emptyDamageDefenses: DamageDefenses = {
+    resistances: [],
+    immunities: [],
+    vulnerabilities: [],
+  };
   return {
     schemaVersion: '2024.1',
     name: params.name,
@@ -199,6 +204,7 @@ export function createCharacter(
     combatStats,
     currency,
     conditions: [],
+    damageDefenses: emptyDamageDefenses,
     notes: '',
     createdAt: now,
     updatedAt: now,

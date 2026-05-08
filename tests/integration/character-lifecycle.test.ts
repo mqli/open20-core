@@ -1,12 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createDataLoader } from '../../src/data/loader';
 import { createCharacter } from '../../src/character/create';
-import { modifyHP } from '../../src/character/mutate';
+import { modifyHP, applyTypedDamage } from '../../src/character/mutate';
 import { shortRest, longRest } from '../../src/character/rest';
 import { levelUp } from '../../src/character/level-up';
 import { validateCharacter } from '../../src/character/validate';
 import { recomputeDerivedStats } from '../../src/character/recompute';
 import { serialize, deserialize } from '../../src/storage/serializer';
+import { calculateTypedDamage } from '../../src/engine/damage-calculator';
+import type { DamageDefenses } from '../../src/types/character';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
@@ -147,7 +149,10 @@ describe('D&D Player Behavior - Character Lifecycle', () => {
     });
 
     it('should fully recover after Long Rest', () => {
-      let char = modifyHP(wizard, -10);
+      // Take damage proportional to character HP (not hardcoded -10)
+      const damageAmount = wizard.hitPoints.current - 1; // Leave 1 HP
+      let char = modifyHP(wizard, -damageAmount);
+      expect(char.hitPoints.current).toBe(1);
       
       const afterRest = longRest(char, dataLoader);
 
@@ -480,31 +485,197 @@ describe('D&D Player Behavior - Character Lifecycle', () => {
       char = levelUp(char, { classId: 'Wizard', hpChoice: 'fixed' }, dataLoader);
       expect(char.classes[0]!.level).toBe(2);
 
-      // 3. Take some damage
-      char = modifyHP(char, -10);
-      expect(char.hitPoints.current).toBeLessThan(char.hitPoints.max);
+      // 3. Take some damage (leave at least 1 HP)
+      const damageAmount = char.hitPoints.current - 1;
+      char = modifyHP(char, -damageAmount);
+      expect(char.hitPoints.current).toBe(1);
 
-      // 4. Short rest (should recover some HP)
+      // 4. Short rest (should recover some HP using hit dice)
+      const hitDiceBefore = char.classes[0]!.hitDice.used;
       const afterShortRest = shortRest(char, 1, dataLoader);
       expect(afterShortRest.hitPoints.current).toBeGreaterThan(char.hitPoints.current);
+      expect(afterShortRest.classes[0]!.hitDice.used).toBe(hitDiceBefore + 1);
 
-      // 5. Short rest again
-      char = shortRest(afterShortRest, 1, dataLoader);
-
-      // 6. Long rest (full recovery)
-      char = longRest(char, dataLoader);
+      // 5. Long rest (full recovery + hit dice recovery)
+      char = longRest(afterShortRest, dataLoader);
       expect(char.hitPoints.current).toBe(char.hitPoints.max);
+      // Long rest recovers half hit dice (round up), minimum 1
+      // Level 2 wizard has 2 hit dice, recovers 1 (ceil(2/2) = 1)
+      expect(char.classes[0]!.hitDice.used).toBe(0);
 
-      // 7. Serialize and restore
+      // 6. Serialize and restore
       const json = serialize(char);
       const restored = deserialize(json);
       expect(restored.name).toBe(char.name);
       expect(restored.hitPoints.current).toBe(char.hitPoints.current);
       expect(restored.classes[0]!.level).toBe(char.classes[0]!.level);
 
-      // 8. Validate restored character
+      // 7. Validate restored character
       const validation = validateCharacter(restored, dataLoader);
       expect(validation.valid).toBe(true);
+    });
+  });
+
+  describe('Session 11: Damage Types and Resistance', () => {
+    it('should apply resistance correctly to fire damage', () => {
+      const defenses: DamageDefenses = {
+        resistances: ['Fire'],
+        immunities: [],
+        vulnerabilities: [],
+      };
+
+      const result = calculateTypedDamage(10, 'Fire', defenses);
+      expect(result.originalDamage).toBe(10);
+      expect(result.effectiveDamage).toBe(5);
+      expect(result.modifiers).toHaveLength(1);
+      expect(result.modifiers[0]).toEqual({ type: 'resistance', damageType: 'Fire' });
+    });
+
+    it('should apply immunity to poison damage', () => {
+      const defenses: DamageDefenses = {
+        resistances: [],
+        immunities: ['Poison'],
+        vulnerabilities: [],
+      };
+
+      const result = calculateTypedDamage(50, 'Poison', defenses);
+      expect(result.effectiveDamage).toBe(0);
+      expect(result.modifiers[0]).toEqual({ type: 'immunity', damageType: 'Poison' });
+    });
+
+    it('should apply vulnerability to lightning damage', () => {
+      const defenses: DamageDefenses = {
+        resistances: [],
+        immunities: [],
+        vulnerabilities: ['Lightning'],
+      };
+
+      const result = calculateTypedDamage(10, 'Lightning', defenses);
+      expect(result.effectiveDamage).toBe(20);
+      expect(result.modifiers[0]).toEqual({ type: 'vulnerability', damageType: 'Lightning' });
+    });
+
+    it('should cancel resistance and vulnerability', () => {
+      const defenses: DamageDefenses = {
+        resistances: ['Fire'],
+        immunities: [],
+        vulnerabilities: ['Fire'],
+      };
+
+      const result = calculateTypedDamage(10, 'Fire', defenses);
+      expect(result.effectiveDamage).toBe(10); // Normal damage - they cancel
+      expect(result.modifiers).toHaveLength(0);
+    });
+
+    it('should handle Dwarven Poison Resistance', () => {
+      // Create a Hill Dwarf (has poison resistance from Dwarven Resilience)
+      const dwarf = createCharacter({
+        name: 'Thorin',
+        speciesId: 'Dwarf',
+        speciesSubtypeId: 'Hill Dwarf',
+        backgroundId: 'soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 10,
+          Constitution: 16,
+          Intelligence: 8,
+          Wisdom: 13,
+          Charisma: 11
+        }
+      }, dataLoader);
+
+      const defenses: DamageDefenses = {
+        resistances: ['Poison'],
+        immunities: [],
+        vulnerabilities: [],
+      };
+
+      // Poison damage should be halved
+      const result = calculateTypedDamage(8, 'Poison', defenses);
+      expect(result.effectiveDamage).toBe(4); // 8 / 2 = 4
+    });
+
+    it('should modifyHP with typed damage for a Dwarf', () => {
+      const dwarf = createCharacter({
+        name: 'Thorin',
+        speciesId: 'Dwarf',
+        speciesSubtypeId: 'Hill Dwarf',
+        backgroundId: 'soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 10,
+          Constitution: 16,
+          Intelligence: 8,
+          Wisdom: 13,
+          Charisma: 11
+        }
+      }, dataLoader);
+
+      const defenses: DamageDefenses = {
+        resistances: ['Poison'],
+        immunities: [],
+        vulnerabilities: [],
+      };
+
+      const originalHP = dwarf.hitPoints.current;
+
+      // Take 8 poison damage - should only take 4 due to resistance
+      const damaged = modifyHP(dwarf, -8, 'Poison', defenses);
+      expect(originalHP - damaged.hitPoints.current).toBe(4);
+    });
+
+    it('should use applyTypedDamage and return damage result', () => {
+      const fighter = createCharacter({
+        name: 'Tordek',
+        speciesId: 'Human',
+        backgroundId: 'soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 13,
+          Constitution: 14,
+          Intelligence: 10,
+          Wisdom: 12,
+          Charisma: 8
+        }
+      }, dataLoader);
+
+      const defenses: DamageDefenses = {
+        resistances: ['Fire'],
+        immunities: [],
+        vulnerabilities: [],
+      };
+
+      const originalHP = fighter.hitPoints.current;
+      const { char: damaged, result } = applyTypedDamage(fighter, 10, 'Fire', defenses);
+
+      expect(result.originalDamage).toBe(10);
+      expect(result.effectiveDamage).toBe(5);
+      expect(originalHP - damaged.hitPoints.current).toBe(5);
+    });
+
+    it('should handle Barbarian rage resistance (Bludgeoning/Piercing/Slashing)', () => {
+      const defenses: DamageDefenses = {
+        resistances: ['Bludgeoning', 'Piercing', 'Slashing'],
+        immunities: [],
+        vulnerabilities: [],
+      };
+
+      // Barbarian takes 10 physical damage while raging
+      const slashResult = calculateTypedDamage(10, 'Slashing', defenses);
+      expect(slashResult.effectiveDamage).toBe(5);
+
+      const pierceResult = calculateTypedDamage(10, 'Piercing', defenses);
+      expect(pierceResult.effectiveDamage).toBe(5);
+
+      const bludgeResult = calculateTypedDamage(10, 'Bludgeoning', defenses);
+      expect(bludgeResult.effectiveDamage).toBe(5);
+
+      // Non-physical damage still applies normally
+      const fireResult = calculateTypedDamage(10, 'Fire', defenses);
+      expect(fireResult.effectiveDamage).toBe(10);
     });
   });
 });

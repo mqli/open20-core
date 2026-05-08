@@ -18,6 +18,7 @@ export interface Feature {
 // 职业类型
 export interface Class {
   readonly id: string;
+  readonly name: string;
   readonly source: '2024 PHB' | '2014 PHB';
   readonly hitDie: import('./character').DieType;
   readonly savingThrowProficiencies: readonly import('./ability').AbilityName[];

@@ -2,9 +2,10 @@
 // Character mutation functions — all return new Character (immutable)
 // Corresponds to HLD §6.2
 
-import type { Character, ConditionName, Currency, ActiveCondition } from '../types/character';
+import type { Character, ConditionName, Currency, ActiveCondition, DamageType, DamageDefenses, DamageResult } from '../types/character';
 import type { EquipmentItem } from '../types/equipment';
 import type { SpellLevel } from '../types/spell';
+import { calculateTypedDamage } from '../engine/damage-calculator';
 
 // ── Helper ──────────────────────────────────────────────────────
 
@@ -18,8 +19,20 @@ function withUpdate(char: Character, patch: Partial<Character>): Character {
 
 // ── HP Mutations ────────────────────────────────────────────────
 
-export function modifyHP(char: Character, delta: number): Character {
-  let remaining = delta;
+export function modifyHP(
+  char: Character,
+  delta: number,
+  damageType?: DamageType,
+  defenses?: DamageDefenses
+): Character {
+  // Apply damage type modifiers if provided
+  let effectiveDelta = delta;
+  if (damageType !== undefined && defenses !== undefined && delta < 0) {
+    const result = calculateTypedDamage(Math.abs(delta), damageType, defenses);
+    effectiveDelta = -result.effectiveDamage;
+  }
+
+  let remaining = effectiveDelta;
   let temporary = char.hitPoints.temporary;
   let current = char.hitPoints.current;
 
@@ -39,6 +52,21 @@ export function modifyHP(char: Character, delta: number): Character {
       temporary,
     },
   });
+}
+
+/**
+ * Apply typed damage to character and return damage result
+ * Combines defense calculation with HP modification
+ */
+export function applyTypedDamage(
+  char: Character,
+  damage: number,
+  damageType: DamageType,
+  defenses: DamageDefenses
+): { char: Character; result: DamageResult } {
+  const result = calculateTypedDamage(damage, damageType, defenses);
+  const updatedChar = modifyHP(char, -result.effectiveDamage);
+  return { char: updatedChar, result };
 }
 
 export function setTemporaryHP(char: Character, value: number): Character {
