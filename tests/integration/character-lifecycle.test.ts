@@ -333,5 +333,178 @@ describe('D&D Player Behavior - Character Lifecycle', () => {
       const result = validateCharacter(char, dataLoader);
       expect(result.valid).toBe(true);
     });
+
+    it('should level up multiclass character correctly', () => {
+      // Start with Wizard 1 / Fighter 1
+      let char = createCharacter({
+        name: 'Kira',
+        speciesId: 'Human',
+        backgroundId: 'sage',
+        classId: 'Wizard',
+        abilityScores: {
+          Strength: 14,
+          Dexterity: 13,
+          Constitution: 14,
+          Intelligence: 15,
+          Wisdom: 12,
+          Charisma: 8
+        },
+        additionalClasses: [
+          { classId: 'Fighter', level: 1 }
+        ]
+      }, dataLoader);
+
+      expect(char.classes).toHaveLength(2);
+      expect(char.classes[0]!.level).toBe(1);
+      expect(char.classes[1]!.level).toBe(1);
+      // Level up Fighter class
+      char = levelUp(char, { classId: 'Fighter', hpChoice: 'fixed' }, dataLoader);
+
+      // Fighter should now be level 2
+      expect(char.classes[1]!.classId).toBe('Fighter');
+      expect(char.classes[1]!.level).toBe(2);
+      // Wizard should still be level 1
+      expect(char.classes[0]!.level).toBe(1);
+      // Total level = 3, proficiency bonus = 2
+      expect(char.combatStats.proficiencyBonus).toBe(2);
+    });
+  });
+
+  describe('Session 8: Half-Caster Multiclass', () => {
+    it('should calculate correct spell slots for Paladin 5 / Wizard 5', () => {
+      // Paladin is half caster: 5/2 = 2 effective levels
+      // Wizard is full caster: 5 levels
+      // Total: 2 + 5 = 7 effective spellcasting levels
+      const char = createCharacter({
+        name: 'Theron',
+        speciesId: 'Human',
+        backgroundId: 'soldier',
+        classId: 'Paladin',
+        classLevel: 5,
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 13,
+          Constitution: 14,
+          Intelligence: 10,
+          Wisdom: 12,
+          Charisma: 15
+        },
+        additionalClasses: [
+          { classId: 'Wizard', level: 5 }
+        ]
+      }, dataLoader);
+
+      // Total effective spellcasting level = 2 (Paladin) + 5 (Wizard) = 7
+      // Level 7 multiclass: 4/3/3/1 spell slots
+      expect(char.spells.spellSlots[1]!.total).toBe(4);
+      expect(char.spells.spellSlots[2]!.total).toBe(3);
+      expect(char.spells.spellSlots[3]!.total).toBe(3);
+      expect(char.spells.spellSlots[4]!.total).toBe(1);
+    });
+  });
+
+  describe('Session 9: Death and Death Saves', () => {
+    it('should track death saves when dropped to 0 HP', () => {
+      const fighter = createCharacter({
+        name: 'Bron',
+        speciesId: 'Human',
+        backgroundId: 'soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 13,
+          Constitution: 14,
+          Intelligence: 10,
+          Wisdom: 12,
+          Charisma: 8
+        }
+      }, dataLoader);
+
+      // Drop to 0 HP
+      const dying = modifyHP(fighter, -fighter.hitPoints.max);
+      expect(dying.hitPoints.current).toBe(0);
+      expect(dying.hitPoints.deathSaves).toBeDefined();
+      expect(dying.hitPoints.deathSaves!.successes).toBe(0);
+      expect(dying.hitPoints.deathSaves!.failures).toBe(0);
+    });
+
+    it('should reset death saves and restore HP on long rest', () => {
+      let fighter = createCharacter({
+        name: 'Bron',
+        speciesId: 'Human',
+        backgroundId: 'soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 13,
+          Constitution: 14,
+          Intelligence: 10,
+          Wisdom: 12,
+          Charisma: 8
+        }
+      }, dataLoader);
+
+      // Drop to 0 HP
+      fighter = modifyHP(fighter, -fighter.hitPoints.max);
+      expect(fighter.hitPoints.current).toBe(0);
+      
+      // Long rest should restore HP and reset death saves
+      const restored = longRest(fighter, dataLoader);
+      expect(restored.hitPoints.current).toBe(restored.hitPoints.max);
+      expect(restored.hitPoints.deathSaves!.successes).toBe(0);
+      expect(restored.hitPoints.deathSaves!.failures).toBe(0);
+    });
+  });
+
+  describe('Session 10: Full Character Lifecycle', () => {
+    it('should handle complete character journey', () => {
+      // 1. Create character
+      let char = createCharacter({
+        name: 'Aria',
+        speciesId: 'Elf',
+        backgroundId: 'sage',
+        classId: 'Wizard',
+        abilityScores: {
+          Strength: 8,
+          Dexterity: 14,
+          Constitution: 13,
+          Intelligence: 15,
+          Wisdom: 12,
+          Charisma: 10
+        }
+      }, dataLoader);
+
+      expect(char.classes[0]!.level).toBe(1);
+
+      // 2. Level up to 2
+      char = levelUp(char, { classId: 'Wizard', hpChoice: 'fixed' }, dataLoader);
+      expect(char.classes[0]!.level).toBe(2);
+
+      // 3. Take some damage
+      char = modifyHP(char, -10);
+      expect(char.hitPoints.current).toBeLessThan(char.hitPoints.max);
+
+      // 4. Short rest (should recover some HP)
+      const afterShortRest = shortRest(char, 1, dataLoader);
+      expect(afterShortRest.hitPoints.current).toBeGreaterThan(char.hitPoints.current);
+
+      // 5. Short rest again
+      char = shortRest(afterShortRest, 1, dataLoader);
+
+      // 6. Long rest (full recovery)
+      char = longRest(char, dataLoader);
+      expect(char.hitPoints.current).toBe(char.hitPoints.max);
+
+      // 7. Serialize and restore
+      const json = serialize(char);
+      const restored = deserialize(json);
+      expect(restored.name).toBe(char.name);
+      expect(restored.hitPoints.current).toBe(char.hitPoints.current);
+      expect(restored.classes[0]!.level).toBe(char.classes[0]!.level);
+
+      // 8. Validate restored character
+      const validation = validateCharacter(restored, dataLoader);
+      expect(validation.valid).toBe(true);
+    });
   });
 });
