@@ -31,7 +31,7 @@ export function calculatePassivePerception(
   scores: AbilityScores,
   skills: Record<string, SkillEntry>,
   proficiencyBonus: number,
-  conditions: readonly ActiveCondition[],
+  conditions: readonly ActiveCondition[]
 ): number {
   const perceptionSkill = skills['Perception'];
   const base = 10;
@@ -42,17 +42,12 @@ export function calculatePassivePerception(
     return base + wisMod;
   }
 
-  const perceptionBonus = getSkillBonus(
-    scores,
-    perceptionSkill,
-    'Wisdom',
-    proficiencyBonus,
-  );
+  const perceptionBonus = getSkillBonus(scores, perceptionSkill, 'Wisdom', proficiencyBonus);
 
   let passive = base + perceptionBonus;
 
   // 状态影响
-  const conditionNames = new Set(conditions.map((c) => c.id));
+  const conditionNames = new Set(conditions.map(c => c.id));
 
   // Blinded: 被动感知-10（实际上无法用视觉感知）
   // 这里简化处理：不自动减10，因为被动感知可能不依赖视觉

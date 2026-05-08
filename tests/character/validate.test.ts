@@ -58,7 +58,12 @@ const FIGHTER_CLASS: Class = {
 
 const WIZARD_FEATURES_L1: Feature[] = [
   { name: 'Spellcasting', description: 'Cast wizard spells', level: 1 },
-  { name: 'Arcane Recovery', description: 'Recover spell slots', resourceId: 'Arcane Recovery', level: 1 },
+  {
+    name: 'Arcane Recovery',
+    description: 'Recover spell slots',
+    resourceId: 'Arcane Recovery',
+    level: 1,
+  },
 ];
 
 const WIZARD_CLASS: Class = {
@@ -84,7 +89,9 @@ const CHAMPION_SUBCLASS: Subclass = {
   id: 'Champion',
   parentClass: 'Fighter',
   grantedAtLevel: 3,
-  featuresByLevel: new Map([[3, [{ name: 'Improved Critical', description: 'Crit on 19-20', level: 3 }]]]),
+  featuresByLevel: new Map([
+    [3, [{ name: 'Improved Critical', description: 'Crit on 19-20', level: 3 }]],
+  ]),
 };
 
 // ── Mock DataLoader ────────────────────────────────────────────
@@ -97,7 +104,9 @@ function createMockDataLoader(overrides?: {
   const backgroundMap: Record<string, Background> = { Soldier: SOLDIER_BACKGROUND };
   const classMap: Record<string, Class> = { Fighter: FIGHTER_CLASS, Wizard: WIZARD_CLASS };
   const featMap: Record<string, Feat> = overrides?.feats ?? { Alert: ALERT_FEAT };
-  const subclassMap: Record<string, Subclass> = overrides?.subclasses ?? { Champion: CHAMPION_SUBCLASS };
+  const subclassMap: Record<string, Subclass> = overrides?.subclasses ?? {
+    Champion: CHAMPION_SUBCLASS,
+  };
 
   const fullCasterSlots: Record<number, Record<number, number>> = {
     1: { 1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
@@ -140,7 +149,9 @@ function createMockDataLoader(overrides?: {
       if (nonCasters.includes(classId)) {
         return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
       }
-      return fullCasterSlots[classLevel] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+      return (
+        fullCasterSlots[classLevel] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
+      );
     },
     getMulticlassSpellSlots: () => ({}),
     getPactMagicSlots: () => ({ slots: 0, slotLevel: 0 }),
@@ -193,7 +204,7 @@ describe('validateCharacter', () => {
     const result = validateCharacter(char, data);
     expect(result.valid).toBe(false);
     expect(result.errors).toContainEqual(
-      expect.objectContaining({ field: 'name', severity: 'error' }),
+      expect.objectContaining({ field: 'name', severity: 'error' })
     );
   });
 
@@ -203,7 +214,7 @@ describe('validateCharacter', () => {
     const result = validateCharacter(char, data);
     expect(result.valid).toBe(false);
     expect(result.errors).toContainEqual(
-      expect.objectContaining({ field: 'species', severity: 'error' }),
+      expect.objectContaining({ field: 'species', severity: 'error' })
     );
   });
 
@@ -213,7 +224,7 @@ describe('validateCharacter', () => {
     const result = validateCharacter(char, data);
     expect(result.valid).toBe(false);
     expect(result.errors).toContainEqual(
-      expect.objectContaining({ field: 'background', severity: 'error' }),
+      expect.objectContaining({ field: 'background', severity: 'error' })
     );
   });
 
@@ -223,7 +234,7 @@ describe('validateCharacter', () => {
     const result = validateCharacter(char, data);
     expect(result.valid).toBe(false);
     expect(result.errors).toContainEqual(
-      expect.objectContaining({ field: 'classes[0].classId', severity: 'error' }),
+      expect.objectContaining({ field: 'classes[0].classId', severity: 'error' })
     );
   });
 
@@ -233,7 +244,11 @@ describe('validateCharacter', () => {
     const result = validateCharacter(char, data);
     expect(result.valid).toBe(false);
     expect(result.errors).toContainEqual(
-      expect.objectContaining({ field: 'classes[0].level', severity: 'error', message: expect.stringContaining('>= 1') }),
+      expect.objectContaining({
+        field: 'classes[0].level',
+        severity: 'error',
+        message: expect.stringContaining('>= 1'),
+      })
     );
   });
 
@@ -243,20 +258,40 @@ describe('validateCharacter', () => {
     const result = validateCharacter(char, data);
     expect(result.valid).toBe(false);
     expect(result.errors).toContainEqual(
-      expect.objectContaining({ field: 'classes[0].level', severity: 'error', message: expect.stringContaining('<= 20') }),
+      expect.objectContaining({
+        field: 'classes[0].level',
+        severity: 'error',
+        message: expect.stringContaining('<= 20'),
+      })
     );
   });
 
   it('returns error for total level > 20', () => {
     const char = createValidCharacter(data);
     mutate(char).classes = [
-      { classId: 'Fighter', level: 15, subclassId: null, subclassLevel: null, hitDice: { die: 'd10', used: 0 } },
-      { classId: 'Wizard', level: 10, subclassId: null, subclassLevel: null, hitDice: { die: 'd6', used: 0 } },
+      {
+        classId: 'Fighter',
+        level: 15,
+        subclassId: null,
+        subclassLevel: null,
+        hitDice: { die: 'd10', used: 0 },
+      },
+      {
+        classId: 'Wizard',
+        level: 10,
+        subclassId: null,
+        subclassLevel: null,
+        hitDice: { die: 'd6', used: 0 },
+      },
     ];
     const result = validateCharacter(char, data);
     expect(result.valid).toBe(false);
     expect(result.errors).toContainEqual(
-      expect.objectContaining({ field: 'classes', severity: 'error', message: expect.stringContaining('Total level') }),
+      expect.objectContaining({
+        field: 'classes',
+        severity: 'error',
+        message: expect.stringContaining('Total level'),
+      })
     );
   });
 
@@ -267,7 +302,7 @@ describe('validateCharacter', () => {
     const result = validateCharacter(char, data);
     expect(result.valid).toBe(false);
     expect(result.errors).toContainEqual(
-      expect.objectContaining({ field: 'abilityScores.base.Strength', severity: 'error' }),
+      expect.objectContaining({ field: 'abilityScores.base.Strength', severity: 'error' })
     );
   });
 
@@ -278,7 +313,7 @@ describe('validateCharacter', () => {
     const result = validateCharacter(char, data);
     expect(result.valid).toBe(false);
     expect(result.errors).toContainEqual(
-      expect.objectContaining({ field: 'abilityScores.base.Strength', severity: 'error' }),
+      expect.objectContaining({ field: 'abilityScores.base.Strength', severity: 'error' })
     );
   });
 
@@ -290,7 +325,7 @@ describe('validateCharacter', () => {
     // Should have a warning but still be valid
     expect(result.valid).toBe(true);
     expect(result.errors).toContainEqual(
-      expect.objectContaining({ field: 'abilityScores.base.Intelligence', severity: 'warning' }),
+      expect.objectContaining({ field: 'abilityScores.base.Intelligence', severity: 'warning' })
     );
   });
 
@@ -300,17 +335,19 @@ describe('validateCharacter', () => {
     const result = validateCharacter(char, data);
     expect(result.valid).toBe(false);
     expect(result.errors).toContainEqual(
-      expect.objectContaining({ field: 'hitPoints.current', severity: 'error' }),
+      expect.objectContaining({ field: 'hitPoints.current', severity: 'error' })
     );
   });
 
   it('returns error for resource used > max', () => {
     const char = createValidCharacter(data);
-    mutate(char).resources = [{ id: 'Second Wind', name: 'Second Wind', max: 1, used: 3, resetOn: 'Short Rest' as const }];
+    mutate(char).resources = [
+      { id: 'Second Wind', name: 'Second Wind', max: 1, used: 3, resetOn: 'Short Rest' as const },
+    ];
     const result = validateCharacter(char, data);
     expect(result.valid).toBe(false);
     expect(result.errors).toContainEqual(
-      expect.objectContaining({ field: 'resources[0].used', severity: 'error' }),
+      expect.objectContaining({ field: 'resources[0].used', severity: 'error' })
     );
   });
 
@@ -321,7 +358,11 @@ describe('validateCharacter', () => {
     // Warning means valid is still true
     expect(result.valid).toBe(true);
     expect(result.errors).toContainEqual(
-      expect.objectContaining({ field: 'feats[0]', severity: 'warning', message: expect.stringContaining('NonExistentFeat') }),
+      expect.objectContaining({
+        field: 'feats[0]',
+        severity: 'warning',
+        message: expect.stringContaining('NonExistentFeat'),
+      })
     );
   });
 

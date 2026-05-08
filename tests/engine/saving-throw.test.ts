@@ -69,15 +69,15 @@ describe('getSavingThrowBonus', () => {
     ];
 
     const baseScores = {
-      Strength: 15,       // +2
-      Dexterity: 14,       // +2
-      Constitution: 13,    // +1
-      Intelligence: 12,     // +1
-      Wisdom: 10,           // 0
-      Charisma: 8,          // -1
+      Strength: 15, // +2
+      Dexterity: 14, // +2
+      Constitution: 13, // +1
+      Intelligence: 12, // +1
+      Wisdom: 10, // 0
+      Charisma: 8, // -1
     };
 
-    it.each(abilities)('calculates saving throw for %s when proficient', (ability) => {
+    it.each(abilities)('calculates saving throw for %s when proficient', ability => {
       const scores = makeScores(baseScores);
       const proficiencyBonus = 3;
 
@@ -89,7 +89,7 @@ describe('getSavingThrowBonus', () => {
       expect(result).toBe(expected);
     });
 
-    it.each(abilities)('calculates saving throw for %s when not proficient', (ability) => {
+    it.each(abilities)('calculates saving throw for %s when not proficient', ability => {
       const scores = makeScores(baseScores);
       const proficiencyBonus = 3;
 
@@ -182,29 +182,41 @@ describe('getSavingThrowBonus', () => {
         Charisma: 8,
       });
 
-      const proficientAbilities: AbilityName[] = [
-        'Strength',
-        'Constitution',
-        'Wisdom',
-        'Charisma',
-      ];
+      const proficientAbilities: AbilityName[] = ['Strength', 'Constitution', 'Wisdom', 'Charisma'];
 
       const proficiencyBonus = 3;
 
       // Test each ability
-      expect(getSavingThrowBonus(scores, 'Strength', proficientAbilities, proficiencyBonus)).toBe(5); // +2 + 3
-      expect(getSavingThrowBonus(scores, 'Dexterity', proficientAbilities, proficiencyBonus)).toBe(2); // +2 + 0
-      expect(getSavingThrowBonus(scores, 'Constitution', proficientAbilities, proficiencyBonus)).toBe(4); // +1 + 3
-      expect(getSavingThrowBonus(scores, 'Intelligence', proficientAbilities, proficiencyBonus)).toBe(1); // +1 + 0
+      expect(getSavingThrowBonus(scores, 'Strength', proficientAbilities, proficiencyBonus)).toBe(
+        5
+      ); // +2 + 3
+      expect(getSavingThrowBonus(scores, 'Dexterity', proficientAbilities, proficiencyBonus)).toBe(
+        2
+      ); // +2 + 0
+      expect(
+        getSavingThrowBonus(scores, 'Constitution', proficientAbilities, proficiencyBonus)
+      ).toBe(4); // +1 + 3
+      expect(
+        getSavingThrowBonus(scores, 'Intelligence', proficientAbilities, proficiencyBonus)
+      ).toBe(1); // +1 + 0
       expect(getSavingThrowBonus(scores, 'Wisdom', proficientAbilities, proficiencyBonus)).toBe(3); // +0 + 3
-      expect(getSavingThrowBonus(scores, 'Charisma', proficientAbilities, proficiencyBonus)).toBe(2); // -1 + 3
+      expect(getSavingThrowBonus(scores, 'Charisma', proficientAbilities, proficiencyBonus)).toBe(
+        2
+      ); // -1 + 3
     });
   });
 
   describe('with racial/feat/temporary bonuses', () => {
     it('includes racial bonus in total score calculation', () => {
       const scores: AbilityScores = {
-        base: { Strength: 15, Dexterity: 10, Constitution: 10, Intelligence: 10, Wisdom: 10, Charisma: 10 },
+        base: {
+          Strength: 15,
+          Dexterity: 10,
+          Constitution: 10,
+          Intelligence: 10,
+          Wisdom: 10,
+          Charisma: 10,
+        },
         racialBonuses: { Strength: 2 },
         featBonuses: {},
         temporaryBonuses: {},
@@ -217,7 +229,14 @@ describe('getSavingThrowBonus', () => {
 
     it('includes all bonuses (racial + feat + temporary) in total score calculation', () => {
       const scores: AbilityScores = {
-        base: { Strength: 15, Dexterity: 10, Constitution: 10, Intelligence: 10, Wisdom: 10, Charisma: 10 },
+        base: {
+          Strength: 15,
+          Dexterity: 10,
+          Constitution: 10,
+          Intelligence: 10,
+          Wisdom: 10,
+          Charisma: 10,
+        },
         racialBonuses: { Strength: 2 },
         featBonuses: { Strength: 1 },
         temporaryBonuses: { Strength: 2 },

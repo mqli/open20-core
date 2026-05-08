@@ -77,7 +77,5 @@ export class JsonFileStorage implements ICharacterStorage {
 }
 
 function buildClassSummary(char: Character): string {
-  return char.classes
-    .map((c) => `${c.classId} ${c.level}`)
-    .join(' / ');
+  return char.classes.map(c => `${c.classId} ${c.level}`).join(' / ');
 }

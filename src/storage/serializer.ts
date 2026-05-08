@@ -50,6 +50,14 @@ const CharacterSchema = z.object({
     pp: z.number(),
   }),
   conditions: z.array(z.any()),
+  damageDefenses: z
+    .object({
+      resistances: z.array(z.string()),
+      immunities: z.array(z.string()),
+      vulnerabilities: z.array(z.string()),
+    })
+    .optional()
+    .default({ resistances: [], immunities: [], vulnerabilities: [] }),
   notes: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -85,7 +93,7 @@ export function deserialize(json: string): Character {
     const version = (raw as { schemaVersion: unknown }).schemaVersion;
     if (typeof version !== 'string' || !COMPATIBLE_VERSIONS.includes(version)) {
       throw new Error(
-        `Incompatible schema version: "${version}". Compatible versions: ${COMPATIBLE_VERSIONS.join(', ')}`,
+        `Incompatible schema version: "${version}". Compatible versions: ${COMPATIBLE_VERSIONS.join(', ')}`
       );
     }
   } else {

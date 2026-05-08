@@ -13,7 +13,11 @@ import { calculateInitiative } from '../engine/initiative';
 import { calculatePassivePerception } from '../engine/passive-perception';
 import { calculateAttacks } from '../engine/attack-calculator';
 import { calculateMaxHP } from '../engine/hp-calculator';
-import { calculateSpellSlots, calculateSpellSlotsFromClasses, calculatePactMagic } from '../engine/spell-slots';
+import {
+  calculateSpellSlots,
+  calculateSpellSlotsFromClasses,
+  calculatePactMagic,
+} from '../engine/spell-slots';
 import { getFeaturesAtLevel } from './create';
 
 /**
@@ -29,15 +33,10 @@ import { getFeaturesAtLevel } from './create';
  * 7. Spell Save DC & Spell Attack Bonus (if spellcasting)
  * 8. Spell slot totals (preserving used counts where possible)
  */
-export function recomputeDerivedStats(
-  char: Character,
-  data: DataLoader,
-): Character {
+export function recomputeDerivedStats(char: Character, data: DataLoader): Character {
   const totalLevel = char.classes.reduce((sum, c) => sum + c.level, 0);
   const pb = getProficiencyBonus(totalLevel);
-  const conMod = getModifier(
-    getTotalScore(char.abilityScores, 'Constitution'),
-  );
+  const conMod = getModifier(getTotalScore(char.abilityScores, 'Constitution'));
 
   // Gather all features across all classes and subclasses
   const features: Feature[] = [];
@@ -66,31 +65,21 @@ export function recomputeDerivedStats(
 
   // Recalculate combat stats
   const newAC = calculateAC(char.abilityScores, char.equipment, features, data);
-  const newInitiative = calculateInitiative(
-    char.abilityScores,
-    char.feats,
-    features,
-  );
+  const newInitiative = calculateInitiative(char.abilityScores, char.feats, features);
   const newPassivePerception = calculatePassivePerception(
     char.abilityScores,
     char.skills,
     pb,
-    char.conditions,
+    char.conditions
   );
-  const newAttacks = calculateAttacks(
-    char.abilityScores,
-    char.equipment,
-    pb,
-    features,
-    data,
-  );
+  const newAttacks = calculateAttacks(char.abilityScores, char.equipment, pb, features, data);
 
   // Recalculate spell stats
   let newSpells = { ...char.spells };
 
   if (char.spells.spellcastingAbility) {
     const spellMod = getModifier(
-      getTotalScore(char.abilityScores, char.spells.spellcastingAbility),
+      getTotalScore(char.abilityScores, char.spells.spellcastingAbility)
     );
     newSpells = {
       ...newSpells,
@@ -101,7 +90,7 @@ export function recomputeDerivedStats(
 
   // Recalculate spell slots (handles both single class and multiclass)
   const hasWarlock = char.classes.some(c => c.classId === 'Warlock');
-  
+
   if (hasWarlock) {
     // Handle Warlock pact magic
     const warlockLevel = char.classes.find(c => c.classId === 'Warlock')!.level;
@@ -117,7 +106,7 @@ export function recomputeDerivedStats(
       };
     }
   }
-  
+
   // Recalculate regular spell slots (using multiclass rules if multiple classes)
   const newSlots = calculateSpellSlotsFromClasses(char.classes, data);
   // Preserve used counts, update totals

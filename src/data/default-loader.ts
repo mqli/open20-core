@@ -43,7 +43,7 @@ const rawSpells: unknown[] = require('../../static/spells.json');
 
 /** 将 JSON 中的 featuresByLevel 数组转为 ReadonlyMap<number, Feature[]> */
 function parseFeaturesByLevel(
-  raw: Array<{ level: number; features: readonly Feature[] }>,
+  raw: Array<{ level: number; features: readonly Feature[] }>
 ): ReadonlyMap<number, readonly Feature[]> {
   const map = new Map<number, readonly Feature[]>();
   for (const entry of raw) {
@@ -57,13 +57,14 @@ function parseClass(raw: unknown): Class {
   const c = raw as Record<string, unknown>;
   return {
     id: c.id as string,
+    name: (c.name as string) ?? (c.id as string),
     source: c.source as '2024 PHB' | '2014 PHB',
     hitDie: c.hitDie as DieType,
     savingThrowProficiencies: c.savingThrowProficiencies as readonly AbilityName[],
     armorTraining: c.armorTraining as readonly string[],
     weaponMastery: c.weaponMastery as boolean,
     featuresByLevel: parseFeaturesByLevel(
-      c.featuresByLevel as Array<{ level: number; features: readonly Feature[] }>,
+      c.featuresByLevel as Array<{ level: number; features: readonly Feature[] }>
     ),
     spellcasting: c.spellcasting as Class['spellcasting'],
   };
@@ -77,7 +78,7 @@ function parseSubclass(raw: unknown): Subclass {
     parentClass: s.parentClass as string,
     grantedAtLevel: s.grantedAtLevel as number,
     featuresByLevel: parseFeaturesByLevel(
-      s.featuresByLevel as Array<{ level: number; features: readonly Feature[] }>,
+      s.featuresByLevel as Array<{ level: number; features: readonly Feature[] }>
     ),
   };
 }
@@ -99,11 +100,11 @@ export function createDataLoader(tables: LookupTables): DataLoader {
   return {
     // ── 物种（Species）───
     getSpecies(id: string): Species | undefined {
-      return speciesData.find((s) => s.id === id);
+      return speciesData.find(s => s.id === id);
     },
 
     getSpeciesSubtype(speciesId: string, subtypeId: string): SpeciesSubtype | undefined {
-      const species = speciesData.find((s) => s.id === speciesId);
+      const species = speciesData.find(s => s.id === speciesId);
       if (!species?.subtypes) return undefined;
       return species.subtypes.find((st: SpeciesSubtype) => st.id === subtypeId);
     },
@@ -114,7 +115,7 @@ export function createDataLoader(tables: LookupTables): DataLoader {
 
     // ── 背景（Background）───
     getBackground(id: string): Background | undefined {
-      return backgroundsData.find((b) => b.id === id);
+      return backgroundsData.find(b => b.id === id);
     },
 
     getAllBackgrounds(): Background[] {
@@ -123,7 +124,7 @@ export function createDataLoader(tables: LookupTables): DataLoader {
 
     // ── 职业（Class）/ 子职业（Subclass）───
     getClass(id: string): Class | undefined {
-      return classesData.find((c) => c.id === id);
+      return classesData.find(c => c.id === id);
     },
 
     getAllClasses(): Class[] {
@@ -131,11 +132,11 @@ export function createDataLoader(tables: LookupTables): DataLoader {
     },
 
     getSubclass(id: string): Subclass | undefined {
-      return subclassesData.find((s) => s.id === id);
+      return subclassesData.find(s => s.id === id);
     },
 
     getSubclassesForClass(classId: string): Subclass[] {
-      return subclassesData.filter((s) => s.parentClass === classId);
+      return subclassesData.filter(s => s.parentClass === classId);
     },
 
     getAllSubclasses(): Subclass[] {
@@ -144,11 +145,11 @@ export function createDataLoader(tables: LookupTables): DataLoader {
 
     // ── 专长（Feat）───
     getFeat(id: string): Feat | undefined {
-      return featsData.find((f) => f.id === id);
+      return featsData.find(f => f.id === id);
     },
 
     getFeatsByCategory(category: FeatCategory): Feat[] {
-      return featsData.filter((f) => f.category === category);
+      return featsData.filter(f => f.category === category);
     },
 
     getAllFeats(): Feat[] {
@@ -157,7 +158,7 @@ export function createDataLoader(tables: LookupTables): DataLoader {
 
     // ── 装备 / 武器 / 护甲 ──────────────────────────────
     getWeapon(id: string): Weapon | undefined {
-      return weaponsData.find((w) => w.id === id);
+      return weaponsData.find(w => w.id === id);
     },
 
     getAllWeapons(): Weapon[] {
@@ -165,7 +166,7 @@ export function createDataLoader(tables: LookupTables): DataLoader {
     },
 
     getArmor(id: string): Armor | undefined {
-      return armorData.find((a) => a.id === id);
+      return armorData.find(a => a.id === id);
     },
 
     getAllArmor(): Armor[] {
@@ -173,7 +174,7 @@ export function createDataLoader(tables: LookupTables): DataLoader {
     },
 
     getGearItem(id: string): GearItem | undefined {
-      return gearData.find((g) => g.id === id);
+      return gearData.find(g => g.id === id);
     },
 
     getAllGear(): GearItem[] {
@@ -182,11 +183,11 @@ export function createDataLoader(tables: LookupTables): DataLoader {
 
     // ── 法术（Spell）───
     getSpell(id: string): Spell | undefined {
-      return spellsData.find((s) => s.id === id);
+      return spellsData.find(s => s.id === id);
     },
 
     getSpellsByLevel(level: SpellLevel): Spell[] {
-      return spellsData.filter((s) => s.level === level);
+      return spellsData.filter(s => s.level === level);
     },
 
     getAllSpells(): Spell[] {
@@ -224,7 +225,7 @@ export function createDataLoader(tables: LookupTables): DataLoader {
       // slotsArray 是数组，index 0 = 1级法术位，index 1 = 2级法术位...
       const result: Record<number, number> = {};
       for (let i = 0; i < slotsArray.length; i++) {
-        result[i + 1] = slotsArray[i] ?? 0;  // 修正：index 0 → 法术位等级 1
+        result[i + 1] = slotsArray[i] ?? 0; // 修正：index 0 → 法术位等级 1
       }
       return result;
     },

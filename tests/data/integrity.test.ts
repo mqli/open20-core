@@ -26,7 +26,7 @@ describe('Data Integrity Tests', () => {
     });
 
     it('should have hit die fixed values for all die types', () => {
-      const expected = { 'd4': 3, 'd6': 4, 'd8': 5, 'd10': 6, 'd12': 7, 'd20': 11 };
+      const expected = { d4: 3, d6: 4, d8: 5, d10: 6, d12: 7, d20: 11 };
       for (const [die, value] of Object.entries(expected)) {
         expect(lookupTables.hitDieFixedValue[die]).toBe(value);
       }
@@ -56,7 +56,14 @@ describe('Data Integrity Tests', () => {
 
     it('should have all 8 weapon mastery properties', () => {
       const expectedProperties = [
-        'Push', 'Slow', 'Topple', 'Vex', 'Sap', 'Graze', 'Nick', 'Cleave'
+        'Push',
+        'Slow',
+        'Topple',
+        'Vex',
+        'Sap',
+        'Graze',
+        'Nick',
+        'Cleave',
       ];
       for (const prop of expectedProperties) {
         expect(lookupTables.weaponMasteryProperties).toContain(prop);
@@ -65,9 +72,22 @@ describe('Data Integrity Tests', () => {
 
     it('should have all condition names', () => {
       const expectedConditions = [
-        'Blinded', 'Charmed', 'Deafened', 'Exhaustion', 'Frightened',
-        'Grappled', 'Incapacitated', 'Invisible', 'Paralyzed', 'Petrified',
-        'Poisoned', 'Prone', 'Restrained', 'Stunned', 'Unconscious', 'Concentrating'
+        'Blinded',
+        'Charmed',
+        'Deafened',
+        'Exhaustion',
+        'Frightened',
+        'Grappled',
+        'Incapacitated',
+        'Invisible',
+        'Paralyzed',
+        'Petrified',
+        'Poisoned',
+        'Prone',
+        'Restrained',
+        'Stunned',
+        'Unconscious',
+        'Concentrating',
       ];
       for (const condition of expectedConditions) {
         expect(lookupTables.conditionNames).toContain(condition);
@@ -81,7 +101,15 @@ describe('Data Integrity Tests', () => {
     });
 
     it('should have all required fields', () => {
-      const requiredFields = ['id', 'source', 'size', 'speed', 'abilityBonuses', 'baseTraits', 'subtypes'];
+      const requiredFields = [
+        'id',
+        'source',
+        'size',
+        'speed',
+        'abilityBonuses',
+        'baseTraits',
+        'subtypes',
+      ];
       for (const spec of species) {
         for (const field of requiredFields) {
           expect(spec[field]).toBeDefined(`Species ${spec.id} missing ${field}`);
@@ -90,7 +118,14 @@ describe('Data Integrity Tests', () => {
     });
 
     it('should use full ability names in abilityBonuses', () => {
-      const validAbilities = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+      const validAbilities = [
+        'Strength',
+        'Dexterity',
+        'Constitution',
+        'Intelligence',
+        'Wisdom',
+        'Charisma',
+      ];
       for (const spec of species) {
         for (const [ability, bonus] of Object.entries(spec.abilityBonuses || {})) {
           expect(validAbilities).toContain(ability);
@@ -113,7 +148,26 @@ describe('Data Integrity Tests', () => {
     });
 
     it('should have skillProficiencies', () => {
-      const validSkills = ['Acrobatics', 'Animal Handling', 'Arcana', 'Athletics', 'Deception', 'History', 'Insight', 'Intimidation', 'Investigation', 'Medicine', 'Nature', 'Perception', 'Performance', 'Persuasion', 'Religion', 'Sleight of Hand', 'Stealth', 'Survival'];
+      const validSkills = [
+        'Acrobatics',
+        'Animal Handling',
+        'Arcana',
+        'Athletics',
+        'Deception',
+        'History',
+        'Insight',
+        'Intimidation',
+        'Investigation',
+        'Medicine',
+        'Nature',
+        'Perception',
+        'Performance',
+        'Persuasion',
+        'Religion',
+        'Sleight of Hand',
+        'Stealth',
+        'Survival',
+      ];
       for (const bg of backgrounds) {
         expect(bg.skillProficiencies.length).toBeGreaterThan(0);
         for (const skill of bg.skillProficiencies) {
@@ -129,7 +183,13 @@ describe('Data Integrity Tests', () => {
     });
 
     it('should have all required fields', () => {
-      const requiredFields = ['id', 'source', 'hitDie', 'savingThrowProficiencies', 'featuresByLevel'];
+      const requiredFields = [
+        'id',
+        'source',
+        'hitDie',
+        'savingThrowProficiencies',
+        'featuresByLevel',
+      ];
       for (const cls of classes) {
         for (const field of requiredFields) {
           expect(cls[field]).toBeDefined(`Class ${cls.id} missing ${field}`);
@@ -238,7 +298,16 @@ describe('Data Integrity Tests', () => {
     });
 
     it('should have all required fields', () => {
-      const requiredFields = ['id', 'name', 'level', 'school', 'castingTime', 'range', 'components', 'duration'];
+      const requiredFields = [
+        'id',
+        'name',
+        'level',
+        'school',
+        'castingTime',
+        'range',
+        'components',
+        'duration',
+      ];
       for (const spell of spells) {
         for (const field of requiredFields) {
           expect(spell[field]).toBeDefined(`Spell ${spell.name} missing ${field}`);

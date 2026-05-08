@@ -3,24 +3,24 @@
 
 // 技能名 — 字符串字面量联合类型（18个标准技能）
 export type SkillName =
-  | 'Athletics'          // Strength
-  | 'Acrobatics'         // Dexterity
-  | 'Sleight of Hand'    // Dexterity
-  | 'Stealth'             // Dexterity
-  | 'Arcana'             // Intelligence
-  | 'History'             // Intelligence
-  | 'Investigation'       // Intelligence
-  | 'Nature'              // Intelligence
-  | 'Religion'            // Intelligence
-  | 'Animal Handling'     // Wisdom
-  | 'Insight'             // Wisdom
-  | 'Medicine'            // Wisdom
-  | 'Perception'          // Wisdom
-  | 'Survival'            // Wisdom
-  | 'Deception'           // Charisma
-  | 'Intimidation'        // Charisma
-  | 'Performance'          // Charisma
-  | 'Persuasion';         // Charisma
+  | 'Athletics' // Strength
+  | 'Acrobatics' // Dexterity
+  | 'Sleight of Hand' // Dexterity
+  | 'Stealth' // Dexterity
+  | 'Arcana' // Intelligence
+  | 'History' // Intelligence
+  | 'Investigation' // Intelligence
+  | 'Nature' // Intelligence
+  | 'Religion' // Intelligence
+  | 'Animal Handling' // Wisdom
+  | 'Insight' // Wisdom
+  | 'Medicine' // Wisdom
+  | 'Perception' // Wisdom
+  | 'Survival' // Wisdom
+  | 'Deception' // Charisma
+  | 'Intimidation' // Charisma
+  | 'Performance' // Charisma
+  | 'Persuasion'; // Charisma
 
 // 全部技能名（用于遍历）
 export const SKILL_NAMES: readonly SkillName[] = [
@@ -46,28 +46,28 @@ export const SKILL_NAMES: readonly SkillName[] = [
 
 // 技能 → 属性的映射
 export const SKILL_ABILITY_MAP: Record<SkillName, import('./ability').AbilityName> = {
-  'Athletics': 'Strength',
-  'Acrobatics': 'Dexterity',
+  Athletics: 'Strength',
+  Acrobatics: 'Dexterity',
   'Sleight of Hand': 'Dexterity',
-  'Stealth': 'Dexterity',
-  'Arcana': 'Intelligence',
-  'History': 'Intelligence',
-  'Investigation': 'Intelligence',
-  'Nature': 'Intelligence',
-  'Religion': 'Intelligence',
+  Stealth: 'Dexterity',
+  Arcana: 'Intelligence',
+  History: 'Intelligence',
+  Investigation: 'Intelligence',
+  Nature: 'Intelligence',
+  Religion: 'Intelligence',
   'Animal Handling': 'Wisdom',
-  'Insight': 'Wisdom',
-  'Medicine': 'Wisdom',
-  'Perception': 'Wisdom',
-  'Survival': 'Wisdom',
-  'Deception': 'Charisma',
-  'Intimidation': 'Charisma',
-  'Performance': 'Charisma',
-  'Persuasion': 'Charisma',
+  Insight: 'Wisdom',
+  Medicine: 'Wisdom',
+  Perception: 'Wisdom',
+  Survival: 'Wisdom',
+  Deception: 'Charisma',
+  Intimidation: 'Charisma',
+  Performance: 'Charisma',
+  Persuasion: 'Charisma',
 };
 
 // 技能条目（角色JSON中的数据结构）
 export interface SkillEntry {
   readonly proficient: boolean;
-  readonly expertise: boolean;    // Rogue 6/13级、Bard 3/10级
+  readonly expertise: boolean; // Rogue 6/13级、Bard 3/10级
 }

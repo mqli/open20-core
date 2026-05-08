@@ -30,7 +30,7 @@ export function getSavingThrowBonus(
   scores: AbilityScores,
   ability: AbilityName,
   proficientAbilities: readonly AbilityName[],
-  proficiencyBonus: number,
+  proficiencyBonus: number
 ): number {
   const abilityModifier = getModifier(getTotalScore(scores, ability));
   const isProficient = proficientAbilities.includes(ability);

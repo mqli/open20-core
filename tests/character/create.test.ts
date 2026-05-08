@@ -101,7 +101,12 @@ const BARBARIAN_FEATURES_L1: Feature[] = [
 
 const WIZARD_FEATURES_L1: Feature[] = [
   { name: 'Spellcasting', description: 'Cast wizard spells', level: 1 },
-  { name: 'Arcane Recovery', description: 'Recover spell slots on short rest', resourceId: 'Arcane Recovery', level: 1 },
+  {
+    name: 'Arcane Recovery',
+    description: 'Recover spell slots on short rest',
+    resourceId: 'Arcane Recovery',
+    level: 1,
+  },
 ];
 
 const FIGHTER_CLASS: Class = {
@@ -144,10 +149,15 @@ const ROGUE_CLASS: Class = {
   savingThrowProficiencies: ['Dexterity', 'Intelligence'],
   armorTraining: ['Light'],
   weaponMastery: true,
-  featuresByLevel: new Map([[1, [
-    { name: 'Sneak Attack', description: 'Extra damage', level: 1 },
-    { name: 'Cunning Action', description: 'Bonus action dash/disengage/hide', level: 1 },
-  ]]]),
+  featuresByLevel: new Map([
+    [
+      1,
+      [
+        { name: 'Sneak Attack', description: 'Extra damage', level: 1 },
+        { name: 'Cunning Action', description: 'Bonus action dash/disengage/hide', level: 1 },
+      ],
+    ],
+  ]),
   spellcasting: null,
 };
 
@@ -220,7 +230,9 @@ function createMockDataLoader(): DataLoader {
       if (nonCasters.includes(classId)) {
         return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
       }
-      return fullCasterSlots[classLevel] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+      return (
+        fullCasterSlots[classLevel] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
+      );
     },
     getMulticlassSpellSlots: () => ({}),
     getPactMagicSlots: (warlockLevel: number) => {
@@ -691,7 +703,7 @@ describe('createCharacter', () => {
       };
 
       expect(() => createCharacter(params, data)).toThrow(
-        'Invalid speciesId: "Dragonborn" not found in data',
+        'Invalid speciesId: "Dragonborn" not found in data'
       );
     });
 
@@ -705,7 +717,7 @@ describe('createCharacter', () => {
       };
 
       expect(() => createCharacter(params, data)).toThrow(
-        'Invalid classId: "Artificer" not found in data',
+        'Invalid classId: "Artificer" not found in data'
       );
     });
 
@@ -719,7 +731,7 @@ describe('createCharacter', () => {
       };
 
       expect(() => createCharacter(params, data)).toThrow(
-        'Invalid backgroundId: "Pirate" not found in data',
+        'Invalid backgroundId: "Pirate" not found in data'
       );
     });
   });
@@ -842,7 +854,14 @@ describe('isProficient', () => {
 describe('buildInitialSpells', () => {
   it('calculates spell save DC and attack bonus correctly', () => {
     const abilityScores = {
-      base: { Strength: 10, Dexterity: 10, Constitution: 10, Intelligence: 16, Wisdom: 10, Charisma: 10 },
+      base: {
+        Strength: 10,
+        Dexterity: 10,
+        Constitution: 10,
+        Intelligence: 16,
+        Wisdom: 10,
+        Charisma: 10,
+      },
       racialBonuses: {},
       featBonuses: {},
       temporaryBonuses: {},

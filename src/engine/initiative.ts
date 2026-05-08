@@ -29,7 +29,7 @@ import { getModifier, getTotalScore } from './ability-modifier';
 export function calculateInitiative(
   scores: AbilityScores,
   featIds: readonly string[],
-  features: readonly Feature[],
+  features: readonly Feature[]
 ): number {
   const dexMod = getModifier(getTotalScore(scores, 'Dexterity'));
   let initiative = dexMod;

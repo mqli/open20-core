@@ -33,10 +33,7 @@ export function getModifier(score: number): number {
  * getTotalScore({ base: { Strength: 15 }, racialBonuses: { Strength: 2 }, featBonuses: {}, temporaryBonuses: {} }, 'Strength')
  * // 17
  */
-export function getTotalScore(
-  scores: AbilityScores,
-  ability: AbilityName,
-): number {
+export function getTotalScore(scores: AbilityScores, ability: AbilityName): number {
   const base = scores.base[ability] ?? 10;
   const racial = scores.racialBonuses[ability] ?? 0;
   const feat = scores.featBonuses[ability] ?? 0;

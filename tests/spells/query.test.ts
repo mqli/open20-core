@@ -106,10 +106,10 @@ const MOCK_SPELLS: Spell[] = [
 
 function createMockDataLoader(spells: Spell[] = MOCK_SPELLS): DataLoader {
   return {
-    getSpell: (id: string) => spells.find((s) => s.id === id),
+    getSpell: (id: string) => spells.find(s => s.id === id),
     getAllSpells: () => spells,
-    getSpellsByLevel: (level: SpellLevel) => spells.filter((s) => s.level === level),
-    
+    getSpellsByLevel: (level: SpellLevel) => spells.filter(s => s.level === level),
+
     // Unused methods (return defaults)
     getSpecies: () => undefined,
     getSpeciesSubtype: () => undefined,
@@ -182,25 +182,25 @@ describe('searchSpells', () => {
   it('should filter by name (case-insensitive)', () => {
     const results = searchSpells({ name: 'fire' }, data);
     expect(results.length).toBeGreaterThan(0);
-    expect(results.every((s) => s.name.toLowerCase().includes('fire'))).toBe(true);
+    expect(results.every(s => s.name.toLowerCase().includes('fire'))).toBe(true);
   });
 
   it('should filter by level', () => {
     const results = searchSpells({ level: [0, 1] }, data);
     expect(results.length).toBeGreaterThan(0);
-    expect(results.every((s) => s.level === 0 || s.level === 1)).toBe(true);
+    expect(results.every(s => s.level === 0 || s.level === 1)).toBe(true);
   });
 
   it('should filter by school', () => {
     const results = searchSpells({ school: 'Evocation' }, data);
     expect(results.length).toBeGreaterThan(0);
-    expect(results.every((s) => s.school === 'Evocation')).toBe(true);
+    expect(results.every(s => s.school === 'Evocation')).toBe(true);
   });
 
   it('should filter by concentration', () => {
     const results = searchSpells({ concentration: true }, data);
     expect(results.length).toBeGreaterThan(0);
-    expect(results.every((s) => s.concentration === true)).toBe(true);
+    expect(results.every(s => s.concentration === true)).toBe(true);
   });
 
   it('should filter by ritual', () => {
@@ -209,10 +209,13 @@ describe('searchSpells', () => {
   });
 
   it('should combine multiple filters', () => {
-    const results = searchSpells({
-      level: [1],
-      school: 'Evocation',
-    }, data);
+    const results = searchSpells(
+      {
+        level: [1],
+        school: 'Evocation',
+      },
+      data
+    );
     expect(results.length).toBe(1);
     expect(results[0].id).toBe('healing-word');
   });
@@ -224,9 +227,9 @@ describe('getSpellsForCharacter', () => {
   it('should return known spells with full data', () => {
     const results = getSpellsForCharacter(MOCK_CHARACTER as any, data);
     expect(results.length).toBe(3);
-    expect(results.map((s) => s.id)).toContain('fireball');
-    expect(results.map((s) => s.id)).toContain('shield');
-    expect(results.map((s) => s.id)).toContain('fire-bolt');
+    expect(results.map(s => s.id)).toContain('fireball');
+    expect(results.map(s => s.id)).toContain('shield');
+    expect(results.map(s => s.id)).toContain('fire-bolt');
   });
 
   it('should skip unknown spell ids', () => {
@@ -253,8 +256,8 @@ describe('getPreparedSpells', () => {
   it('should return prepared spells with full data', () => {
     const results = getPreparedSpells(MOCK_CHARACTER as any, data);
     expect(results.length).toBe(2);
-    expect(results.map((s) => s.id)).toContain('shield');
-    expect(results.map((s) => s.id)).toContain('fireball');
+    expect(results.map(s => s.id)).toContain('shield');
+    expect(results.map(s => s.id)).toContain('fireball');
   });
 });
 

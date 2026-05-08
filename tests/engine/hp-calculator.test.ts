@@ -25,16 +25,18 @@ function createMockDataLoader(): DataLoader {
         Rogue: { hitDie: 'd8' },
       };
       const c = classes[id];
-      return c ? {
-        id,
-        source: '2024 PHB' as const,
-        hitDie: c.hitDie,
-        savingThrowProficiencies: [],
-        armorTraining: [],
-        weaponMastery: false,
-        featuresByLevel: new Map(),
-        spellcasting: null,
-      } : undefined;
+      return c
+        ? {
+            id,
+            source: '2024 PHB' as const,
+            hitDie: c.hitDie,
+            savingThrowProficiencies: [],
+            armorTraining: [],
+            weaponMastery: false,
+            featuresByLevel: new Map(),
+            spellcasting: null,
+          }
+        : undefined;
     },
     getAllClasses: () => [],
     getSubclass: () => undefined,
@@ -83,25 +85,25 @@ describe('calculateHPAtLevel1', () => {
   });
 
   it('handles negative Con modifier', () => {
-    expect(calculateHPAtLevel1('d8', -1)).toBe(7);  // 8 + (-1)
+    expect(calculateHPAtLevel1('d8', -1)).toBe(7); // 8 + (-1)
   });
 
   it('handles Con -5 (extremely low)', () => {
-    expect(calculateHPAtLevel1('d6', -5)).toBe(1);  // 6 + (-5) = 1
+    expect(calculateHPAtLevel1('d6', -5)).toBe(1); // 6 + (-5) = 1
   });
 });
 
 describe('calculateHPIncrement', () => {
   it('calculates d10 + Con 3 = 9', () => {
-    expect(calculateHPIncrement('d10', 3)).toBe(9);  // 6 + 3
+    expect(calculateHPIncrement('d10', 3)).toBe(9); // 6 + 3
   });
 
   it('calculates d8 + Con -1 = 4', () => {
-    expect(calculateHPIncrement('d8', -1)).toBe(4);  // 5 + (-1)
+    expect(calculateHPIncrement('d8', -1)).toBe(4); // 5 + (-1)
   });
 
   it('calculates d6 + Con 0 = 4', () => {
-    expect(calculateHPIncrement('d6', 0)).toBe(4);  // 4 + 0
+    expect(calculateHPIncrement('d6', 0)).toBe(4); // 4 + 0
   });
 });
 
@@ -112,12 +114,28 @@ describe('calculateMaxHP', () => {
     // 1级: 10+3=13
     // 2-5级: 4 * (6+3) = 36
     // 总计: 13 + 36 = 49
-    const char = [{ classId: 'Fighter', level: 5, subclassId: null, subclassLevel: null, hitDice: { die: 'd10' as const, used: 0 } }];
+    const char = [
+      {
+        classId: 'Fighter',
+        level: 5,
+        subclassId: null,
+        subclassLevel: null,
+        hitDice: { die: 'd10' as const, used: 0 },
+      },
+    ];
     expect(calculateMaxHP(char, 3, data)).toBe(49);
   });
 
   it('calculates 1-level Wizard Con +2 = 8', () => {
-    const char = [{ classId: 'Wizard', level: 1, subclassId: null, subclassLevel: null, hitDice: { die: 'd6' as const, used: 0 } }];
+    const char = [
+      {
+        classId: 'Wizard',
+        level: 1,
+        subclassId: null,
+        subclassLevel: null,
+        hitDice: { die: 'd6' as const, used: 0 },
+      },
+    ];
     expect(calculateMaxHP(char, 2, data)).toBe(8);
   });
 
@@ -125,7 +143,15 @@ describe('calculateMaxHP', () => {
     // 1级: 12+4=16
     // 2-3级: 2 * (7+4) = 22
     // 总计: 16 + 22 = 38
-    const char = [{ classId: 'Barbarian', level: 3, subclassId: null, subclassLevel: null, hitDice: { die: 'd12' as const, used: 0 } }];
+    const char = [
+      {
+        classId: 'Barbarian',
+        level: 3,
+        subclassId: null,
+        subclassLevel: null,
+        hitDice: { die: 'd12' as const, used: 0 },
+      },
+    ];
     expect(calculateMaxHP(char, 4, data)).toBe(38);
   });
 
@@ -135,7 +161,15 @@ describe('calculateMaxHP', () => {
 
   it('HP minimum is 1 even with very negative Con', () => {
     // d6 + (-5) per level, 5 levels → would be negative but capped at 1
-    const char = [{ classId: 'Wizard', level: 5, subclassId: null, subclassLevel: null, hitDice: { die: 'd6' as const, used: 0 } }];
-    expect(calculateMaxHP(char, -5, data)).toBe(1);  // Math.max(1, ...)
+    const char = [
+      {
+        classId: 'Wizard',
+        level: 5,
+        subclassId: null,
+        subclassLevel: null,
+        hitDice: { die: 'd6' as const, used: 0 },
+      },
+    ];
+    expect(calculateMaxHP(char, -5, data)).toBe(1); // Math.max(1, ...)
   });
 });

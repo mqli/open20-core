@@ -42,7 +42,7 @@ export function shortRest(
   char: Character,
   hitDiceToSpend: number,
   data: DataLoader,
-  rng?: RandomProvider,
+  rng?: RandomProvider
 ): Character {
   let result = char;
   let remainingToSpend = hitDiceToSpend;

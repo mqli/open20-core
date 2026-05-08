@@ -2,7 +2,13 @@
 // Damage type & defense calculation — pure functions
 // Corresponds to PRD §4.5
 
-import type { Character, DamageType, DamageDefenses, DamageDefenseSource, DamageResult } from '../types/character';
+import type {
+  Character,
+  DamageType,
+  DamageDefenses,
+  DamageDefenseSource,
+  DamageResult,
+} from '../types/character';
 export type { DamageDefenses, DamageDefenseSource, DamageResult } from '../types/character';
 import type { DataLoader } from '../data/loader';
 import { modifyHP } from '../character/mutate';
@@ -89,9 +95,19 @@ export function calculateTypedDamage(
 export function parseDamageType(value: string): DamageType | null {
   const normalized = value.trim();
   const damageTypes: DamageType[] = [
-    'Bludgeoning', 'Piercing', 'Slashing',
-    'Fire', 'Cold', 'Lightning', 'Thunder', 'Acid', 'Poison',
-    'Psychic', 'Force', 'Necrotic', 'Radiant',
+    'Bludgeoning',
+    'Piercing',
+    'Slashing',
+    'Fire',
+    'Cold',
+    'Lightning',
+    'Thunder',
+    'Acid',
+    'Poison',
+    'Psychic',
+    'Force',
+    'Necrotic',
+    'Radiant',
   ];
 
   // Try exact match first (case-sensitive)
@@ -109,21 +125,21 @@ export function parseDamageType(value: string): DamageType | null {
 
   // Handle common aliases
   const aliases: Record<string, DamageType> = {
-    'bludgeoning': 'Bludgeoning',
-    'piercing': 'Piercing',
-    'slashing': 'Slashing',
-    'physical': 'Slashing', // Generic, default to Slashing
-    'fire': 'Fire',
-    'cold': 'Cold',
-    'lightning': 'Lightning',
-    'thunder': 'Thunder',
-    'acid': 'Acid',
-    'poison': 'Poison',
-    'psychic': 'Psychic',
-    'force': 'Force',
-    'necrotic': 'Necrotic',
-    'radiant': 'Radiant',
-    'magical': 'Force', // Generic magical, default to Force
+    bludgeoning: 'Bludgeoning',
+    piercing: 'Piercing',
+    slashing: 'Slashing',
+    physical: 'Slashing', // Generic, default to Slashing
+    fire: 'Fire',
+    cold: 'Cold',
+    lightning: 'Lightning',
+    thunder: 'Thunder',
+    acid: 'Acid',
+    poison: 'Poison',
+    psychic: 'Psychic',
+    force: 'Force',
+    necrotic: 'Necrotic',
+    radiant: 'Radiant',
+    magical: 'Force', // Generic magical, default to Force
     'non-magical': 'Bludgeoning', // Generic physical
   };
 
@@ -141,9 +157,19 @@ export function isValidDamageType(value: string): boolean {
  * Get list of all standard damage types
  */
 export const ALL_DAMAGE_TYPES: readonly DamageType[] = [
-  'Bludgeoning', 'Piercing', 'Slashing',
-  'Fire', 'Cold', 'Lightning', 'Thunder', 'Acid', 'Poison',
-  'Psychic', 'Force', 'Necrotic', 'Radiant',
+  'Bludgeoning',
+  'Piercing',
+  'Slashing',
+  'Fire',
+  'Cold',
+  'Lightning',
+  'Thunder',
+  'Acid',
+  'Poison',
+  'Psychic',
+  'Force',
+  'Necrotic',
+  'Radiant',
 ];
 
 /**
@@ -175,7 +201,10 @@ const DEFENSE_PATTERNS: readonly { pattern: RegExp; damageType: DamageType }[] =
   // Rage resistance
   { pattern: /resistance\s+to\s+(bludgeoning|piercing|slashing)/i, damageType: 'Bludgeoning' },
   // Avatar of Battle (Path of the Battlerager)
-  { pattern: /resistance\s+to\s+(nonmagical\s+)?(bludgeoning|piercing|slashing)/i, damageType: 'Bludgeoning' },
+  {
+    pattern: /resistance\s+to\s+(nonmagical\s+)?(bludgeoning|piercing|slashing)/i,
+    damageType: 'Bludgeoning',
+  },
 ];
 
 /**
@@ -188,25 +217,27 @@ function parseDefenseFromDescription(description: string): DamageType[] {
 
   // Check for specific damage type mentions
   const typeMap: Record<string, DamageType> = {
-    'fire': 'Fire',
-    'cold': 'Cold',
-    'lightning': 'Lightning',
-    'thunder': 'Thunder',
-    'acid': 'Acid',
-    'poison': 'Poison',
-    'psychic': 'Psychic',
-    'force': 'Force',
-    'necrotic': 'Necrotic',
-    'radiant': 'Radiant',
-    'bludgeoning': 'Bludgeoning',
-    'piercing': 'Piercing',
-    'slashing': 'Slashing',
+    fire: 'Fire',
+    cold: 'Cold',
+    lightning: 'Lightning',
+    thunder: 'Thunder',
+    acid: 'Acid',
+    poison: 'Poison',
+    psychic: 'Psychic',
+    force: 'Force',
+    necrotic: 'Necrotic',
+    radiant: 'Radiant',
+    bludgeoning: 'Bludgeoning',
+    piercing: 'Piercing',
+    slashing: 'Slashing',
   };
 
   for (const [keyword, dtype] of Object.entries(typeMap)) {
-    if (lowerDesc.includes(`resistance to ${keyword}`) || 
-        lowerDesc.includes(`${keyword} resistance`) ||
-        lowerDesc.includes(`resistance to ${keyword} damage`)) {
+    if (
+      lowerDesc.includes(`resistance to ${keyword}`) ||
+      lowerDesc.includes(`${keyword} resistance`) ||
+      lowerDesc.includes(`resistance to ${keyword} damage`)
+    ) {
       if (!found.includes(dtype)) {
         found.push(dtype);
       }
@@ -239,7 +270,7 @@ function getSpeciesDefenses(char: Character, dataLoader: DataLoader): DamageDefe
 
   const defenses: DamageType[] = [];
   const baseTraits = species.baseTraits ?? [];
-  const subtype = char.speciesSubtype 
+  const subtype = char.speciesSubtype
     ? dataLoader.getSpeciesSubtype(char.species, char.speciesSubtype)
     : null;
   const subtypeTraits = subtype?.traits ?? [];

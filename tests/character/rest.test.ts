@@ -5,7 +5,12 @@ import { describe, it, expect } from 'vitest';
 import type { Character, CharacterClass, HitPoints, DieType } from '../../src/types/character';
 import type { Resource } from '../../src/types/resource';
 import { ResetType } from '../../src/types/resource';
-import type { CharacterSpells, SpellLevel, SpellSlotEntry, PactMagicSlots } from '../../src/types/spell';
+import type {
+  CharacterSpells,
+  SpellLevel,
+  SpellSlotEntry,
+  PactMagicSlots,
+} from '../../src/types/spell';
 import type { DataLoader } from '../../src/data/loader';
 import type { Class, Feature } from '../../src/types/class';
 import type { Species } from '../../src/types/species';
@@ -19,6 +24,7 @@ import type { RandomProvider } from '../../src/character/rest';
 function makeMockClass(id: string, hitDie: DieType): Class {
   return {
     id,
+    name: id,
     source: '2024 PHB',
     hitDie,
     savingThrowProficiencies: [],
@@ -63,7 +69,8 @@ function createMockDataLoader(): DataLoader {
     getSpell: (_id: string) => undefined,
     getSpellsByLevel: (_level: SpellLevel) => [],
     getAllSpells: () => [],
-    getProficiencyBonus: (level: number) => level < 5 ? 2 : level < 9 ? 3 : level < 13 ? 4 : level < 17 ? 5 : 6,
+    getProficiencyBonus: (level: number) =>
+      level < 5 ? 2 : level < 9 ? 3 : level < 13 ? 4 : level < 17 ? 5 : 6,
     getHitDieFixedValue: (die: DieType) => {
       const map: Record<DieType, number> = { d4: 3, d6: 4, d8: 5, d10: 6, d12: 7, d20: 11 };
       return map[die] ?? 0;
@@ -88,15 +95,24 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
     species: 'Human',
     speciesSubtype: null,
     background: 'Soldier',
-    classes: [{
-      classId: 'Fighter',
-      level: 5,
-      subclassId: null,
-      subclassLevel: null,
-      hitDice: { die: 'd10', used: 0 },
-    }],
+    classes: [
+      {
+        classId: 'Fighter',
+        level: 5,
+        subclassId: null,
+        subclassLevel: null,
+        hitDice: { die: 'd10', used: 0 },
+      },
+    ],
     abilityScores: {
-      base: { Strength: 16, Dexterity: 14, Constitution: 16, Intelligence: 10, Wisdom: 12, Charisma: 8 },
+      base: {
+        Strength: 16,
+        Dexterity: 14,
+        Constitution: 16,
+        Intelligence: 10,
+        Wisdom: 12,
+        Charisma: 8,
+      },
       racialBonuses: {},
       featBonuses: {},
       temporaryBonuses: {},
@@ -114,10 +130,23 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
       pactMagicSlots: null,
     },
     resources: [],
-    hitPoints: { max: 49, current: 49, temporary: 0, deathSaves: { successes: 0, failures: 0, isStable: false } },
-    combatStats: { AC: 16, initiative: 2, speed: 30, passivePerception: 12, proficiencyBonus: 3, attacks: [] },
+    hitPoints: {
+      max: 49,
+      current: 49,
+      temporary: 0,
+      deathSaves: { successes: 0, failures: 0, isStable: false },
+    },
+    combatStats: {
+      AC: 16,
+      initiative: 2,
+      speed: 30,
+      passivePerception: 12,
+      proficiencyBonus: 3,
+      attacks: [],
+    },
     currency: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 },
     conditions: [],
+    damageDefenses: { resistances: [], immunities: [], vulnerabilities: [] },
     notes: '',
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
@@ -149,14 +178,21 @@ function makeFighterWithResources(): Character {
   };
 
   return makeCharacter({
-    hitPoints: { max: 49, current: 25, temporary: 0, deathSaves: { successes: 0, failures: 0, isStable: false } },
-    classes: [{
-      classId: 'Fighter',
-      level: 5,
-      subclassId: null,
-      subclassLevel: null,
-      hitDice: { die: 'd10', used: 2 },
-    }],
+    hitPoints: {
+      max: 49,
+      current: 25,
+      temporary: 0,
+      deathSaves: { successes: 0, failures: 0, isStable: false },
+    },
+    classes: [
+      {
+        classId: 'Fighter',
+        level: 5,
+        subclassId: null,
+        subclassLevel: null,
+        hitDice: { die: 'd10', used: 2 },
+      },
+    ],
     resources: [shortRestResource, longRestResource, perTurnResource],
   });
 }
@@ -183,13 +219,15 @@ function makeWarlock(): Character {
   };
 
   return makeCharacter({
-    classes: [{
-      classId: 'Warlock',
-      level: 5,
-      subclassId: null,
-      subclassLevel: null,
-      hitDice: { die: 'd8', used: 3 },
-    }],
+    classes: [
+      {
+        classId: 'Warlock',
+        level: 5,
+        subclassId: null,
+        subclassLevel: null,
+        hitDice: { die: 'd8', used: 3 },
+      },
+    ],
     spells: {
       spellcastingAbility: 'Charisma',
       spellSaveDC: 14,
@@ -199,7 +237,12 @@ function makeWarlock(): Character {
       spellSlots,
       pactMagicSlots: pactMagic,
     },
-    hitPoints: { max: 35, current: 10, temporary: 0, deathSaves: { successes: 2, failures: 1, isStable: false } },
+    hitPoints: {
+      max: 35,
+      current: 10,
+      temporary: 0,
+      deathSaves: { successes: 2, failures: 1, isStable: false },
+    },
   });
 }
 
@@ -272,14 +315,21 @@ describe('shortRest', () => {
 
   it('HP is capped at max', () => {
     const char = makeCharacter({
-      hitPoints: { max: 49, current: 45, temporary: 0, deathSaves: { successes: 0, failures: 0, isStable: false } },
-      classes: [{
-        classId: 'Fighter',
-        level: 5,
-        subclassId: null,
-        subclassLevel: null,
-        hitDice: { die: 'd10', used: 0 },
-      }],
+      hitPoints: {
+        max: 49,
+        current: 45,
+        temporary: 0,
+        deathSaves: { successes: 0, failures: 0, isStable: false },
+      },
+      classes: [
+        {
+          classId: 'Fighter',
+          level: 5,
+          subclassId: null,
+          subclassLevel: null,
+          hitDice: { die: 'd10', used: 0 },
+        },
+      ],
     });
     const result = shortRest(char, 1, data);
 
@@ -339,13 +389,15 @@ describe('longRest', () => {
     };
 
     const char = makeCharacter({
-      classes: [{
-        classId: 'Wizard',
-        level: 9,
-        subclassId: null,
-        subclassLevel: null,
-        hitDice: { die: 'd6', used: 5 },
-      }],
+      classes: [
+        {
+          classId: 'Wizard',
+          level: 9,
+          subclassId: null,
+          subclassLevel: null,
+          hitDice: { die: 'd6', used: 5 },
+        },
+      ],
       spells: {
         spellcastingAbility: 'Intelligence',
         spellSaveDC: 15,
@@ -418,12 +470,36 @@ describe('shortRest with multi-class', () => {
   it('spends hit dice across classes in order', () => {
     const char = makeCharacter({
       classes: [
-        { classId: 'Fighter', level: 5, subclassId: null, subclassLevel: null, hitDice: { die: 'd10', used: 3 } },
-        { classId: 'Wizard', level: 3, subclassId: null, subclassLevel: null, hitDice: { die: 'd6', used: 1 } },
+        {
+          classId: 'Fighter',
+          level: 5,
+          subclassId: null,
+          subclassLevel: null,
+          hitDice: { die: 'd10', used: 3 },
+        },
+        {
+          classId: 'Wizard',
+          level: 3,
+          subclassId: null,
+          subclassLevel: null,
+          hitDice: { die: 'd6', used: 1 },
+        },
       ],
-      hitPoints: { max: 55, current: 20, temporary: 0, deathSaves: { successes: 0, failures: 0, isStable: false } },
+      hitPoints: {
+        max: 55,
+        current: 20,
+        temporary: 0,
+        deathSaves: { successes: 0, failures: 0, isStable: false },
+      },
       abilityScores: {
-        base: { Strength: 16, Dexterity: 14, Constitution: 16, Intelligence: 10, Wisdom: 12, Charisma: 8 },
+        base: {
+          Strength: 16,
+          Dexterity: 14,
+          Constitution: 16,
+          Intelligence: 10,
+          Wisdom: 12,
+          Charisma: 8,
+        },
         racialBonuses: {},
         featBonuses: {},
         temporaryBonuses: {},

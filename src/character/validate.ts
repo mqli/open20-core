@@ -35,10 +35,7 @@ export interface ValidationResult {
  * 10. Spell slots: used must be between 0 and total for each level
  * 11. Feats: each feat ID must exist in DataLoader (warning if not found)
  */
-export function validateCharacter(
-  char: Character,
-  data: DataLoader,
-): ValidationResult {
+export function validateCharacter(char: Character, data: DataLoader): ValidationResult {
   const errors: ValidationError[] = [];
 
   // 1. Name
@@ -236,7 +233,7 @@ export function validateCharacter(
     }
   }
 
-  const valid = errors.filter((e) => e.severity === 'error').length === 0;
+  const valid = errors.filter(e => e.severity === 'error').length === 0;
 
   return { valid, errors };
 }

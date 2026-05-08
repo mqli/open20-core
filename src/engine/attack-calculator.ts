@@ -30,15 +30,15 @@ export function calculateAttacks(
   equipment: readonly EquipmentItem[],
   proficiencyBonus: number,
   features: readonly Feature[],
-  data: DataLoader,
+  data: DataLoader
 ): Attack[] {
   const attacks: Attack[] = [];
-  const featureNames = new Set(features.map((f) => f.name));
+  const featureNames = new Set(features.map(f => f.name));
 
   // 获取所有已装备的武器
   const equippedWeapons = equipment
-    .filter((e) => e.equipped && e.type === 'weapon')
-    .map((e) => ({ itemId: e.id, weapon: data.getWeapon(e.id) }))
+    .filter(e => e.equipped && e.type === 'weapon')
+    .map(e => ({ itemId: e.id, weapon: data.getWeapon(e.id) }))
     .filter((w): w is { itemId: string; weapon: Weapon } => w.weapon != null);
 
   for (const { weapon } of equippedWeapons) {
@@ -46,7 +46,7 @@ export function calculateAttacks(
       scores,
       weapon,
       proficiencyBonus,
-      featureNames,
+      featureNames
     );
 
     // 伤害字符串
@@ -74,7 +74,7 @@ function calculateWeaponAttack(
   scores: AbilityScores,
   weapon: Weapon,
   proficiencyBonus: number,
-  featureNames: Set<string>,
+  featureNames: Set<string>
 ): { attackBonus: number; damageMod: number; abilityUsed: string } {
   const strMod = getModifier(getTotalScore(scores, 'Strength'));
   const dexMod = getModifier(getTotalScore(scores, 'Dexterity'));

@@ -12,21 +12,21 @@ export enum ResetType {
 
 // 资源显示类型（UI层用）
 export enum DisplayType {
-  Counter = 'Counter',   // 数字计数器（如 Second Wind 1/1）
-  Dots = 'Dots',         // 圆点显示（如 Rage ●●○）
-  Points = 'Points',       // 点数显示（如 Sorcery Points 3/3）
+  Counter = 'Counter', // 数字计数器（如 Second Wind 1/1）
+  Dots = 'Dots', // 圆点显示（如 Rage ●●○）
+  Points = 'Points', // 点数显示（如 Sorcery Points 3/3）
 }
 
 // 资源条目
 export interface Resource {
-  readonly id: string;             // 资源ID（如 "Second Wind"）
-  readonly name?: string;          // 显示名称（无则用id）
-  readonly description?: string;      // 描述（用于tooltip）
+  readonly id: string; // 资源ID（如 "Second Wind"）
+  readonly name?: string; // 显示名称（无则用id）
+  readonly description?: string; // 描述（用于tooltip）
   readonly max: number;
   readonly used: number;
   readonly resetOn: ResetType;
   readonly displayType?: DisplayType;
-  readonly displayName?: string;    // 显示名称（如 "Rage 1/3"）
+  readonly displayName?: string; // 显示名称（如 "Rage 1/3"）
 }
 
 // 2024 各职业资源清单（参考，非类型定义）：

@@ -18,7 +18,7 @@ import type { ActiveCondition } from '../../src/types/character';
  */
 function makeScores(
   wisdomBase: number,
-  otherBases: Partial<Record<string, number>> = {},
+  otherBases: Partial<Record<string, number>> = {}
 ): AbilityScores {
   return {
     base: {
@@ -39,9 +39,10 @@ function makeScores(
  * 创建技能记录
  * @param perception - Perception 技能配置（可选）
  */
-function makeSkills(
-  perception?: { proficient: boolean; expertise: boolean },
-): Record<string, SkillEntry> {
+function makeSkills(perception?: {
+  proficient: boolean;
+  expertise: boolean;
+}): Record<string, SkillEntry> {
   const skills: Record<string, SkillEntry> = {};
 
   if (perception) {
@@ -57,7 +58,11 @@ function makeSkills(
 /**
  * 创建 ActiveCondition 对象
  */
-function makeCondition(id: string, source = 'test', appliedAt = '2024-01-01T00:00:00Z'): ActiveCondition {
+function makeCondition(
+  id: string,
+  source = 'test',
+  appliedAt = '2024-01-01T00:00:00Z'
+): ActiveCondition {
   return { id: id as ActiveCondition['id'], source, appliedAt };
 }
 

@@ -122,7 +122,11 @@ describe('calculateInitiative', () => {
   describe('Alert feat among multiple feats', () => {
     it('should add +5 when Alert is among other feats', () => {
       const scores = makeScores({ Dexterity: 14 });
-      const result = calculateInitiative(scores, ['Great Weapon Master', 'Alert', 'Sharpshooter'], []);
+      const result = calculateInitiative(
+        scores,
+        ['Great Weapon Master', 'Alert', 'Sharpshooter'],
+        []
+      );
       expect(result).toBe(7); // 2 + 5
     });
 
@@ -142,7 +146,14 @@ describe('calculateInitiative', () => {
   describe('with racial bonuses to Dexterity', () => {
     it('should include racial bonuses in Dex total', () => {
       const scores: AbilityScores = {
-        base: { Strength: 10, Dexterity: 14, Constitution: 10, Intelligence: 10, Wisdom: 10, Charisma: 10 },
+        base: {
+          Strength: 10,
+          Dexterity: 14,
+          Constitution: 10,
+          Intelligence: 10,
+          Wisdom: 10,
+          Charisma: 10,
+        },
         racialBonuses: { Dexterity: 2 },
         featBonuses: {},
         temporaryBonuses: {},
@@ -154,7 +165,14 @@ describe('calculateInitiative', () => {
 
     it('should include racial bonuses with Alert feat', () => {
       const scores: AbilityScores = {
-        base: { Strength: 10, Dexterity: 14, Constitution: 10, Intelligence: 10, Wisdom: 10, Charisma: 10 },
+        base: {
+          Strength: 10,
+          Dexterity: 14,
+          Constitution: 10,
+          Intelligence: 10,
+          Wisdom: 10,
+          Charisma: 10,
+        },
         racialBonuses: { Dexterity: 2 },
         featBonuses: {},
         temporaryBonuses: {},
@@ -169,14 +187,14 @@ describe('calculateInitiative', () => {
     it('should be fast for 1000 calls', () => {
       const scores = makeScores({ Dexterity: 14 });
       const start = performance.now();
-      
+
       for (let i = 0; i < 1000; i++) {
         calculateInitiative(scores, ['Alert'], []);
       }
-      
+
       const end = performance.now();
       const duration = end - start;
-      
+
       // Should complete 1000 calls in under 50ms
       expect(duration).toBeLessThan(50);
     });
@@ -184,14 +202,14 @@ describe('calculateInitiative', () => {
     it('should be fast for 1000 calls without Alert', () => {
       const scores = makeScores({ Dexterity: 14 });
       const start = performance.now();
-      
+
       for (let i = 0; i < 1000; i++) {
         calculateInitiative(scores, [], []);
       }
-      
+
       const end = performance.now();
       const duration = end - start;
-      
+
       // Should complete 1000 calls in under 50ms
       expect(duration).toBeLessThan(50);
     });

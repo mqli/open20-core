@@ -13,6 +13,6 @@ export interface ICharacterStorage {
 export interface CharacterSummary {
   id: string;
   name: string;
-  classSummary: string;   // "Fighter 5" or "Fighter 5 / Wizard 2"
+  classSummary: string; // "Fighter 5" or "Fighter 5 / Wizard 2"
   lastModified: string;
 }

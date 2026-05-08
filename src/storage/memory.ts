@@ -35,7 +35,7 @@ export class InMemoryStorage implements ICharacterStorage {
 
 function buildClassSummary(char: Character): string {
   return char.classes
-    .map((c) => {
+    .map(c => {
       const parts = [c.classId, String(c.level)];
       return parts.join(' ');
     })

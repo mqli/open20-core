@@ -79,7 +79,12 @@ const BARBARIAN_FEATURES_L1: Feature[] = [
 
 const WIZARD_FEATURES_L1: Feature[] = [
   { name: 'Spellcasting', description: 'Cast wizard spells', level: 1 },
-  { name: 'Arcane Recovery', description: 'Recover spell slots', resourceId: 'Arcane Recovery', level: 1 },
+  {
+    name: 'Arcane Recovery',
+    description: 'Recover spell slots',
+    resourceId: 'Arcane Recovery',
+    level: 1,
+  },
 ];
 
 const CHAMPION_FEATURES_L3: Feature[] = [
@@ -87,7 +92,11 @@ const CHAMPION_FEATURES_L3: Feature[] = [
 ];
 
 const CHAMPION_FEATURES_L7: Feature[] = [
-  { name: 'Remarkable Athlete', description: 'Add half proficiency to Str/Dex/Con checks', level: 7 },
+  {
+    name: 'Remarkable Athlete',
+    description: 'Add half proficiency to Str/Dex/Con checks',
+    level: 7,
+  },
 ];
 
 const CHAMPION_SUBCLASS: Subclass = {
@@ -102,6 +111,7 @@ const CHAMPION_SUBCLASS: Subclass = {
 
 const FIGHTER_CLASS: Class = {
   id: 'Fighter',
+  name: 'Fighter',
   source: '2024 PHB',
   hitDie: 'd10',
   savingThrowProficiencies: ['Strength', 'Constitution'],
@@ -116,6 +126,7 @@ const FIGHTER_CLASS: Class = {
 
 const BARBARIAN_CLASS: Class = {
   id: 'Barbarian',
+  name: 'Barbarian',
   source: '2024 PHB',
   hitDie: 'd12',
   savingThrowProficiencies: ['Strength', 'Constitution'],
@@ -127,6 +138,7 @@ const BARBARIAN_CLASS: Class = {
 
 const WIZARD_CLASS: Class = {
   id: 'Wizard',
+  name: 'Wizard',
   source: '2024 PHB',
   hitDie: 'd6',
   savingThrowProficiencies: ['Intelligence', 'Wisdom'],
@@ -142,6 +154,7 @@ const WARLOCK_FEATURES_L1: Feature[] = [
 
 const WARLOCK_CLASS: Class = {
   id: 'Warlock',
+  name: 'Warlock',
   source: '2024 PHB',
   hitDie: 'd8',
   savingThrowProficiencies: ['Wisdom', 'Charisma'],
@@ -220,7 +233,9 @@ function createMockDataLoader(): DataLoader {
       if (nonCasters.includes(classId)) {
         return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
       }
-      return fullCasterSlots[classLevel] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+      return (
+        fullCasterSlots[classLevel] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
+      );
     },
     getMulticlassSpellSlots: (level: number) => {
       // Standard multiclass spell slot table
@@ -253,13 +268,23 @@ describe('recomputeDerivedStats', () => {
   const data = createMockDataLoader();
 
   it('recalculates proficiency bonus', () => {
-    let char = createCharacter({
-      name: 'Test',
-      speciesId: 'Human',
-      backgroundId: 'Soldier',
-      classId: 'Fighter',
-      abilityScores: { Strength: 15, Dexterity: 14, Constitution: 15, Intelligence: 8, Wisdom: 12, Charisma: 10 },
-    }, data);
+    let char = createCharacter(
+      {
+        name: 'Test',
+        speciesId: 'Human',
+        backgroundId: 'Soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 14,
+          Constitution: 15,
+          Intelligence: 8,
+          Wisdom: 12,
+          Charisma: 10,
+        },
+      },
+      data
+    );
 
     // Level 1 → PB = 2
     expect(char.combatStats.proficiencyBonus).toBe(2);
@@ -272,13 +297,23 @@ describe('recomputeDerivedStats', () => {
   });
 
   it('recalculates AC', () => {
-    let char = createCharacter({
-      name: 'Test',
-      speciesId: 'Human',
-      backgroundId: 'Soldier',
-      classId: 'Fighter',
-      abilityScores: { Strength: 15, Dexterity: 14, Constitution: 15, Intelligence: 8, Wisdom: 12, Charisma: 10 },
-    }, data);
+    let char = createCharacter(
+      {
+        name: 'Test',
+        speciesId: 'Human',
+        backgroundId: 'Soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 14,
+          Constitution: 15,
+          Intelligence: 8,
+          Wisdom: 12,
+          Charisma: 10,
+        },
+      },
+      data
+    );
 
     // Unarmored: 10 + Dex(+2) = 12
     expect(char.combatStats.AC).toBe(12);
@@ -294,13 +329,23 @@ describe('recomputeDerivedStats', () => {
   });
 
   it('recalculates initiative', () => {
-    let char = createCharacter({
-      name: 'Test',
-      speciesId: 'Human',
-      backgroundId: 'Soldier',
-      classId: 'Fighter',
-      abilityScores: { Strength: 15, Dexterity: 14, Constitution: 15, Intelligence: 8, Wisdom: 12, Charisma: 10 },
-    }, data);
+    let char = createCharacter(
+      {
+        name: 'Test',
+        speciesId: 'Human',
+        backgroundId: 'Soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 14,
+          Constitution: 15,
+          Intelligence: 8,
+          Wisdom: 12,
+          Charisma: 10,
+        },
+      },
+      data
+    );
 
     // Dex 14 → +2
     expect(char.combatStats.initiative).toBe(2);
@@ -313,14 +358,24 @@ describe('recomputeDerivedStats', () => {
   });
 
   it('recalculates passive perception', () => {
-    let char = createCharacter({
-      name: 'Test',
-      speciesId: 'Human',
-      backgroundId: 'Soldier',
-      classId: 'Fighter',
-      abilityScores: { Strength: 15, Dexterity: 14, Constitution: 15, Intelligence: 8, Wisdom: 12, Charisma: 10 },
-      skillChoices: ['Perception'],
-    }, data);
+    let char = createCharacter(
+      {
+        name: 'Test',
+        speciesId: 'Human',
+        backgroundId: 'Soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 14,
+          Constitution: 15,
+          Intelligence: 8,
+          Wisdom: 12,
+          Charisma: 10,
+        },
+        skillChoices: ['Perception'],
+      },
+      data
+    );
 
     // Wis 12 → +1, proficient, PB 2 → 10 + 1 + 2 = 13
     expect(char.combatStats.passivePerception).toBe(13);
@@ -337,13 +392,23 @@ describe('recomputeDerivedStats', () => {
   });
 
   it('recalculates max HP', () => {
-    let char = createCharacter({
-      name: 'Test',
-      speciesId: 'Human',
-      backgroundId: 'Soldier',
-      classId: 'Fighter',
-      abilityScores: { Strength: 15, Dexterity: 14, Constitution: 15, Intelligence: 8, Wisdom: 12, Charisma: 10 },
-    }, data);
+    let char = createCharacter(
+      {
+        name: 'Test',
+        speciesId: 'Human',
+        backgroundId: 'Soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 14,
+          Constitution: 15,
+          Intelligence: 8,
+          Wisdom: 12,
+          Charisma: 10,
+        },
+      },
+      data
+    );
 
     // Level 1 Fighter, Con 15 → +2, d10: 10+2 = 12
     expect(char.hitPoints.max).toBe(12);
@@ -357,13 +422,23 @@ describe('recomputeDerivedStats', () => {
   });
 
   it('caps current HP at new max', () => {
-    let char = createCharacter({
-      name: 'Test',
-      speciesId: 'Human',
-      backgroundId: 'Soldier',
-      classId: 'Fighter',
-      abilityScores: { Strength: 15, Dexterity: 14, Constitution: 15, Intelligence: 8, Wisdom: 12, Charisma: 10 },
-    }, data);
+    let char = createCharacter(
+      {
+        name: 'Test',
+        speciesId: 'Human',
+        backgroundId: 'Soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 14,
+          Constitution: 15,
+          Intelligence: 8,
+          Wisdom: 12,
+          Charisma: 10,
+        },
+      },
+      data
+    );
 
     // Set current HP to max
     const mutated = mutate(char);
@@ -381,13 +456,23 @@ describe('recomputeDerivedStats', () => {
   });
 
   it('recalculates spell save DC', () => {
-    let char = createCharacter({
-      name: 'Test',
-      speciesId: 'Human',
-      backgroundId: 'Sage',
-      classId: 'Wizard',
-      abilityScores: { Strength: 8, Dexterity: 14, Constitution: 12, Intelligence: 15, Wisdom: 13, Charisma: 10 },
-    }, data);
+    let char = createCharacter(
+      {
+        name: 'Test',
+        speciesId: 'Human',
+        backgroundId: 'Sage',
+        classId: 'Wizard',
+        abilityScores: {
+          Strength: 8,
+          Dexterity: 14,
+          Constitution: 12,
+          Intelligence: 15,
+          Wisdom: 13,
+          Charisma: 10,
+        },
+      },
+      data
+    );
 
     // Int 15 → +2, PB 2, DC = 8 + 2 + 2 = 12
     expect(char.spells.spellSaveDC).toBe(12);
@@ -404,13 +489,23 @@ describe('recomputeDerivedStats', () => {
   });
 
   it('recalculates spell attack bonus', () => {
-    let char = createCharacter({
-      name: 'Test',
-      speciesId: 'Human',
-      backgroundId: 'Sage',
-      classId: 'Wizard',
-      abilityScores: { Strength: 8, Dexterity: 14, Constitution: 12, Intelligence: 15, Wisdom: 13, Charisma: 10 },
-    }, data);
+    let char = createCharacter(
+      {
+        name: 'Test',
+        speciesId: 'Human',
+        backgroundId: 'Sage',
+        classId: 'Wizard',
+        abilityScores: {
+          Strength: 8,
+          Dexterity: 14,
+          Constitution: 12,
+          Intelligence: 15,
+          Wisdom: 13,
+          Charisma: 10,
+        },
+      },
+      data
+    );
 
     // Int 15 → +2, PB 2, Attack = 2 + 2 = 4
     expect(char.spells.spellAttackBonus).toBe(4);
@@ -424,13 +519,23 @@ describe('recomputeDerivedStats', () => {
   });
 
   it('updates spell slot totals', () => {
-    let char = createCharacter({
-      name: 'Test',
-      speciesId: 'Human',
-      backgroundId: 'Sage',
-      classId: 'Wizard',
-      abilityScores: { Strength: 8, Dexterity: 14, Constitution: 12, Intelligence: 15, Wisdom: 13, Charisma: 10 },
-    }, data);
+    let char = createCharacter(
+      {
+        name: 'Test',
+        speciesId: 'Human',
+        backgroundId: 'Sage',
+        classId: 'Wizard',
+        abilityScores: {
+          Strength: 8,
+          Dexterity: 14,
+          Constitution: 12,
+          Intelligence: 15,
+          Wisdom: 13,
+          Charisma: 10,
+        },
+      },
+      data
+    );
 
     // Level 1: 2 level-1 slots
     expect(char.spells.spellSlots[1].total).toBe(2);
@@ -444,13 +549,23 @@ describe('recomputeDerivedStats', () => {
   });
 
   it('preserves used counts where possible', () => {
-    let char = createCharacter({
-      name: 'Test',
-      speciesId: 'Human',
-      backgroundId: 'Sage',
-      classId: 'Wizard',
-      abilityScores: { Strength: 8, Dexterity: 14, Constitution: 12, Intelligence: 15, Wisdom: 13, Charisma: 10 },
-    }, data);
+    let char = createCharacter(
+      {
+        name: 'Test',
+        speciesId: 'Human',
+        backgroundId: 'Sage',
+        classId: 'Wizard',
+        abilityScores: {
+          Strength: 8,
+          Dexterity: 14,
+          Constitution: 12,
+          Intelligence: 15,
+          Wisdom: 13,
+          Charisma: 10,
+        },
+      },
+      data
+    );
 
     // Use 1 slot
     const mutated = mutate(char);
@@ -468,13 +583,23 @@ describe('recomputeDerivedStats', () => {
   });
 
   it('after level up, combat stats reflect new level', () => {
-    let char = createCharacter({
-      name: 'Test',
-      speciesId: 'Human',
-      backgroundId: 'Soldier',
-      classId: 'Fighter',
-      abilityScores: { Strength: 15, Dexterity: 14, Constitution: 15, Intelligence: 8, Wisdom: 12, Charisma: 10 },
-    }, data);
+    let char = createCharacter(
+      {
+        name: 'Test',
+        speciesId: 'Human',
+        backgroundId: 'Soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 14,
+          Constitution: 15,
+          Intelligence: 8,
+          Wisdom: 12,
+          Charisma: 10,
+        },
+      },
+      data
+    );
 
     // Level 1
     expect(char.combatStats.proficiencyBonus).toBe(2);
@@ -490,13 +615,23 @@ describe('recomputeDerivedStats', () => {
   });
 
   it('includes features from subclass', () => {
-    let char = createCharacter({
-      name: 'Test',
-      speciesId: 'Human',
-      backgroundId: 'Soldier',
-      classId: 'Fighter',
-      abilityScores: { Strength: 15, Dexterity: 14, Constitution: 15, Intelligence: 8, Wisdom: 12, Charisma: 10 },
-    }, data);
+    let char = createCharacter(
+      {
+        name: 'Test',
+        speciesId: 'Human',
+        backgroundId: 'Soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 14,
+          Constitution: 15,
+          Intelligence: 8,
+          Wisdom: 12,
+          Charisma: 10,
+        },
+      },
+      data
+    );
 
     // Add subclass and level up to 7
     const mutated = mutate(char);

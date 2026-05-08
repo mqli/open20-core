@@ -106,7 +106,9 @@ function createMockDataLoader(): DataLoader {
       if (nonCasters.includes(classId)) {
         return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
       }
-      return fullCasterSlots[classLevel] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+      return (
+        fullCasterSlots[classLevel] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
+      );
     },
 
     getMulticlassSpellSlots(level: number): Record<number, number> {
@@ -123,31 +125,81 @@ function createMockDataLoader(): DataLoader {
     },
 
     // 以下方法在测试中不会被调用，返回默认值
-    getSpecies(): undefined { return undefined; },
-    getSpeciesSubtype(): undefined { return undefined; },
-    getAllSpecies(): never[] { return []; },
-    getBackground(): undefined { return undefined; },
-    getAllBackgrounds(): never[] { return []; },
-    getAllClasses(): never[] { return []; },
-    getSubclass(): undefined { return undefined; },
-    getSubclassesForClass(): never[] { return []; },
-    getAllSubclasses(): never[] { return []; },
-    getFeat(): undefined { return undefined; },
-    getFeatsByCategory(): never[] { return []; },
-    getAllFeats(): never[] { return []; },
-    getWeapon(): undefined { return undefined; },
-    getAllWeapons(): never[] { return []; },
-    getArmor(): undefined { return undefined; },
-    getAllArmor(): never[] { return []; },
-    getGearItem(): undefined { return undefined; },
-    getAllGear(): never[] { return []; },
-    getSpell(): undefined { return undefined; },
-    getSpellsByLevel(): never[] { return []; },
-    getAllSpells(): never[] { return []; },
-    getProficiencyBonus(): 0 { return 0; },
-    getHitDieFixedValue(): 0 { return 0; },
-    getWeaponMasteryProperties(): readonly string[] { return []; },
-    getConditionNames(): readonly string[] { return []; },
+    getSpecies(): undefined {
+      return undefined;
+    },
+    getSpeciesSubtype(): undefined {
+      return undefined;
+    },
+    getAllSpecies(): never[] {
+      return [];
+    },
+    getBackground(): undefined {
+      return undefined;
+    },
+    getAllBackgrounds(): never[] {
+      return [];
+    },
+    getAllClasses(): never[] {
+      return [];
+    },
+    getSubclass(): undefined {
+      return undefined;
+    },
+    getSubclassesForClass(): never[] {
+      return [];
+    },
+    getAllSubclasses(): never[] {
+      return [];
+    },
+    getFeat(): undefined {
+      return undefined;
+    },
+    getFeatsByCategory(): never[] {
+      return [];
+    },
+    getAllFeats(): never[] {
+      return [];
+    },
+    getWeapon(): undefined {
+      return undefined;
+    },
+    getAllWeapons(): never[] {
+      return [];
+    },
+    getArmor(): undefined {
+      return undefined;
+    },
+    getAllArmor(): never[] {
+      return [];
+    },
+    getGearItem(): undefined {
+      return undefined;
+    },
+    getAllGear(): never[] {
+      return [];
+    },
+    getSpell(): undefined {
+      return undefined;
+    },
+    getSpellsByLevel(): never[] {
+      return [];
+    },
+    getAllSpells(): never[] {
+      return [];
+    },
+    getProficiencyBonus(): 0 {
+      return 0;
+    },
+    getHitDieFixedValue(): 0 {
+      return 0;
+    },
+    getWeaponMasteryProperties(): readonly string[] {
+      return [];
+    },
+    getConditionNames(): readonly string[] {
+      return [];
+    },
   };
 }
 

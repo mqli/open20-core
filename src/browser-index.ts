@@ -25,8 +25,18 @@ export { getProficiencyBonus } from './engine';
 export { getSkillBonus, getAllSkillBonuses } from './engine';
 export { getSavingThrowBonus } from './engine';
 export { calculateAC } from './engine';
-export { getHitDieFixedValue, calculateHPAtLevel1, calculateHPIncrement, calculateMaxHP } from './engine';
-export { calculateSpellSlots, calculatePactMagic, getMulticlassSpellcasterLevel, calculateMulticlassSpellSlots } from './engine';
+export {
+  getHitDieFixedValue,
+  calculateHPAtLevel1,
+  calculateHPIncrement,
+  calculateMaxHP,
+} from './engine';
+export {
+  calculateSpellSlots,
+  calculatePactMagic,
+  getMulticlassSpellcasterLevel,
+  calculateMulticlassSpellSlots,
+} from './engine';
 export type { SpellSlotEntry as SpellSlotEntryEngine, PactMagicResult } from './engine';
 export { calculateInitiative } from './engine';
 export { calculatePassivePerception } from './engine';
@@ -37,11 +47,22 @@ export { createCharacter } from './character';
 export { levelUp } from './character';
 export { shortRest, longRest } from './character';
 export {
-  modifyHP, setTemporaryHP, consumeResource, recoverResource,
-  consumeSpellSlot, recoverSpellSlot, toggleCondition,
-  equipItem, unequipItem, equipItemAndRecompute, unequipItemAndRecompute,
-  prepareSpell, unprepareSpell,
-  addEquipment, removeEquipment, modifyCurrency,
+  modifyHP,
+  setTemporaryHP,
+  consumeResource,
+  recoverResource,
+  consumeSpellSlot,
+  recoverSpellSlot,
+  toggleCondition,
+  equipItem,
+  unequipItem,
+  equipItemAndRecompute,
+  unequipItemAndRecompute,
+  prepareSpell,
+  unprepareSpell,
+  addEquipment,
+  removeEquipment,
+  modifyCurrency,
 } from './character';
 export { validateCharacter } from './character';
 export { recomputeDerivedStats } from './character';

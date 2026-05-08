@@ -33,13 +33,13 @@ export function calculateAC(
   scores: AbilityScores,
   equipment: readonly EquipmentItem[],
   features: readonly Feature[],
-  data: DataLoader,
+  data: DataLoader
 ): number {
   const dexMod = getModifier(getTotalScore(scores, 'Dexterity'));
   const conMod = getModifier(getTotalScore(scores, 'Constitution'));
   const wisMod = getModifier(getTotalScore(scores, 'Wisdom'));
 
-  const featureNames = new Set(features.map((f) => f.name));
+  const featureNames = new Set(features.map(f => f.name));
 
   // 1. 收集所有装备的护甲和盾牌
   const equippedArmor = getEquippedArmor(equipment, data);
@@ -62,7 +62,10 @@ export function calculateAC(
   }
 
   // Monk Unarmored Defense: 10 + Dex + Wis
-  if (featureNames.has('Unarmored Defense (Monk)') || featureNames.has('Unarmored Defense [Monk]')) {
+  if (
+    featureNames.has('Unarmored Defense (Monk)') ||
+    featureNames.has('Unarmored Defense [Monk]')
+  ) {
     acOptions.push(10 + dexMod + wisMod);
   }
 
@@ -103,24 +106,18 @@ function calculateArmorAC(armor: Armor, dexMod: number): number {
 /**
  * 获取所有已装备的护甲（非盾牌）
  */
-function getEquippedArmor(
-  equipment: readonly EquipmentItem[],
-  data: DataLoader,
-): Armor[] {
+function getEquippedArmor(equipment: readonly EquipmentItem[], data: DataLoader): Armor[] {
   return equipment
-    .filter((e) => e.equipped && e.type === 'armor')
-    .map((e) => data.getArmor(e.id))
+    .filter(e => e.equipped && e.type === 'armor')
+    .map(e => data.getArmor(e.id))
     .filter((a): a is Armor => a != null && a.category !== 'Shield');
 }
 
 /**
  * 检查是否装备了盾牌
  */
-function hasEquippedShield(
-  equipment: readonly EquipmentItem[],
-  data: DataLoader,
-): boolean {
-  return equipment.some((e) => {
+function hasEquippedShield(equipment: readonly EquipmentItem[], data: DataLoader): boolean {
+  return equipment.some(e => {
     if (!e.equipped || e.type !== 'armor') return false;
     const armor = data.getArmor(e.id);
     return armor != null && armor.category === 'Shield';

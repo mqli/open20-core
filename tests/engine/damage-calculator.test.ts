@@ -210,7 +210,11 @@ describe('calculateTypedDamage', () => {
 
   describe('edge cases', () => {
     it('handles very large damage numbers', () => {
-      const result = calculateTypedDamage(999999, 'Fire', { resistances: ['Fire'], immunities: [], vulnerabilities: [] });
+      const result = calculateTypedDamage(999999, 'Fire', {
+        resistances: ['Fire'],
+        immunities: [],
+        vulnerabilities: [],
+      });
       expect(result.effectiveDamage).toBe(499999);
     });
 
@@ -243,21 +247,24 @@ describe('calculateTypedDamage', () => {
 describe('getActiveDamageDefenses', () => {
   describe('Dwarf species resistance', () => {
     it('should detect Poison resistance from Dwarf species', () => {
-      const dwarf = createCharacter({
-        name: 'Thorin',
-        speciesId: 'Dwarf',
-        speciesSubtypeId: 'Hill Dwarf',
-        backgroundId: 'soldier',
-        classId: 'Fighter',
-        abilityScores: {
-          Strength: 15,
-          Dexterity: 10,
-          Constitution: 16,
-          Intelligence: 8,
-          Wisdom: 13,
-          Charisma: 11
-        }
-      }, dataLoader);
+      const dwarf = createCharacter(
+        {
+          name: 'Thorin',
+          speciesId: 'Dwarf',
+          speciesSubtypeId: 'Hill Dwarf',
+          backgroundId: 'soldier',
+          classId: 'Fighter',
+          abilityScores: {
+            Strength: 15,
+            Dexterity: 10,
+            Constitution: 16,
+            Intelligence: 8,
+            Wisdom: 13,
+            Charisma: 11,
+          },
+        },
+        dataLoader
+      );
 
       const { defenses, sources } = getActiveDamageDefenses(dwarf, dataLoader);
 
@@ -269,21 +276,24 @@ describe('getActiveDamageDefenses', () => {
     });
 
     it('should aggregate defenses from Hill Dwarf correctly', () => {
-      const dwarf = createCharacter({
-        name: 'Gimli',
-        speciesId: 'Dwarf',
-        speciesSubtypeId: 'Hill Dwarf',
-        backgroundId: 'soldier',
-        classId: 'Fighter',
-        abilityScores: {
-          Strength: 16,
-          Dexterity: 10,
-          Constitution: 16,
-          Intelligence: 8,
-          Wisdom: 13,
-          Charisma: 11
-        }
-      }, dataLoader);
+      const dwarf = createCharacter(
+        {
+          name: 'Gimli',
+          speciesId: 'Dwarf',
+          speciesSubtypeId: 'Hill Dwarf',
+          backgroundId: 'soldier',
+          classId: 'Fighter',
+          abilityScores: {
+            Strength: 16,
+            Dexterity: 10,
+            Constitution: 16,
+            Intelligence: 8,
+            Wisdom: 13,
+            Charisma: 11,
+          },
+        },
+        dataLoader
+      );
 
       const { defenses } = getActiveDamageDefenses(dwarf, dataLoader);
 
@@ -294,20 +304,23 @@ describe('getActiveDamageDefenses', () => {
 
   describe('Human has no innate defenses', () => {
     it('should return empty defenses for Human', () => {
-      const human = createCharacter({
-        name: 'Bob',
-        speciesId: 'Human',
-        backgroundId: 'soldier',
-        classId: 'Fighter',
-        abilityScores: {
-          Strength: 15,
-          Dexterity: 13,
-          Constitution: 14,
-          Intelligence: 10,
-          Wisdom: 12,
-          Charisma: 8
-        }
-      }, dataLoader);
+      const human = createCharacter(
+        {
+          name: 'Bob',
+          speciesId: 'Human',
+          backgroundId: 'soldier',
+          classId: 'Fighter',
+          abilityScores: {
+            Strength: 15,
+            Dexterity: 13,
+            Constitution: 14,
+            Intelligence: 10,
+            Wisdom: 12,
+            Charisma: 8,
+          },
+        },
+        dataLoader
+      );
 
       const { defenses, sources } = getActiveDamageDefenses(human, dataLoader);
 
@@ -321,20 +334,23 @@ describe('getActiveDamageDefenses', () => {
 
 describe('Rage condition integration', () => {
   it('should NOT apply B/P/S resistance when not raging', () => {
-    const barbarian = createCharacter({
-      name: 'Kroth',
-      speciesId: 'Human',
-      backgroundId: 'soldier',
-      classId: 'Barbarian',
-      abilityScores: {
-        Strength: 16,
-        Dexterity: 12,
-        Constitution: 16,
-        Intelligence: 8,
-        Wisdom: 10,
-        Charisma: 8
-      }
-    }, dataLoader);
+    const barbarian = createCharacter(
+      {
+        name: 'Kroth',
+        speciesId: 'Human',
+        backgroundId: 'soldier',
+        classId: 'Barbarian',
+        abilityScores: {
+          Strength: 16,
+          Dexterity: 12,
+          Constitution: 16,
+          Intelligence: 8,
+          Wisdom: 10,
+          Charisma: 8,
+        },
+      },
+      dataLoader
+    );
 
     const { defenses } = getActiveDamageDefenses(barbarian, dataLoader);
 
@@ -345,32 +361,38 @@ describe('Rage condition integration', () => {
   });
 
   it('should apply B/P/S resistance when Raging condition is active', () => {
-    let barbarian = createCharacter({
-      name: 'Kroth',
-      speciesId: 'Human',
-      backgroundId: 'soldier',
-      classId: 'Barbarian',
-      abilityScores: {
-        Strength: 16,
-        Dexterity: 12,
-        Constitution: 16,
-        Intelligence: 8,
-        Wisdom: 10,
-        Charisma: 8
-      }
-    }, dataLoader);
+    let barbarian = createCharacter(
+      {
+        name: 'Kroth',
+        speciesId: 'Human',
+        backgroundId: 'soldier',
+        classId: 'Barbarian',
+        abilityScores: {
+          Strength: 16,
+          Dexterity: 12,
+          Constitution: 16,
+          Intelligence: 8,
+          Wisdom: 10,
+          Charisma: 8,
+        },
+      },
+      dataLoader
+    );
 
     // Add Raging condition
     barbarian = modifyHP(barbarian, 0); // No HP change, just trigger withUpdate
     // Manually add the Raging condition
     barbarian = {
       ...barbarian,
-      conditions: [...barbarian.conditions, {
-        id: 'Raging' as any,
-        source: 'Player',
-        appliedAt: new Date().toISOString()
-      }],
-      updatedAt: new Date().toISOString()
+      conditions: [
+        ...barbarian.conditions,
+        {
+          id: 'Raging' as any,
+          source: 'Player',
+          appliedAt: new Date().toISOString(),
+        },
+      ],
+      updatedAt: new Date().toISOString(),
     };
 
     const { defenses, sources } = getActiveDamageDefenses(barbarian, dataLoader);
@@ -379,7 +401,7 @@ describe('Rage condition integration', () => {
     expect(defenses.resistances).toContain('Bludgeoning');
     expect(defenses.resistances).toContain('Piercing');
     expect(defenses.resistances).toContain('Slashing');
-    
+
     // Should have rage source
     const rageSource = sources.find(s => s.source.includes('Rage'));
     expect(rageSource).toBeDefined();
@@ -387,34 +409,45 @@ describe('Rage condition integration', () => {
   });
 
   it('should apply resistance correctly to physical damage while raging', () => {
-    let barbarian = createCharacter({
-      name: 'Kroth',
-      speciesId: 'Human',
-      backgroundId: 'soldier',
-      classId: 'Barbarian',
-      abilityScores: {
-        Strength: 16,
-        Dexterity: 12,
-        Constitution: 16,
-        Intelligence: 8,
-        Wisdom: 10,
-        Charisma: 8
-      }
-    }, dataLoader);
+    let barbarian = createCharacter(
+      {
+        name: 'Kroth',
+        speciesId: 'Human',
+        backgroundId: 'soldier',
+        classId: 'Barbarian',
+        abilityScores: {
+          Strength: 16,
+          Dexterity: 12,
+          Constitution: 16,
+          Intelligence: 8,
+          Wisdom: 10,
+          Charisma: 8,
+        },
+      },
+      dataLoader
+    );
 
     // Add Raging condition
     barbarian = {
       ...barbarian,
-      conditions: [...barbarian.conditions, {
-        id: 'Raging' as any,
-        source: 'Player',
-        appliedAt: new Date().toISOString()
-      }],
-      updatedAt: new Date().toISOString()
+      conditions: [
+        ...barbarian.conditions,
+        {
+          id: 'Raging' as any,
+          source: 'Player',
+          appliedAt: new Date().toISOString(),
+        },
+      ],
+      updatedAt: new Date().toISOString(),
     };
 
     // Take 10 slashing damage while raging
-    const { char: damaged, result } = applyDamageWithDefenses(barbarian, 10, 'Slashing', dataLoader);
+    const { char: damaged, result } = applyDamageWithDefenses(
+      barbarian,
+      10,
+      'Slashing',
+      dataLoader
+    );
 
     // Should be halved due to rage resistance
     expect(result.originalDamage).toBe(10);
@@ -424,30 +457,36 @@ describe('Rage condition integration', () => {
   });
 
   it('should NOT apply rage resistance to non-physical damage', () => {
-    let barbarian = createCharacter({
-      name: 'Kroth',
-      speciesId: 'Human',
-      backgroundId: 'soldier',
-      classId: 'Barbarian',
-      abilityScores: {
-        Strength: 16,
-        Dexterity: 12,
-        Constitution: 16,
-        Intelligence: 8,
-        Wisdom: 10,
-        Charisma: 8
-      }
-    }, dataLoader);
+    let barbarian = createCharacter(
+      {
+        name: 'Kroth',
+        speciesId: 'Human',
+        backgroundId: 'soldier',
+        classId: 'Barbarian',
+        abilityScores: {
+          Strength: 16,
+          Dexterity: 12,
+          Constitution: 16,
+          Intelligence: 8,
+          Wisdom: 10,
+          Charisma: 8,
+        },
+      },
+      dataLoader
+    );
 
     // Add Raging condition
     barbarian = {
       ...barbarian,
-      conditions: [...barbarian.conditions, {
-        id: 'Raging' as any,
-        source: 'Player',
-        appliedAt: new Date().toISOString()
-      }],
-      updatedAt: new Date().toISOString()
+      conditions: [
+        ...barbarian.conditions,
+        {
+          id: 'Raging' as any,
+          source: 'Player',
+          appliedAt: new Date().toISOString(),
+        },
+      ],
+      updatedAt: new Date().toISOString(),
     };
 
     // Take 10 fire damage while raging (rage doesn't protect from fire)
@@ -461,24 +500,31 @@ describe('Rage condition integration', () => {
 
 describe('applyDamageWithDefenses', () => {
   it('should apply damage and return defenses used', () => {
-    const dwarf = createCharacter({
-      name: 'Thorin',
-      speciesId: 'Dwarf',
-      speciesSubtypeId: 'Hill Dwarf',
-      backgroundId: 'soldier',
-      classId: 'Fighter',
-      abilityScores: {
-        Strength: 15,
-        Dexterity: 10,
-        Constitution: 16,
-        Intelligence: 8,
-        Wisdom: 13,
-        Charisma: 11
-      }
-    }, dataLoader);
+    const dwarf = createCharacter(
+      {
+        name: 'Thorin',
+        speciesId: 'Dwarf',
+        speciesSubtypeId: 'Hill Dwarf',
+        backgroundId: 'soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 10,
+          Constitution: 16,
+          Intelligence: 8,
+          Wisdom: 13,
+          Charisma: 11,
+        },
+      },
+      dataLoader
+    );
 
     const originalHP = dwarf.hitPoints.current;
-    const { char: damaged, result, defenses } = applyDamageWithDefenses(dwarf, 10, 'Poison', dataLoader);
+    const {
+      char: damaged,
+      result,
+      defenses,
+    } = applyDamageWithDefenses(dwarf, 10, 'Poison', dataLoader);
 
     // Poison damage should be halved
     expect(result.effectiveDamage).toBe(5);
@@ -487,21 +533,24 @@ describe('applyDamageWithDefenses', () => {
   });
 
   it('should handle immunity from defenses', () => {
-    let dwarf = createCharacter({
-      name: 'Thorin',
-      speciesId: 'Dwarf',
-      speciesSubtypeId: 'Hill Dwarf',
-      backgroundId: 'soldier',
-      classId: 'Fighter',
-      abilityScores: {
-        Strength: 15,
-        Dexterity: 10,
-        Constitution: 16,
-        Intelligence: 8,
-        Wisdom: 13,
-        Charisma: 11
-      }
-    }, dataLoader);
+    let dwarf = createCharacter(
+      {
+        name: 'Thorin',
+        speciesId: 'Dwarf',
+        speciesSubtypeId: 'Hill Dwarf',
+        backgroundId: 'soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 10,
+          Constitution: 16,
+          Intelligence: 8,
+          Wisdom: 13,
+          Charisma: 11,
+        },
+      },
+      dataLoader
+    );
 
     // Add custom immunity to fire
     dwarf = {
@@ -511,7 +560,7 @@ describe('applyDamageWithDefenses', () => {
         immunities: ['Fire'],
         vulnerabilities: [],
       },
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     const { char: damaged, result } = applyDamageWithDefenses(dwarf, 100, 'Fire', dataLoader);
@@ -523,21 +572,24 @@ describe('applyDamageWithDefenses', () => {
 
 describe('getDamageDefenses (convenience function)', () => {
   it('should return only defenses without sources', () => {
-    const dwarf = createCharacter({
-      name: 'Thorin',
-      speciesId: 'Dwarf',
-      speciesSubtypeId: 'Hill Dwarf',
-      backgroundId: 'soldier',
-      classId: 'Fighter',
-      abilityScores: {
-        Strength: 15,
-        Dexterity: 10,
-        Constitution: 16,
-        Intelligence: 8,
-        Wisdom: 13,
-        Charisma: 11
-      }
-    }, dataLoader);
+    const dwarf = createCharacter(
+      {
+        name: 'Thorin',
+        speciesId: 'Dwarf',
+        speciesSubtypeId: 'Hill Dwarf',
+        backgroundId: 'soldier',
+        classId: 'Fighter',
+        abilityScores: {
+          Strength: 15,
+          Dexterity: 10,
+          Constitution: 16,
+          Intelligence: 8,
+          Wisdom: 13,
+          Charisma: 11,
+        },
+      },
+      dataLoader
+    );
 
     const defenses = getDamageDefenses(dwarf, dataLoader);
 

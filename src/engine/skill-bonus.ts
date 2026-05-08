@@ -34,7 +34,7 @@ export function getSkillBonus(
   scores: AbilityScores,
   skill: SkillEntry,
   abilityName: import('../types/ability').AbilityName,
-  proficiencyBonus: number,
+  proficiencyBonus: number
 ): number {
   const abilityModifier = getModifier(getTotalScore(scores, abilityName));
 
@@ -60,7 +60,7 @@ export function getAllSkillBonuses(
   scores: AbilityScores,
   skills: Record<string, SkillEntry>,
   skillAbilityMap: Record<string, import('../types/ability').AbilityName>,
-  proficiencyBonus: number,
+  proficiencyBonus: number
 ): Record<string, number> {
   const result: Record<string, number> = {};
   for (const [skillName, entry] of Object.entries(skills)) {

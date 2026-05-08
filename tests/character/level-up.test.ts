@@ -41,9 +41,7 @@ function makeWizardClass(): Class {
   featuresByLevel.set(1, [
     { name: 'Spellcasting', description: 'Cast wizard spells', resourceId: 'Arcane Recovery' },
   ]);
-  featuresByLevel.set(2, [
-    { name: 'Scholar', description: 'Gain expertise in a skill' },
-  ]);
+  featuresByLevel.set(2, [{ name: 'Scholar', description: 'Gain expertise in a skill' }]);
   return {
     id: 'Wizard',
     source: '2024 PHB',
@@ -122,7 +120,14 @@ function makeLevel1Fighter(overrides?: Partial<Character>): Character {
       },
     ],
     abilityScores: {
-      base: { Strength: 16, Dexterity: 14, Constitution: 15, Intelligence: 10, Wisdom: 12, Charisma: 8 },
+      base: {
+        Strength: 16,
+        Dexterity: 14,
+        Constitution: 15,
+        Intelligence: 10,
+        Wisdom: 12,
+        Charisma: 8,
+      },
       racialBonuses: { Strength: 1, Constitution: 1 },
       featBonuses: {},
       temporaryBonuses: {},
@@ -187,7 +192,14 @@ function makeLevel1Wizard(): Character {
       },
     ],
     abilityScores: {
-      base: { Strength: 8, Dexterity: 14, Constitution: 12, Intelligence: 15, Wisdom: 13, Charisma: 10 },
+      base: {
+        Strength: 8,
+        Dexterity: 14,
+        Constitution: 12,
+        Intelligence: 15,
+        Wisdom: 13,
+        Charisma: 10,
+      },
       racialBonuses: { Intelligence: 2 },
       featBonuses: {},
       temporaryBonuses: {},
@@ -251,12 +263,7 @@ describe('levelUp', () => {
   it('2. level up with roll: Fighter 1 → 2', () => {
     const char = makeLevel1Fighter();
     const mockRng: RandomProvider = { d: () => 8 };
-    const result = levelUp(
-      char,
-      { classId: 'Fighter', hpChoice: 'roll' },
-      data,
-      mockRng,
-    );
+    const result = levelUp(char, { classId: 'Fighter', hpChoice: 'roll' }, data, mockRng);
 
     // HP increases by 8 (rolled) + 3 (Con mod) = 11
     // 12 + 11 = 23
@@ -273,14 +280,18 @@ describe('levelUp', () => {
     expect(char.classes[0]!.level).toBe(3);
 
     // Now level up to 4 with ASI
-    const result = levelUp(char, {
-      classId: 'Fighter',
-      hpChoice: 'fixed',
-      asiOrFeat: {
-        type: 'asi',
-        asi: { Strength: 2 },
+    const result = levelUp(
+      char,
+      {
+        classId: 'Fighter',
+        hpChoice: 'fixed',
+        asiOrFeat: {
+          type: 'asi',
+          asi: { Strength: 2 },
+        },
       },
-    }, data);
+      data
+    );
 
     expect(result.classes[0]!.level).toBe(4);
     // featBonuses.Strength should increase by 2
@@ -296,14 +307,18 @@ describe('levelUp', () => {
     expect(char.classes[0]!.level).toBe(7);
 
     // Level up to 8 with a feat
-    const result = levelUp(char, {
-      classId: 'Fighter',
-      hpChoice: 'fixed',
-      asiOrFeat: {
-        type: 'feat',
-        featId: 'Tough',
+    const result = levelUp(
+      char,
+      {
+        classId: 'Fighter',
+        hpChoice: 'fixed',
+        asiOrFeat: {
+          type: 'feat',
+          featId: 'Tough',
+        },
       },
-    }, data);
+      data
+    );
 
     expect(result.classes[0]!.level).toBe(8);
     expect(result.feats).toContain('Tough');
@@ -314,11 +329,15 @@ describe('levelUp', () => {
     char = levelUp(char, { classId: 'Fighter', hpChoice: 'fixed' }, data);
     expect(char.classes[0]!.level).toBe(2);
 
-    const result = levelUp(char, {
-      classId: 'Fighter',
-      hpChoice: 'fixed',
-      subclassId: 'Champion',
-    }, data);
+    const result = levelUp(
+      char,
+      {
+        classId: 'Fighter',
+        hpChoice: 'fixed',
+        subclassId: 'Champion',
+      },
+      data
+    );
 
     expect(result.classes[0]!.level).toBe(3);
     expect(result.classes[0]!.subclassId).toBe('Champion');
@@ -327,11 +346,15 @@ describe('levelUp', () => {
 
   it('6. new spells: Wizard 1 → 2', () => {
     const char = makeLevel1Wizard();
-    const result = levelUp(char, {
-      classId: 'Wizard',
-      hpChoice: 'fixed',
-      newSpells: ['Shield', 'Misty Step'],
-    }, data);
+    const result = levelUp(
+      char,
+      {
+        classId: 'Wizard',
+        hpChoice: 'fixed',
+        newSpells: ['Shield', 'Misty Step'],
+      },
+      data
+    );
 
     expect(result.classes[0]!.level).toBe(2);
     expect(result.spells.knownSpells).toContain('Shield');
@@ -360,12 +383,24 @@ describe('levelUp', () => {
     const char: Character = {
       ...makeLevel1Fighter(),
       abilityScores: {
-        base: { Strength: 16, Dexterity: 14, Constitution: 1, Intelligence: 10, Wisdom: 12, Charisma: 8 },
+        base: {
+          Strength: 16,
+          Dexterity: 14,
+          Constitution: 1,
+          Intelligence: 10,
+          Wisdom: 12,
+          Charisma: 8,
+        },
         racialBonuses: {},
         featBonuses: {},
         temporaryBonuses: {},
       },
-      hitPoints: { max: 5, current: 5, temporary: 0, deathSaves: { successes: 0, failures: 0, isStable: false } },
+      hitPoints: {
+        max: 5,
+        current: 5,
+        temporary: 0,
+        deathSaves: { successes: 0, failures: 0, isStable: false },
+      },
     };
 
     // Fixed HP: d10 fixed = 6, Con mod = -5 (Con 1 → -5), 6 + (-5) = 1 → minimum is 1
@@ -392,9 +427,9 @@ describe('levelUp', () => {
 
   it('10. error case: invalid classId throws error', () => {
     const char = makeLevel1Fighter();
-    expect(() =>
-      levelUp(char, { classId: 'Barbarian', hpChoice: 'fixed' }, data)
-    ).toThrow('Class Barbarian not found on character');
+    expect(() => levelUp(char, { classId: 'Barbarian', hpChoice: 'fixed' }, data)).toThrow(
+      'Class Barbarian not found on character'
+    );
   });
 
   it('updates proficiency bonus when crossing threshold', () => {

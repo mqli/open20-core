@@ -3,7 +3,15 @@
 
 import { describe, it, expect } from 'vitest';
 import { calculateAttacks } from '../../src/engine/attack-calculator';
-import type { AbilityScores, Weapon, Armor, DataLoader, Feature, EquipmentItem, Attack } from '../../src/types';
+import type {
+  AbilityScores,
+  Weapon,
+  Armor,
+  DataLoader,
+  Feature,
+  EquipmentItem,
+  Attack,
+} from '../../src/types';
 
 // ── Helper Functions ──────────────────────────────────────────────
 
@@ -61,7 +69,7 @@ function makeEquippedArmor(id: string): EquipmentItem {
  */
 function createMockDataLoader(): DataLoader {
   const weapons: Record<string, Weapon> = {
-    'Longsword': {
+    Longsword: {
       id: 'Longsword',
       name: 'Longsword',
       type: 'weapon',
@@ -74,7 +82,7 @@ function createMockDataLoader(): DataLoader {
       versatileDamage: 'd10',
       mastery: 'Topple',
     },
-    'Dagger': {
+    Dagger: {
       id: 'Dagger',
       name: 'Dagger',
       type: 'weapon',
@@ -86,7 +94,7 @@ function createMockDataLoader(): DataLoader {
       properties: ['Finesse', 'Light', 'Thrown'],
       mastery: 'Nick',
     },
-    'Shortbow': {
+    Shortbow: {
       id: 'Shortbow',
       name: 'Shortbow',
       type: 'weapon',
@@ -98,7 +106,7 @@ function createMockDataLoader(): DataLoader {
       properties: ['Ammunition', 'Two-Handed'],
       mastery: 'Vex',
     },
-    'Quarterstaff': {
+    Quarterstaff: {
       id: 'Quarterstaff',
       name: 'Quarterstaff',
       type: 'weapon',
@@ -216,9 +224,24 @@ function createMockDataLoader(): DataLoader {
       return ['Cleave', 'Graze', 'Nick', 'Push', 'Sap', 'Slow', 'Topple', 'Vex'];
     },
     getConditionNames(): readonly string[] {
-      return ['Blinded', 'Charmed', 'Deafened', 'Exhaustion', 'Frightened', 'Grappled',
-              'Incapacitated', 'Invisible', 'Paralyzed', 'Petrified', 'Poisoned',
-              'Prone', 'Restrained', 'Stunned', 'Unconscious', 'Concentrating'];
+      return [
+        'Blinded',
+        'Charmed',
+        'Deafened',
+        'Exhaustion',
+        'Frightened',
+        'Grappled',
+        'Incapacitated',
+        'Invisible',
+        'Paralyzed',
+        'Petrified',
+        'Poisoned',
+        'Prone',
+        'Restrained',
+        'Stunned',
+        'Unconscious',
+        'Concentrating',
+      ];
     },
   } as DataLoader;
 }
@@ -344,10 +367,7 @@ describe('calculateAttacks', () => {
   // Test 8: Non-weapon equipment (Armor) should be ignored
   it('should ignore non-weapon equipment like armor', () => {
     const scores = makeScores(15);
-    const equipment = [
-      makeEquippedWeapon('Longsword'),
-      makeEquippedArmor('Chain Mail'),
-    ];
+    const equipment = [makeEquippedWeapon('Longsword'), makeEquippedArmor('Chain Mail')];
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
     expect(result).toHaveLength(1);
@@ -409,10 +429,7 @@ describe('calculateAttacks', () => {
   // Additional Test: Unknown weapon id should be filtered out
   it('should filter out weapons with unknown ids (getWeapon returns undefined)', () => {
     const scores = makeScores(15);
-    const equipment = [
-      makeEquippedWeapon('Longsword'),
-      makeEquippedWeapon('UnknownWeapon'),
-    ];
+    const equipment = [makeEquippedWeapon('Longsword'), makeEquippedWeapon('UnknownWeapon')];
     const result = calculateAttacks(scores, equipment, 3, emptyFeatures, mockData);
 
     expect(result).toHaveLength(1);

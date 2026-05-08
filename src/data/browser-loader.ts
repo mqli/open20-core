@@ -26,7 +26,7 @@ import spellsData from '../../static/spells.json';
 // ── 类型转换工具 ───────────────────────────────────────────────
 
 function parseFeaturesByLevel(
-  raw: Array<{ level: number; features: readonly Feature[] }>,
+  raw: Array<{ level: number; features: readonly Feature[] }>
 ): ReadonlyMap<number, readonly Feature[]> {
   const map = new Map<number, readonly Feature[]>();
   for (const entry of raw) {
@@ -39,13 +39,14 @@ function parseClass(raw: unknown): Class {
   const c = raw as Record<string, unknown>;
   return {
     id: c.id as string,
+    name: (c.name as string) ?? (c.id as string),
     source: c.source as '2024 PHB' | '2014 PHB',
     hitDie: c.hitDie as DieType,
     savingThrowProficiencies: c.savingThrowProficiencies as readonly AbilityName[],
     armorTraining: c.armorTraining as readonly string[],
     weaponMastery: c.weaponMastery as boolean,
     featuresByLevel: parseFeaturesByLevel(
-      c.featuresByLevel as Array<{ level: number; features: readonly Feature[] }>,
+      c.featuresByLevel as Array<{ level: number; features: readonly Feature[] }>
     ),
     spellcasting: c.spellcasting as Class['spellcasting'],
   };
@@ -58,7 +59,7 @@ function parseSubclass(raw: unknown): Subclass {
     parentClass: s.parentClass as string,
     grantedAtLevel: s.grantedAtLevel as number,
     featuresByLevel: parseFeaturesByLevel(
-      s.featuresByLevel as Array<{ level: number; features: readonly Feature[] }>,
+      s.featuresByLevel as Array<{ level: number; features: readonly Feature[] }>
     ),
   };
 }
@@ -80,11 +81,11 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
   return {
     // ── 物种（Species）───
     getSpecies(id: string): Species | undefined {
-      return species.find((s) => s.id === id);
+      return species.find(s => s.id === id);
     },
 
     getSpeciesSubtype(speciesId: string, subtypeId: string): SpeciesSubtype | undefined {
-      const sp = species.find((s) => s.id === speciesId);
+      const sp = species.find(s => s.id === speciesId);
       if (!sp?.subtypes) return undefined;
       return sp.subtypes.find((st: SpeciesSubtype) => st.id === subtypeId);
     },
@@ -95,7 +96,7 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
 
     // ── 背景（Background）───
     getBackground(id: string): Background | undefined {
-      return backgrounds.find((b) => b.id === id);
+      return backgrounds.find(b => b.id === id);
     },
 
     getAllBackgrounds(): Background[] {
@@ -104,7 +105,7 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
 
     // ── 职业（Class）/ 子职业（Subclass）───
     getClass(id: string): Class | undefined {
-      return classes.find((c) => c.id === id);
+      return classes.find(c => c.id === id);
     },
 
     getAllClasses(): Class[] {
@@ -112,11 +113,11 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
     },
 
     getSubclass(id: string): Subclass | undefined {
-      return subclasses.find((s) => s.id === id);
+      return subclasses.find(s => s.id === id);
     },
 
     getSubclassesForClass(classId: string): Subclass[] {
-      return subclasses.filter((s) => s.parentClass === classId);
+      return subclasses.filter(s => s.parentClass === classId);
     },
 
     getAllSubclasses(): Subclass[] {
@@ -125,11 +126,11 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
 
     // ── 专长（Feat）───
     getFeat(id: string): Feat | undefined {
-      return feats.find((f) => f.id === id);
+      return feats.find(f => f.id === id);
     },
 
     getFeatsByCategory(category: FeatCategory): Feat[] {
-      return feats.filter((f) => f.category === category);
+      return feats.filter(f => f.category === category);
     },
 
     getAllFeats(): Feat[] {
@@ -138,7 +139,7 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
 
     // ── 装备 / 武器 / 护甲 ──────────────────────────────
     getWeapon(id: string): Weapon | undefined {
-      return weapons.find((w) => w.id === id);
+      return weapons.find(w => w.id === id);
     },
 
     getAllWeapons(): Weapon[] {
@@ -146,7 +147,7 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
     },
 
     getArmor(id: string): Armor | undefined {
-      return armors.find((a) => a.id === id);
+      return armors.find(a => a.id === id);
     },
 
     getAllArmor(): Armor[] {
@@ -154,7 +155,7 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
     },
 
     getGearItem(id: string): GearItem | undefined {
-      return gear.find((g) => g.id === id);
+      return gear.find(g => g.id === id);
     },
 
     getAllGear(): GearItem[] {
@@ -163,11 +164,11 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
 
     // ── 法术（Spell）───
     getSpell(id: string): Spell | undefined {
-      return spells.find((s) => s.id === id);
+      return spells.find(s => s.id === id);
     },
 
     getSpellsByLevel(level: SpellLevel): Spell[] {
-      return spells.filter((s) => s.level === level);
+      return spells.filter(s => s.level === level);
     },
 
     getAllSpells(): Spell[] {

@@ -73,7 +73,12 @@ const FIGHTER_CLASS: Class = {
 
 const WIZARD_FEATURES_L1: Feature[] = [
   { name: 'Spellcasting', description: 'Cast wizard spells', level: 1 },
-  { name: 'Arcane Recovery', description: 'Recover spell slots', resourceId: 'Arcane Recovery', level: 1 },
+  {
+    name: 'Arcane Recovery',
+    description: 'Recover spell slots',
+    resourceId: 'Arcane Recovery',
+    level: 1,
+  },
 ];
 
 const WIZARD_CLASS: Class = {
@@ -119,11 +124,13 @@ function createMockDataLoader(): DataLoader {
     getSpell: () => undefined,
     getSpellsByLevel: () => [],
     getAllSpells: () => [],
-    getProficiencyBonus: (level: number) => level <= 4 ? 2 : 3,
+    getProficiencyBonus: (level: number) => (level <= 4 ? 2 : 3),
     getHitDieFixedValue: () => 6,
     getSpellSlots: (classId: string, classLevel: number) => {
       if (classId === 'Fighter') return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
-      return fullCasterSlots[classLevel] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+      return (
+        fullCasterSlots[classLevel] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
+      );
     },
     getMulticlassSpellSlots: () => ({}),
     getPactMagicSlots: () => ({ slots: 0, slotLevel: 0 }),
@@ -162,7 +169,14 @@ function makeWizard(): ReturnType<typeof createCharacter> {
     speciesId: 'Human',
     backgroundId: 'Soldier',
     classId: 'Wizard',
-    abilityScores: { Strength: 8, Dexterity: 14, Constitution: 12, Intelligence: 16, Wisdom: 13, Charisma: 10 },
+    abilityScores: {
+      Strength: 8,
+      Dexterity: 14,
+      Constitution: 12,
+      Intelligence: 16,
+      Wisdom: 13,
+      Charisma: 10,
+    },
   };
   return createCharacter(params, data);
 }
@@ -476,10 +490,10 @@ describe('modifyCurrency', () => {
     const char = makeFighter();
     const result = modifyCurrency(char, { gp: 3, sp: 5, cp: -1 });
     expect(result.currency.gp).toBe(13); // 10 + 3
-    expect(result.currency.sp).toBe(5);  // 0 + 5
-    expect(result.currency.cp).toBe(0);  // 0 + (-1), clamped to 0
-    expect(result.currency.ep).toBe(0);  // unchanged
-    expect(result.currency.pp).toBe(0);  // unchanged
+    expect(result.currency.sp).toBe(5); // 0 + 5
+    expect(result.currency.cp).toBe(0); // 0 + (-1), clamped to 0
+    expect(result.currency.ep).toBe(0); // unchanged
+    expect(result.currency.pp).toBe(0); // unchanged
   });
 
   it('original unchanged (immutability)', () => {

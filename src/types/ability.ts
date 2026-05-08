@@ -22,9 +22,9 @@ export const ABILITY_NAMES: readonly AbilityName[] = [
 
 // 属性值记录 — base/ racial/ feat/ temporary 四维
 export interface AbilityScores {
-  readonly base: Record<AbilityName, number>;           // 玩家分配的原始值（8-15）
+  readonly base: Record<AbilityName, number>; // 玩家分配的原始值（8-15）
   readonly racialBonuses: Partial<Record<AbilityName, number>>; // 来自物种的固定加值
-  readonly featBonuses: Partial<Record<AbilityName, number>>;   // 来自专长的加值
+  readonly featBonuses: Partial<Record<AbilityName, number>>; // 来自专长的加值
   readonly temporaryBonuses: Partial<Record<AbilityName, number>>; // 法术/特性临时加值
 }
 

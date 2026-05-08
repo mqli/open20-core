@@ -96,7 +96,7 @@ export function calculateHPIncrement(die: DieType, conModifier: number): number 
 export function calculateMaxHP(
   classes: readonly CharacterClass[],
   conModifier: number,
-  data: DataLoader,
+  data: DataLoader
 ): number {
   if (classes.length === 0) return 0;
 

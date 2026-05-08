@@ -2,7 +2,12 @@
 // Unit tests for storage/serializer module
 
 import { describe, it, expect } from 'vitest';
-import { serialize, deserialize, validateSchemaVersion, sanitizeFilename } from '../../src/storage/serializer';
+import {
+  serialize,
+  deserialize,
+  validateSchemaVersion,
+  sanitizeFilename,
+} from '../../src/storage/serializer';
 import type { Character } from '../../src/types/character';
 
 // ── Test Helpers ──────────────────────────────────────────────────
@@ -24,7 +29,14 @@ function createMinimalCharacter(overrides?: Partial<Character>): Character {
       },
     ],
     abilityScores: {
-      base: { Strength: 15, Dexterity: 12, Constitution: 14, Intelligence: 10, Wisdom: 13, Charisma: 8 },
+      base: {
+        Strength: 15,
+        Dexterity: 12,
+        Constitution: 14,
+        Intelligence: 10,
+        Wisdom: 13,
+        Charisma: 8,
+      },
       racialBonuses: {},
       featBonuses: {},
       temporaryBonuses: {},

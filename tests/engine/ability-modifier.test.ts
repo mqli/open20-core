@@ -71,7 +71,14 @@ describe('getTotalScore', () => {
 
   it('sums all bonus sources', () => {
     const scores: AbilityScores = {
-      base: { Strength: 15, Dexterity: 12, Constitution: 14, Intelligence: 10, Wisdom: 13, Charisma: 8 },
+      base: {
+        Strength: 15,
+        Dexterity: 12,
+        Constitution: 14,
+        Intelligence: 10,
+        Wisdom: 13,
+        Charisma: 8,
+      },
       racialBonuses: { Strength: 2 },
       featBonuses: { Strength: 1 },
       temporaryBonuses: {},
@@ -81,7 +88,14 @@ describe('getTotalScore', () => {
 
   it('defaults to 10 for missing base value', () => {
     const scores: AbilityScores = {
-      base: { Strength: 15, Dexterity: 12, Constitution: 14, Intelligence: 10, Wisdom: 13, Charisma: 8 },
+      base: {
+        Strength: 15,
+        Dexterity: 12,
+        Constitution: 14,
+        Intelligence: 10,
+        Wisdom: 13,
+        Charisma: 8,
+      },
       racialBonuses: {},
       featBonuses: {},
       temporaryBonuses: {},

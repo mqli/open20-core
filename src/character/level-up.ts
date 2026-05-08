@@ -10,23 +10,32 @@ import type { ResetType } from '../types/resource';
 import { getModifier, getTotalScore } from '../engine/ability-modifier';
 import { getHitDieFixedValue, calculateHPIncrement } from '../engine/hp-calculator';
 import { getProficiencyBonus } from '../engine/proficiency-bonus';
-import { extractResources, getFeaturesAtLevel, buildInitialSpells, emptyCharacterSpells } from './create';
-import { getMulticlassSpellcasterLevel, calculateMulticlassSpellSlots } from '../engine/spell-slots';
+import {
+  extractResources,
+  getFeaturesAtLevel,
+  buildInitialSpells,
+  emptyCharacterSpells,
+} from './create';
+import {
+  getMulticlassSpellcasterLevel,
+  calculateMulticlassSpellSlots,
+} from '../engine/spell-slots';
 
 // ── 公共接口 ────────────────────────────────────────────
 
 export interface LevelUpOptions {
-  classId: string;                     // which class to level (or new class for multiclassing)
-  subclassId?: string;                 // if reached subclass level
-  hpChoice: 'fixed' | 'roll';          // HP increment method
-  asiOrFeat?: {                        // ASI/Feat choice (at levels 4/8/12/16/19)
+  classId: string; // which class to level (or new class for multiclassing)
+  subclassId?: string; // if reached subclass level
+  hpChoice: 'fixed' | 'roll'; // HP increment method
+  asiOrFeat?: {
+    // ASI/Feat choice (at levels 4/8/12/16/19)
     type: 'asi' | 'feat';
     asi?: Partial<Record<AbilityName, number>>;
     featId?: string;
   };
-  newSpells?: string[];                // new spells for spellcasters
+  newSpells?: string[]; // new spells for spellcasters
   // Multiclassing: add a new class
-  isNewClass?: boolean;                // true if adding a new class (multiclassing)
+  isNewClass?: boolean; // true if adding a new class (multiclassing)
 }
 
 export interface RandomProvider {
@@ -39,7 +48,7 @@ export function levelUp(
   char: Character,
   options: LevelUpOptions,
   data: DataLoader,
-  rng?: RandomProvider,
+  rng?: RandomProvider
 ): Character {
   // Check if adding a new class (multiclassing)
   if (options.isNewClass) {
@@ -94,7 +103,8 @@ export function levelUp(
       const newFeatBonuses = { ...newAbilityScores.featBonuses };
       for (const [ability, bonus] of Object.entries(options.asiOrFeat.asi)) {
         if (bonus !== undefined) {
-          newFeatBonuses[ability as AbilityName] = (newFeatBonuses[ability as AbilityName] ?? 0) + bonus;
+          newFeatBonuses[ability as AbilityName] =
+            (newFeatBonuses[ability as AbilityName] ?? 0) + bonus;
         }
       }
       newAbilityScores = { ...newAbilityScores, featBonuses: newFeatBonuses };
@@ -166,7 +176,7 @@ function addNewClass(
   char: Character,
   options: LevelUpOptions,
   data: DataLoader,
-  rng?: RandomProvider,
+  rng?: RandomProvider
 ): Character {
   // Validate new class exists in data
   const classData = data.getClass(options.classId);
@@ -207,16 +217,16 @@ function addNewClass(
   // Handle spellcasting for multiclass
   let newSpells = { ...char.spells };
   const hasSpellcasting = classData.spellcasting;
-  
+
   if (hasSpellcasting) {
     // Recalculate spell slots using multiclass rules
     const totalSpellcastingLevel = getMulticlassSpellcasterLevel(newClasses, data);
-    
+
     if (totalSpellcastingLevel > 0) {
       const spellSlots = calculateMulticlassSpellSlots(totalSpellcastingLevel, data);
       const ability = classData.spellcasting?.ability ?? 'Intelligence';
       const abilityMod = getModifier(getTotalScore(char.abilityScores, ability));
-      
+
       newSpells = {
         ...newSpells,
         spellcastingAbility: ability,
@@ -231,9 +241,10 @@ function addNewClass(
   let result: Character = {
     ...char,
     classes: newClasses,
-    feats: options.asiOrFeat?.type === 'feat' && options.asiOrFeat.featId
-      ? [...char.feats, options.asiOrFeat.featId]
-      : char.feats,
+    feats:
+      options.asiOrFeat?.type === 'feat' && options.asiOrFeat.featId
+        ? [...char.feats, options.asiOrFeat.featId]
+        : char.feats,
     spells: newSpells,
     resources: newResources,
     hitPoints: {

@@ -8,7 +8,7 @@ export type DieType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20';
 export type DamageType =
   | 'Bludgeoning'
   | 'Piercing'
-  | 'Slashing'      // Physical
+  | 'Slashing' // Physical
   | 'Fire'
   | 'Cold'
   | 'Lightning'
@@ -18,7 +18,7 @@ export type DamageType =
   | 'Psychic'
   | 'Force'
   | 'Necrotic'
-  | 'Radiant';      // Magical/Elemental
+  | 'Radiant'; // Magical/Elemental
 
 /**
  * Damage defense modifiers
@@ -43,7 +43,7 @@ export interface DamageDefenseSource {
  */
 export interface DamageResult {
   readonly originalDamage: number;
-  readonly effectiveDamage: number;  // After defenses applied
+  readonly effectiveDamage: number; // After defenses applied
   readonly modifiers: readonly {
     readonly type: 'resistance' | 'immunity' | 'vulnerability';
     readonly damageType: DamageType;
@@ -54,13 +54,13 @@ export interface DamageResult {
 export interface Character {
   readonly schemaVersion: string;
   readonly name: string;
-  readonly species: string;                    // Species.id
-  readonly speciesSubtype: string | null;      // 物种变体（如 "Mountain Dwarf"）
-  readonly background: string;                 // Background.id
-  readonly classes: readonly CharacterClass[];  // 支持多维职业
+  readonly species: string; // Species.id
+  readonly speciesSubtype: string | null; // 物种变体（如 "Mountain Dwarf"）
+  readonly background: string; // Background.id
+  readonly classes: readonly CharacterClass[]; // 支持多维职业
   readonly abilityScores: import('./ability').AbilityScores;
   readonly skills: Record<string, import('./skill').SkillEntry>;
-  readonly feats: readonly string[];            // Feat.id 列表
+  readonly feats: readonly string[]; // Feat.id 列表
   readonly equipment: readonly import('./equipment').EquipmentItem[];
   readonly spells: import('./spell').CharacterSpells;
   readonly resources: readonly import('./resource').Resource[];
@@ -70,16 +70,16 @@ export interface Character {
   readonly conditions: readonly ActiveCondition[];
   readonly damageDefenses: DamageDefenses;
   readonly notes: string;
-  readonly createdAt: string;                  // ISO 8601
-  readonly updatedAt: string;                  // ISO 8601
+  readonly createdAt: string; // ISO 8601
+  readonly updatedAt: string; // ISO 8601
 }
 
 // 角色职业条目（支持多维职业）
 export interface CharacterClass {
-  readonly classId: string;          // Class.id
+  readonly classId: string; // Class.id
   readonly level: number;
   readonly subclassId: string | null;
-  readonly subclassLevel: number | null;  // 获得子职业的等级
+  readonly subclassLevel: number | null; // 获得子职业的等级
   readonly hitDice: { readonly die: DieType; readonly used: number };
 }
 
@@ -93,8 +93,8 @@ export interface HitPoints {
 
 // 死亡豁免
 export interface DeathSaves {
-  readonly successes: number;    // 0-3
-  readonly failures: number;     // 0-3
+  readonly successes: number; // 0-3
+  readonly failures: number; // 0-3
   readonly isStable: boolean;
 }
 
@@ -112,16 +112,16 @@ export interface CombatStats {
 export interface Attack {
   readonly name: string;
   readonly attackBonus: number;
-  readonly damage: string;           // 如 "1d8+4"
-  readonly damageType: string;       // 如 "Slashing"
+  readonly damage: string; // 如 "1d8+4"
+  readonly damageType: string; // 如 "Slashing"
   readonly mastery: readonly string[]; // Weapon Mastery 属性
 }
 
 // 活跃状态（当前施加于角色的状态）
 export interface ActiveCondition {
   readonly id: ConditionName;
-  readonly source: string;       // 来源（如 "Player A", "Hold Person"）
-  readonly appliedAt: string;     // ISO 8601
+  readonly source: string; // 来源（如 "Player A", "Hold Person"）
+  readonly appliedAt: string; // ISO 8601
 }
 
 // 状态名称
@@ -129,7 +129,7 @@ export type ConditionName =
   | 'Blinded'
   | 'Charmed'
   | 'Deafened'
-  | 'Exhaustion'      // 特殊：有等级 1-6
+  | 'Exhaustion' // 特殊：有等级 1-6
   | 'Frightened'
   | 'Grappled'
   | 'Incapacitated'
@@ -139,16 +139,16 @@ export type ConditionName =
   | 'Poisoned'
   | 'Prone'
   | 'Restrained'
-  | 'Raging'          // 野蛮人狂暴（激活时生效）
+  | 'Raging' // 野蛮人狂暴（激活时生效）
   | 'Stunned'
   | 'Unconscious'
-  | 'Concentrating';  // 非官方但需追踪（专注）
+  | 'Concentrating'; // 非官方但需追踪（专注）
 
 // 金币
 export interface Currency {
-  readonly cp: number;  // Copper Piece
-  readonly sp: number;  // Silver Piece
-  readonly ep: number;  // Electrum Piece
-  readonly gp: number;  // Gold Piece
-  readonly pp: number;  // Platinum Piece
+  readonly cp: number; // Copper Piece
+  readonly sp: number; // Silver Piece
+  readonly ep: number; // Electrum Piece
+  readonly gp: number; // Gold Piece
+  readonly pp: number; // Platinum Piece
 }
