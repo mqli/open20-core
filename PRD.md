@@ -72,19 +72,65 @@ interface Spell {
 }
 ```
 
-**Data sources**: SRD 5.1 (~391 spells, full descriptions), 2024 PHB (~200, metadata), XGtE/TCoE (~110, SRD-eligible).
+**Data sources**: SRD 5.2 (~391+ spells, full descriptions), 2024 PHB (~200, metadata), XGtE/TCoE (~110, SRD-eligible).
 
-### 1.4 Static Data (`@open20/core/data`)
+> **TODO**: Align all content with SRD 5.2 (latest version). See: https://www.dndbeyond.com/srd
 
-| Dataset | Count | Source |
-|---|---|---|
-| Species | 12 | 2024 PHB + legacy |
-| Backgrounds | 16 | 2024 PHB |
-| Classes | 12 | 2024 PHB |
-| Subclasses | ~48 | 2024 PHB |
-| Feats | 75 | 2024 PHB |
-| Spells | 560+ | SRD + 2024 PHB |
-| Equipment | ~200 | 2024 PHB |
+### 1.4 Static Data & Content Management (`@open20/core/data`)
+
+**Content Management Requirements (R26)**:
+1. **SRD content included** — Core package ships with SRD content
+2. **Separate files per content type** — JSON files kept separate for maintainability
+3. **Import/export support** — Ability to import from and export to a single unified JSON file (for distribution)
+4. **No override** — Same ID in different sources = separate items, no overwriting
+
+#### SRD Content (included in core)
+
+Located in `static/srd/` as separate files:
+
+| Dataset | File | Count | Source |
+|---|---|---|---|
+| Species | `species.json` | 9 | SRD 5.1 |
+| Backgrounds | `backgrounds.json` | 13 | SRD 5.1 |
+| Classes | `classes.json` | 12 | SRD 5.1 |
+| Subclasses | `subclasses.json` | ~12 | SRD 5.1 |
+| Feats | `feats.json` | Limited set | SRD 5.1 |
+| Spells | `spells.json` | 391+ | SRD 5.1 |
+| Equipment | `weapons.json`, `armor.json`, `gear.json` | ~100 | SRD 5.1 |
+
+#### Content Pack System
+
+**File Structure** (separate files for maintainability):
+```
+static/srd/
+├── meta.json          # Content pack metadata
+├── species.json       # Separate file for easy maintenance
+├── backgrounds.json
+├── classes.json
+├── subclasses.json
+├── feats.json
+├── spells.json
+├── weapons.json
+├── armor.json
+├── gear.json
+└── lookup-tables.json
+```
+
+**Import/Export Support** (for distribution):
+- `exportContentPack(dirPath)` — Merge separate files into unified `ContentPack` object
+- `importContentPack(pack, dirPath)` — Split unified `ContentPack` into separate files
+- Enables easy sharing of content packs as single JSON files
+
+**Distribution**:
+- **SRD**: Included in `@open20/core` (`static/srd/`)
+- **Official**: Separate npm packages (`@open20/content-phb2024`, etc.)
+- **Homebrew**: User-provided JSON files or unified `ContentPack` objects
+
+**No Override Rule**:
+- Same ID in multiple packs = separate items coexist
+- `getSpell('fireball')` → highest priority pack wins
+- `getSpellsBySource('homebrew')` → filter by source field
+- `priority` field in `meta.json` controls disambiguation
 
 ---
 
@@ -125,10 +171,14 @@ src/
 ├── spells/           # Spell data & queries
 │   ├── query.ts
 │   └── types.ts
-├── data/             # Static JSON loading
-│   ├── loader.ts
-│   ├── default-loader.ts
-│   └── browser-loader.ts
+├── data/             # Content loading & management (R26)
+│   ├── loader.ts             # DataLoader interface
+│   ├── default-loader.ts     # Default implementation (loads SRD)
+│   ├── browser-loader.ts     # Browser-compatible loader
+│   └── content-registry.ts  # Content pack registry (R26.3)
+├── content/          # Content pack types & utilities (R26)
+│   ├── types.ts              # ContentPack interface
+│   └── index.ts
 ├── schemas/          # Zod schemas
 │   ├── character.ts
 │   ├── spell.ts
@@ -139,6 +189,23 @@ src/
 │   ├── memory.ts
 │   └── json-file.ts
 └── index.ts          # Public API
+```
+
+**Static Data** (`static/`):
+```
+static/
+└── srd/                      # SRD content (separate files for maintainability)
+    ├── meta.json              # Content pack metadata
+    ├── species.json           # Species[]
+    ├── backgrounds.json       # Background[]
+    ├── classes.json           # Class[]
+    ├── subclasses.json        # Subclass[]
+    ├── feats.json             # Feat[]
+    ├── spells.json            # Spell[]
+    ├── weapons.json           # Weapon[]
+    ├── armor.json             # Armor[]
+    ├── gear.json              # GearItem[]
+    └── lookup-tables.json    # Proficiency, HP, spell slots, etc.
 ```
 
 ---
@@ -157,9 +224,16 @@ src/
 ### P1 (Should Have)
 - [ ] Multiclassing support
 - [ ] 2014 legacy content
-- [ ] Homebrew data structures
+- [x] ~~Homebrew data structures~~ → **R26 Content Management** (see below)
 - [ ] Spell preparation helpers
 - [ ] Equipment effect calculations
+
+### P1 — Content Management (R26)
+- [ ] SRD content as separate files (`static/srd/*.json`)
+- [ ] ContentPack type definition + import/export support
+- [ ] Content registry (register/unregister packs)
+- [ ] No-override rule implementation
+- [ ] Source filtering in query functions
 
 ### P2 (Nice to Have)
 - [ ] Monster data

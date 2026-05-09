@@ -57,16 +57,18 @@ open20-core/
 ├── requirements/
 │   └── README.md               # R1-R21 requirements traceability
 ├── static/
-│   ├── lookup-tables.json      # Proficiency, HP, spell slots, etc.
-│   ├── species.json            # 12 species
-│   ├── backgrounds.json        # 16 backgrounds
-│   ├── classes.json            # 12 classes
-│   ├── subclasses.json         # Subclasses for all classes
-│   ├── feats.json              # 75 feats
-│   ├── weapons.json            # ~40 weapons
-│   ├── armor.json              # ~20 armors
-│   ├── gear.json               # ~50 gear items
-│   └── spells.json             # 560+ spells (SRD + 2024 PHB)
+│   └── srd/                   # SRD 5.2 content (included in core)
+│       ├── meta.json           # Content pack metadata
+│       ├── species.json        # 9 species (SRD 5.2)
+│       ├── backgrounds.json    # 13 backgrounds (SRD 5.2)
+│       ├── classes.json        # 12 classes (SRD 5.2)
+│       ├── subclasses.json     # Subclasses for SRD classes
+│       ├── feats.json          # Limited feats (SRD 5.2)
+│       ├── spells.json         # 391+ spells (SRD 5.2)
+│       ├── weapons.json        # ~30 weapons (SRD 5.2)
+│       ├── armor.json          # ~15 armors (SRD 5.2)
+│       ├── gear.json           # ~20 gear items (SRD 5.2)
+│       └── lookup-tables.json  # Proficiency, HP, spell slots, etc.
 ├── src/
 │   ├── index.ts                # Node.js barrel export (includes storage)
 │   ├── browser-index.ts        # Browser barrel export (excludes Node.js storage)
@@ -286,12 +288,53 @@ npm run build:browser
 4. Write tests in `tests/character/mutate.test.ts`
 5. Export via `src/character/index.ts`
 
-### 7.3 Adding New Static Data
+### 7.3 Adding New Static Data (SRD 5.2)
+> **TODO**: Align all content with SRD 5.2. See: https://www.dndbeyond.com/srd
+
 1. Update JSON schema in `spec/data-model.md`
-2. Add data to `static/*.json`
-3. Update `default-loader.ts` if new `DataLoader` methods needed
-4. Update `LookupTables` interface in `src/data/loader.ts`
-5. Write data integrity tests in `tests/data/` (S20)
+2. Add data to `static/srd/*.json` (NOT `static/*.json`)
+3. Ensure `source: 'SRD 5.2'` tag on all content
+4. Update `default-loader.ts` if new `DataLoader` methods needed
+5. Update `LookupTables` interface in `src/data/loader.ts`
+6. Write data integrity tests in `tests/data/` (S20)
+
+### 7.4 Creating Content Packs (Homebrew/Official)
+Content packs are directories with `meta.json` + JSON files:
+```
+my-content-pack/
+├── meta.json          # ContentPackMeta
+├── species.json       # Additional species
+├── spells.json        # Additional spells
+└── ...
+```
+
+**meta.json schema**:
+```json
+{
+  "id": "my-homebrew",
+  "name": "My Homebrew Content",
+  "version": "1.0.0",
+  "source": "Homebrew",
+  "author": "Your Name",
+  "priority": 0
+}
+```
+
+**Loading content packs**:
+```typescript
+import { registerContentPack } from '@open20/core';
+
+const meta = { id: 'my-homebrew', name: '...', version: '1.0.0', source: 'Homebrew' };
+const data = {
+  spells: [{ id: 'custom-spell', name: 'Custom Spell', source: 'Homebrew', ... }]
+};
+registerContentPack(meta, data);
+```
+
+**Key rules**:
+- Same ID in different packs = separate items (no override)
+- `getSpell('custom-spell')` returns first registered version
+- Use `getSpellsBySource('Homebrew')` to filter by source
 
 ### 7.4 Adding Spell Data
 1. Use `scripts/import_srd_spells.py` to import from dnd-data repo
@@ -467,9 +510,12 @@ Examples:
 | `agent.md` | This file - read first! |
 | `spec/high-level-design.md` | Technical architecture (S1-S20) |
 | `spec/data-model.md` | TypeScript interfaces & JSON schema |
-| `requirements/README.md` | Requirements traceability (R1-R21) |
+| `requirements/README.md | Requirements traceability (R1-R26) |) |
 | `src/types/index.ts` | All core types |
 | `src/data/loader.ts` | DataLoader interface |
+|| `requirements/11-content-management/` | Content management spec (R26) |
+|| `src/types/content.ts` | ContentPackMeta interface |
+|| `static/srd/` | SRD 5.2 content (included in core) |
 
 ---
 

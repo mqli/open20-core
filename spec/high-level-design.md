@@ -93,8 +93,13 @@ open20-core/
 │   │
 │   ├── data/                     # A7: Rule data (depends only on types)
 │   │   ├── loader.ts             #   DataLoader interface + LookupTables type + createDataLoader factory
-│   │   ├── default-loader.ts     #   Default DataLoader implementation (loads from static/*.json)
+│   │   ├── default-loader.ts     #   Default DataLoader implementation (loads from static/srd/content.json)
 │   │   ├── browser-loader.ts     #   Browser-compatible DataLoader (bundles JSON via esbuild)
+│   │   ├── content-registry.ts   #   Content pack registry (R26: register/unregister packs)
+│   │   └── index.ts
+│   │
+│   ├── content/                  # R26: Content pack types & utilities
+│   │   ├── types.ts              #   ContentPack, ContentPackMeta interfaces
 │   │   └── index.ts
 │   │
 │   ├── engine/                   # A1: Pure function calculations (no side effects)
@@ -152,17 +157,27 @@ open20-core/
 │   └── browser-index.ts          # Public API barrel export (Browser, excludes Node.js storage)
 │
 ├── static/                       # Static JSON data files
-│   ├── lookup-tables.json        # Proficiency, HP, spell slots, etc.
-│   ├── species.json              # 12 species (2024 PHB + legacy)
-│   ├── backgrounds.json          # 16 backgrounds (2024 PHB)
-│   ├── classes.json              # 12 classes (2024 PHB)
-│   ├── subclasses.json           # Subclasses for all classes
-│   ├── feats.json                # 75 feats (2024 PHB)
-│   ├── weapons.json              # ~40 weapons (2024 PHB)
-│   ├── armor.json                # ~20 armors (2024 PHB)
-│   ├── gear.json                 # ~50 gear items (2024 PHB)
-│   └── spells.json               # 560+ spells (SRD + 2024 PHB)
+│   └── srd/                      # SRD content (separate files for maintainability)
+│       ├── meta.json              # Content pack metadata
+│       ├── species.json           # Species[]
+│       ├── backgrounds.json       # Background[]
+│       ├── classes.json           # Class[]
+│       ├── subclasses.json        # Subclass[]
+│       ├── feats.json             # Feat[]
+│       ├── spells.json            # Spell[]
+│       ├── weapons.json           # Weapon[]
+│       ├── armor.json             # Armor[]
+│       ├── gear.json              # GearItem[]
+│       └── lookup-tables.json    # Proficiency, HP, spell slots, etc.
 │
+│                           # Future content packs (separate packages):
+│                           # @open20/content-phb2024/
+│                           #   ├── meta.json
+│                           #   ├── species.json
+│                           #   └── ...
+│                           # @open20/content-xgte/
+│                           # my-homebrew/
+
 ├── scripts/
 │   ├── bundle.mjs                # Browser bundle builder (esbuild)
 │   └── import_srd_spells.py     # Import SRD spells from dnd-data GitHub repo
@@ -445,10 +460,49 @@ calculateAC(character, equipment, dataLoader)
 |---|---|---|
 | Multiclassing | P0 | Full multiclass support with correct spell slot calculations |
 | 2014 Legacy | P1 | Half-Elf, Half-Orc, legacy subclasses and feats |
-| Homebrew Support | P1 | Data structures and validation for homebrew content |
+| Content Management (R26) | P1 | 📋 Requirements defined, implementation pending |
 | Monster Data | P2 | SRD monster statistics and queries |
 | Magic Items | P2 | SRD magic item data |
 | Encounter Builder | P2 | Helper functions for encounter difficulty |
+
+### 9.1 Content Management (R26) — Requirements Defined
+
+**Status**: 📋 Requirements defined in `requirements/11-content-management/content-management.md`
+
+**Key Design Decisions**:
+1. **SRD content included in core** — `static/srd/` ships with `@open20/core`
+2. **Separate files per content type** — `species.json`, `spells.json`, etc. (not unified)
+3. **Import/export support** — `exportContentPack()` and `importContentPack()` for distribution
+4. **No override** — Same ID in different sources = separate items
+
+**Components** (to be implemented):
+- `src/content/types.ts` — ContentPack, ContentPackMeta interfaces
+- `src/content/io.ts` — `exportContentPack()`, `importContentPack()` functions
+- `src/data/content-registry.ts` — Registry for multiple content sources
+- `static/srd/` — Separate JSON files for SRD content
+- No-override rule: same ID = separate items coexist
+
+**Usage** (planned):
+```typescript
+import { ContentRegistry, loadContentPack, exportContentPack } from '@open20/core';
+
+// Load SRD content (separate files)
+const registry = new ContentRegistry();
+registry.register('static/srd/');
+
+// Export to unified file for distribution
+const pack = exportContentPack('static/srd/');
+// pack is a single ContentPack object with meta + all content
+
+// Import unified file (split into separate files)
+importContentPack(pack, 'my-homebrew/');
+
+// Add homebrew
+registry.register({
+  meta: { id: 'my-homebrew', name: 'My Homebrew', version: '1.0.0', source: 'Homebrew', priority: 10 },
+  spells: [{ id: 'custom-spell', name: 'Custom Spell', ... }]
+});
+```
 
 ---
 

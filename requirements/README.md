@@ -30,6 +30,7 @@
 | R20 | Character — Conditions | - | `src/character/mutate.ts` | P0 | ✅ S13 done |
 | R21 | Multiclassing | - | `src/engine/spell-slots.ts` + `recompute.ts` | P1 | ✅ Done |
 | R22 | Dice Rolling | - | `src/engine/dice.ts` | P1 | ✅ Done |
+| R26 | Content Management | `requirements/11-content-management/content-management.md` | `src/data/loader.ts`, `src/types/content.ts` | P1 | 📋 |
 
 ---
 
@@ -40,9 +41,10 @@
 | R21 | Multiclassing | Full multiclass support with spell slot recalculation | ✅ Done |
 | R22 | Dice Rolling | Attack/skill/save/damage rolls with advantage/disadvantage, support composed damage types | ✅ Done |
 | R23 | 2014 Legacy | Half-Elf/Half-Orc + legacy subclasses/feats | 📋 |
-| R23 | Homebrew support | Data structures for homebrew content | 📋 |
-| R24 | Multiple character management | Character list + quick switch | 📋 |
-| R25 | Quick roll to clipboard | Copy "1d20+bonus" to clipboard | 📋 |
+| R24 | Homebrew support | Data structures for homebrew content | 📋 See R26 |
+| R25 | Multiple character management | Character list + quick switch | 📋 |
+| R26 | Content Management | Unified content pack system with SRD included | 📋 `requirements/11-content-management/content-management.md` |
+| R27 | Quick roll to clipboard | Copy "1d20+bonus" to clipboard | 📋 |
 
 ---
 
