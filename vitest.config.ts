@@ -14,7 +14,7 @@ export default defineConfig({
       exclude: ['src/**/*.test.ts', 'src/**/index.ts'],
     },
     include: ['tests/**/*.test.ts'],
-    exclude: ['node_modules', 'dist'],
+    exclude: ['node_modules', 'dist', 'tests/artifact', 'tests/browser-artifact'],
   },
   resolve: {
     alias: {
