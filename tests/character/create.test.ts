@@ -16,7 +16,7 @@ import type { Species } from '../../src/types/species';
 import type { Background } from '../../src/types/background';
 import type { Class, Feature } from '../../src/types/class';
 import type { AbilityName } from '../../src/types/ability';
-import type { DieType } from '../../src/types/character';
+import type { DieType } from '../../src/types/dice';
 
 // ── Mock Data ──────────────────────────────────────────────────
 

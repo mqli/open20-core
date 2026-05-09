@@ -15,7 +15,8 @@ import {
   defaultRandom,
   type RandomProvider,
 } from '../../src/engine/dice';
-import type { Character, DieType } from '../../src/types/character';
+import type { Character } from '../../src/types/character';
+import type { DieType } from '../../src/types/dice';
 import type { Weapon } from '../../src/types/equipment';
 import type { Spell } from '../../src/types/spell';
 

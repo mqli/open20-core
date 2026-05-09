@@ -7,7 +7,7 @@ import { levelUp } from '../../src/character/level-up';
 import { recomputeDerivedStats } from '../../src/character/recompute';
 import { serialize, deserialize } from '../../src/storage/serializer';
 import { applyTypedDamage } from '../../src/character/mutate';
-import type { DamageDefenses } from '../../src/types/character';
+import type { DamageDefenses } from '../../src/types/damage';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);

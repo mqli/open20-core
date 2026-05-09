@@ -5,7 +5,7 @@ import { modifyHP } from '../../src/character/mutate';
 import { longRest } from '../../src/character/rest';
 import { calculateTypedDamage } from '../../src/engine/damage-calculator';
 import { applyTypedDamage } from '../../src/character/mutate';
-import type { DamageDefenses } from '../../src/types/character';
+import type { DamageDefenses } from '../../src/types/damage';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
