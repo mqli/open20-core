@@ -49,17 +49,18 @@ export function calculateAttacks(
       featureNames
     );
 
-    // 伤害字符串
+    // 伤害字符串（使用 entries[0] 为基础伤害）
+    const baseEntry = weapon.damage.entries[0];
     const damageDice = weapon.versatileDamage
-      ? `${weapon.damage.dice}(${weapon.versatileDamage})`
-      : weapon.damage.dice;
+      ? `${baseEntry?.dice ?? '1d8'}(${weapon.versatileDamage})`
+      : (baseEntry?.dice ?? '1d8');
     const damageStr = `${damageDice}+${damageMod}`;
 
     attacks.push({
       name: weapon.id,
       attackBonus,
       damage: damageStr,
-      damageType: 'Slashing', // 简化，实际应从武器数据获取
+      damageType: baseEntry?.type ?? 'Slashing', // 从武器数据获取伤害类型
       mastery: weapon.mastery ? [weapon.mastery] : [],
     });
   }

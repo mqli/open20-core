@@ -310,7 +310,7 @@ describe('rollSavingThrow', () => {
 
 describe('rollWeaponDamage', () => {
   it('calculates weapon damage correctly', () => {
-    const rng = createMockRNG([4, 6, 3]); // 1d8 + 1d8 + 1d6
+    const rng = createMockRNG([4]); // 1d8
     const character = createMockCharacter();
     const weapon: Weapon = {
       id: 'longsword',
@@ -319,7 +319,7 @@ describe('rollWeaponDamage', () => {
       category: 'Martial',
       weight: 3,
       equipped: true,
-      damage: { dice: '1d8', ability: 'Strength', bonus: 0 },
+      damage: { entries: [{ dice: '1d8', type: 'Slashing' }], ability: 'Strength', bonus: 0 },
       properties: [],
     };
 
@@ -337,7 +337,7 @@ describe('rollWeaponDamage', () => {
   });
 
   it('doubles dice on critical hit', () => {
-    const rng = createMockRNG([4, 6, 3, 8]); // 2d8 + 1d6
+    const rng = createMockRNG([4, 6]); // 2d8
     const character = createMockCharacter();
     const weapon: Weapon = {
       id: 'longsword',
@@ -346,7 +346,7 @@ describe('rollWeaponDamage', () => {
       category: 'Martial',
       weight: 3,
       equipped: true,
-      damage: { dice: '1d8', ability: 'Strength', bonus: 0 },
+      damage: { entries: [{ dice: '1d8', type: 'Slashing' }], ability: 'Strength', bonus: 0 },
       properties: [],
     };
 
@@ -355,11 +355,77 @@ describe('rollWeaponDamage', () => {
     expect(result.rolls[0]?.count).toBe(2); // Doubled!
     expect(result.rolls[0]?.results).toEqual([4, 6]);
   });
+
+  it('supports composed damage types (weapon with poison)', () => {
+    const rng = createMockRNG([4, 3]); // 1d8 piercing + 1d4 poison
+    const character = createMockCharacter();
+    const weapon: Weapon = {
+      id: 'poisoned-shortbow',
+      name: 'Poisoned Shortbow',
+      type: 'weapon',
+      category: 'Simple',
+      weight: 2,
+      equipped: true,
+      damage: {
+        entries: [
+          { dice: '1d8', type: 'Piercing' },
+          { dice: '1d4', type: 'Poison' },
+        ],
+        ability: 'Dexterity',
+        bonus: 0,
+      },
+      properties: ['Ammunition', 'Range', 'Two-Handed'],
+    };
+
+    const result = rollWeaponDamage(rng, character, weapon);
+
+    // Should have 2 roll entries: Piercing and Poison
+    expect(result.rolls).toHaveLength(2);
+    expect(result.rolls[0]?.damageType).toBe('Piercing');
+    expect(result.rolls[1]?.damageType).toBe('Poison');
+
+    // typedDamage should have both types
+    expect(result.typedDamage['Piercing']).toBeDefined();
+    expect(result.typedDamage['Poison']).toBeDefined();
+
+    // Total should equal sum of typedDamage values
+    const typedTotal = Object.values(result.typedDamage).reduce((a, b) => a + b, 0);
+    expect(result.total).toBe(typedTotal);
+  });
+
+  it('ability modifier only applies to physical damage', () => {
+    const rng = createMockRNG([4, 3]); // 1d8 slashing + 1d6 fire
+    const character = createMockCharacter(); // Str 18 = +4
+    const weapon: Weapon = {
+      id: 'flametongue-longsword',
+      name: 'Flametongue Longsword',
+      type: 'weapon',
+      category: 'Martial',
+      weight: 3,
+      equipped: true,
+      damage: {
+        entries: [
+          { dice: '1d8', type: 'Slashing' },
+          { dice: '1d6', type: 'Fire' },
+        ],
+        ability: 'Strength',
+        bonus: 0,
+      },
+      properties: [],
+    };
+
+    const result = rollWeaponDamage(rng, character, weapon);
+
+    // Slashing should include Str modifier (+4)
+    expect(result.typedDamage['Slashing']).toBe(4 + 4); // 1d8 = 4, +4 Str
+    // Fire should NOT include Str modifier
+    expect(result.typedDamage['Fire']).toBe(3); // 1d6 = 3
+  });
 });
 
 describe('rollSpellDamage', () => {
   it('calculates spell damage correctly', () => {
-    const rng = createMockRNG([5, 6]); // 1d6 + 1d6
+    const rng = createMockRNG([5]); // 1d10
     const character = createMockCharacter();
     const spell: Spell = {
       id: 'firebolt',
@@ -373,7 +439,7 @@ describe('rollSpellDamage', () => {
       concentration: false,
       ritual: false,
       description: 'You hurl a mote of fire...',
-      damage: { dice: '1d10', type: 'Fire' },
+      damage: { entries: [{ dice: '1d10', type: 'Fire' }] },
       attack: true,
       source: '2024 PHB',
     };
@@ -388,7 +454,7 @@ describe('rollSpellDamage', () => {
   });
 
   it('scales damage with higher slot level', () => {
-    const rng = createMockRNG([4, 5, 6, 3, 4, 5]); // 4d6 at level 3
+    const rng = createMockRNG([4, 5, 6, 3, 4]); // 5d6 at level 3
     const character = createMockCharacter();
     const spell: Spell = {
       id: 'scorching-ray',
@@ -403,8 +469,7 @@ describe('rollSpellDamage', () => {
       ritual: false,
       description: 'You create three rays...',
       damage: {
-        dice: '4d6',
-        type: 'Fire',
+        entries: [{ dice: '4d6', type: 'Fire' }],
         higherLevel: ['5d6', '6d6', '7d6', '8d6', '9d6', '10d6', '11d6', '12d6'],
       },
       attack: true,
@@ -414,6 +479,42 @@ describe('rollSpellDamage', () => {
     const result = rollSpellDamage(rng, character, spell, 3); // Cast at 3rd level
 
     expect(result.rolls[0]?.count).toBe(5); // 5d6 at level 3 (base 4d6 + 1 extra)
+  });
+
+  it('supports composed damage types (spell with additional damage)', () => {
+    const rng = createMockRNG([4, 3]); // 2d6 piercing + 1d6 poison
+    const character = createMockCharacter();
+    const spell: Spell = {
+      id: 'melfs-acid-arrow',
+      name: "Melf's Acid Arrow",
+      level: 2,
+      school: 'Evocation',
+      castingTime: 'Action',
+      range: '90 feet',
+      components: ['V', 'S', 'M'],
+      duration: 'Instantaneous',
+      concentration: false,
+      ritual: false,
+      description: 'A shimmering green arrow...',
+      damage: {
+        entries: [{ dice: '2d6', type: 'Piercing' }],
+        higherLevel: ['3d6', '4d6', '5d6', '6d6'],
+        additional: [{ dice: '1d6', type: 'Poison' }],
+      },
+      attack: false,
+      source: '2024 PHB',
+    };
+
+    const result = rollSpellDamage(rng, character, spell, 2);
+
+    // Should have 2 roll entries: Piercing and Poison
+    expect(result.rolls).toHaveLength(2);
+    expect(result.rolls[0]?.damageType).toBe('Piercing');
+    expect(result.rolls[1]?.damageType).toBe('Poison');
+
+    // typedDamage should have both types
+    expect(result.typedDamage['Piercing']).toBeDefined();
+    expect(result.typedDamage['Poison']).toBeDefined();
   });
 });
 

@@ -261,6 +261,7 @@ export function rollSavingThrow(
 // ── Damage Roll ───────────────────────────────────────────────────
 
 export interface DamageRollEntry {
+  damageType: string; // 伤害类型，如 "Piercing", "Poison"
   die: DieType;
   count: number;
   results: readonly number[];
@@ -277,6 +278,7 @@ export interface DamageRollResult {
   rolls: readonly DamageRollEntry[];
   modifiers: readonly DamageModifier[];
   total: number;
+  typedDamage: Record<string, number>; // 按伤害类型分解的伤害值
 }
 
 /**
@@ -294,7 +296,8 @@ function parseDiceString(diceStr: string): { count: number; die: DieType } {
 }
 
 /**
- * Execute a weapon damage roll
+ * Execute a weapon damage roll (支持多种伤害类型)
+ * 使用统一的 entries 数组，第一条为基础伤害（重击时骰子翻倍，应用能力加值）
  */
 export function rollWeaponDamage(
   rng: RandomProvider,
@@ -304,32 +307,59 @@ export function rollWeaponDamage(
 ): DamageRollResult {
   const rolls: DamageRollEntry[] = [];
   const modifiers: DamageModifier[] = [];
+  const typedDamage: Record<string, number> = {};
 
-  // Parse weapon damage dice
-  const { count: baseCount, die } = parseDiceString(weapon.damage.dice);
-  const rollCount = isCritical ? baseCount * 2 : baseCount;
+  const entries = weapon.damage.entries;
 
-  const results: number[] = [];
-  for (let i = 0; i < rollCount; i++) {
-    results.push(rollDie(rng, die));
+  // 处理所有伤害条目
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i]!;
+    const { count, die } = parseDiceString(entry.dice);
+
+    // 第一条为基础伤害，重击时骰子翻倍
+    const rollCount = (i === 0 && isCritical) ? count * 2 : count;
+
+    const results: number[] = [];
+    for (let j = 0; j < rollCount; j++) {
+      results.push(rollDie(rng, die));
+    }
+
+    const subtotal = results.reduce((a, b) => a + b, 0);
+
+    rolls.push({
+      damageType: entry.type,
+      die,
+      count: rollCount,
+      results,
+      subtotal,
+    });
+
+    typedDamage[entry.type] = (typedDamage[entry.type] ?? 0) + subtotal;
   }
 
-  rolls.push({
-    die,
-    count: rollCount,
-    results,
-    subtotal: results.reduce((a, b) => a + b, 0),
-  });
-
-  // Add ability modifier (not doubled on crit)
+  // Add ability modifier (only to first entry / physical damage)
   const abilityScore = getTotalScore(character.abilityScores, weapon.damage.ability);
   const abilityMod = getModifier(abilityScore);
 
-  modifiers.push({
-    type: 'ability',
-    value: abilityMod,
-    description: `${weapon.damage.ability} modifier`,
-  });
+  if (abilityMod !== 0) {
+    modifiers.push({
+      type: 'ability',
+      value: abilityMod,
+      description: `${weapon.damage.ability} modifier`,
+    });
+
+    // 能力加值应用于所有物理伤害
+    const firstEntry = entries[0];
+    if (firstEntry) {
+      const firstType = firstEntry.type;
+      if (['Bludgeoning', 'Piercing', 'Slashing'].includes(firstType)) {
+        typedDamage[firstType] = (typedDamage[firstType] ?? 0) + abilityMod;
+      } else {
+        // 非物理伤害，加到第一条伤害类型上
+        typedDamage[firstType] = (typedDamage[firstType] ?? 0) + abilityMod;
+      }
+    }
+  }
 
   // Add weapon bonus damage
   if (weapon.damage.bonus !== 0) {
@@ -338,6 +368,9 @@ export function rollWeaponDamage(
       value: weapon.damage.bonus,
       description: 'weapon bonus',
     });
+    // 武器加值加到第一条伤害类型上
+    const firstType = entries[0]?.type ?? 'Slashing';
+    typedDamage[firstType] = (typedDamage[firstType] ?? 0) + weapon.damage.bonus;
   }
 
   // Calculate total
@@ -345,11 +378,12 @@ export function rollWeaponDamage(
   const modifierTotal = modifiers.reduce((sum, m) => sum + m.value, 0);
   const total = diceTotal + modifierTotal;
 
-  return { rolls, modifiers, total };
+  return { rolls, modifiers, total, typedDamage };
 }
 
 /**
- * Execute a spell damage roll
+ * Execute a spell damage roll (支持多种伤害类型)
+ * 使用统一的 entries 数组
  */
 export function rollSpellDamage(
   rng: RandomProvider,
@@ -359,33 +393,46 @@ export function rollSpellDamage(
 ): DamageRollResult {
   const rolls: DamageRollEntry[] = [];
   const modifiers: DamageModifier[] = [];
+  const typedDamage: Record<string, number> = {};
 
   if (spell.damage) {
-    // Get the appropriate dice string based on slot level
-    let diceStr = spell.damage.dice;
-    if (slotLevel > spell.level && spell.damage.higherLevel) {
-      const higherIndex = Math.min(
-        slotLevel - spell.level - 1,
-        spell.damage.higherLevel.length - 1
-      );
-      diceStr = spell.damage.higherLevel[higherIndex] ?? diceStr;
-    }
+    const entries = spell.damage.entries;
 
-    const { count, die } = parseDiceString(diceStr);
-    const results: number[] = [];
-    for (let i = 0; i < count; i++) {
-      results.push(rollDie(rng, die));
-    }
+    // 处理主伤害条目（第一条可随升环增加）
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i]!;
+      let diceStr = entry.dice;
 
-    rolls.push({
-      die,
-      count,
-      results,
-      subtotal: results.reduce((a, b) => a + b, 0),
-    });
+      // 第一条伤害在升环时增加
+      if (i === 0 && slotLevel > spell.level && spell.damage.higherLevel) {
+        const higherIndex = Math.min(
+          slotLevel - spell.level - 1,
+          spell.damage.higherLevel.length - 1
+        );
+        diceStr = spell.damage.higherLevel[higherIndex] ?? diceStr;
+      }
+
+      const { count, die } = parseDiceString(diceStr);
+      const results: number[] = [];
+      for (let j = 0; j < count; j++) {
+        results.push(rollDie(rng, die));
+      }
+
+      const subtotal = results.reduce((a, b) => a + b, 0);
+
+      rolls.push({
+        damageType: entry.type,
+        die,
+        count,
+        results,
+        subtotal,
+      });
+
+      typedDamage[entry.type] = (typedDamage[entry.type] ?? 0) + subtotal;
+    }
 
     // Add spellcasting ability modifier if it's a spell attack
-    if (spell.attack) {
+    if (spell.attack && entries.length > 0) {
       const abilityScore = getTotalScore(
         character.abilityScores,
         character.spells.spellcastingAbility
@@ -397,6 +444,32 @@ export function rollSpellDamage(
         value: abilityMod,
         description: `${character.spells.spellcastingAbility} modifier`,
       });
+
+      // 能力加值加到第一条伤害类型上
+      const firstType = entries[0]!.type;
+      typedDamage[firstType] = (typedDamage[firstType] ?? 0) + abilityMod;
+    }
+
+    // 处理额外伤害（不随升环增加，如 Melf's Acid Arrow 的 1d6 poison）
+    if (spell.damage.additional) {
+      for (const additional of spell.damage.additional) {
+        const { count: addCount, die: addDie } = parseDiceString(additional.dice);
+        const addResults: number[] = [];
+        for (let i = 0; i < addCount; i++) {
+          addResults.push(rollDie(rng, addDie));
+        }
+        const addSubtotal = addResults.reduce((a, b) => a + b, 0);
+
+        rolls.push({
+          damageType: additional.type,
+          die: addDie,
+          count: addCount,
+          results: addResults,
+          subtotal: addSubtotal,
+        });
+
+        typedDamage[additional.type] = (typedDamage[additional.type] ?? 0) + addSubtotal;
+      }
     }
   }
 
@@ -404,5 +477,5 @@ export function rollSpellDamage(
   const modifierTotal = modifiers.reduce((sum, m) => sum + m.value, 0);
   const total = diceTotal + modifierTotal;
 
-  return { rolls, modifiers, total };
+  return { rolls, modifiers, total, typedDamage };
 }

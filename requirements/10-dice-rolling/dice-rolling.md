@@ -4,6 +4,13 @@
 
 核心掷骰系统，支持攻击、技能检定、豁免检定和伤害掷骰，包含优势/劣势规则。
 
+**重要**: 伤害掷骰必须支持**复合伤害类型**（composed damage types），例如：
+- 武器： "2d6 piercing + 1d4 poison" (如 Poisoned Weapon)
+- 法术： "2d6 fire + 1d6 poison" (如 Melf's Acid Arrow)
+- 特殊： "1d8 slashing + 1d6 fire" (如 Flametongue Sword)
+
+**更新 (2026-05-09)**: 统一伤害类型定义，消除 `dice`/`type` 与 `additional` 的冗余，使用统一的 `entries[]` 数组。
+
 ## 核心接口
 
 ### 基础掷骰
@@ -125,24 +132,29 @@ export function rollSavingThrow(
 ): SavingThrowResult;
 ```
 
-### 伤害掷骰
+### 伤害掷骰（支持复合伤害类型）
 
 ```typescript
 // src/engine/dice.ts
 
+// 伤害掷骰条目（支持多种伤害类型）
+export interface DamageRollEntry {
+  damageType: string;        // 伤害类型，如 "Piercing", "Poison"
+  die: DieType;
+  count: number;
+  results: readonly number[];
+  subtotal: number;
+}
+
 export interface DamageRollResult {
-  rolls: ReadonlyArray<{
-    die: DieType;
-    count: number;
-    results: readonly number[];
-    subtotal: number;
-  }>;
+  rolls: ReadonlyArray<DamageRollEntry>;
   modifiers: ReadonlyArray<{
     type: 'ability' | 'flat' | 'extra';
     value: number;
     description: string;
   }>;
   total: number;
+  typedDamage: Record<string, number>;  // 按伤害类型分解的伤害值
 }
 
 /**
@@ -164,6 +176,66 @@ export function rollSpellDamage(
   spell: Spell,
   slotLevel: SpellLevel
 ): DamageRollResult;
+```
+
+## 数据结构要求
+
+### WeaponDamage 类型（src/types/equipment.ts）
+
+武器伤害使用统一的 `entries` 数组，消除 `dice`/`type` 与 `additional` 的冗余。
+
+```typescript
+// 武器伤害条目
+export interface WeaponDamageEntry {
+  readonly dice: string; // 如 "1d8", "2d6", "1d4"
+  readonly type: string;   // 伤害类型，如 "Piercing", "Poison", "Fire"
+}
+
+// 武器伤害（统一使用 entries 数组）
+export interface WeaponDamage {
+  readonly entries: readonly WeaponDamageEntry[]; // 所有伤害条目，第一条为基础伤害（应用能力加值）
+  readonly ability: AbilityName;
+  readonly bonus: number;
+}
+```
+
+**示例**：
+```typescript
+// 普通长剑：1d8 slashing
+{ entries: [{ dice: "1d8", type: "Slashing" }], ability: "Strength", bonus: 0 }
+
+// 淬毒匕首：1d4 piercing + 1d4 poison
+{ entries: [{ dice: "1d4", type: "Piercing" }, { dice: "1d4", type: "Poison" }], ability: "Dexterity", bonus: 0 }
+
+// 火焰舌剑：1d8 slashing + 1d6 fire
+{ entries: [{ dice: "1d8", type: "Slashing" }, { dice: "1d6", type: "Fire" }], ability: "Strength", bonus: 0 }
+```
+
+### SpellDamage 类型（src/types/spell.ts）
+
+法术伤害使用统一的 `entries` 数组。
+
+```typescript
+// 法术伤害条目
+export interface SpellDamageEntry {
+  readonly dice: string; // 如 "2d6", "1d6"
+  readonly type: string;   // 伤害类型，如 "Fire", "Poison"
+}
+
+export interface SpellDamage {
+  readonly entries: readonly SpellDamageEntry[]; // 法术伤害条目（升环时第一条伤害骰增加）
+  readonly higherLevel?: readonly string[];       // 升环伤害（对应 entries[0]）
+  readonly additional?: readonly SpellDamageEntry[]; // 额外伤害（不随升环增加，如 Melf's Acid Arrow 的 poison）
+}
+```
+
+**示例**：
+```typescript
+// Firebolt：1d10 fire（0级法术）
+{ entries: [{ dice: "1d10", type: "Fire" }], higherLevel: ["2d10", "3d10", ...] }
+
+// Melf's Acid Arrow：2d6 piercing + 1d6 poison（额外 poison 不随升环增加）
+{ entries: [{ dice: "2d6", type: "Piercing" }], higherLevel: ["3d6", "4d6", ...], additional: [{ dice: "1d6", type: "Poison" }] }
 ```
 
 ## 实现要点
@@ -189,6 +261,22 @@ export function rollSpellDamage(
 - `character.combatStats.proficiencyBonus` - 熟练加成
 - `character.skills` - 技能熟练状态
 
+### 5. 复合伤害类型处理（新增）
+- **基础伤害**：从 `weapon.damage.dice` 或 `spell.damage.dice` 解析
+- **额外伤害**：从 `weapon.damage.additional` 或 `spell.damage.additional` 解析
+- **伤害类型分解**：`typedDamage` 记录每种伤害类型的具体值
+- **能力加值应用**：
+  - 能力加值只加到**物理伤害**（Bludgeoning/Piercing/Slashing）
+  - 如果没有物理伤害，则加到第一种伤害类型上
+- **重击规则**：
+  - 只有**基础伤害骰**翻倍（D&D 5e 规则）
+  - 额外伤害骰（如 poison）不翻倍
+  - 能力加值不翻倍
+- **示例**：
+  - 武器：1d8 piercing + 1d4 poison
+  - 重击：2d8 piercing + 1d4 poison（poison 不翻倍）
+  - 力量 +3：1d8+3 piercing + 1d4 poison
+
 ## 导出结构
 
 ```typescript
@@ -203,6 +291,7 @@ export * from './dice';
 
 ## 测试用例
 
+### 基础测试
 1. `rollDie` - 验证返回值在有效范围内
 2. `rollWithAdvantage` - 验证取较高值
 3. `rollWithDisadvantage` - 验证取较低值
@@ -211,6 +300,21 @@ export * from './dice';
 6. `rollSavingThrow` - 验证 DC 对比
 7. `rollWeaponDamage` - 验证重击伤害翻倍
 8. `rollSpellDamage` - 验证法术伤害计算
+
+### 复合伤害类型测试（新增）
+9. `rollWeaponDamage` - 验证武器基础伤害 + 额外伤害
+   - 测试：武器 "1d8 piercing + 1d4 poison"
+   - 验证：`typedDamage` 包含 `Piercing` 和 `Poison` 两个条目
+   - 验证：`total` = 所有伤害之和
+10. `rollSpellDamage` - 验证法术复合伤害
+    - 测试：法术 "2d6 fire + 1d6 poison"
+    - 验证：`typedDamage` 包含 `Fire` 和 `Poison` 两个条目
+11. `rollWeaponDamage` - 验证重击时所有伤害骰都翻倍
+    - 测试：武器 "1d8 piercing + 1d4 poison"，重击
+    - 验证：`Piercing` 伤害 = 2d8，`Poison` 伤害 = 1d4（额外伤害不翻倍）
+12. 能力加值应用 - 验证能力加值只加到物理伤害
+    - 测试：武器 "1d8 slashing + 1d6 fire"，力量 +3
+    - 验证：`Slashing` 伤害包含 +3，`Fire` 伤害不包含 +3
 
 ## 依赖
 

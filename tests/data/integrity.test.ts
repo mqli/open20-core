@@ -281,8 +281,10 @@ describe('Data Integrity Tests', () => {
 
     it('should have valid damage structure', () => {
       for (const weapon of weapons) {
-        expect(weapon.damage.dice).toMatch(/^\d+d\d+$/);
-        expect(['bludgeoning', 'piercing', 'slashing']).toContain(weapon.damage.type);
+        expect(weapon.damage.entries.length).toBeGreaterThan(0);
+        const firstEntry = weapon.damage.entries[0];
+        expect(firstEntry?.dice).toMatch(/^\d+d\d+$/);
+        expect(['bludgeoning', 'piercing', 'slashing']).toContain(firstEntry?.type?.toLowerCase());
       }
     });
   });

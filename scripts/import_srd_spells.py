@@ -46,16 +46,18 @@ def parse_components(comp_str):
 def extract_damage(description, level):
     """Extract damage dice and type from description."""
     damage = None
-    
+
     # Pattern for damage dice: 1d4, 2d6, 10d8, etc.
     dmg_pattern = r'(\d+d\d+(?:\s*\+\s*\d+)?)\s+(acid|cold|fire|force|lightning|necrotic|poison|radiant|thunder|psychic|slashing|piercing|bludgeoning)'
     match = re.search(dmg_pattern, description, re.IGNORECASE)
     if match:
         damage = {
-            "dice": match.group(1),
-            "type": match.group(2).capitalize()
+            "entries": [{
+                "dice": match.group(1),
+                "type": match.group(2).capitalize()
+            }]
         }
-    
+
     return damage
 
 def extract_save(description):

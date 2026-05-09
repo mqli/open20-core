@@ -77,6 +77,30 @@ export {
   knowsSpell,
 } from './spells';
 
+// ── Dice Rolling (R22) ──────────────────────────────
+export type {
+  RandomProvider,
+  AttackModifier,
+  AttackRollResult,
+  SkillCheckResult,
+  SavingThrowResult,
+  DamageRollResult,
+  DamageRollEntry,
+  DamageModifier,
+} from './engine';
+export {
+  rollDie,
+  rollDice,
+  rollWithAdvantage,
+  rollWithDisadvantage,
+  rollAttack,
+  rollSkillCheck,
+  rollSavingThrow,
+  rollWeaponDamage,
+  rollSpellDamage,
+  defaultRandom,
+} from './engine';
+
 // ── Storage ──────────────────────────────────────────────
 export type { ICharacterStorage, CharacterSummary } from './storage';
 export { InMemoryStorage } from './storage';

@@ -23,9 +23,15 @@ export interface Weapon extends EquipmentItem {
   readonly versatileDamage?: string; // 双手使用时伤害（如 "1d10"）
 }
 
-// 武器伤害
+// 武器伤害条目（统一结构，消除 dice/type 与 additional 的冗余）
+export interface WeaponDamageEntry {
+  readonly dice: string; // 如 "1d8", "2d6", "1d4"
+  readonly type: string; // 伤害类型，如 "Piercing", "Slashing", "Poison", "Fire"
+}
+
+// 武器伤害（统一使用 entries 数组）
 export interface WeaponDamage {
-  readonly dice: string; // 如 "1d8", "2d6"
+  readonly entries: readonly WeaponDamageEntry[]; // 所有伤害条目，第一条为基础伤害（应用能力加值）
   readonly ability: import('./ability').AbilityName;
   readonly bonus: number;
 }

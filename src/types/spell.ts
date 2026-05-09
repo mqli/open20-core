@@ -37,11 +37,17 @@ export type CastingTime = 'Action' | 'Bonus Action' | 'Reaction' | 'Minute' | 'H
 // 法术成分
 export type SpellComponent = 'V' | 'S' | 'M';
 
-// Spell damage/effect data
+// 法术伤害条目
+export interface SpellDamageEntry {
+  readonly dice: string; // 如 "2d6", "1d10"
+  readonly type: string; // 伤害类型，如 "Fire", "Piercing", "Poison"
+}
+
+// Spell damage/effect data（统一使用 entries 数组）
 export interface SpellDamage {
-  readonly dice: string; // e.g., "1d6"
-  readonly type: string; // e.g., "Fire"
-  readonly higherLevel?: readonly string[];
+  readonly entries: readonly SpellDamageEntry[]; // 法术伤害条目（升环时第一条伤害骰增加）
+  readonly higherLevel?: readonly string[];       // 升环伤害（对应 entries[0]）
+  readonly additional?: readonly SpellDamageEntry[]; // 额外伤害（不随升环增加）
 }
 
 export interface SpellHeal {
