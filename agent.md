@@ -8,7 +8,7 @@
 
 **Project**: Open20 Core - Headless D&D 5e 2024 Game Engine
 **Goal**: A TypeScript library for D&D 5e 2024 rules engine, spell management, and character management. No UI - pure logic, testable via unit tests, usable by any framework.
-**Status**: S1-S20 complete (550+ tests passing)
+**Status**: S1-S20 complete (560+ tests passing)
 
 ### Key Design Decisions
 - **Headless**: Zero UI dependency. Pure functions, immutable state.
@@ -51,7 +51,7 @@ open20-core/
 │   ├── bundle.mjs             # Browser bundle builder (esbuild)
 │   └── import_srd_spells.py   # Import SRD spells from dnd-data repo
 ├── spec/
-│   ├── high-level-design.md    # HLD v1.1 (S1-S20, status tracking)
+│   ├── high-level-design.md    # HLD v2.1 (S1-S20, R26 complete)
 │   ├── data-model.md           # TypeScript interfaces & JSON schema
 │   └── test-plan.md           # Test plan and coverage goals
 ├── requirements/
@@ -99,7 +99,12 @@ open20-core/
 │   │   └── index.ts           # Barrel export
 │   ├── spells/                 # Spell data & queries
 │   │   ├── query.ts           # getSpell(), searchSpells(), etc.
-│   │   └── types.ts           # Spell types
+│   │   ├── types.ts           # Spell types
+│   │   └── index.ts           # Barrel export
+│   ├── content/                # R26: Content pack types & utilities
+│   │   ├── types.ts           #   ContentPack, ContentPack, ContentPackMeta interfacess
+│   │   ├── io.ts             #   exportContentPack(), importContentPack()
+│   │   └── index.ts           # Barrel export
 │   ├── schemas/                # Zod schemas
 │   │   ├── character.ts
 │   │   ├── spell.ts
@@ -119,7 +124,8 @@ open20-core/
     ├── character/*.test.ts      # 6 test files
     ├── storage/*.test.ts       # 1 test file
     ├── data/*.test.ts          # 1 test file
-    └── integration/*.test.ts   # 1 test file
+    ├── content/*.test.ts       # 1 test file
+    └── integration/*.test.ts   # 7 test files
 ```
 
 ---
@@ -289,7 +295,7 @@ npm run build:browser
 5. Export via `src/character/index.ts`
 
 ### 7.3 Adding New Static Data (SRD 5.2)
-> **TODO**: Align all content with SRD 5.2. See: https://www.dndbeyond.com/srd
+> **Status**: ✅ Complete. All content aligned with SRD 5.2.
 
 1. Update JSON schema in `spec/data-model.md`
 2. Add data to `static/srd/*.json` (NOT `static/*.json`)
@@ -347,7 +353,7 @@ registerContentPack(meta, data);
 ## 8. Spell Data Management
 
 ### Current Status
-- ✅ `spells.json` populated with 560+ SRD spells
+- ✅ `spells.json` populated with 391+ SRD 5.2 spells
 - ✅ Import script at `scripts/import_srd_spells.py`
 - ✅ Source: dnd-data GitHub repo (nick-aschenbach/dnd-data)
 
@@ -369,40 +375,147 @@ npx vitest run tests/data/spells.test.ts
 
 ---
 
-## 9. How to Update Documents
+## 9. Requirement Management
 
-### When to Update `PRD.md`
+### 9.1 Requirement Tracking System
+Requirements are tracked in `requirements/README.md` with IDs R1-R26:
+
+```markdown
+### R11: Spell Query Functions
+**Description**: Provide functions to query spell data
+**Status**: ✅ Completed
+**对应源码**:
+- `src/spells/query.ts` - Query functions
+- `tests/spells/query.test.ts` - Tests
+```
+
+### 9.2 Requirement Status Indicators
+- ✅ **Completed**: Fully implemented with tests
+- 📋 **Planned**: Documented but not started
+- 🚧 **In Progress**: Partially implemented
+- ❌ **Blocked**: Cannot implement due to dependencies
+
+### 9.3 How to Mark a Requirement as Complete
+1. Implement all functionality described in the requirement
+2. Write tests covering the requirement
+3. Update `requirements/README.md`:
+   - Change status to ✅
+   - Add "对应源码" section with file paths
+4. Update `spec/high-level-design.md` S-xx status if applicable
+5. Run `npm test` to verify all tests pass
+6. Commit with prefix `[Rx]` (e.g., `[R11]`)
+
+### 9.4 How to Add a New Requirement
+1. Add entry to `requirements/README.md` with format:
+   ```markdown
+   ### Rxx: [Requirement Name]
+   **Description**: [What it does]
+   **Status**: 📋 Planned
+   ```
+2. Create directory `requirements/Rxx-name/` if detailed spec needed
+3. Update `spec/high-level-design.md` if it affects architecture
+4. Add to PRD.md if it's a user-facing feature
+
+### 9.5 Requirement Implementation Checklist
+- [ ] Code implemented in `src/`
+- [ ] Unit tests written in `tests/`
+- [ ] All tests pass (`npx vitest run`)
+- [ ] Type check passes (`npm run typecheck`)
+- [ ] Lint passes (`npm run lint`)
+- [ ] Documentation updated
+- [ ] Requirement marked as ✅ in `requirements/README.md`
+- [ ] `对应源码` links added
+
+### 9.6 Traceability Matrix
+Keep requirements traceable through implementation:
+
+| Requirement | Specification | Source Files | Tests |
+|-------------|---------------|--------------|-------|
+| R1 | S1 | `src/engine/*.ts` | `tests/engine/*.test.ts` |
+| R11 | S14 | `src/spells/query.ts` | `tests/spells/query.test.ts` |
+
+Update this matrix in `requirements/README.md` when adding new requirements.
+
+---
+
+## 10. Documentation Maintenance
+
+### 10.1 Documentation Suite Overview
+| Document | Purpose | Update Frequency |
+|----------|---------|------------------|
+| `PRD.md` | Product requirements | Major features only |
+| `spec/high-level-design.md` | Technical architecture | Every S1-S20 change |
+| `spec/data-model.md` | TypeScript interfaces | Every type change |
+| `requirements/README.md` | Requirement traceability | Every R1-R26 change |
+| `agent.md` | AI agent guidelines | Every convention/pitfall |
+| `README.md` | User-facing docs | Every public API change |
+
+### 10.2 When to Update Each Document
+
+#### `PRD.md`
 - Project scope or positioning changes
 - New major features added
 - Target audience changes
+- Release planning updates
 
-### When to Update `spec/high-level-design.md`
+#### `spec/high-level-design.md`
 - Added/modified/removed any S1-S20 functionality
 - Changed function signatures (update §12 function list)
 - Changed module dependencies
 - Update status column (✅/📋/🚧)
+- Update test count after adding tests
 
-### When to Update `spec/data-model.md`
+#### `spec/data-model.md`
 - Changed TypeScript interfaces in `src/types/index.ts`
 - Changed JSON schema in `static/*.json`
 - Added/removed fields from core types
+- Updated Zod schemas in `src/schemas/`
 
-### When to Update `requirements/README.md`
+#### `requirements/README.md`
 - Implemented a new requirement (mark Rxx as ✅)
 - Changed requirement scope
 - Add "对应源码" links when implementing
+- Update status indicators regularly
 
-### When to Update This File (`agent.md`)
+#### `agent.md` (This File)
 - New common pitfalls discovered
 - New conventions established
 - Project structure changed
 - New tooling added
+- Test count changes
+- New sections needed (like this one!)
+
+### 10.3 Documentation Sync Checklist
+After completing any code change:
+
+1. **Identify affected documents** (see §10.2)
+2. **Update specification status** (S-xx, R-xx)
+3. **Update test counts** if tests added/removed
+4. **Update directory structure** if files added/removed
+5. **Add new pitfalls** discovered during implementation
+6. **Cross-reference check**: Ensure links between documents work
+7. **Build and verify**: `npm run lint && npm run typecheck && npx vitest run`
+
+### 10.4 Writing Guidelines for Documentation
+- **Be concise**: No narration, get to the point
+- **Use examples**: Code snippets speak louder than words
+- **Keep tables readable**: Don't let them get too wide
+- **Update the "Last updated" line** at bottom of each document
+- **Use status indicators**: ✅ 📋 🚧 ❌ for quick visual scanning
+- **Link to source**: Use "对应源码" sections for traceability
+
+### 10.5 Common Documentation Mistakes to Avoid
+- ❌ Forgetting to update test counts after adding tests
+- ❌ Not marking requirements as complete in `requirements/README.md`
+- ❌ Letting `agent.md` get out of date with actual project structure
+- ❌ Not updating function signatures in `spec/high-level-design.md` §12
+- ❌ Breaking markdown table formatting (triple pipes `|||`)
 
 ---
 
-## 10. Testing Patterns
+## 11. Testing Patterns
 
-### 10.1 Unit Test Structure
+### 11.1 Unit Test Structure
 ```typescript
 import { describe, it, expect } from 'vitest';
 import { functionUnderTest } from '../../src/module/file';
@@ -420,7 +533,7 @@ describe('functionUnderTest', () => {
 });
 ```
 
-### 10.2 Testing with DataLoader
+### 11.2 Testing with DataLoader
 ```typescript
 import { createDataLoader, type DataLoader } from '../../src/data/loader';
 
@@ -436,7 +549,7 @@ const mockLoader: DataLoader = createDataLoader(mockTables);
 const result = createCharacter(params, mockLoader);
 ```
 
-### 10.3 Testing Immutable Updates
+### 11.3 Testing Immutable Updates
 ```typescript
 it('should return new object without mutating original', () => {
   const original = createTestCharacter();
@@ -456,7 +569,7 @@ it('should return new object without mutating original', () => {
 });
 ```
 
-### 10.4 Testing Spell Queries
+### 11.4 Testing Spell Queries
 ```typescript
 it('should filter spells by school and level', () => {
   const spells = searchSpells({ 
@@ -474,7 +587,7 @@ it('should filter spells by school and level', () => {
 
 ---
 
-## 11. Git Commit Guidelines
+## 12. Git Commit Guidelines
 
 Since this project uses AI agents, commit messages should be:
 - **Clear**: What changed, why
@@ -492,7 +605,7 @@ Examples:
 
 ---
 
-## 12. Quick Reference
+## 13. Quick Reference
 
 | Task | Command |
 |------|---------|
@@ -510,16 +623,16 @@ Examples:
 | `agent.md` | This file - read first! |
 | `spec/high-level-design.md` | Technical architecture (S1-S20) |
 | `spec/data-model.md` | TypeScript interfaces & JSON schema |
-| `requirements/README.md | Requirements traceability (R1-R26) |) |
+| `requirements/README.md` | Requirements traceability (R1-R26) |
 | `src/types/index.ts` | All core types |
 | `src/data/loader.ts` | DataLoader interface |
-|| `requirements/11-content-management/` | Content management spec (R26) |
-|| `src/types/content.ts` | ContentPackMeta interface |
-|| `static/srd/` | SRD 5.2 content (included in core) |
+| `requirements/11-content-management/` | Content management spec (R26) |
+| `src/content/types.ts` | ContentPack, ContentPackMeta interfaces |
+| `static/srd/` | SRD 5.2 content (included in core) |
 
 ---
 
-## 13. Contact / Escalation
+## 14. Contact / Escalation
 
 If you're stuck or unsure:
 1. Read `spec/high-level-design.md` for architecture context
@@ -531,5 +644,5 @@ If you're stuck or unsure:
 
 ---
 
-*Last updated: 2026-05-09 (updated lint workflow)*
+*Last updated: 2026-05-09 (added sections 9 Requirement Management and 10 Documentation Maintenance)*
 *Maintained by: AI agents working on this project*

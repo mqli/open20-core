@@ -74,8 +74,6 @@ interface Spell {
 
 **Data sources**: SRD 5.2 (~391+ spells, full descriptions), 2024 PHB (~200, metadata), XGtE/TCoE (~110, SRD-eligible).
 
-> **TODO**: Align all content with SRD 5.2 (latest version). See: https://www.dndbeyond.com/srd
-
 ### 1.4 Static Data & Content Management (`@open20/core/data`)
 
 **Content Management Requirements (R26)**:

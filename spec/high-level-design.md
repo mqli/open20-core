@@ -374,7 +374,7 @@ interface SpellFilter {
 | S19 | Public API barrel exports | ✅ | `index.ts`, `browser-index.ts` |
 | S20 | Integration tests | ✅ | `tests/integration/` |
 
-**Current Test Status**: **550+ tests passing**, `tsc --noEmit` ✅
+**Current Test Status**: **560+ tests passing**, `tsc --noEmit` ✅
 
 ---
 
@@ -460,14 +460,14 @@ calculateAC(character, equipment, dataLoader)
 |---|---|---|
 | Multiclassing | P0 | Full multiclass support with correct spell slot calculations |
 | 2014 Legacy | P1 | Half-Elf, Half-Orc, legacy subclasses and feats |
-| Content Management (R26) | P1 | 📋 Requirements defined, implementation pending |
+| Content Management (R26) | P1 | ✅ Implemented |
 | Monster Data | P2 | SRD monster statistics and queries |
 | Magic Items | P2 | SRD magic item data |
 | Encounter Builder | P2 | Helper functions for encounter difficulty |
 
-### 9.1 Content Management (R26) — Requirements Defined
+### 9.1 Content Management (R26) — Implemented
 
-**Status**: 📋 Requirements defined in `requirements/11-content-management/content-management.md`
+**Status**: ✅ Implemented (2026-05-09)
 
 **Key Design Decisions**:
 1. **SRD content included in core** — `static/srd/` ships with `@open20/core`
@@ -475,36 +475,38 @@ calculateAC(character, equipment, dataLoader)
 3. **Import/export support** — `exportContentPack()` and `importContentPack()` for distribution
 4. **No override** — Same ID in different sources = separate items
 
-**Components** (to be implemented):
+**Components** (implemented):
 - `src/content/types.ts` — ContentPack, ContentPackMeta interfaces
 - `src/content/io.ts` — `exportContentPack()`, `importContentPack()` functions
-- `src/data/content-registry.ts` — Registry for multiple content sources
-- `static/srd/` — Separate JSON files for SRD content
+- `src/data/default-loader.ts` — Registry for multiple content sources
+- `static/srd/` — Separate JSON files for SRD content (source: 'SRD 5.2')
 - No-override rule: same ID = separate items coexist
 
-**Usage** (planned):
+**Usage**:
 ```typescript
-import { ContentRegistry, loadContentPack, exportContentPack } from '@open20/core';
+import { createDataLoader, loadContentPack } from '@open20/core';
 
-// Load SRD content (separate files)
-const registry = new ContentRegistry();
-registry.register('static/srd/');
+// Load SRD content (separate files, loaded by default)
+const dataLoader = createDataLoader(lookupTables);
 
-// Export to unified file for distribution
-const pack = exportContentPack('static/srd/');
-// pack is a single ContentPack object with meta + all content
+// Get all registered content packs
+const packs = dataLoader.getContentPacks();
+console.log(packs[0].name); // 'SRD 5.2'
 
-// Import unified file (split into separate files)
-importContentPack(pack, 'my-homebrew/');
-
-// Add homebrew
-registry.register({
+// Register custom content pack
+dataLoader.registerContentPack({
   meta: { id: 'my-homebrew', name: 'My Homebrew', version: '1.0.0', source: 'Homebrew', priority: 10 },
-  spells: [{ id: 'custom-spell', name: 'Custom Spell', ... }]
+  spells: [{ id: 'custom-spell', name: 'Custom Spell', source: 'Homebrew', ... }]
 });
+
+// Filter by source
+const homebrewSpells = dataLoader.getSpellsBySource('Homebrew');
+
+// Unregister content pack
+dataLoader.unregisterContentPack('my-homebrew');
 ```
 
 ---
 
 *Last updated: 2026-05-09*
-*Version: 2.0 (Headless Engine)*
+*Version: 2.1 (R26 Implemented)*
