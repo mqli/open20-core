@@ -31,7 +31,7 @@
 | R21 | Multiclassing | - | `src/engine/spell-slots.ts` + `recompute.ts` | P1 | ✅ Done |
 | R22 | Dice Rolling | - | `src/engine/dice.ts` | P1 | ✅ Done |
 | R26 | Content Management | `requirements/11-content-management/content-management.md` | `src/data/loader.ts`, `src/types/content.ts` | P1 | ✅ Done |
-| R28 | Monster Support | `requirements/28-monster-support/monster-support.md` | `src/monsters/*`, `src/types/monster.ts` | P2 | 📋 Planned |
+| R28 | Monster Support | `requirements/28-monster-support/monster-support.md` | `src/monsters/*`, `src/types/monster.ts` | P2 | 🚧 In Progress |
 
 ---
 
@@ -50,7 +50,7 @@
 | # | Requirement | Description | Status |
 |---|---|---|---|
 | R23 | 2014 Legacy | Half-Elf/Half-Orc + legacy subclasses/feats | 📋 `23-2014-legacy.md` |
-| R28 | Monster Support | Query functions + combat calculations | 📋 `28-monster-support/monster-support.md` |
+| R28 | Monster Support | Query functions + combat calculations | 🚧 In Progress `28-monster-support/monster-support.md` |
 
 ---
 

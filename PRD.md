@@ -74,6 +74,31 @@ interface Spell {
 
 **Data sources**: SRD 5.2 (~391+ spells, full descriptions), 2024 PHB (~200, metadata), XGtE/TCoE (~110, SRD-eligible).
 
+### 1.4 Monster Management (`@open20/core/monsters`)
+
+```typescript
+// Query
+const monster = getMonster('goblin')
+const monsters = searchMonsters({ minCR: 0, maxCR: 2, type: ['Beast'] })
+const partyMonsters = getMonstersForParty(3, 4)
+```
+
+**Monster data structure**:
+```typescript
+interface Monster {
+  id: string; name: string; source: string;
+  size: MonsterSize; type: MonsterType; alignment: string;
+  armorClass: ArmorClassEntry[]; hitPoints: HPInfo;
+  speed: SpeedInfo; abilityScores: AbilityScores;
+  challengeRating: ChallengeRatingInfo;
+  traits?: MonsterFeature[]; actions?: MonsterAction[];
+  reactions?: MonsterReaction[]; legendaryActions?: MonsterLegendaryAction[];
+  environments?: readonly string[];
+}
+```
+
+**Data sources**: SRD 5.2 (~300 monsters, structured attack data).
+
 ### 1.4 Static Data & Content Management (`@open20/core/data`)
 
 **Content Management Requirements (R26)**:

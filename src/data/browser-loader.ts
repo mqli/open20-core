@@ -12,6 +12,7 @@ import type { Feat, FeatCategory } from '../types/feat';
 import type { Weapon, Armor, GearItem } from '../types/equipment';
 import type { Spell } from '../types/spell';
 import type { DieType } from '../types/dice';
+import type { Monster } from '../monsters/types';
 
 // ── 静态 JSON 数据（esbuild 会直接 bundle 进输出） ────────────
 import speciesData from '../../static/srd/species.json';
@@ -23,6 +24,7 @@ import weaponsData from '../../static/srd/weapons.json';
 import armorData from '../../static/srd/armor.json';
 import gearData from '../../static/srd/gear.json';
 import spellsData from '../../static/srd/spells.json';
+import monstersData from '../../static/srd/monsters.json';
 
 // ── 类型转换工具 ─────────────────────────────────────
 
@@ -75,6 +77,7 @@ const weapons: Weapon[] = weaponsData as unknown as Weapon[];
 const armors: Armor[] = armorData as unknown as Armor[];
 const gear: GearItem[] = gearData as unknown as GearItem[];
 const spells: Spell[] = spellsData as unknown as Spell[];
+const monsters: Monster[] = monstersData as unknown as Monster[];
 
 // ── createBrowserDataLoader ────────────────────────────────────
 
@@ -211,6 +214,19 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
 
     getAllSpells(): Spell[] {
       return spells;
+    },
+
+    // ── 怪物（Monster）───
+    getMonster(id: string): Monster | undefined {
+      return monsters.find(m => m.id === id);
+    },
+
+    getMonstersBySource(source: string): Monster[] {
+      return monsters.filter(m => m.source === source);
+    },
+
+    getAllMonsters(): Monster[] {
+      return monsters;
     },
 
     // ── 内容包管理（R26，Browser 环境为 stub）─────────────────────

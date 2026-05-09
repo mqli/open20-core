@@ -18,6 +18,7 @@ import type { Feat, FeatCategory } from '../types/feat';
 import type { Weapon, Armor, GearItem } from '../types/equipment';
 import type { Spell } from '../types/spell';
 import type { DieType } from '../types/dice';
+import type { Monster } from '../monsters/types';
 import { loadContentPack } from '../content/io';
 
 // ── ESM 兼容的 JSON 加载 ────────────────────────────────────
@@ -41,6 +42,9 @@ const rawArmor: unknown[] = require('../../static/srd/armor.json');
 const rawGear: unknown[] = require('../../static/srd/gear.json');
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const rawSpells: unknown[] = require('../../static/srd/spells.json');
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const rawMonsters: unknown[] = require('../../static/srd/monsters.json');
 
 // ── JSON → 类型转换工具 ──────────────────────────────────────
 
@@ -98,6 +102,7 @@ let weaponsData: Weapon[] = rawWeapons as Weapon[];
 let armorData: Armor[] = rawArmor as Armor[];
 let gearData: GearItem[] = rawGear as GearItem[];
 let spellsData: Spell[] = rawSpells as Spell[];
+let monstersData: Monster[] = rawMonsters as Monster[];
 
 // 已注册的内容包元数据
 const registeredPacks: Map<string, ContentPackMeta> = new Map();
@@ -126,6 +131,7 @@ function registerData(pack: ContentPack): void {
   if (pack.armor) armorData = [...armorData, ...pack.armor];
   if (pack.gear) gearData = [...gearData, ...pack.gear];
   if (pack.spells) spellsData = [...spellsData, ...pack.spells];
+  if (pack.monsters) monstersData = [...monstersData, ...pack.monsters];
 }
 
 function unregisterData(source: string): void {
@@ -141,6 +147,7 @@ function unregisterData(source: string): void {
   armorData = armorData.filter(a => a.source !== source);
   gearData = gearData.filter(g => g.source !== source);
   spellsData = spellsData.filter(s => s.source !== source);
+  monstersData = monstersData.filter(m => m.source !== source);
 }
 
 // ── createDataLoader 工厂函数 ───────────────────────────────
@@ -156,6 +163,7 @@ export function createDataLoader(tables: LookupTables): DataLoader {
   armorData = rawArmor as Armor[];
   gearData = rawGear as GearItem[];
   spellsData = rawSpells as Spell[];
+  monstersData = rawMonsters as Monster[];
   registeredPacks.clear();
 
   // 重新注册 SRD
@@ -298,6 +306,19 @@ export function createDataLoader(tables: LookupTables): DataLoader {
 
     getAllSpells(): Spell[] {
       return spellsData;
+    },
+
+    // ── 怪物（Monster）───
+    getMonster(id: string): Monster | undefined {
+      return monstersData.find(m => m.id === id);
+    },
+
+    getMonstersBySource(source: string): Monster[] {
+      return monstersData.filter(m => m.source === source);
+    },
+
+    getAllMonsters(): Monster[] {
+      return monstersData;
     },
 
     // ── 内容包管理（R26）─────────────────────

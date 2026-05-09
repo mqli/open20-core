@@ -8,7 +8,7 @@
 
 **Project**: Open20 Core - Headless D&D 5e 2024 Game Engine
 **Goal**: A TypeScript library for D&D 5e 2024 rules engine, spell management, and character management. No UI - pure logic, testable via unit tests, usable by any framework.
-**Status**: S1-S20 complete (560+ tests passing)
+**Status**: S1-S20 complete (586+ tests passing)
 
 ### Key Design Decisions
 - **Headless**: Zero UI dependency. Pure functions, immutable state.
@@ -65,6 +65,7 @@ open20-core/
 │       ├── subclasses.json     # Subclasses for SRD classes
 │       ├── feats.json          # Limited feats (SRD 5.2)
 │       ├── spells.json         # 391+ spells (SRD 5.2)
+│       ├── monsters.json       # ~3 SRD monsters (sample)
 │       ├── weapons.json        # ~30 weapons (SRD 5.2)
 │       ├── armor.json          # ~15 armors (SRD 5.2)
 │       ├── gear.json           # ~20 gear items (SRD 5.2)
@@ -101,10 +102,19 @@ open20-core/
 │   │   ├── query.ts           # getSpell(), searchSpells(), etc.
 │   │   ├── types.ts           # Spell types
 │   │   └── index.ts           # Barrel export
+│   ├── monsters/              # Monster data & queries (R28)
+│   │   ├── query.ts           # getMonster(), searchMonsters(), etc.
+│   │   ├── calculator.ts      # getMonsterProficiencyBonus(), etc.
+│   │   ├── types.ts           # Monster types
+│   │   └── index.ts           # Barrel export
 │   ├── content/                # R26: Content pack types & utilities
 │   │   ├── types.ts           #   ContentPack, ContentPack, ContentPackMeta interfacess
 │   │   ├── io.ts             #   exportContentPack(), importContentPack()
 │   │   └── index.ts           # Barrel export
+│   ├── types/
+│   │   ├── attack.ts          # BaseAttack (shared)
+│   │   ├── monster.ts         # MonsterSize, MonsterType, etc.
+│   │   └── index.ts           # All TypeScript interfaces/types
 │   ├── schemas/                # Zod schemas
 │   │   ├── character.ts
 │   │   ├── spell.ts
@@ -122,6 +132,7 @@ open20-core/
 └── tests/
     ├── engine/*.test.ts        # 11 test files
     ├── character/*.test.ts      # 6 test files
+    ├── monsters/*.test.ts      # 2 test files (query, calculator)
     ├── storage/*.test.ts       # 1 test file
     ├── data/*.test.ts          # 1 test file
     ├── content/*.test.ts       # 1 test file

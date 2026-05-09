@@ -11,6 +11,7 @@ import type { Weapon, Armor, GearItem } from '../types/equipment';
 import type { Spell } from '../types/spell';
 import type { DieType } from '../types/dice';
 import type { ContentPack, ContentPackMeta } from '../content/types';
+import type { Monster } from '../monsters/types';
 
 // ── DataLoader 接口 ───────────────────────────────────────────────
 // 所有读取规则数据的函数集中在此接口
@@ -92,6 +93,11 @@ export interface DataLoader {
 
   // 标准状态列表（14个）
   getConditionNames(): readonly string[];
+
+  // ── 怪物（Monster）───
+  getMonster(id: string): Monster | undefined;
+  getMonstersBySource(source: string): Monster[];
+  getAllMonsters(): Monster[];
 }
 
 // ── 查表数据辅助类型 ──────────────────────────────────────────

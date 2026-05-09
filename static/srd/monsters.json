@@ -1,0 +1,209 @@
+[
+  {
+    "id": "goblin",
+    "name": "Goblin",
+    "source": "SRD 5.2",
+    "size": "Small",
+    "type": "Humanoid",
+    "alignment": "neutral evil",
+    "armorClass": [
+      {
+        "value": 15,
+        "type": "hide armor, shield"
+      }
+    ],
+    "hitPoints": {
+      "value": 7,
+      "formula": "2d6+2"
+    },
+    "speed": {
+      "walk": 30
+    },
+    "abilityScores": {
+      "Strength": 8,
+      "Dexterity": 14,
+      "Constitution": 10,
+      "Intelligence": 10,
+      "Wisdom": 8,
+      "Charisma": 8
+    },
+    "challengeRating": {
+      "rating": "1/4",
+      "xp": 50
+    },
+    "traits": [
+      {
+        "name": "Nimble Escape",
+        "description": "The goblin can take the Disengage or Hide action as a bonus action on each of its turns."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Scimitar",
+        "attacks": [
+          {
+            "name": "Scimitar",
+            "attackBonus": 4,
+            "damage": "1d6+2",
+            "damageType": "Slashing",
+            "damageEntries": [
+              {
+                "dice": "1d6",
+                "type": "Slashing",
+                "bonus": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Shortbow",
+        "attacks": [
+          {
+            "name": "Shortbow",
+            "attackBonus": 4,
+            "damage": "1d6+2",
+            "damageType": "Piercing",
+            "reach": null,
+            "range": {
+              "normal": 80,
+              "long": 320
+            },
+            "damageEntries": [
+              {
+                "dice": "1d6",
+                "type": "Piercing",
+                "bonus": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "environments": ["forest", "hill", "mountain"]
+  },
+  {
+    "id": "orc",
+    "name": "Orc",
+    "source": "SRD 5.2",
+    "size": "Medium",
+    "type": "Humanoid",
+    "alignment": "chaotic evil",
+    "armorClass": [
+      {
+        "value": 13,
+        "type": "hide armor"
+      }
+    ],
+    "hitPoints": {
+      "value": 15,
+      "formula": "3d8+3"
+    },
+    "speed": {
+      "walk": 30
+    },
+    "abilityScores": {
+      "Strength": 16,
+      "Dexterity": 12,
+      "Constitution": 16,
+      "Intelligence": 7,
+      "Wisdom": 11,
+      "Charisma": 10
+    },
+    "challengeRating": {
+      "rating": "1/2",
+      "xp": 100
+    },
+    "traits": [
+      {
+        "name": "Aggressive",
+        "description": "As a bonus action, the orc can move up to its speed toward a hostile creature that it can see."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Greataxe",
+        "attacks": [
+          {
+            "name": "Greataxe",
+            "attackBonus": 5,
+            "damage": "1d12+3",
+            "damageType": "Slashing",
+            "damageEntries": [
+              {
+                "dice": "1d12",
+                "type": "Slashing",
+                "bonus": 3
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "environments": ["forest", "grassland", "hill", "mountain"]
+  },
+  {
+    "id": "wolf",
+    "name": "Wolf",
+    "source": "SRD 5.2",
+    "size": "Medium",
+    "type": "Beast",
+    "alignment": "unaligned",
+    "armorClass": [
+      {
+        "value": 13,
+        "type": "natural armor"
+      }
+    ],
+    "hitPoints": {
+      "value": 11,
+      "formula": "3d8"
+    },
+    "speed": {
+      "walk": 40
+    },
+    "abilityScores": {
+      "Strength": 12,
+      "Dexterity": 15,
+      "Constitution": 12,
+      "Intelligence": 3,
+      "Wisdom": 12,
+      "Charisma": 6
+    },
+    "challengeRating": {
+      "rating": "1/4",
+      "xp": 50
+    },
+    "traits": [
+      {
+        "name": "Keen Hearing and Smell",
+        "description": "The wolf has advantage on Wisdom (Perception) checks that rely on hearing or smell."
+      },
+      {
+        "name": "Pack Tactics",
+        "description": "The wolf has advantage on an attack roll against a creature if at least one of the wolf's allies is within 5 feet of the creature and the ally isn't incapacitated."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Bite",
+        "attacks": [
+          {
+            "name": "Bite",
+            "attackBonus": 4,
+            "damage": "2d4+2",
+            "damageType": "Piercing",
+            "damageEntries": [
+              {
+                "dice": "2d4",
+                "type": "Piercing",
+                "bonus": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "environments": ["forest", "grassland", "hill", "mountain", "tundra"]
+  }
+]
