@@ -1,15 +1,27 @@
 import { describe, it, expect } from 'vitest';
 import { createDataLoader } from '../../src/data/loader';
-import lookupTables from '../../static/lookup-tables.json';
-import species from '../../static/species.json';
-import backgrounds from '../../static/backgrounds.json';
-import classes from '../../static/classes.json';
-import subclasses from '../../static/subclasses.json';
-import feats from '../../static/feats.json';
-import weapons from '../../static/weapons.json';
-import armors from '../../static/armor.json';
-import gear from '../../static/gear.json';
-import spells from '../../static/spells.json';
+import _lookupTables from '../../static/lookup-tables.json';
+import _species from '../../static/species.json';
+import _backgrounds from '../../static/backgrounds.json';
+import _classes from '../../static/classes.json';
+import _subclasses from '../../static/subclasses.json';
+import _feats from '../../static/feats.json';
+import _weapons from '../../static/weapons.json';
+import _armors from '../../static/armor.json';
+import _gear from '../../static/gear.json';
+import _spells from '../../static/spells.json';
+
+// Cast JSON imports to any to allow dynamic property access in integrity tests
+const lookupTables: any = _lookupTables;
+const species: any = _species;
+const backgrounds: any = _backgrounds;
+const classes: any = _classes;
+const subclasses: any = _subclasses;
+const feats: any = _feats;
+const weapons: any = _weapons;
+const armors: any = _armors;
+const gear: any = _gear;
+const spells: any = _spells;
 
 const dataLoader = createDataLoader(lookupTables);
 
