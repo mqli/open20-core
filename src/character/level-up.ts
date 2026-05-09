@@ -4,19 +4,13 @@
 
 import type { AbilityName } from '../types/ability';
 import type { Character, CharacterClass } from '../types/character';
-import type { DieType } from '../types/dice';
 import type { DataLoader } from '../data/loader';
-import type { ResetType } from '../types/resource';
+import type { DieType } from '../types/dice';
 
 import { getModifier, getTotalScore } from '../engine/ability-modifier';
-import { getHitDieFixedValue, calculateHPIncrement } from '../engine/hp-calculator';
+import { getHitDieFixedValue } from '../engine/hp-calculator';
 import { getProficiencyBonus } from '../engine/proficiency-bonus';
-import {
-  extractResources,
-  getFeaturesAtLevel,
-  buildInitialSpells,
-  emptyCharacterSpells,
-} from './create';
+import { extractResources } from './create';
 import {
   getMulticlassSpellcasterLevel,
   calculateMulticlassSpellSlots,
@@ -177,7 +171,7 @@ function addNewClass(
   char: Character,
   options: LevelUpOptions,
   data: DataLoader,
-  rng?: RandomProvider
+  _rng?: RandomProvider
 ): Character {
   // Validate new class exists in data
   const classData = data.getClass(options.classId);

@@ -3,7 +3,6 @@
 // Returns structured errors/warnings without throwing
 
 import type { Character } from '../types/character';
-import type { AbilityName } from '../types/ability';
 import { ABILITY_NAMES } from '../types/ability';
 import type { DataLoader } from '../data/loader';
 import type { SpellLevel } from '../types/spell';

@@ -2,10 +2,8 @@
 // Recalculates all derived/computed stats on a Character
 // Pure function — returns a new Character with updated combat stats
 
-import type { Character, CharacterClass } from '../types/character';
-import type { Feature } from '../types/class';
+import type { Character } from '../types/character';
 import type { DataLoader } from '../data/loader';
-import type { SpellLevel } from '../types/spell';
 import { getModifier, getTotalScore } from '../engine/ability-modifier';
 import { getProficiencyBonus } from '../engine/proficiency-bonus';
 import { calculateAC } from '../engine/ac-calculator';
@@ -13,11 +11,9 @@ import { calculateInitiative } from '../engine/initiative';
 import { calculatePassivePerception } from '../engine/passive-perception';
 import { calculateAttacks } from '../engine/attack-calculator';
 import { calculateMaxHP } from '../engine/hp-calculator';
-import {
-  calculateSpellSlots,
-  calculateSpellSlotsFromClasses,
-  calculatePactMagic,
-} from '../engine/spell-slots';
+import type { Feature } from '../types/class';
+import { calculatePactMagic, calculateSpellSlotsFromClasses } from '../engine/spell-slots';
+import type { SpellLevel } from '../types/spell';
 import { getFeaturesAtLevel } from './create';
 
 /**

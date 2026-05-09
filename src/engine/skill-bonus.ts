@@ -3,9 +3,8 @@
 // 对应 HLD §6.1 + PRD v4.0 §4.2
 
 import type { AbilityScores } from '../types/ability';
-import type { SkillEntry, SkillName } from '../types/skill';
+import type { SkillEntry } from '../types/skill';
 import { getModifier, getTotalScore } from './ability-modifier';
-import { getProficiencyBonus } from './proficiency-bonus';
 
 /**
  * 计算技能加值

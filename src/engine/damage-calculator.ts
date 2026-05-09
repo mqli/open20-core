@@ -184,25 +184,6 @@ export const DAMAGE_TYPE_CATEGORIES = {
 const PHYSICAL_DAMAGE_TYPES: readonly DamageType[] = ['Bludgeoning', 'Piercing', 'Slashing'];
 
 /**
- * Known defense patterns in features (regex-based detection)
- * Maps feature patterns to damage types
- */
-const DEFENSE_PATTERNS: readonly { pattern: RegExp; damageType: DamageType }[] = [
-  // Dwarven Resilience and poison resistance
-  { pattern: /resistance\s+to\s+poison/i, damageType: 'Poison' },
-  { pattern: /poison\s+resistance/i, damageType: 'Poison' },
-  // Dragon ancestry elemental resistances
-  { pattern: /resistance\s+to\s+(fire|cold|lightning|thunder|acid)/i, damageType: 'Fire' }, // Generic, needs specific
-  // Rage resistance
-  { pattern: /resistance\s+to\s+(bludgeoning|piercing|slashing)/i, damageType: 'Bludgeoning' },
-  // Avatar of Battle (Path of the Battlerager)
-  {
-    pattern: /resistance\s+to\s+(nonmagical\s+)?(bludgeoning|piercing|slashing)/i,
-    damageType: 'Bludgeoning',
-  },
-];
-
-/**
  * Parse damage type from a feature description
  * Extracts damage types from phrases like "resistance to fire damage"
  */
@@ -252,7 +233,7 @@ function isRaging(char: Character): boolean {
 /**
  * Check if character has a specific class at minimum level
  */
-function hasClassLevel(char: Character, classId: string, minLevel: number): boolean {
+function _hasClassLevel(char: Character, classId: string, minLevel: number): boolean {
   return char.classes.some(c => c.classId === classId && c.level >= minLevel);
 }
 

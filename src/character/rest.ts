@@ -115,7 +115,7 @@ export function shortRest(
 
 // ── Long Rest ──────────────────────────────────────────────────
 
-export function longRest(char: Character, data: DataLoader): Character {
+export function longRest(char: Character, _data: DataLoader): Character {
   // 1. Regain all HP
   let result = withUpdate(char, {
     hitPoints: {

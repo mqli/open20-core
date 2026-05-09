@@ -3,10 +3,9 @@
 // 对应 HLD §6.1 + PRD v4.0 §10 附录E
 // ⚠️ 这是v1.0公式错误的修正版，必须100%准确
 
-import type { CharacterClass } from '../types/character';
 import type { DieType } from '../types/dice';
+import type { CharacterClass } from '../types/character';
 import type { DataLoader } from '../data/loader';
-import { getModifier, getTotalScore } from './ability-modifier';
 
 /**
  * 生命骰固定值对照表

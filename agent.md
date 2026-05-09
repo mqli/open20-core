@@ -250,8 +250,11 @@ npx vitest run
 # Run specific test file
 npx vitest run tests/engine/ability-modifier.test.ts
 
+# Lint (MUST pass before committing)
+npm run lint
+
 # Type check (MUST pass before committing)
-npx tsc --noEmit
+npm run typecheck
 
 # Run tests with coverage
 npx vitest run --coverage
@@ -447,7 +450,8 @@ Examples:
 
 | Task | Command |
 |------|---------|
-| Type check | `npx tsc --noEmit` |
+| Lint | `npm run lint` |
+| Type check | `npm run typecheck` |
 | Run all tests | `npx vitest run` |
 | Run single test | `npx vitest run tests/path/to/test.test.ts` |
 | Install deps | `npm install` |
@@ -478,5 +482,5 @@ If you're stuck or unsure:
 
 ---
 
-*Last updated: 2026-05-09*
+*Last updated: 2026-05-09 (updated lint workflow)*
 *Maintained by: AI agents working on this project*

@@ -4,7 +4,7 @@
 // 这是所有计算中最容易出错的，必须100%准确
 
 import type { AbilityScores } from '../types/ability';
-import type { EquipmentItem, Armor, Weapon } from '../types/equipment';
+import type { Armor, EquipmentItem } from '../types/equipment';
 import type { Feature } from '../types/class';
 import type { DataLoader } from '../data/loader';
 import { getModifier, getTotalScore } from './ability-modifier';

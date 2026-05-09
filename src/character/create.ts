@@ -3,23 +3,23 @@
 // 对应 HLD §6.2
 
 import type { AbilityName, AbilityScores } from '../types/ability';
+import type { SkillEntry } from '../types/skill';
 import type {
   Character,
   CharacterClass,
   HitPoints,
   CombatStats,
   Currency,
+  DamageDefenses,
 } from '../types/character';
-import type { DieType } from '../types/dice';
-import type { DamageDefenses } from '../types/damage';
-import type { SkillEntry, SkillName } from '../types/skill';
-import { SKILL_NAMES } from '../types/skill';
 import type { CharacterSpells, SpellLevel, SpellSlotEntry, PactMagicSlots } from '../types/spell';
 import type { Feature, Class } from '../types/class';
-import { Resource, ResetType } from '../types/resource';
+import type { Resource } from '../types/resource';
+import { ResetType } from '../types/resource';
 import type { DataLoader } from '../data/loader';
 
 import { getModifier, getTotalScore } from '../engine/ability-modifier';
+import { SKILL_NAMES } from '../types/skill';
 import { getProficiencyBonus } from '../engine/proficiency-bonus';
 import { calculateHPAtLevel1, calculateHPIncrement } from '../engine/hp-calculator';
 import { calculateAC } from '../engine/ac-calculator';

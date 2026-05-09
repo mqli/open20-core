@@ -2,7 +2,8 @@
 // Character 及其相关类型（零依赖）
 
 import type { DieType } from './dice';
-import type { DamageType, DamageDefenses } from './damage';
+import type { DamageDefenses } from './damage';
+export type { DamageDefenses };
 
 // 角色核心接口 — 所有字段均为 readonly（不可变）
 export interface Character {

@@ -3,7 +3,7 @@
 // 对应 HLD §6.1
 
 import type { AbilityScores } from '../types/ability';
-import type { EquipmentItem, Weapon } from '../types/equipment';
+import type { Weapon, EquipmentItem } from '../types/equipment';
 import type { Feature } from '../types/class';
 import type { Attack } from '../types/character';
 import type { DataLoader } from '../data/loader';
@@ -33,7 +33,6 @@ export function calculateAttacks(
   data: DataLoader
 ): Attack[] {
   const attacks: Attack[] = [];
-  const featureNames = new Set(features.map(f => f.name));
 
   // 获取所有已装备的武器
   const equippedWeapons = equipment
@@ -42,11 +41,10 @@ export function calculateAttacks(
     .filter((w): w is { itemId: string; weapon: Weapon } => w.weapon != null);
 
   for (const { weapon } of equippedWeapons) {
-    const { attackBonus, damageMod, abilityUsed } = calculateWeaponAttack(
+    const { attackBonus, damageMod } = calculateWeaponAttack(
       scores,
       weapon,
-      proficiencyBonus,
-      featureNames
+      proficiencyBonus
     );
 
     // 伤害字符串（使用 entries[0] 为基础伤害）
@@ -74,8 +72,7 @@ export function calculateAttacks(
 function calculateWeaponAttack(
   scores: AbilityScores,
   weapon: Weapon,
-  proficiencyBonus: number,
-  featureNames: Set<string>
+  proficiencyBonus: number
 ): { attackBonus: number; damageMod: number; abilityUsed: string } {
   const strMod = getModifier(getTotalScore(scores, 'Strength'));
   const dexMod = getModifier(getTotalScore(scores, 'Dexterity'));

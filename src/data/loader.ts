@@ -5,12 +5,11 @@
 
 import type { Species, SpeciesSubtype } from '../types/species';
 import type { Background } from '../types/background';
-import type { Class, Subclass, MulticlassSpellSlotEntry } from '../types/class';
+import type { Class, Subclass } from '../types/class';
 import type { Feat, FeatCategory } from '../types/feat';
-import type { EquipmentItem, Weapon, Armor, GearItem } from '../types/equipment';
+import type { Weapon, Armor, GearItem } from '../types/equipment';
 import type { Spell } from '../types/spell';
 import type { DieType } from '../types/dice';
-import type { ResetType } from '../types/resource';
 
 // ── DataLoader 接口 ───────────────────────────────────────────────
 // 所有读取规则数据的函数集中在此接口
