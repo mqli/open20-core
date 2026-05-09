@@ -2,10 +2,16 @@
 // Barrel export — 公共类型API
 
 // 核心类型
-export type { Character, CharacterClass, DieType } from './character';
+export type { Character, CharacterClass } from './character';
 export type { HitPoints, DeathSaves } from './character';
 export type { CombatStats, Attack, ActiveCondition } from './character';
 export type { ConditionName, Currency } from './character';
+
+// 骰子类型
+export type { DieType } from './dice';
+
+// 伤害类型
+export type { DamageType, DamageDefenses, DamageDefenseSource, DamageResult } from './damage';
 
 // 属性
 export type { AbilityName, AbilityScores } from './ability';

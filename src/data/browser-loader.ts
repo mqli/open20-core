@@ -10,7 +10,7 @@ import type { AbilityName } from '../types/ability';
 import type { Feat, FeatCategory } from '../types/feat';
 import type { Weapon, Armor, GearItem } from '../types/equipment';
 import type { Spell } from '../types/spell';
-import type { DieType } from '../types/character';
+import type { DieType } from '../types/dice';
 
 // ── 静态 JSON 数据（esbuild 会直接 bundle 进输出） ─────────────
 import speciesData from '../../static/species.json';

@@ -2,7 +2,8 @@
 // Short Rest and Long Rest functions — DND 2024 rules
 // Corresponds to HLD §6.2
 
-import type { Character, CharacterClass, DieType } from '../types/character';
+import type { Character, CharacterClass } from '../types/character';
+import type { DieType } from '../types/dice';
 import type { Resource } from '../types/resource';
 import { ResetType } from '../types/resource';
 import type { DataLoader } from '../data/loader';

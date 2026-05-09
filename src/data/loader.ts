@@ -9,7 +9,7 @@ import type { Class, Subclass, MulticlassSpellSlotEntry } from '../types/class';
 import type { Feat, FeatCategory } from '../types/feat';
 import type { EquipmentItem, Weapon, Armor, GearItem } from '../types/equipment';
 import type { Spell } from '../types/spell';
-import type { DieType } from '../types/character';
+import type { DieType } from '../types/dice';
 import type { ResetType } from '../types/resource';
 
 // ── DataLoader 接口 ───────────────────────────────────────────────

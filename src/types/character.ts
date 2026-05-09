@@ -1,54 +1,8 @@
 // types/character.ts
 // Character 及其相关类型（零依赖）
 
-// 骰子类型 — 用于生命骰和武器伤害骰
-export type DieType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20';
-
-// 伤害类型 (5e标准)
-export type DamageType =
-  | 'Bludgeoning'
-  | 'Piercing'
-  | 'Slashing' // Physical
-  | 'Fire'
-  | 'Cold'
-  | 'Lightning'
-  | 'Thunder'
-  | 'Acid'
-  | 'Poison'
-  | 'Psychic'
-  | 'Force'
-  | 'Necrotic'
-  | 'Radiant'; // Magical/Elemental
-
-/**
- * Damage defense modifiers
- */
-export interface DamageDefenses {
-  readonly resistances: readonly DamageType[];
-  readonly immunities: readonly DamageType[];
-  readonly vulnerabilities: readonly DamageType[];
-}
-
-/**
- * Source of a damage defense
- */
-export interface DamageDefenseSource {
-  readonly source: string;
-  readonly type: 'species' | 'class' | 'equipment' | 'condition' | 'spell' | 'custom';
-  readonly defenses: DamageDefenses;
-}
-
-/**
- * Result of applying typed damage
- */
-export interface DamageResult {
-  readonly originalDamage: number;
-  readonly effectiveDamage: number; // After defenses applied
-  readonly modifiers: readonly {
-    readonly type: 'resistance' | 'immunity' | 'vulnerability';
-    readonly damageType: DamageType;
-  }[];
-}
+import type { DieType } from './dice';
+import type { DamageType, DamageDefenses } from './damage';
 
 // 角色核心接口 — 所有字段均为 readonly（不可变）
 export interface Character {

@@ -2,7 +2,8 @@
 // Dice rolling system for attacks, skills, saves, and damage
 // Implements R22
 
-import type { Character, DieType } from '../types/character';
+import type { Character } from '../types/character';
+import type { DieType } from '../types/dice';
 import type { AbilityName } from '../types/ability';
 import type { SkillName } from '../types/skill';
 import type { Weapon } from '../types/equipment';

@@ -3,7 +3,8 @@
 // 对应 HLD §6.2 + S16
 
 import type { AbilityName } from '../types/ability';
-import type { Character, CharacterClass, DieType } from '../types/character';
+import type { Character, CharacterClass } from '../types/character';
+import type { DieType } from '../types/dice';
 import type { DataLoader } from '../data/loader';
 import type { ResetType } from '../types/resource';
 

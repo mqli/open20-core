@@ -12,7 +12,7 @@ import {
   ALL_DAMAGE_TYPES,
   DAMAGE_TYPE_CATEGORIES,
 } from '../../src/engine/damage-calculator';
-import type { DamageType, DamageDefenses } from '../../src/types/character';
+import type { DamageType, DamageDefenses } from '../../src/types/damage';
 import { createDataLoader } from '../../src/data/loader';
 import { createCharacter } from '../../src/character/create';
 import { modifyHP } from '../../src/character/mutate';

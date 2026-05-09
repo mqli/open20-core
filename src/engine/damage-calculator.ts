@@ -2,14 +2,9 @@
 // Damage type & defense calculation — pure functions
 // Corresponds to PRD §4.5
 
-import type {
-  Character,
-  DamageType,
-  DamageDefenses,
-  DamageDefenseSource,
-  DamageResult,
-} from '../types/character';
-export type { DamageDefenses, DamageDefenseSource, DamageResult } from '../types/character';
+import type { Character } from '../types/character';
+import type { DamageType, DamageDefenses, DamageDefenseSource, DamageResult } from '../types/damage';
+export type { DamageDefenses, DamageDefenseSource, DamageResult } from '../types/damage';
 import type { DataLoader } from '../data/loader';
 import { modifyHP } from '../character/mutate';
 
