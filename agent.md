@@ -105,6 +105,7 @@ open20-core/
 │   ├── monsters/              # Monster data & queries (R28)
 │   │   ├── query.ts           # getMonster(), searchMonsters(), etc.
 │   │   ├── calculator.ts      # getMonsterProficiencyBonus(), etc.
+│   │   ├── combat.ts          # HP management, damage dealing/taking
 │   │   ├── types.ts           # Monster types
 │   │   └── index.ts           # Barrel export
 │   ├── content/                # R26: Content pack types & utilities
@@ -132,7 +133,7 @@ open20-core/
 └── tests/
     ├── engine/*.test.ts        # 11 test files
     ├── character/*.test.ts      # 6 test files
-    ├── monsters/*.test.ts      # 2 test files (query, calculator)
+    ├── monsters/*.test.ts      # 3 test files (query, calculator, combat)
     ├── storage/*.test.ts       # 1 test file
     ├── data/*.test.ts          # 1 test file
     ├── content/*.test.ts       # 1 test file

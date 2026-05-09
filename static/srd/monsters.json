@@ -205,5 +205,103 @@
       }
     ],
     "environments": ["forest", "grassland", "hill", "mountain", "tundra"]
+  },
+  {
+    "id": "young-red-dragon",
+    "name": "Young Red Dragon",
+    "source": "SRD 5.2",
+    "size": "Large",
+    "type": "Dragon",
+    "alignment": "chaotic evil",
+    "armorClass": [
+      {
+        "value": 18,
+        "type": "natural armor"
+      }
+    ],
+    "hitPoints": {
+      "value": 178,
+      "formula": "17d10+85"
+    },
+    "speed": {
+      "walk": 40,
+      "fly": 80
+    },
+    "abilityScores": {
+      "Strength": 23,
+      "Dexterity": 10,
+      "Constitution": 21,
+      "Intelligence": 14,
+      "Wisdom": 11,
+      "Charisma": 19
+    },
+    "challengeRating": {
+      "rating": 10,
+      "xp": 5900
+    },
+    "damageDefenses": {
+      "resistances": [],
+      "immunities": ["Fire"],
+      "vulnerabilities": []
+    },
+    "conditionImmunities": ["Charmed", "Frightened", "Poisoned"],
+    "traits": [
+      {
+        "name": "Fire Aura",
+        "description": "At the start of each of the dragon's turns, each creature within 5 feet of it takes 5 (1d10) fire damage."
+      }
+    ],
+    "actions": [
+      {
+        "name": "Multiattack",
+        "description": "The dragon makes three attacks: one with its bite and two with its claws."
+      },
+      {
+        "name": "Bite",
+        "attacks": [
+          {
+            "name": "Bite",
+            "attackBonus": 11,
+            "damage": "2d10+6",
+            "damageType": "Piercing",
+            "damageEntries": [
+              {
+                "dice": "2d10",
+                "type": "Piercing",
+                "bonus": 6
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Fire Breath (Recharge 5-6)",
+        "description": "The dragon exhales fire in a 30-foot cone. Each creature in that area must make a DC 18 Dexterity saving throw, taking 56 (16d6) fire damage on a failed save, or half as much damage on a successful one."
+      }
+    ],
+    "reactions": [
+      {
+        "name": "Tail Strike",
+        "description": "When a creature provokes an opportunity attack from the dragon, the dragon can use its tail to make a melee attack instead of its bite or claws."
+      }
+    ],
+    "legendaryActions": [
+      {
+        "name": "Detect",
+        "description": "The dragon makes a Wisdom (Perception) check.",
+        "cost": 1
+      },
+      {
+        "name": "Tail Attack",
+        "description": "The dragon makes a tail attack.",
+        "cost": 1
+      },
+      {
+        "name": "Wing Attack (Costs 2 Actions)",
+        "description": "The dragon beats its wings. Each creature within 10 feet of the dragon must succeed on a DC 19 Dexterity saving throw or take 14 (2d6+6) bludgeoning damage and be knocked prone. The dragon can then fly up to half its flying speed.",
+        "cost": 2
+      }
+    ],
+    "environments": ["mountain"]
   }
 ]

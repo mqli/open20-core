@@ -1,7 +1,9 @@
 // tests/monsters/calculator.test.ts
 // Unit tests for monster calculator functions
+import { describe, it, expect, beforeEach } from 'vitest';
 
-import type { Monster, ChallengeRating, MonsterAttack } from '../../src/types/monster';
+import type { ChallengeRating, MonsterAttack } from '../../src/types/monster';
+import type { Monster } from '../../src/monsters/types';
 import {
   getMonsterProficiencyBonus,
   calculateMonsterAttackBonus,

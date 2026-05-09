@@ -41,3 +41,19 @@ export {
   calculateMonsterAC,
   calculateMonsterHP
 } from './calculator';
+
+// Combat functions
+export type { DamageResult } from '../types/damage';
+export {
+  initializeMonsterForCombat,
+  modifyMonsterHP,
+  applyMonsterTypedDamage,
+  setMonsterTemporaryHP,
+  isMonsterDefeated,
+  rollMonsterAttack,
+  getMonsterAC,
+  rollMonsterAttackDamage,
+  addMonsterDamageResistance,
+  addMonsterDamageImmunity,
+  addMonsterDamageVulnerability
+} from './combat';

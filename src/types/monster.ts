@@ -31,7 +31,7 @@ export type ChallengeRating = number | '1/8' | '1/4' | '1/2';
 export interface MonsterAttack extends BaseAttack {
   readonly reach?: number;
   readonly range?: { normal: number; long?: number };
-  readonly damageEntries: readonly MonsterDamageEntry[];
+  readonly damageEntries?: readonly MonsterDamageEntry[]; // Optional: some attacks don't deal damage (e.g., Grapple)
 }
 
 // Structured damage entry for monster attacks

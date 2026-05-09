@@ -3,7 +3,7 @@
 
 import type { MonsterSize, MonsterType, ChallengeRating, MonsterAttack, MonsterDamageEntry } from '../types/monster';
 import type { AbilityScores } from '../types/ability';
-import type { DamageType } from '../types/damage';
+import type { DamageType, DamageDefenses } from '../types/damage';
 
 // ── Main Monster Interface ─────────────────────────────────────
 
@@ -24,6 +24,13 @@ export interface Monster {
   readonly reactions?: readonly MonsterReaction[];
   readonly legendaryActions?: readonly MonsterLegendaryAction[];
   readonly environments?: readonly string[];
+  // Damage defenses (optional, not all monsters have them)
+  readonly damageDefenses?: DamageDefenses;
+  // Condition immunities (common in monsters)
+  readonly conditionImmunities?: readonly string[];
+  // Current HP for combat (not part of stat block, used during combat)
+  readonly currentHP?: number;
+  readonly temporaryHP?: number;
 }
 
 // ── HP & AC ──────────────────────────────────────────────────

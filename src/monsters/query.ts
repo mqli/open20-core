@@ -1,7 +1,7 @@
 // monsters/query.ts
 // Monster query functions — filter, search, and retrieve monsters
 
-import type { Monster } from './types';
+import type { Monster, MonsterAction, MonsterFeature, MonsterReaction, MonsterLegendaryAction } from './types';
 import type { MonsterSize, MonsterType, ChallengeRating } from '../types/monster';
 import type { DataLoader } from '../data/loader';
 
@@ -155,4 +155,131 @@ function crToNumber(cr: ChallengeRating): number {
     case '1/2': return 0.5;
     default: return 0;
   }
+}
+
+// ── Action/Trait/Reaction Query Functions ─────────────────────
+
+/**
+ * Get all actions for a specific monster
+ *
+ * @param monsterId - Monster ID
+ * @param data - DataLoader
+ * @returns Array of actions or empty array
+ *
+ * @example
+ * getMonsterActions('goblin', data) // [{ name: 'Scimitar', attacks: [...] }]
+ */
+export function getMonsterActions(monsterId: string, data: DataLoader): readonly MonsterAction[] {
+  const monster = getMonster(monsterId, data);
+  return monster?.actions ?? [];
+}
+
+/**
+ * Get all traits for a specific monster
+ *
+ * @param monsterId - Monster ID
+ * @param data - DataLoader
+ * @returns Array of traits or empty array
+ *
+ * @example
+ * getMonsterTraits('goblin', data) // [{ name: 'Nimble Escape', description: '...' }]
+ */
+export function getMonsterTraits(monsterId: string, data: DataLoader): readonly MonsterFeature[] {
+  const monster = getMonster(monsterId, data);
+  return monster?.traits ?? [];
+}
+
+/**
+ * Get all reactions for a specific monster
+ *
+ * @param monsterId - Monster ID
+ * @param data - DataLoader
+ * @returns Array of reactions or empty array
+ */
+export function getMonsterReactions(monsterId: string, data: DataLoader): readonly MonsterReaction[] {
+  const monster = getMonster(monsterId, data);
+  return monster?.reactions ?? [];
+}
+
+/**
+ * Get all legendary actions for a specific monster
+ *
+ * @param monsterId - Monster ID
+ * @param data - DataLoader
+ * @returns Array of legendary actions or empty array
+ */
+export function getMonsterLegendaryActions(monsterId: string, data: DataLoader): readonly MonsterLegendaryAction[] {
+  const monster = getMonster(monsterId, data);
+  return monster?.legendaryActions ?? [];
+}
+
+/**
+ * Search monsters that have a specific trait
+ *
+ * @param traitName - Trait name (case-insensitive partial match)
+ * @param data - DataLoader
+ * @returns Array of monsters with the specified trait
+ *
+ * @example
+ * getMonstersWithTrait('Pack Tactics', data) // [{ id: 'wolf', ... }]
+ */
+export function getMonstersWithTrait(traitName: string, data: DataLoader): Monster[] {
+  const searchLower = traitName.toLowerCase();
+  return data.getAllMonsters().filter(m =>
+    m.traits?.some(t => t.name.toLowerCase().includes(searchLower))
+  );
+}
+
+/**
+ * Search monsters that have legendary actions
+ *
+ * @param data - DataLoader
+ * @returns Array of monsters with legendary actions
+ */
+export function getLegendaryMonsters(data: DataLoader): Monster[] {
+  return data.getAllMonsters().filter(m =>
+    m.legendaryActions && m.legendaryActions.length > 0
+  );
+}
+
+/**
+ * Get all attacks from all actions of a monster
+ *
+ * @param monsterId - Monster ID
+ * @param data - DataLoader
+ * @returns Array of all attacks from all actions
+ */
+export function getMonsterAllAttacks(monsterId: string, data: DataLoader): MonsterAction[] {
+  const actions = getMonsterActions(monsterId, data);
+  return actions.filter(a => a.attacks && a.attacks.length > 0);
+}
+
+/**
+ * Search actions by name across all monsters
+ *
+ * @param actionName - Action name (case-insensitive partial match)
+ * @param data - DataLoader
+ * @returns Array of { monsterId, monsterName, action }
+ */
+export function searchActionsByName(
+  actionName: string,
+  data: DataLoader
+): Array<{ monsterId: string; monsterName: string; action: MonsterAction }> {
+  const searchLower = actionName.toLowerCase();
+  const results: Array<{ monsterId: string; monsterName: string; action: MonsterAction }> = [];
+
+  for (const monster of data.getAllMonsters()) {
+    if (!monster.actions) continue;
+    for (const action of monster.actions) {
+      if (action.name.toLowerCase().includes(searchLower)) {
+        results.push({
+          monsterId: monster.id,
+          monsterName: monster.name,
+          action
+        });
+      }
+    }
+  }
+
+  return results;
 }

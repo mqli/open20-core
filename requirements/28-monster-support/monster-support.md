@@ -51,10 +51,22 @@ Add support for D&D 5e monsters (SRD and homebrew) with query functions and comb
 
 **Functions** (in `src/monsters/query.ts`):
 ```typescript
+// Basic queries
 getMonster(id: string, data: DataLoader): Monster | undefined
 searchMonsters(filter: MonsterFilter, data: DataLoader): Monster[]
 getMonstersByCR(minCR: ChallengeRating, maxCR: ChallengeRating, data: DataLoader): Monster[]
 getMonstersByType(type: MonsterType, data: DataLoader): Monster[]
+getMonstersForParty(partyLevel: number, partySize: number, data: DataLoader): Monster[]
+
+// Action/Trait/Reaction queries
+getMonsterActions(monsterId: string, data: DataLoader): readonly MonsterAction[]
+getMonsterTraits(monsterId: string, data: DataLoader): readonly MonsterFeature[]
+getMonsterReactions(monsterId: string, data: DataLoader): readonly MonsterReaction[]
+getMonsterLegendaryActions(monsterId: string, data: DataLoader): readonly MonsterLegendaryAction[]
+getMonstersWithTrait(traitName: string, data: DataLoader): Monster[]
+getLegendaryMonsters(data: DataLoader): Monster[]
+getMonsterAllAttacks(monsterId: string, data: DataLoader): MonsterAction[]
+searchActionsByName(actionName: string, data: DataLoader): Array<{ monsterId, monsterName, action }>
 ```
 
 **Filter Criteria**:
@@ -71,8 +83,16 @@ getMonstersByType(type: MonsterType, data: DataLoader): Monster[]
 - [x] `searchMonsters()` supports all filter criteria
 - [x] `getMonstersByCR()` returns monsters within CR range
 - [x] `getMonstersByType()` returns monsters of given type
+- [x] `getMonsterActions()` returns actions for a monster
+- [x] `getMonsterTraits()` returns traits for a monster
+- [x] `getMonsterReactions()` returns reactions for a monster
+- [x] `getMonsterLegendaryActions()` returns legendary actions
+- [x] `getMonstersWithTrait()` finds monsters by trait name
+- [x] `getLegendaryMonsters()` returns only legendary monsters
+- [x] `getMonsterAllAttacks()` returns actions with attacks
+- [x] `searchActionsByName()` searches actions across all monsters
 - [x] All functions pass `DataLoader` as parameter
-- [x] Tests created and passing (12 tests)
+- [x] Tests created and passing (30 tests)
 
 ---
 
@@ -105,6 +125,47 @@ calculateMonsterHP(monster: Monster): number
 - [x] `calculateMonsterSaveDC()` calculates DC correctly
 - [x] All calculations are pure functions (no side effects)
 - [x] Tests created and passing (14 tests)
+
+---
+
+### R28.6 — Monster Combat Functions (NEW)
+
+**Description**: Enable monsters to deal damage and take damage in combat. Handles HP management, damage defenses (resistances/immunities/vulnerabilities), and attack damage calculation.
+
+**Functions** (in `src/monsters/combat.ts`):
+```typescript
+// HP Management
+initializeMonsterForCombat(monster: Monster): Monster
+modifyMonsterHP(monster: Monster, delta: number, damageType?: DamageType): Monster
+applyMonsterTypedDamage(monster: Monster, damage: number, damageType: DamageType): { monster: Monster; result: DamageResult }
+setMonsterTemporaryHP(monster: Monster, value: number): Monster
+isMonsterDefeated(monster: Monster): boolean
+
+// Attack Helpers
+rollMonsterAttack(attack: MonsterAttack, monster: Monster, data: DataLoader): { d20: number; total: number; critical: boolean }
+rollMonsterAttackDamage(attack: MonsterAttack): number
+getMonsterAC(monster: Monster): number
+
+// Damage Defenses
+addMonsterDamageResistance(monster: Monster, damageType: DamageType): Monster
+addMonsterDamageImmunity(monster: Monster, damageType: DamageType): Monster
+addMonsterDamageVulnerability(monster: Monster, damageType: DamageType): Monster
+```
+
+**Monster Type Updates**:
+- Added `damageDefenses?: DamageDefenses` (resistances, immunities, vulnerabilities)
+- Added `conditionImmunities?: readonly string[]`
+- Added `currentHP?: number` (for combat state)
+- Added `temporaryHP?: number` (for combat state)
+
+**Acceptance Criteria**:
+- [x] `initializeMonsterForCombat()` sets currentHP to max HP
+- [x] `modifyMonsterHP()` applies damage/healing with temporary HP support
+- [x] `applyMonsterTypedDamage()` applies damage defenses correctly
+- [x] `isMonsterDefeated()` returns true when HP <= 0
+- [x] `rollMonsterAttackDamage()` calculates damage from attack
+- [x] Damage defenses (resistance/immunity/vulnerability) work correctly
+- [x] Tests created and passing (29 tests)
 
 ---
 
@@ -171,13 +232,18 @@ export interface DataLoader {
 ```
 
 **Acceptance Criteria**:
-- [x] `static/srd/monsters.json` populated with sample monsters (3 so far)
+- [x] `static/srd/monsters.json` populated with sample monsters (4 including legendary)
 - [x] All monsters have structured attack data (not parsed text)
+- [x] Sample data includes traits, actions, reactions, and legendary actions
 - [ ] Import script created and tested (for full SRD import)
 - [ ] Full SRD monster data imported (~300 monsters)
-}
 ```
 
+**Sample Data Includes**:
+- `goblin` - Has traits and actions with attacks
+- `orc` - Has traits and actions
+- `wolf` - Has multiple traits and actions
+- `young-red-dragon` - Has traits, actions, reactions, and legendary actions
 **Acceptance Criteria**:
 - [ ] `static/srd/monsters.json` populated with SRD monsters
 - [ ] All monsters have structured attack data (not parsed text)
@@ -267,7 +333,9 @@ export interface DataLoader {
 1. [x] Create `src/monsters/query.ts`
 2. [x] Implement `getMonster()`, `searchMonsters()`, etc.
 3. [x] Add filtering by name, size, type, CR, environment
-4. [x] Tests created and passing (12 tests)
+4. [x] Add `getMonsterActions()`, `getMonsterTraits()`, `getMonsterReactions()`, `getMonsterLegendaryActions()`
+5. [x] Add `getMonstersWithTrait()`, `getLegendaryMonsters()`, `getMonsterAllAttacks()`, `searchActionsByName()`
+6. [x] Tests created and passing (30 tests)
 
 ### Phase 4: Calculator Functions (2 hours) ✅
 1. [x] Create `src/monsters/calculator.ts`
@@ -283,15 +351,25 @@ export interface DataLoader {
 4. [x] Add sample data to `static/srd/monsters.json` (3 monsters)
 
 ### Phase 6: Tests (2-3 hours) ✅
-1. [x] Create `tests/monsters/query.test.ts` (12 tests)
+1. [x] Create `tests/monsters/query.test.ts` (30 tests)
 2. [x] Create `tests/monsters/calculator.test.ts` (14 tests)
-3. [x] Test all query and calculation functions
-4. [x] Test edge cases (fractional CR, etc.)
+3. [x] Create `tests/monsters/combat.test.ts` (29 tests)
+4. [x] Test all query, calculation, and combat functions
+5. [x] Test edge cases (fractional CR, damage defenses, etc.)
 
 ### Phase 7: Documentation (1 hour) ✅
 1. [x] Update `PRD.md` to mark R28 as in progress/complete
 2. [ ] Update `spec/high-level-design.md` with monster module
 3. [x] Update `agent.md` with monster module conventions
+
+### Phase 8: Combat Support (2 hours) ✅
+1. [x] Add `damageDefenses` and `conditionImmunities` to Monster type
+2. [x] Create `src/monsters/combat.ts` with HP management functions
+3. [x] Implement `initializeMonsterForCombat()`, `modifyMonsterHP()`, `applyMonsterTypedDamage()`
+4. [x] Implement `addMonsterDamageResistance/Immunity/Vulnerability()`
+5. [x] Add `rollMonsterAttack()` and `rollMonsterAttackDamage()`
+6. [x] Create `tests/monsters/combat.test.ts` (29 tests)
+7. [x] Update sample data with damage defenses (Young Red Dragon)
 
 ---
 
