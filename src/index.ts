@@ -11,7 +11,8 @@ export type { Feat, FeatCategory } from './types';
 export type { Weapon, Armor, GearItem, EquipmentItem } from './types';
 export type { Spell, CharacterSpells, SpellSlotEntry, PactMagicSlots } from './types';
 export type { Resource, ResetType } from './types';
-export type { CombatStats, Attack, ActiveCondition, ConditionName } from './types';
+export type { CombatStats, CharacterAttack, ActiveCondition, ConditionName } from './types';
+export type { BaseAttack } from './types';
 export type { DieType } from './types';
 
 // ── Data ──────────────────────────────────────────────────

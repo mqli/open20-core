@@ -5,7 +5,7 @@
 import type { AbilityScores } from '../types/ability';
 import type { Weapon, EquipmentItem } from '../types/equipment';
 import type { Feature } from '../types/class';
-import type { Attack } from '../types/character';
+import type { CharacterAttack } from '../types/character';
 import type { DataLoader } from '../data/loader';
 import { getModifier, getTotalScore } from './ability-modifier';
 
@@ -31,8 +31,8 @@ export function calculateAttacks(
   proficiencyBonus: number,
   features: readonly Feature[],
   data: DataLoader
-): Attack[] {
-  const attacks: Attack[] = [];
+): CharacterAttack[] {
+  const attacks: CharacterAttack[] = [];
 
   // 获取所有已装备的武器
   const equippedWeapons = equipment

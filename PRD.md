@@ -220,18 +220,23 @@ static/
 - [x] JSON export/import
 
 ### P1 (Should Have)
-- [ ] Multiclassing support
-- [ ] 2014 legacy content
+- [x] Multiclassing support (R21)
 - [x] ~~Homebrew data structures~~ → **R26 Content Management** (see below)
-- [ ] Spell preparation helpers
+- [x] Spell preparation helpers
 - [ ] Equipment effect calculations
 
-### P1 — Content Management (R26)
-- [ ] SRD content as separate files (`static/srd/*.json`)
-- [ ] ContentPack type definition + import/export support
-- [ ] Content registry (register/unregister packs)
-- [ ] No-override rule implementation
-- [ ] Source filtering in query functions
+### P2 (Nice to Have)
+- [ ] 2014 legacy content (R23) - Deprioritized
+- [ ] Monster data
+- [ ] Magic item data
+- [ ] Encounter building helpers
+
+### P1 — Content Management (R26) ✅
+- [x] SRD content as separate files (`static/srd/*.json`)
+- [x] ContentPack type definition + import/export support
+- [x] Content registry (register/unregister packs)
+- [x] No-override rule implementation
+- [x] Source filtering in query functions
 
 ### P2 (Nice to Have)
 - [ ] Monster data

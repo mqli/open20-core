@@ -31,6 +31,7 @@
 | R21 | Multiclassing | - | `src/engine/spell-slots.ts` + `recompute.ts` | P1 | ✅ Done |
 | R22 | Dice Rolling | - | `src/engine/dice.ts` | P1 | ✅ Done |
 | R26 | Content Management | `requirements/11-content-management/content-management.md` | `src/data/loader.ts`, `src/types/content.ts` | P1 | ✅ Done |
+| R28 | Monster Support | `requirements/28-monster-support/monster-support.md` | `src/monsters/*`, `src/types/monster.ts` | P2 | 📋 Planned |
 
 ---
 
@@ -40,11 +41,16 @@
 |---|---|---|---|
 | R21 | Multiclassing | Full multiclass support with spell slot recalculation | ✅ Done |
 | R22 | Dice Rolling | Attack/skill/save/damage rolls with advantage/disadvantage, support composed damage types | ✅ Done |
-| R23 | 2014 Legacy | Half-Elf/Half-Orc + legacy subclasses/feats | 📋 |
-| R24 | Homebrew support | Data structures for homebrew content | 📋 See R26 |
 | R25 | Multiple character management | Character list + quick switch | 📋 |
-| R26 | Content Management | Unified content pack system with SRD included | 📋 `requirements/11-content-management/content-management.md` |
+| R26 | Content Management | Unified content pack system with SRD included | ✅ Done `requirements/11-content-management/content-management.md` |
 | R27 | Quick roll to clipboard | Copy "1d20+bonus" to clipboard | 📋 |
+
+## P2 Requirements
+
+| # | Requirement | Description | Status |
+|---|---|---|---|
+| R23 | 2014 Legacy | Half-Elf/Half-Orc + legacy subclasses/feats | 📋 `23-2014-legacy.md` |
+| R28 | Monster Support | Query functions + combat calculations | 📋 `28-monster-support/monster-support.md` |
 
 ---
 
@@ -60,7 +66,7 @@
 | S13-S17 | Character state management | ✅ |
 | S18-S20 | Spells, Storage, Integration | ✅ |
 
-**Current test status**: **550+ tests passing**, `tsc --noEmit` ✅
+**Current test status**: **560+ tests passing**, `tsc --noEmit` ✅
 
 ---
 

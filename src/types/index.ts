@@ -4,8 +4,15 @@
 // 核心类型
 export type { Character, CharacterClass } from './character';
 export type { HitPoints, DeathSaves } from './character';
-export type { CombatStats, Attack, ActiveCondition } from './character';
+export type { CombatStats, CharacterAttack, ActiveCondition } from './character';
 export type { ConditionName, Currency } from './character';
+
+// 攻击类型
+export type { BaseAttack } from './attack';
+
+// 怪物类型
+export type { MonsterSize, MonsterType, ChallengeRating } from './monster';
+export type { MonsterAttack, MonsterDamageEntry } from './monster';
 
 // 骰子类型
 export type { DieType } from './dice';

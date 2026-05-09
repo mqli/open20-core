@@ -3,6 +3,7 @@
 
 import type { DieType } from './dice';
 import type { DamageDefenses } from './damage';
+import type { BaseAttack } from './attack';
 export type { DamageDefenses };
 
 // 角色核心接口 — 所有字段均为 readonly（不可变）
@@ -60,15 +61,11 @@ export interface CombatStats {
   readonly speed: number;
   readonly passivePerception: number;
   readonly proficiencyBonus: number;
-  readonly attacks: readonly Attack[];
+  readonly attacks: readonly CharacterAttack[];
 }
 
-// 攻击条目（游戏模式中显示）
-export interface Attack {
-  readonly name: string;
-  readonly attackBonus: number;
-  readonly damage: string; // 如 "1d8+4"
-  readonly damageType: string; // 如 "Slashing"
+// 角色攻击条目（扩展 BaseAttack，添加 mastery）
+export interface CharacterAttack extends BaseAttack {
   readonly mastery: readonly string[]; // Weapon Mastery 属性
 }
 
