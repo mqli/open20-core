@@ -1,7 +1,7 @@
 // tests/engine/dice.test.ts
 // Tests for dice rolling system (R22)
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   rollDie,
   rollDice,
@@ -16,7 +16,6 @@ import {
   type RandomProvider,
 } from '../../src/engine/dice';
 import type { Character } from '../../src/types/character';
-import type { DieType } from '../../src/types/dice';
 import type { Weapon } from '../../src/types/equipment';
 import type { Spell } from '../../src/types/spell';
 

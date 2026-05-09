@@ -12,7 +12,7 @@ import {
   ALL_DAMAGE_TYPES,
   DAMAGE_TYPE_CATEGORIES,
 } from '../../src/engine/damage-calculator';
-import type { DamageType, DamageDefenses } from '../../src/types/damage';
+import type { DamageDefenses } from '../../src/types/damage';
 import { createDataLoader } from '../../src/data/loader';
 import { createCharacter } from '../../src/character/create';
 import { modifyHP } from '../../src/character/mutate';
@@ -439,7 +439,7 @@ describe('Rage condition integration', () => {
     };
 
     // Take 10 slashing damage while raging
-    const { char: damaged, result } = applyDamageWithDefenses(
+    const { char: _damaged, result } = applyDamageWithDefenses(
       barbarian,
       10,
       'Slashing',
@@ -560,10 +560,10 @@ describe('applyDamageWithDefenses', () => {
       updatedAt: new Date().toISOString(),
     };
 
-    const { char: damaged, result } = applyDamageWithDefenses(dwarf, 100, 'Fire', dataLoader);
+    const { char: _damaged, result } = applyDamageWithDefenses(dwarf, 100, 'Fire', dataLoader);
 
     expect(result.effectiveDamage).toBe(0);
-    expect(damaged.hitPoints.current).toBe(dwarf.hitPoints.current);
+    expect(_damaged.hitPoints.current).toBe(dwarf.hitPoints.current);
   });
 });
 

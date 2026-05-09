@@ -119,7 +119,7 @@ describe('D&D Player Behavior - Combat and Damage', () => {
     });
 
     it('should handle Dwarven Poison Resistance', () => {
-      const dwarf = createCharacter(
+      const _dwarf = createCharacter(
         {
           name: 'Thorin',
           speciesId: 'Dwarf',
@@ -149,7 +149,7 @@ describe('D&D Player Behavior - Combat and Damage', () => {
     });
 
     it('should modifyHP with typed damage for a Dwarf', () => {
-      const dwarf = createCharacter(
+      const _dwarf = createCharacter(
         {
           name: 'Thorin',
           speciesId: 'Dwarf',
@@ -174,8 +174,8 @@ describe('D&D Player Behavior - Combat and Damage', () => {
         vulnerabilities: [],
       };
 
-      const originalHP = dwarf.hitPoints.current;
-      const damaged = modifyHP(dwarf, -8, 'Poison', defenses);
+      const originalHP = _dwarf.hitPoints.current;
+      const damaged = modifyHP(_dwarf, -8, 'Poison', defenses);
       expect(originalHP - damaged.hitPoints.current).toBe(4);
     });
 

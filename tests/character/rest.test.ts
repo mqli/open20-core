@@ -2,20 +2,17 @@
 // Tests for shortRest and longRest — DND 2024 rules
 
 import { describe, it, expect } from 'vitest';
-import type { Character, CharacterClass, HitPoints } from '../../src/types/character';
+import type { Character } from '../../src/types/character';
 import type { DieType } from '../../src/types/dice';
 import type { Resource } from '../../src/types/resource';
-import { ResetType } from '../../src/types/resource';
 import type {
-  CharacterSpells,
-  SpellLevel,
   SpellSlotEntry,
   PactMagicSlots,
+  SpellLevel,
 } from '../../src/types/spell';
+import { ResetType } from '../../src/types/resource';
 import type { DataLoader } from '../../src/data/loader';
 import type { Class, Feature } from '../../src/types/class';
-import type { Species } from '../../src/types/species';
-import type { Background } from '../../src/types/background';
 
 import { shortRest, longRest } from '../../src/character/rest';
 import type { RandomProvider } from '../../src/character/rest';

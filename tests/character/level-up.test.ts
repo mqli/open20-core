@@ -3,7 +3,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { levelUp } from '../../src/character/level-up';
-import type { LevelUpOptions, RandomProvider } from '../../src/character/level-up';
+import type { RandomProvider } from '../../src/character/level-up';
 import type { Character } from '../../src/types/character';
 import type { Class, Feature } from '../../src/types/class';
 import type { DataLoader } from '../../src/data/loader';
@@ -105,7 +105,7 @@ function makeMockDataLoader(fighterClass?: Class, wizardClass?: Class): DataLoad
   } as DataLoader;
 }
 
-function makeLevel1Fighter(overrides?: Partial<Character>): Character {
+function makeLevel1Fighter(_overrides?: Partial<Character>): Character {
   return {
     schemaVersion: '2024.1',
     name: 'Test Fighter',

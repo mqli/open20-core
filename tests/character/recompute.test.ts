@@ -4,14 +4,10 @@
 import { describe, it, expect } from 'vitest';
 import { recomputeDerivedStats } from '../../src/character/recompute';
 import { createCharacter } from '../../src/character/create';
-import type { CreateCharacterParams } from '../../src/character/create';
 import type { DataLoader } from '../../src/data/loader';
 import type { Species } from '../../src/types/species';
 import type { Background } from '../../src/types/background';
 import type { Class, Feature, Subclass } from '../../src/types/class';
-import type { AbilityName } from '../../src/types/ability';
-import type { Character } from '../../src/types/character';
-import type { SpellLevel } from '../../src/types/spell';
 
 // ── Mock Data ──────────────────────────────────────────────────
 

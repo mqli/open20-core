@@ -24,6 +24,21 @@ export default [
       'no-undef': 'off', // TypeScript handles this
     },
   },
+  // Test file specific rules
+  {
+    files: ['**/*.test.ts'],
+    rules: {
+      // Disable no-explicit-any for test files (tests use any for flexibility)
+      '@typescript-eslint/no-explicit-any': 'off',
+      // Restrict createRequire in test files (vitest supports ESM JSON imports natively)
+      'no-restricted-imports': ['error', {
+        patterns: [{
+          group: ['node:module'],
+          message: 'Use ESM imports instead of createRequire for JSON imports in vitest.',
+        }],
+      }],
+    },
+  },
   {
     ignores: ['dist/**', 'node_modules/**', 'coverage/**'],
   },

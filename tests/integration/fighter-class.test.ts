@@ -1,9 +1,8 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { createDataLoader } from '../../src/data/loader';
 import { createCharacter } from '../../src/character/create';
 import { modifyHP, applyTypedDamage } from '../../src/character/mutate';
 import { shortRest, longRest } from '../../src/character/rest';
-import { levelUp } from '../../src/character/level-up';
 import { validateCharacter } from '../../src/character/validate';
 import lookupTables from '../../static/lookup-tables.json';
 

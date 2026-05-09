@@ -11,7 +11,7 @@ import type { Class, Feature } from '../../src/types/class';
 import type { AbilityName } from '../../src/types/ability';
 import type { EquipmentItem } from '../../src/types/equipment';
 import type { ConditionName } from '../../src/types/character';
-import { ResetType } from '../../src/types/resource';
+
 
 import {
   modifyHP,

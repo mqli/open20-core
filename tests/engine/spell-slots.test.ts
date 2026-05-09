@@ -8,7 +8,6 @@ import {
   getMulticlassSpellcasterLevel,
   calculateMulticlassSpellSlots,
   type SpellSlotEntry,
-  type PactMagicResult,
 } from '../../src/engine/spell-slots';
 import type { DataLoader } from '../../src/data/loader';
 import type { CharacterClass } from '../../src/types/character';

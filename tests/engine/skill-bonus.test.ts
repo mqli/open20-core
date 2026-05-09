@@ -4,7 +4,7 @@
 import { describe, it, expect } from 'vitest';
 import { getSkillBonus, getAllSkillBonuses } from '../../src/engine/skill-bonus';
 import type { AbilityScores, AbilityName } from '../../src/types/ability';
-import type { SkillEntry, SkillName } from '../../src/types/skill';
+import type { SkillEntry } from '../../src/types/skill';
 import { SKILL_NAMES, SKILL_ABILITY_MAP } from '../../src/types/skill';
 
 /**

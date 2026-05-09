@@ -14,7 +14,7 @@
 - **Headless**: Zero UI dependency. Pure functions, immutable state.
 - **Immutable State**: All Character fields are `readonly`. Modifications return new objects via spread operator. No Immer/Immutable.js.
 - **Dependency Injection**: `DataLoader` interface for testability and future API replacement.
-- **ESM**: Project uses `"type": "module"`. Uses `createRequire` for JSON loading.
+- **ESM**: Project uses `"type": "module"`. Uses native ESM JSON imports (vitest supports `import data from './file.json'`).
 - **Zod Schemas**: Runtime validation for all data structures.
 
 ---
@@ -191,12 +191,15 @@ export { value1, value2 } from './types';     // For values
 
 ### 5.1 ESM JSON Loading
 **Problem**: `require()` doesn't work in ESM.
-**Fix**: Use `createRequire`:
+**Fix**: Use native ESM imports (vitest/Vite supports JSON imports natively):
 ```typescript
+// ✅ RIGHT - Native ESM JSON import
+import data from './file.json';
+
+// ❌ WRONG - Don't use createRequire in test files
 import { createRequire } from 'node:module';
-const require = createRequire(import.meta.url);
-const data = require('./file.json');
 ```
+**Note**: `src/data/default-loader.ts` uses `createRequire` for Node.js production code where JSON imports may not be supported. Test files should use native ESM imports.
 
 ### 5.2 `ReadonlyMap` Serialization
 **Problem**: `ReadonlyMap` can't be serialized to JSON.

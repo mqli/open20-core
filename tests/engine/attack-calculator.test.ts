@@ -9,7 +9,6 @@ import type {
   Armor,
   Feature,
   EquipmentItem,
-  Attack,
 } from '../../src/types';
 import type { DataLoader } from '../../src/data/loader';
 
