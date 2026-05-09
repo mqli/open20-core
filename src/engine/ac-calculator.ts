@@ -14,7 +14,7 @@ import { getModifier, getTotalScore } from './ability-modifier';
  *
  * 规则（2024 PHB）：
  * - 无甲(无特性): 10 + Dex调整值
- * - Mage Armor: 13 + Dex调整值
+ * - Mage Armor: 13 + Dex调整值（通过法术或条件触发）
  * - Barbarian Unarmored Defense: 10 + Dex + Con
  * - Monk Unarmored Defense: 10 + Dex + Wis
  * - 轻甲: 护甲AC + Dex
@@ -27,13 +27,15 @@ import { getModifier, getTotalScore } from './ability-modifier';
  * @param equipment - 装备列表
  * @param features - 角色拥有的特性列表
  * @param data - DataLoader（查护甲数据）
+ * @param conditions - 角色当前状态列表（用于检测Mage Armor等，可选，默认空）
  * @returns AC值
  */
 export function calculateAC(
   scores: AbilityScores,
   equipment: readonly EquipmentItem[],
   features: readonly Feature[],
-  data: DataLoader
+  data: DataLoader,
+  conditions: readonly { source?: string; id?: string }[] = []
 ): number {
   const dexMod = getModifier(getTotalScore(scores, 'Dexterity'));
   const conMod = getModifier(getTotalScore(scores, 'Constitution'));
@@ -52,9 +54,13 @@ export function calculateAC(
   const unarmoredAC = 10 + dexMod;
   acOptions.push(unarmoredAC);
 
-  // Mage Armor（13 + Dex，但需要法术状态——此处暂按特性判断）
-  // 注意：Mage Armor通常是法术效果，不是特性。但这里预留接口
-  // TODO: Mage Armor应通过 temporaryBonuses 或 conditions 触发
+  // Mage Armor（13 + Dex，通过法术或状态触发）
+  const hasMageArmor = conditions.some(
+    c => c.source === 'Mage Armor' || c.id === 'mage-armor'
+  );
+  if (hasMageArmor) {
+    acOptions.push(13 + dexMod);
+  }
 
   // Barbarian Unarmored Defense: 10 + Dex + Con
   if (featureNames.has('Unarmored Defense') || featureNames.has('Unarmored Defense (Barbarian)')) {

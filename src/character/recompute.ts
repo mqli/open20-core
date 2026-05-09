@@ -59,8 +59,19 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
   const newMaxHP = calculateMaxHP(char.classes, conMod, data);
   const newCurrent = Math.min(char.hitPoints.current, newMaxHP);
 
+  // Compute weapon proficiencies from all classes
+  const weaponProficiencies = new Set<string>();
+  for (const charClass of char.classes) {
+    const classData = data.getClass(charClass.classId);
+    if (classData && classData.weaponProficiencies) {
+      for (const wp of classData.weaponProficiencies) {
+        weaponProficiencies.add(wp);
+      }
+    }
+  }
+
   // Recalculate combat stats
-  const newAC = calculateAC(char.abilityScores, char.equipment, features, data);
+  const newAC = calculateAC(char.abilityScores, char.equipment, features, data, char.conditions);
   const newInitiative = calculateInitiative(char.abilityScores, char.feats, features);
   const newPassivePerception = calculatePassivePerception(
     char.abilityScores,
@@ -68,7 +79,14 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     pb,
     char.conditions
   );
-  const newAttacks = calculateAttacks(char.abilityScores, char.equipment, pb, features, data);
+  const newAttacks = calculateAttacks(
+    char.abilityScores,
+    char.equipment,
+    pb,
+    features,
+    data,
+    Array.from(weaponProficiencies)
+  );
 
   // Recalculate spell stats
   let newSpells = { ...char.spells };

@@ -249,4 +249,53 @@ describe('calculateAC', () => {
     // No armor equipped → falls back to unarmored 10+2=12
     expect(calculateAC(defaultScores, equip, noFeatures, data)).toBe(12);
   });
+
+  // Test: Mage Armor (via conditions)
+  it('should apply Mage Armor AC when condition is present', () => {
+    const scores: AbilityScores = {
+      base: {
+        Strength: 10,
+        Dexterity: 16, // mod +3
+        Constitution: 10,
+        Intelligence: 10,
+        Wisdom: 10,
+        Charisma: 10,
+      },
+      racialBonuses: {},
+      featBonuses: {},
+      temporaryBonuses: {},
+    };
+    const equip: EquipmentItem[] = [];
+    const features: readonly Feature[] = [];
+    const conditions: readonly { source?: string; id?: string }[] = [
+      { id: 'mage-armor', source: 'Mage Armor' },
+    ];
+    const data = createMockDataLoader();
+
+    // Mage Armor: 13 + Dex mod (3) = 16
+    expect(calculateAC(scores, equip, features, data, conditions)).toBe(16);
+  });
+
+  it('should not apply Mage Armor AC when condition is absent', () => {
+    const scores: AbilityScores = {
+      base: {
+        Strength: 10,
+        Dexterity: 16, // mod +3
+        Constitution: 10,
+        Intelligence: 10,
+        Wisdom: 10,
+        Charisma: 10,
+      },
+      racialBonuses: {},
+      featBonuses: {},
+      temporaryBonuses: {},
+    };
+    const equip: EquipmentItem[] = [];
+    const features: readonly Feature[] = [];
+    const conditions: readonly { source?: string; id?: string }[] = [];
+    const data = createMockDataLoader();
+
+    // No Mage Armor → unarmored 10 + 3 = 13
+    expect(calculateAC(scores, equip, features, data, conditions)).toBe(13);
+  });
 });

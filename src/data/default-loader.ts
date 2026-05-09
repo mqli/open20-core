@@ -69,6 +69,7 @@ function parseClass(raw: unknown): Class {
     hitDie: c.hitDie as DieType,
     savingThrowProficiencies: c.savingThrowProficiencies as readonly AbilityName[],
     armorTraining: c.armorTraining as readonly string[],
+    weaponProficiencies: c.weaponProficiencies as readonly string[],
     weaponMastery: c.weaponMastery as boolean,
     featuresByLevel: parseFeaturesByLevel(
       c.featuresByLevel as Array<{ level: number; features: readonly Feature[] }>

@@ -5,6 +5,7 @@
     "hitDie": "d12",
     "savingThrowProficiencies": ["Strength", "Constitution"],
     "armorTraining": [],
+    "weaponProficiencies": ["Simple", "Martial"],
     "weaponMastery": true,
     "featuresByLevel": [
       {
@@ -167,6 +168,7 @@
     "hitDie": "d8",
     "savingThrowProficiencies": ["Dexterity", "Charisma"],
     "armorTraining": ["Light"],
+    "weaponProficiencies": ["Simple"],
     "weaponMastery": false,
     "featuresByLevel": [
       {
@@ -280,6 +282,7 @@
     "hitDie": "d8",
     "savingThrowProficiencies": ["Wisdom", "Charisma"],
     "armorTraining": ["Light", "Medium", "Heavy", "Shields"],
+    "weaponProficiencies": ["Simple"],
     "weaponMastery": false,
     "featuresByLevel": [
       {
@@ -389,6 +392,7 @@
     "hitDie": "d8",
     "savingThrowProficiencies": ["Intelligence", "Wisdom"],
     "armorTraining": ["Light", "Medium", "Shields"],
+    "weaponProficiencies": ["Simple"],
     "weaponMastery": false,
     "featuresByLevel": [
       {
@@ -506,6 +510,7 @@
     "hitDie": "d10",
     "savingThrowProficiencies": ["Strength", "Constitution"],
     "armorTraining": ["Light", "Medium", "Heavy", "Shields"],
+    "weaponProficiencies": ["Simple", "Martial"],
     "weaponMastery": true,
     "featuresByLevel": [
       {
@@ -636,6 +641,7 @@
     "hitDie": "d8",
     "savingThrowProficiencies": ["Strength", "Dexterity"],
     "armorTraining": [],
+    "weaponProficiencies": ["Simple", "Shortsword"],
     "weaponMastery": false,
     "featuresByLevel": [
       {
@@ -811,6 +817,7 @@
     "hitDie": "d10",
     "savingThrowProficiencies": ["Wisdom", "Charisma"],
     "armorTraining": ["Light", "Medium", "Heavy", "Shields"],
+    "weaponProficiencies": ["Simple", "Martial"],
     "weaponMastery": true,
     "featuresByLevel": [
       {
@@ -955,6 +962,7 @@
     "hitDie": "d10",
     "savingThrowProficiencies": ["Strength", "Dexterity"],
     "armorTraining": ["Light", "Medium", "Shields"],
+    "weaponProficiencies": ["Simple", "Martial"],
     "weaponMastery": true,
     "featuresByLevel": [
       {
@@ -1107,6 +1115,7 @@
     "hitDie": "d8",
     "savingThrowProficiencies": ["Dexterity", "Intelligence"],
     "armorTraining": ["Light"],
+    "weaponProficiencies": ["Simple", "Hand Crossbow", "Longsword", "Rapier", "Shortsword"],
     "weaponMastery": true,
     "featuresByLevel": [
       {
@@ -1251,6 +1260,7 @@
     "hitDie": "d6",
     "savingThrowProficiencies": ["Constitution", "Charisma"],
     "armorTraining": [],
+    "weaponProficiencies": ["Dagger", "Dart", "Sling", "Quarterstaff"],
     "weaponMastery": false,
     "featuresByLevel": [
       {
@@ -1347,6 +1357,7 @@
     "hitDie": "d8",
     "savingThrowProficiencies": ["Wisdom", "Charisma"],
     "armorTraining": ["Light", "Shields"],
+    "weaponProficiencies": ["Simple"],
     "weaponMastery": false,
     "featuresByLevel": [
       {
@@ -1438,6 +1449,7 @@
     "hitDie": "d6",
     "savingThrowProficiencies": ["Intelligence", "Wisdom"],
     "armorTraining": [],
+    "weaponProficiencies": ["Dagger", "Dart", "Sling", "Quarterstaff"],
     "weaponMastery": false,
     "featuresByLevel": [
       {

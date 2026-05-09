@@ -29,6 +29,7 @@ export interface Class {
   readonly hitDie: import('./dice').DieType;
   readonly savingThrowProficiencies: readonly import('./ability').AbilityName[];
   readonly armorTraining: readonly string[]; // 许可的护甲类型
+  readonly weaponProficiencies?: readonly string[]; // 武器熟练项（如 "Simple", "Martial", "Longsword"）
   readonly weaponMastery: boolean; // 是否有Weapon Mastery
   readonly featuresByLevel: ReadonlyMap<number, readonly Feature[]>;
   readonly spellcasting: Spellcasting | null;

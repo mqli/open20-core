@@ -159,7 +159,9 @@ describe('HP Accessor Helpers - Monster', () => {
   });
 
   it('getMonsterCurrentHP (without currentHP, uses hitPoints.value)', () => {
-    const { currentHP: _, ...m } = mockMonster;
+    const m = {
+      hitPoints: { value: 50, formula: '5d10+5' },
+    };
     expect(getMonsterCurrentHP(m)).toBe(50);
   });
 
@@ -172,8 +174,11 @@ describe('HP Accessor Helpers - Monster', () => {
   });
 
   it('getMonsterTemporaryHP (without temporaryHP)', () => {
-    const { temporaryHP: _, ...m } = mockMonster;
-    expect(getMonsterTemporaryHP(m)).toBe(0);
+    const m = {
+      hitPoints: { value: 50, formula: '5d10+5' },
+      currentHP: 35,
+    };
+    expect(getMonsterTemporaryHP(m as { temporaryHP?: number })).toBe(0);
   });
 });
 

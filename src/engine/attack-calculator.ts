@@ -23,6 +23,7 @@ import { getModifier, getTotalScore } from './ability-modifier';
  * @param proficiencyBonus - 熟练加值
  * @param features - 角色特性列表
  * @param data - DataLoader
+ * @param weaponProficiencies - 角色武器熟练项列表（可选，默认空）
  * @returns 攻击列表
  */
 export function calculateAttacks(
@@ -30,7 +31,8 @@ export function calculateAttacks(
   equipment: readonly EquipmentItem[],
   proficiencyBonus: number,
   features: readonly Feature[],
-  data: DataLoader
+  data: DataLoader,
+  weaponProficiencies: readonly string[] = []
 ): CharacterAttack[] {
   const attacks: CharacterAttack[] = [];
 
@@ -44,7 +46,8 @@ export function calculateAttacks(
     const { attackBonus, damageMod } = calculateWeaponAttack(
       scores,
       weapon,
-      proficiencyBonus
+      proficiencyBonus,
+      weaponProficiencies
     );
 
     // 伤害字符串（使用 entries[0] 为基础伤害）
@@ -72,7 +75,8 @@ export function calculateAttacks(
 function calculateWeaponAttack(
   scores: AbilityScores,
   weapon: Weapon,
-  proficiencyBonus: number
+  proficiencyBonus: number,
+  weaponProficiencies: readonly string[]
 ): { attackBonus: number; damageMod: number; abilityUsed: string } {
   const strMod = getModifier(getTotalScore(scores, 'Strength'));
   const dexMod = getModifier(getTotalScore(scores, 'Dexterity'));
@@ -100,10 +104,17 @@ function calculateWeaponAttack(
     abilityUsed = 'Strength';
   }
 
-  // 攻击加值 = 熟练加值 + 属性调整值
-  // 注意：是否熟练取决于角色是否有该武器的熟练项
-  // 简化处理：Martial武器需要Martial熟练，Simple武器默认熟练
-  const isProficient = true; // TODO: 实际应检查角色的weaponProficiencies
+  // 检查武器熟练度
+  // weaponProficiencies 可以包含：
+  // - "Simple"：所有简易武器熟练
+  // - "Martial"：所有军用武器熟练
+  // - 具体武器ID（如 "Longsword"）：特定武器熟练
+  const isProficient =
+    weaponProficiencies.includes(weapon.id) ||
+    weaponProficiencies.includes(weapon.category) ||
+    weaponProficiencies.includes('Simple') && weapon.category === 'Simple' ||
+    weaponProficiencies.includes('Martial') && weapon.category === 'Martial';
+
   const attackBonus = (isProficient ? proficiencyBonus : 0) + abilityMod;
 
   return {

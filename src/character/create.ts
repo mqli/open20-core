@@ -178,13 +178,32 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
 
   // 8. Calculate CombatStats (pb already calculated above for resources)
   const allFeatures = gatherAllFeatures(charClasses, data);
+
+  // Compute weapon proficiencies from classes
+  const weaponProficiencies = new Set<string>();
+  for (const c of charClasses) {
+    const classData = data.getClass(c.classId);
+    if (classData && classData.weaponProficiencies) {
+      for (const wp of classData.weaponProficiencies) {
+        weaponProficiencies.add(wp);
+      }
+    }
+  }
+
   const combatStats: CombatStats = {
-    AC: calculateAC(abilityScores, [], allFeatures, data),
+    AC: calculateAC(abilityScores, [], allFeatures, data, []),
     initiative: calculateInitiative(abilityScores, params.featIds ?? [], allFeatures),
     speed: species.speed,
     passivePerception: calculatePassivePerception(abilityScores, skills, pb, []),
     proficiencyBonus: pb,
-    attacks: calculateAttacks(abilityScores, [], pb, allFeatures, data),
+    attacks: calculateAttacks(
+      abilityScores,
+      [],
+      pb,
+      allFeatures,
+      data,
+      Array.from(weaponProficiencies)
+    ),
   };
 
   // 9. Build Currency
