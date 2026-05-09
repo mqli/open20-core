@@ -7,10 +7,8 @@ import type {
   ConditionName,
   Currency,
   ActiveCondition,
-  DamageType,
-  DamageDefenses,
-  DamageResult,
 } from '../types/character';
+import type { DamageType, DamageDefenses, DamageResult } from '../types/damage';
 import type { EquipmentItem } from '../types/equipment';
 import type { SpellLevel } from '../types/spell';
 import type { DataLoader } from '../data/loader';

@@ -66,3 +66,27 @@ export {
 } from './character';
 export { validateCharacter } from './character';
 export { recomputeDerivedStats } from './character';
+
+// ── Dice Rolling ──────────────────────────────────────
+export type {
+  RandomProvider,
+  AttackModifier,
+  AttackRollResult,
+  SkillCheckResult,
+  SavingThrowResult,
+  DamageRollResult,
+  DamageRollEntry,
+  DamageModifier,
+} from './engine';
+export {
+  rollDie,
+  rollDice,
+  rollWithAdvantage,
+  rollWithDisadvantage,
+  rollAttack,
+  rollSkillCheck,
+  rollSavingThrow,
+  rollWeaponDamage,
+  rollSpellDamage,
+  defaultRandom,
+} from './engine';

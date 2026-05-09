@@ -9,9 +9,9 @@ import type {
   HitPoints,
   CombatStats,
   Currency,
-  DieType,
-  DamageDefenses,
 } from '../types/character';
+import type { DieType } from '../types/dice';
+import type { DamageDefenses } from '../types/damage';
 import type { SkillEntry, SkillName } from '../types/skill';
 import { SKILL_NAMES } from '../types/skill';
 import type { CharacterSpells, SpellLevel, SpellSlotEntry, PactMagicSlots } from '../types/spell';
