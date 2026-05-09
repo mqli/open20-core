@@ -1,6 +1,6 @@
 # Open20 Core - Headless D&D 5e 2024 Game Engine
 
-**Version**: 5.0 | **Date**: 2026-05-08 | **License**: MIT
+**Version**: 5.0 | **Date**: 2026-05-09 | **License**: MIT
 
 ---
 
@@ -103,21 +103,41 @@ interface Spell {
 ```
 src/
 ├── engine/           # Rule calculations (pure functions)
-│   ├── ability-scores.ts
-│   ├── armor-class.ts
-│   ├── hit-points.ts
+│   ├── ability-modifier.ts
+│   ├── proficiency-bonus.ts
+│   ├── skill-bonus.ts
+│   ├── saving-throw.ts
+│   ├── ac-calculator.ts
+│   ├── hp-calculator.ts
 │   ├── spell-slots.ts
-│   └── skill-bonus.ts
+│   ├── initiative.ts
+│   ├── passive-perception.ts
+│   ├── attack-calculator.ts
+│   ├── damage-calculator.ts
+│   └── dice.ts
 ├── character/        # Character creation & validation
 │   ├── create.ts
 │   ├── validate.ts
 │   ├── level-up.ts
-│   └── recompute.ts
+│   ├── recompute.ts
+│   ├── mutate.ts
+│   └── rest.ts
 ├── spells/           # Spell data & queries
 │   ├── query.ts
 │   └── types.ts
-├── data/             # Static JSON (imported at build time)
+├── data/             # Static JSON loading
+│   ├── loader.ts
+│   ├── default-loader.ts
+│   └── browser-loader.ts
 ├── schemas/          # Zod schemas
+│   ├── character.ts
+│   ├── spell.ts
+│   └── index.ts
+├── storage/          # Persistence (serializer, storage implementations)
+│   ├── interface.ts
+│   ├── serializer.ts
+│   ├── memory.ts
+│   └── json-file.ts
 └── index.ts          # Public API
 ```
 
@@ -129,10 +149,10 @@ src/
 - [x] Character creation (single class)
 - [x] Rule calculations (AC, HP, skills, spell slots)
 - [x] Character validation
-- [ ] Complete TypeScript types
-- [ ] Zod schemas for runtime validation
-- [ ] Spell data (SRD spells imported)
-- [ ] JSON export/import
+- [x] Complete TypeScript types
+- [x] Zod schemas for runtime validation
+- [x] Spell data (SRD spells imported)
+- [x] JSON export/import
 
 ### P1 (Should Have)
 - [ ] Multiclassing support

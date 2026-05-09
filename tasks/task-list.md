@@ -55,9 +55,9 @@
 | S10 | `src/engine/spell-slots.ts` | `calculateSpellSlots()` | ✅ |
 | S11 | `src/engine/attack-calculator.ts` | `calculateAttacks()` | ✅ |
 
-**Current tests**: 201 tests passing
+**Current tests**: 550+ tests passing
 
-### S12 — Static Rule Data 🔄
+### S12 — Static Rule Data ✅
 
 | File | Data Count | Status |
 |---|---|---|
@@ -67,9 +67,9 @@
 | `static/subclasses.json` | All subclasses | ✅ Complete |
 | `static/feats.json` | 75 feats | ✅ Complete |
 | `static/spells.json` | 560+ spells | ✅ Imported from SRD |
-| `static/weapons.json` | Weapon list | 🔄 Needs update |
-| `static/armor.json` | Armor list | 🔄 Needs update |
-| `static/gear.json` | Adventure gear | 🔄 Needs update |
+| `static/weapons.json` | ~40 weapons | ✅ Complete |
+| `static/armor.json` | ~20 armors | ✅ Complete |
+| `static/gear.json` | ~50 gear items | ✅ Complete |
 | `static/lookup-tables.json` | Lookup tables | ✅ Complete |
 
 ---
@@ -90,18 +90,18 @@
 
 | Step | File | Core Functions | Status |
 |---|---|---|---|
-| S18 | `src/spells/query.ts` | `getSpell()`, `searchSpells()` | ✅ |
-| S19 | `src/spells/filter.ts` | Filter helpers | 📋 |
+| S18 | `src/spells/query.ts` | `getSpell()`, `searchSpells()`, `getSpellsForCharacter()`, etc. | ✅ |
+| S19 | `src/spells/filter.ts` | Filter helpers | ❌ Not needed (implemented in query.ts) |
 | S20 | `scripts/import_srd_spells.py` | Import from dnd-data | ✅ |
 
 ---
 
-## Phase 4 — Persistence & Integration (S18-S20)
+## Phase 4 — Persistence & Integration (S21-S23)
 
 | Step | File | Core Functions | Status |
 |---|---|---|---|
 | S21 | `src/storage/*` | `ICharacterStorage`, `serialize()` | ✅ |
-| S22 | `src/schemas/*` | Zod schemas | 📋 |
+| S22 | `src/schemas/*` | Zod schemas | ✅ |
 | S23 | `tests/integration/*` | Integration tests | ✅ |
 
 ---
@@ -112,8 +112,10 @@
 |---|---|---|
 | `tests/engine/*.test.ts` | All engine functions | ✅ Complete |
 | `tests/character/*.test.ts` | All mutation functions | ✅ Complete |
-| `tests/spells/*.test.ts` | Spell queries | 📋 |
-| `tests/data/*.test.ts` | Data integrity | 📋 |
+| `tests/spells/*.test.ts` | Spell queries | ✅ Complete |
+| `tests/data/*.test.ts` | Data integrity | ✅ Complete |
+| `tests/storage/*.test.ts` | Storage serialization | ✅ Complete |
+| `tests/integration/*.test.ts` | Integration tests | ✅ Complete |
 
 ---
 
@@ -150,4 +152,4 @@ After completion:
 
 ---
 
-*Last updated: 2026-05-08*
+*Last updated: 2026-05-09*

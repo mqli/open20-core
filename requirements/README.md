@@ -53,12 +53,12 @@
 | S1 | Project scaffolding | ✅ |
 | S2 | Type definitions | ✅ |
 | S3 | DataLoader interface + implementation | ✅ |
-| S4-S11 | Engine pure functions (11 functions) | ✅ (201 tests) |
-| S12 | Static rule data | 🔄 Most complete |
-| S13-S19 | Character state management | ✅ (144 tests) |
-| S20 | Integration tests | ✅ (40 tests) |
+| S4-S11 | Engine pure functions (13 functions) | ✅ |
+| S12 | Static rule data | ✅ Complete |
+| S13-S17 | Character state management | ✅ |
+| S18-S20 | Spells, Storage, Integration | ✅ |
 
-**Current test status**: **415+ tests passing**, `tsc --noEmit` ✅
+**Current test status**: **550+ tests passing**, `tsc --noEmit` ✅
 
 ---
 
@@ -119,4 +119,4 @@ finished: YYYY-MM-DD
 
 ---
 
-*Last updated: 2026-05-08*
+*Last updated: 2026-05-09*

@@ -270,5 +270,5 @@ const result = createCharacter(params, mockLoader);
 
 ---
 
-*Last updated: 2026-05-08*
+*Last updated: 2026-05-09*
 *Version: 2.0 (Headless Engine)*

@@ -294,8 +294,10 @@ open20-core/
 | `getSpell` | `(id: string) => Spell \| undefined` | Get single spell by ID |
 | `searchSpells` | `(filter: SpellFilter) => Spell[]` | Search/filter spells |
 | `getSpellsByClass` | `(className: string) => Spell[]` | Get class spell list |
-| `getSpellsByLevel` | `(level: number) => Spell[]` | Get spells by level |
 | `getSpellsForCharacter` | `(char, data?) => Spell[]` | Get known/prepared spells for character |
+| `getPreparedSpells` | `(char) => string[]` | Get list of prepared spell IDs |
+| `isSpellPrepared` | `(char, spellId) => boolean` | Check if spell is prepared |
+| `knowsSpell` | `(char, spellId) => boolean` | Check if character knows spell |
 
 **SpellFilter Interface**:
 ```typescript
@@ -347,7 +349,7 @@ interface SpellFilter {
 | S9 | Engine: HP calculation functions | ✅ | `hp-calculator.ts` |
 | S10 | Engine: `calculateSpellSlots()`, `calculatePactMagic()` | ✅ | `spell-slots.ts` |
 | S11 | Engine: `calculateInitiative()`, `calculatePassivePerception()`, `calculateAttacks()` | ✅ | `initiative.ts`, `passive-perception.ts`, `attack-calculator.ts` |
-| S12 | Static rule data population | 🔄 | Spells imported (560+), others need update |
+| S12 | Static rule data population | ✅ | All static data complete (species, backgrounds, classes, subclasses, feats, spells, weapons, armor, gear) |
 | S13 | Character: `createCharacter()` | ✅ | `create.ts` |
 | S14 | Character: Mutation functions | ✅ | `mutate.ts` |
 | S15 | Character: `levelUp()` | ✅ | `level-up.ts` |
@@ -357,7 +359,7 @@ interface SpellFilter {
 | S19 | Public API barrel exports | ✅ | `index.ts`, `browser-index.ts` |
 | S20 | Integration tests | ✅ | `tests/integration/` |
 
-**Current Test Status**: **415+ tests passing**, `tsc --noEmit` ✅
+**Current Test Status**: **550+ tests passing**, `tsc --noEmit` ✅
 
 ---
 
@@ -450,5 +452,5 @@ calculateAC(character, equipment, dataLoader)
 
 ---
 
-*Last updated: 2026-05-08*
+*Last updated: 2026-05-09*
 *Version: 2.0 (Headless Engine)*

@@ -8,7 +8,7 @@
 
 **Project**: Open20 Core - Headless D&D 5e 2024 Game Engine
 **Goal**: A TypeScript library for D&D 5e 2024 rules engine, spell management, and character management. No UI - pure logic, testable via unit tests, usable by any framework.
-**Status**: S1-S20 complete (415+ tests passing)
+**Status**: S1-S20 complete (550+ tests passing)
 
 ### Key Design Decisions
 - **Headless**: Zero UI dependency. Pure functions, immutable state.
@@ -97,7 +97,6 @@ open20-core/
 │   │   └── index.ts           # Barrel export
 │   ├── spells/                 # Spell data & queries
 │   │   ├── query.ts           # getSpell(), searchSpells(), etc.
-│   │   ├── filter.ts          # Filter helpers
 │   │   └── types.ts           # Spell types
 │   ├── schemas/                # Zod schemas
 │   │   ├── character.ts
@@ -479,5 +478,5 @@ If you're stuck or unsure:
 
 ---
 
-*Last updated: 2026-05-08*
+*Last updated: 2026-05-09*
 *Maintained by: AI agents working on this project*
