@@ -82,6 +82,48 @@ export {
   knowsSpell,
 } from './spells';
 
+// ── Monsters (query + combat) ─────────────────────────
+export type {
+  Monster,
+  MonsterSize,
+  MonsterType,
+  ChallengeRating,
+  MonsterAttack,
+  MonsterAction,
+  MonsterFeature,
+  MonsterReaction,
+  MonsterLegendaryAction,
+  MonsterFilter,
+} from './monster';
+export {
+  getMonster,
+  searchMonsters,
+  getMonstersByCR,
+  getMonstersByType,
+  getMonstersForParty,
+  getMonsterActions,
+  getMonsterTraits,
+  getMonsterReactions,
+  getMonsterLegendaryActions,
+  getMonstersWithTrait,
+  getLegendaryMonsters,
+  getMonsterAllAttacks,
+  searchActionsByName,
+} from './monster';
+export {
+  initializeMonsterForCombat,
+  modifyMonsterHP,
+  applyMonsterTypedDamage,
+  setMonsterTemporaryHP,
+  isMonsterDefeated,
+  rollMonsterAttack,
+  getMonsterAC,
+  rollMonsterAttackDamage,
+  addMonsterDamageResistance,
+  addMonsterDamageImmunity,
+  addMonsterDamageVulnerability,
+} from './monster';
+
 // ── Dice Rolling (R22) ──────────────────────────────
 export type {
   RandomProvider,

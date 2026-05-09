@@ -2,7 +2,7 @@
 // Unit tests for monster query functions
 
 import type { DataLoader } from '../../src/data/loader';
-import type { Monster } from '../../src/monsters/types';
+import type { Monster } from '../../src/monster/types';
 import { describe, it, expect } from 'vitest';
 import {
   getMonster,
@@ -18,7 +18,7 @@ import {
   getLegendaryMonsters,
   getMonsterAllAttacks,
   searchActionsByName
-} from '../../src/monsters/query';
+} from '../../src/monster/query';
 
 // ── Mock DataLoader ───────────────────────────────────────────
 

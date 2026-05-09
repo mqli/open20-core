@@ -12,7 +12,7 @@ import type { Feat, FeatCategory } from '../types/feat';
 import type { Weapon, Armor, GearItem } from '../types/equipment';
 import type { Spell } from '../types/spell';
 import type { DieType } from '../types/dice';
-import type { Monster } from '../monsters/types';
+import type { Monster } from '../monster/types';
 
 // ── 静态 JSON 数据（esbuild 会直接 bundle 进输出） ────────────
 import speciesData from '../../static/srd/species.json';

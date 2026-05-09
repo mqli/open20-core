@@ -13,6 +13,7 @@ import type { EquipmentItem } from '../types/equipment';
 import type { SpellLevel } from '../types/spell';
 import type { DataLoader } from '../data/loader';
 import { calculateTypedDamage } from '../engine/damage-calculator';
+import { applyHPChange, applyTypedDamageToHP, setTemporaryHPShared } from '../engine/combat';
 import { recomputeDerivedStats } from './recompute';
 
 // ── Helper ──────────────────────────────────────────────────────
@@ -40,24 +41,18 @@ export function modifyHP(
     effectiveDelta = -result.effectiveDamage;
   }
 
-  let remaining = effectiveDelta;
-  let temporary = char.hitPoints.temporary;
-  let current = char.hitPoints.current;
-
-  // Damage: subtract from temporary HP first
-  if (remaining < 0 && temporary > 0) {
-    const tempAbsorbed = Math.min(temporary, Math.abs(remaining));
-    temporary -= tempAbsorbed;
-    remaining += tempAbsorbed;
-  }
-
-  current = Math.max(0, Math.min(current + remaining, char.hitPoints.max));
+  const { currentHP, temporaryHP } = applyHPChange(
+    char.hitPoints.current,
+    char.hitPoints.max,
+    char.hitPoints.temporary,
+    effectiveDelta
+  );
 
   return withUpdate(char, {
     hitPoints: {
       ...char.hitPoints,
-      current,
-      temporary,
+      current: currentHP,
+      temporary: temporaryHP,
     },
   });
 }
@@ -72,16 +67,32 @@ export function applyTypedDamage(
   damageType: DamageType,
   defenses: DamageDefenses
 ): { char: Character; result: DamageResult } {
-  const result = calculateTypedDamage(damage, damageType, defenses);
-  const updatedChar = modifyHP(char, -result.effectiveDamage);
+  const { currentHP, temporaryHP, result } = applyTypedDamageToHP(
+    char.hitPoints.current,
+    char.hitPoints.max,
+    char.hitPoints.temporary,
+    damage,
+    damageType,
+    defenses
+  );
+
+  const updatedChar = withUpdate(char, {
+    hitPoints: {
+      ...char.hitPoints,
+      current: currentHP,
+      temporary: temporaryHP,
+    },
+  });
+
   return { char: updatedChar, result };
 }
 
 export function setTemporaryHP(char: Character, value: number): Character {
+  const newTemp = setTemporaryHPShared(char.hitPoints.temporary, value);
   return withUpdate(char, {
     hitPoints: {
       ...char.hitPoints,
-      temporary: Math.max(0, value),
+      temporary: newTemp,
     },
   });
 }

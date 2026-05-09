@@ -2,7 +2,7 @@
 // Unit tests for monster combat functions
 
 import { describe, it, expect } from 'vitest';
-import type { Monster } from '../../src/monsters/types';
+import type { Monster } from '../../src/monster/types';
 import type { MonsterAttack } from '../../src/types/monster';
 import type { DamageType } from '../../src/types/damage';
 import {
@@ -16,7 +16,7 @@ import {
   addMonsterDamageResistance,
   addMonsterDamageImmunity,
   addMonsterDamageVulnerability,
-} from '../../src/monsters/combat';
+} from '../../src/monster/combat';
 
 // ── Mock Monster ─────────────────────────────────────────
 

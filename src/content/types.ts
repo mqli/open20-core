@@ -7,7 +7,7 @@ import type { Class, Subclass } from '../types/class';
 import type { Feat } from '../types/feat';
 import type { Weapon, Armor, GearItem } from '../types/equipment';
 import type { Spell } from '../types/spell';
-import type { Monster } from '../monsters/types';
+import type { Monster } from '../monster/types';
 
 /**
  * Content pack metadata.

@@ -2,7 +2,7 @@
 
 **Requirement ID**: R28
 **Priority**: P2
-**Status**: 🚧 In Progress
+**Status**: ✅ Complete
 **Created**: 2026-05-09
 **Updated**: 2026-05-09
 
@@ -132,9 +132,35 @@ calculateMonsterHP(monster: Monster): number
 
 **Description**: Enable monsters to deal damage and take damage in combat. Handles HP management, damage defenses (resistances/immunities/vulnerabilities), and attack damage calculation.
 
-**Functions** (in `src/monsters/combat.ts`):
+**Design Decision**: Share HP manipulation logic with Character module via `engine/combat.ts` helpers.
+
+**Shared Helpers** (in `src/engine/combat.ts`):
 ```typescript
-// HP Management
+// Shared HP manipulation (used by both Character and Monster)
+applyHPChange(currentHP: number, maxHP: number, temporaryHP: number, delta: number): { currentHP: number; temporaryHP: number }
+applyTypedDamageToHP(currentHP: number, maxHP: number, temporaryHP: number, damage: number, damageType: DamageType, defenses: DamageDefenses): { currentHP: number; temporaryHP: number; result: DamageResult }
+setTemporaryHPShared(currentTempHP: number, value: number): number
+isDefeatedShared(currentHP: number): boolean
+
+// HP Accessor Helpers (for API consistency)
+getCharacterCurrentHP(char): number
+getCharacterMaxHP(char): number
+getCharacterTemporaryHP(char): number
+getMonsterCurrentHP(monster): number
+getMonsterMaxHP(monster): number
+getMonsterTemporaryHP(monster): number
+
+// Damage Defense Helpers (shared)
+addDamageResistance(defenses, damageType): DamageDefenses
+addDamageImmunity(defenses, damageType): DamageDefenses
+addDamageVulnerability(defenses, damageType): DamageDefenses
+emptyDefenses(): DamageDefenses
+mergeDefenses(a, b): DamageDefenses
+```
+
+**Monster Combat Functions** (in `src/monster/combat.ts`):
+```typescript
+// HP Management (uses shared helpers)
 initializeMonsterForCombat(monster: Monster): Monster
 modifyMonsterHP(monster: Monster, delta: number, damageType?: DamageType): Monster
 applyMonsterTypedDamage(monster: Monster, damage: number, damageType: DamageType): { monster: Monster; result: DamageResult }
@@ -146,7 +172,7 @@ rollMonsterAttack(attack: MonsterAttack, monster: Monster, data: DataLoader): { 
 rollMonsterAttackDamage(attack: MonsterAttack): number
 getMonsterAC(monster: Monster): number
 
-// Damage Defenses
+// Damage Defenses (uses shared helpers)
 addMonsterDamageResistance(monster: Monster, damageType: DamageType): Monster
 addMonsterDamageImmunity(monster: Monster, damageType: DamageType): Monster
 addMonsterDamageVulnerability(monster: Monster, damageType: DamageType): Monster
@@ -362,14 +388,20 @@ export interface DataLoader {
 2. [ ] Update `spec/high-level-design.md` with monster module
 3. [x] Update `agent.md` with monster module conventions
 
-### Phase 8: Combat Support (2 hours) ✅
+### Phase 8: Combat Support & API Consolidation (2 hours) ✅
 1. [x] Add `damageDefenses` and `conditionImmunities` to Monster type
-2. [x] Create `src/monsters/combat.ts` with HP management functions
+2. [x] Create `src/monster/combat.ts` with HP management functions
 3. [x] Implement `initializeMonsterForCombat()`, `modifyMonsterHP()`, `applyMonsterTypedDamage()`
 4. [x] Implement `addMonsterDamageResistance/Immunity/Vulnerability()`
 5. [x] Add `rollMonsterAttack()` and `rollMonsterAttackDamage()`
-6. [x] Create `tests/monsters/combat.test.ts` (29 tests)
+6. [x] Create `tests/monster/combat.test.ts` (29 tests)
 7. [x] Update sample data with damage defenses (Young Red Dragon)
+8. [x] Create `src/engine/combat.ts` with shared HP helpers
+9. [x] Refactor `character/mutate.ts` and `monster/combat.ts` to use shared helpers
+10. [x] Add HP accessor helpers for API consistency
+11. [x] Rename `src/monsters/` to `src/monster/` (consistent with `src/character/`)
+12. [x] Update all imports across codebase
+13. [x] Add tests for shared combat helpers (31 tests)
 
 ---
 

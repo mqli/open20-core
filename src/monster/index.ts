@@ -1,4 +1,4 @@
-// monsters/index.ts
+// monster/index.ts
 // Barrel export — public API for monster module
 
 // Types from local types.ts
@@ -30,7 +30,15 @@ export {
   searchMonsters,
   getMonstersByCR,
   getMonstersByType,
-  getMonstersForParty
+  getMonstersForParty,
+  getMonsterActions,
+  getMonsterTraits,
+  getMonsterReactions,
+  getMonsterLegendaryActions,
+  getMonstersWithTrait,
+  getLegendaryMonsters,
+  getMonsterAllAttacks,
+  searchActionsByName,
 } from './query';
 
 // Calculator functions
@@ -57,3 +65,10 @@ export {
   addMonsterDamageImmunity,
   addMonsterDamageVulnerability
 } from './combat';
+
+// HP Accessor Helpers (for API consistency with character module)
+export {
+  getMonsterCurrentHP,
+  getMonsterMaxHP,
+  getMonsterTemporaryHP,
+} from '../engine/combat';

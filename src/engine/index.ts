@@ -45,3 +45,22 @@ export type {
   DamageRollEntry,
   DamageModifier,
 } from './dice';
+
+// ── Combat Helpers ─────────────────────────────────────
+export {
+  applyHPChange,
+  applyTypedDamageToHP,
+  setTemporaryHPShared,
+  isDefeatedShared,
+  getCharacterCurrentHP,
+  getCharacterMaxHP,
+  getCharacterTemporaryHP,
+  getMonsterCurrentHP,
+  getMonsterMaxHP,
+  getMonsterTemporaryHP,
+  addDamageResistance,
+  addDamageImmunity,
+  addDamageVulnerability,
+  emptyDefenses,
+  mergeDefenses,
+} from './combat';

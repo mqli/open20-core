@@ -13,6 +13,7 @@ export { shortRest, longRest } from './rest';
 export {
   modifyHP,
   setTemporaryHP,
+  applyTypedDamage,
   consumeResource,
   recoverResource,
   consumeSpellSlot,
@@ -33,3 +34,10 @@ export { validateCharacter } from './validate';
 export type { ValidationError, ValidationResult } from './validate';
 
 export { recomputeDerivedStats } from './recompute';
+
+// HP Accessor Helpers (for API consistency with monster module)
+export {
+  getCharacterCurrentHP,
+  getCharacterMaxHP,
+  getCharacterTemporaryHP,
+} from '../engine/combat';

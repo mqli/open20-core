@@ -18,7 +18,7 @@ import type { Feat, FeatCategory } from '../types/feat';
 import type { Weapon, Armor, GearItem } from '../types/equipment';
 import type { Spell } from '../types/spell';
 import type { DieType } from '../types/dice';
-import type { Monster } from '../monsters/types';
+import type { Monster } from '../monster/types';
 import { loadContentPack } from '../content/io';
 
 // ── ESM 兼容的 JSON 加载 ────────────────────────────────────

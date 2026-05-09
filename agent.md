@@ -8,7 +8,7 @@
 
 **Project**: Open20 Core - Headless D&D 5e 2024 Game Engine
 **Goal**: A TypeScript library for D&D 5e 2024 rules engine, spell management, and character management. No UI - pure logic, testable via unit tests, usable by any framework.
-**Status**: S1-S20 complete (586+ tests passing)
+**Status**: S1-S21 complete (633+ tests passing)
 
 ### Key Design Decisions
 - **Headless**: Zero UI dependency. Pure functions, immutable state.
@@ -89,7 +89,9 @@ open20-core/
 │   │   ├── spell-slots.ts
 │   │   ├── initiative.ts
 │   │   ├── passive-perception.ts
-│   │   └── attack-calculator.ts
+│   │   ├── attack-calculator.ts
+│   │   ├── damage-calculator.ts
+│   │   └── combat.ts           # Shared HP helpers (character + monster)
 │   ├── character/              # Character creation & validation
 │   │   ├── create.ts          # createCharacter()
 │   │   ├── mutate.ts          # Immutable mutation functions
@@ -102,7 +104,7 @@ open20-core/
 │   │   ├── query.ts           # getSpell(), searchSpells(), etc.
 │   │   ├── types.ts           # Spell types
 │   │   └── index.ts           # Barrel export
-│   ├── monsters/              # Monster data & queries (R28)
+│   ├── monster/               # Monster data & queries (R28)
 │   │   ├── query.ts           # getMonster(), searchMonsters(), etc.
 │   │   ├── calculator.ts      # getMonsterProficiencyBonus(), etc.
 │   │   ├── combat.ts          # HP management, damage dealing/taking
@@ -133,11 +135,11 @@ open20-core/
 └── tests/
     ├── engine/*.test.ts        # 11 test files
     ├── character/*.test.ts      # 6 test files
-    ├── monsters/*.test.ts      # 3 test files (query, calculator, combat)
+    ├── monster/*.test.ts       # 3 test files (query, calculator, combat)
     ├── storage/*.test.ts       # 1 test file
     ├── data/*.test.ts          # 1 test file
     ├── content/*.test.ts       # 1 test file
-    └── integration/*.test.ts   # 7 test files
+    └── integration/*.test.ts   # 8 test files
 ```
 
 ---

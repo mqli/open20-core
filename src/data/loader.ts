@@ -11,7 +11,7 @@ import type { Weapon, Armor, GearItem } from '../types/equipment';
 import type { Spell } from '../types/spell';
 import type { DieType } from '../types/dice';
 import type { ContentPack, ContentPackMeta } from '../content/types';
-import type { Monster } from '../monsters/types';
+import type { Monster } from '../monster/types';
 
 // ── DataLoader 接口 ───────────────────────────────────────────────
 // 所有读取规则数据的函数集中在此接口

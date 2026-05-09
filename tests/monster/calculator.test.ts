@@ -3,14 +3,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 
 import type { ChallengeRating, MonsterAttack } from '../../src/types/monster';
-import type { Monster } from '../../src/monsters/types';
+import type { Monster } from '../../src/monster/types';
 import {
   getMonsterProficiencyBonus,
   calculateMonsterAttackBonus,
   calculateMonsterSaveDC,
   calculateMonsterAC,
   calculateMonsterHP
-} from '../../src/monsters/calculator';
+} from '../../src/monster/calculator';
 import type { DataLoader } from '../../src/data/loader';
 
 // ── Mock Monster ────────────────────────────────────────────

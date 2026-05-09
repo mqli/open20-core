@@ -1,4 +1,4 @@
-// monsters/combat.ts
+// monster/combat.ts
 // Monster combat functions — deal damage, take damage, HP management
 // Pure functions that return new Monster objects (immutable)
 
@@ -8,6 +8,16 @@ import type { DamageType, DamageDefenses, DamageResult } from '../types/damage';
 import type { DataLoader } from '../data/loader';
 import { calculateTypedDamage } from '../engine/damage-calculator';
 import { calculateMonsterAttackBonus } from './calculator';
+import {
+  applyHPChange,
+  applyTypedDamageToHP,
+  setTemporaryHPShared,
+  isDefeatedShared,
+  addDamageResistance,
+  addDamageImmunity,
+  addDamageVulnerability,
+  emptyDefenses,
+} from '../engine/combat';
 
 // ── Damage Roll ─────────────────────────────────────────────
 
@@ -111,14 +121,10 @@ export function modifyMonsterHP(
   monster: Monster,
   delta: number,
   damageType?: DamageType,
-  data?: DataLoader
+  _data?: DataLoader
 ): Monster {
   // Get defenses from monster or empty
-  const defenses: DamageDefenses = monster.damageDefenses || {
-    resistances: [],
-    immunities: [],
-    vulnerabilities: [],
-  };
+  const defenses: DamageDefenses = monster.damageDefenses || emptyDefenses();
 
   // Apply damage type modifiers if provided
   let effectiveDelta = delta;
@@ -130,19 +136,12 @@ export function modifyMonsterHP(
   const currentHP = monster.currentHP ?? monster.hitPoints.value;
   const temporaryHP = monster.temporaryHP ?? 0;
 
-  let remaining = effectiveDelta;
-  let newTemporary = temporaryHP;
-  let newCurrent = currentHP;
-
-  // Damage: subtract from temporary HP first
-  if (remaining < 0 && newTemporary > 0) {
-    const tempAbsorbed = Math.min(newTemporary, Math.abs(remaining));
-    newTemporary -= tempAbsorbed;
-    remaining += tempAbsorbed;
-  }
-
-  // Apply remaining damage/ healing to current HP
-  newCurrent = Math.max(0, Math.min(newCurrent + remaining, monster.hitPoints.value));
+  const { currentHP: newCurrent, temporaryHP: newTemporary } = applyHPChange(
+    currentHP,
+    monster.hitPoints.value,
+    temporaryHP,
+    effectiveDelta
+  );
 
   return {
     ...monster,
@@ -170,14 +169,25 @@ export function applyMonsterTypedDamage(
   damage: number,
   damageType: DamageType
 ): { monster: Monster; result: DamageResult } {
-  const defenses: DamageDefenses = monster.damageDefenses || {
-    resistances: [],
-    immunities: [],
-    vulnerabilities: [],
-  };
+  const defenses: DamageDefenses = monster.damageDefenses || emptyDefenses();
 
-  const result = calculateTypedDamage(damage, damageType, defenses);
-  const updatedMonster = modifyMonsterHP(monster, -result.effectiveDamage);
+  const currentHP = monster.currentHP ?? monster.hitPoints.value;
+  const temporaryHP = monster.temporaryHP ?? 0;
+
+  const { currentHP: newCurrent, temporaryHP: newTemporary, result } = applyTypedDamageToHP(
+    currentHP,
+    monster.hitPoints.value,
+    temporaryHP,
+    damage,
+    damageType,
+    defenses
+  );
+
+  const updatedMonster = {
+    ...monster,
+    currentHP: newCurrent,
+    temporaryHP: newTemporary,
+  };
 
   return { monster: updatedMonster, result };
 }
@@ -190,9 +200,10 @@ export function applyMonsterTypedDamage(
  * @returns New monster with updated temporary HP
  */
 export function setMonsterTemporaryHP(monster: Monster, value: number): Monster {
+  const newTemp = setTemporaryHPShared(monster.temporaryHP ?? 0, value);
   return {
     ...monster,
-    temporaryHP: Math.max(0, value),
+    temporaryHP: newTemp,
   };
 }
 
@@ -206,7 +217,7 @@ export function setMonsterTemporaryHP(monster: Monster, value: number): Monster 
  */
 export function isMonsterDefeated(monster: Monster): boolean {
   const currentHP = monster.currentHP ?? monster.hitPoints.value;
-  return currentHP <= 0;
+  return isDefeatedShared(currentHP);
 }
 
 /**
@@ -262,20 +273,14 @@ export function addMonsterDamageResistance(
   monster: Monster,
   damageType: DamageType
 ): Monster {
-  const defenses: DamageDefenses = monster.damageDefenses || {
-    resistances: [],
-    immunities: [],
-    vulnerabilities: [],
-  };
+  const defenses: DamageDefenses = monster.damageDefenses || emptyDefenses();
+  const newDefenses = addDamageResistance(defenses, damageType);
 
-  if (defenses.resistances.includes(damageType)) return monster;
+  if (newDefenses === defenses) return monster;
 
   return {
     ...monster,
-    damageDefenses: {
-      ...defenses,
-      resistances: [...defenses.resistances, damageType],
-    },
+    damageDefenses: newDefenses,
   };
 }
 
@@ -290,20 +295,14 @@ export function addMonsterDamageImmunity(
   monster: Monster,
   damageType: DamageType
 ): Monster {
-  const defenses: DamageDefenses = monster.damageDefenses || {
-    resistances: [],
-    immunities: [],
-    vulnerabilities: [],
-  };
+  const defenses: DamageDefenses = monster.damageDefenses || emptyDefenses();
+  const newDefenses = addDamageImmunity(defenses, damageType);
 
-  if (defenses.immunities.includes(damageType)) return monster;
+  if (newDefenses === defenses) return monster;
 
   return {
     ...monster,
-    damageDefenses: {
-      ...defenses,
-      immunities: [...defenses.immunities, damageType],
-    },
+    damageDefenses: newDefenses,
   };
 }
 
@@ -318,19 +317,13 @@ export function addMonsterDamageVulnerability(
   monster: Monster,
   damageType: DamageType
 ): Monster {
-  const defenses: DamageDefenses = monster.damageDefenses || {
-    resistances: [],
-    immunities: [],
-    vulnerabilities: [],
-  };
+  const defenses: DamageDefenses = monster.damageDefenses || emptyDefenses();
+  const newDefenses = addDamageVulnerability(defenses, damageType);
 
-  if (defenses.vulnerabilities.includes(damageType)) return monster;
+  if (newDefenses === defenses) return monster;
 
   return {
     ...monster,
-    damageDefenses: {
-      ...defenses,
-      vulnerabilities: [...defenses.vulnerabilities, damageType],
-    },
+    damageDefenses: newDefenses,
   };
 }
