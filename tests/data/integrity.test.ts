@@ -1,28 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { createRequire } from 'node:module';
 import { createDataLoader } from '../../src/data/loader';
-
-const require = createRequire(import.meta.url);
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const lookupTables: any = require('../../static/lookup-tables.json');
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const species: any = require('../../static/species.json');
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const backgrounds: any = require('../../static/backgrounds.json');
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const classes: any = require('../../static/classes.json');
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const subclasses: any = require('../../static/subclasses.json');
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const feats: any = require('../../static/feats.json');
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const weapons: any = require('../../static/weapons.json');
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const armors: any = require('../../static/armor.json');
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const gear: any = require('../../static/gear.json');
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const spells: any = require('../../static/spells.json');
+import lookupTables from '../../static/lookup-tables.json';
+import species from '../../static/species.json';
+import backgrounds from '../../static/backgrounds.json';
+import classes from '../../static/classes.json';
+import subclasses from '../../static/subclasses.json';
+import feats from '../../static/feats.json';
+import weapons from '../../static/weapons.json';
+import armors from '../../static/armor.json';
+import gear from '../../static/gear.json';
+import spells from '../../static/spells.json';
 
 const dataLoader = createDataLoader(lookupTables);
 

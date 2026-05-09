@@ -212,7 +212,7 @@ function makeClass(classId: string, level: number): CharacterClass {
 
 /** 获取法术位总数（用于断言） */
 function getSlotTotal(result: Record<number, SpellSlotEntry>, level: number): number {
-  return result[level]!?.total ?? 0;
+  return result[level]?.total ?? 0;
 }
 
 // ── 测试用例 ─────────────────────────────────────────────────────

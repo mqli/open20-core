@@ -26,8 +26,8 @@
     "test:browser-artifact": "npm run build:bundle && vitest run --config vitest.browser.config.ts",
     "test:all": "npm run test && npm run test:artifact && npm run test:browser-artifact",
     "typecheck": "tsc -p tsconfig.check.json --noEmit",
-    "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix",
+    "lint": "eslint src/ tests/",
+    "lint:fix": "eslint src/ tests/ --fix",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\""
   },

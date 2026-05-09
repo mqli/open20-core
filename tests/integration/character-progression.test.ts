@@ -7,10 +7,7 @@ import { levelUp } from '../../src/character/level-up';
 import { validateCharacter } from '../../src/character/validate';
 import { recomputeDerivedStats } from '../../src/character/recompute';
 import { serialize, deserialize } from '../../src/storage/serializer';
-import { createRequire } from 'node:module';
-
-const require = createRequire(import.meta.url);
-const lookupTables = require('../../static/lookup-tables.json');
+import lookupTables from '../../static/lookup-tables.json';
 
 const dataLoader = createDataLoader(lookupTables);
 

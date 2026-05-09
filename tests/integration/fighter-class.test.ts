@@ -5,10 +5,7 @@ import { modifyHP, applyTypedDamage } from '../../src/character/mutate';
 import { shortRest, longRest } from '../../src/character/rest';
 import { levelUp } from '../../src/character/level-up';
 import { validateCharacter } from '../../src/character/validate';
-import { createRequire } from 'node:module';
-
-const require = createRequire(import.meta.url);
-const lookupTables = require('../../static/lookup-tables.json');
+import lookupTables from '../../static/lookup-tables.json';
 
 const dataLoader = createDataLoader(lookupTables);
 

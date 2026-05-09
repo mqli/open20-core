@@ -8,10 +8,7 @@ import { validateCharacter } from '../../src/character/validate';
 import { serialize, deserialize } from '../../src/storage/serializer';
 import { applyTypedDamage } from '../../src/character/mutate';
 import type { DamageDefenses } from '../../src/types/damage';
-import { createRequire } from 'node:module';
-
-const require = createRequire(import.meta.url);
-const lookupTables = require('../../static/lookup-tables.json');
+import lookupTables from '../../static/lookup-tables.json';
 
 const dataLoader = createDataLoader(lookupTables);
 

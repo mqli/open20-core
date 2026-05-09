@@ -3,10 +3,7 @@ import { createDataLoader } from '../../src/data/loader';
 import { createCharacter } from '../../src/character/create';
 import { levelUp } from '../../src/character/level-up';
 import { validateCharacter } from '../../src/character/validate';
-import { createRequire } from 'node:module';
-
-const require = createRequire(import.meta.url);
-const lookupTables = require('../../static/lookup-tables.json');
+import lookupTables from '../../static/lookup-tables.json';
 
 const dataLoader = createDataLoader(lookupTables);
 
