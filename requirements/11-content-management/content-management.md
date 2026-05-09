@@ -38,7 +38,7 @@ Define how game content (species, classes, spells, feats, equipment) is organize
 - [ ] SRD classes (Barbarian, Bard, Cleric, Druid, Fighter, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, Wizard)
 - [ ] SRD subclasses (basic archetypes for each class)
 - [ ] SRD feats (limited set)
-- [ ] SRD spells (~391+ spells from SRD 5.1)
+- [ ] SRD spells (~391+ spells from SRD 5.2)
 - [ ] SRD equipment (basic weapons, armor, gear)
 
 **Implementation Notes**:
@@ -58,7 +58,7 @@ Define how game content (species, classes, spells, feats, equipment) is organize
   └── lookup-tables.json
   ```
 - Automatically loaded when using default `createDataLoader()`
-- All SRD content has `source: 'SRD 5.1'` tag (upgrade to SRD 5.2 pending)
+- All SRD content has `source: 'SRD 5.2'` tag
 
 ---
 
@@ -100,10 +100,10 @@ export function loadContentPack(source: string | ContentPack): ContentPack;
 **Content Pack Metadata** (`meta.json`):
 ```typescript
 interface ContentPackMeta {
-  id: string;              // 'srd-5.1', 'phb-2024', 'my-homebrew'
-  name: string;            // 'SRD 5.1', 'Player's Handbook 2024', etc.
+  id: string;              // 'srd-5.2', 'phb-2024', 'my-homebrew'
+  name: string;            // 'SRD 5.2', 'Player's Handbook 2024', etc.
   version: string;         // '1.0.0'
-  source: string;          // 'SRD 5.1', '2024 PHB', 'Homebrew'
+  source: string;          // 'SRD 5.2', '2024 PHB', 'Homebrew'
   author?: string;         // 'Wizards of the Coast', 'Me', etc.
   url?: string;            // Link to source
   priority?: number;       // Higher = wins ID conflicts (default: 0)
@@ -144,7 +144,7 @@ interface ContentPack {
 **Example**:
 ```typescript
 // SRD content
-{ "id": "fireball", "name": "Fireball", "source": "SRD 5.1", ... }
+{ "id": "fireball", "name": "Fireball", "source": "SRD 5.2", ... }
 
 // Homebrew content
 { "id": "fireball", "name": "Fireball (Enhanced)", "source": "my-homebrew", ... }
@@ -177,10 +177,10 @@ interface ContentPack {
 // src/types/content.ts
 
 export interface ContentPackMeta {
-  id: string;              // Unique content pack ID (e.g., 'srd-5.1', 'phb-2024')
-  name: string;            // Display name (e.g., 'SRD 5.1')
+  id: string;              // Unique content pack ID (e.g., 'srd-5.2', 'phb-2024')
+  name: string;            // Display name (e.g., 'SRD 5.2')
   version: string;         // SemVer (e.g., '1.0.0')
-  source: string;          // Tag for all content in this pack (e.g., 'SRD 5.1')
+  source: string;          // Tag for all content in this pack (e.g., 'SRD 5.2')
   author?: string;         // Author name
   url?: string;            // Link to source
   priority?: number;       // Higher = wins ID conflicts (default: 0)
@@ -237,7 +237,7 @@ export interface DataLoader {
 ### Phase 1: SRD Content Organization (P0)
 1. [ ] Create `static/srd/meta.json` with SRD metadata
 2. [ ] Move existing `static/*.json` files to `static/srd/` (if not already there)
-3. [ ] Update `source` field to `'SRD 5.1'` in all SRD content
+3. [ ] Update `source` field to `'SRD 5.2'` in all SRD content
 4. [ ] Update `default-loader.ts` to load from `static/srd/` directory
 5. [ ] Tests: Verify SRD content loads correctly
 
@@ -283,8 +283,7 @@ export interface DataLoader {
 
 ## 6. References
 
-- **SRD 5.1**: https://www.dndbeyond.com/srd (current)
-- **SRD 5.2**: https://www.dndbeyond.com/srd (target, when available)
+- **SRD 5.2**: https://www.dndbeyond.com/srd
 - **PRD Section 1.4**: Static Data & Content Management
 - **HLD Section 3**: Directory Structure
 - **HLD Section 4**: Data Loader

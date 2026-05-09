@@ -4,7 +4,7 @@
 // 背景类型
 export interface Background {
   readonly id: string;
-  readonly source: string; // '2024 PHB' | '2014 PHB' | 'SRD 5.1' | ...
+  readonly source: string; // '2024 PHB' | '2014 PHB' | 'SRD 5.2' | ...
   readonly name?: string; // 显示名称（如无则用id）
   readonly description?: string;
   readonly skillProficiencies: readonly string[]; // 授予的技能熟练项

@@ -29,7 +29,7 @@ export interface SpeciesSubtype {
 // 物种主类型
 export interface Species {
   readonly id: string; // 如 "Dwarf", "Elf"
-  readonly source: string; // '2024 PHB' | '2014 PHB' | 'SRD 5.1' | ...
+  readonly source: string; // '2024 PHB' | '2014 PHB' | 'SRD 5.2' | ...
   readonly description: string;
   readonly size: 'Small' | 'Medium';
   readonly speed: number; // 尺（如30）

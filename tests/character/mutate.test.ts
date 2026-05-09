@@ -138,7 +138,7 @@ function createMockDataLoader(): DataLoader {
     getPactMagicSlots: () => ({ slots: 0, slotLevel: 0 }),
     getWeaponMasteryProperties: () => [],
     getConditionNames: () => [],
-  };
+  } as any as DataLoader;
 }
 
 // ── Helpers ────────────────────────────────────────────────────

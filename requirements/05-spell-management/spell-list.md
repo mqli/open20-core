@@ -113,4 +113,4 @@ interface SpellFilter {
 
 - PRD §4.5 Spell Management
 - 2024 PHB p.30-33 Spellcasting Rules
-- SRD 5.1 Spell List (spell description text source)
+- SRD 5.2 Spell List (spell description text source)

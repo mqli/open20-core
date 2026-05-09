@@ -107,4 +107,4 @@ function setExhaustionLevel(char: Character, level: 0|1|2|3|4|5|6): Character;
 - PRD §4.3 Game Mode (Conditions)
 - 2024 PHB p.30 Conditions
 - 2024 PHB p.363-370 Appendix A: Conditions
-- SRD 5.1 Appendix A: Conditions
+- SRD 5.2 Appendix A: Conditions

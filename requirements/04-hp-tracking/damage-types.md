@@ -220,4 +220,4 @@ Trigger death saves if HP ≤ 0
 - 2024 PHB p.26 Damage and Healing
 - 2024 PHB p.57-58 Barbarian Rage
 - 2024 PHB p.165 Dragonborn Draconic Ancestry
-- SRD 5.1: Damage Types
+- SRD 5.2: Damage Types

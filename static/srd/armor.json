@@ -12,7 +12,7 @@
       "quantity": 5,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "leather-armor",
@@ -27,7 +27,7 @@
       "quantity": 10,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "studded-leather",
@@ -42,7 +42,7 @@
       "quantity": 45,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "hide-armor",
@@ -57,7 +57,7 @@
       "quantity": 10,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "chain-shirt",
@@ -72,7 +72,7 @@
       "quantity": 50,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "scale-mail",
@@ -87,7 +87,7 @@
       "quantity": 50,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "breastplate",
@@ -102,7 +102,7 @@
       "quantity": 400,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "half-plate",
@@ -117,7 +117,7 @@
       "quantity": 750,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "ring-mail",
@@ -132,7 +132,7 @@
       "quantity": 30,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "chain-mail",
@@ -147,7 +147,7 @@
       "quantity": 75,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "splint-mail",
@@ -162,7 +162,7 @@
       "quantity": 200,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "plate-mail",
@@ -177,7 +177,7 @@
       "quantity": 1500,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "shield",
@@ -192,7 +192,7 @@
       "quantity": 10,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "buckler",
@@ -207,7 +207,7 @@
       "quantity": 5,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "tower-shield",
@@ -222,7 +222,7 @@
       "quantity": 30,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "robe",
@@ -237,7 +237,7 @@
       "quantity": 5,
       "unit": "sp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "travelers-clothes",
@@ -252,7 +252,7 @@
       "quantity": 2,
       "unit": "sp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "winter-clothes",
@@ -267,7 +267,7 @@
       "quantity": 5,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "fine-clothes",
@@ -282,6 +282,6 @@
       "quantity": 15,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   }
 ]

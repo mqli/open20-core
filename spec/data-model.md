@@ -91,7 +91,7 @@ interface SpellDamage {
 ```
 
 **Data sources**:
-- SRD 5.1 (~391 spells): Full descriptions
+- SRD 5.2 (~391 spells): Full descriptions
 - 2024 PHB (~200 spells): Metadata only (copyright)
 - XGtE/TCoE (~110 spells): SRD-eligible
 

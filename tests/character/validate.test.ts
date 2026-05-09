@@ -158,7 +158,7 @@ function createMockDataLoader(overrides?: {
     getPactMagicSlots: () => ({ slots: 0, slotLevel: 0 }),
     getWeaponMasteryProperties: () => [],
     getConditionNames: () => [],
-  };
+  } as any as DataLoader;
 }
 
 // ── Helper: create valid character ─────────────────────────────

@@ -8,7 +8,7 @@
       "quantity": 2,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "bedroll",
@@ -19,7 +19,7 @@
       "quantity": 1,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "rations",
@@ -30,7 +30,7 @@
       "quantity": 5,
       "unit": "sp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "rope-hempen",
@@ -41,7 +41,7 @@
       "quantity": 1,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "rope-silk",
@@ -52,7 +52,7 @@
       "quantity": 10,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "torch",
@@ -63,7 +63,7 @@
       "quantity": 1,
       "unit": "cp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "waterskin",
@@ -74,7 +74,7 @@
       "quantity": 2,
       "unit": "sp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "flint-and-steel",
@@ -85,7 +85,7 @@
       "quantity": 5,
       "unit": "sp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "mess-kit",
@@ -96,7 +96,7 @@
       "quantity": 2,
       "unit": "sp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "tinderbox",
@@ -107,7 +107,7 @@
       "quantity": 5,
       "unit": "sp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "candle",
@@ -118,7 +118,7 @@
       "quantity": 1,
       "unit": "cp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "lantern-bullseye",
@@ -129,7 +129,7 @@
       "quantity": 10,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "lantern-hooded",
@@ -140,7 +140,7 @@
       "quantity": 5,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "oil-flask",
@@ -151,7 +151,7 @@
       "quantity": 1,
       "unit": "sp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "iron-pot",
@@ -162,7 +162,7 @@
       "quantity": 2,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "sack",
@@ -173,7 +173,7 @@
       "quantity": 1,
       "unit": "cp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "signaling-whistle",
@@ -184,7 +184,7 @@
       "quantity": 5,
       "unit": "cp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "soap",
@@ -195,7 +195,7 @@
       "quantity": 2,
       "unit": "cp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "tent",
@@ -206,7 +206,7 @@
       "quantity": 2,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "arrow",
@@ -217,7 +217,7 @@
       "quantity": 1,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "bolt",
@@ -228,7 +228,7 @@
       "quantity": 1,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "bullet-blowgun",
@@ -239,7 +239,7 @@
       "quantity": 1,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "bullet-firearm",
@@ -250,7 +250,7 @@
       "quantity": 3,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "sling-bullet",
@@ -261,7 +261,7 @@
       "quantity": 4,
       "unit": "cp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "healers-kit",
@@ -272,7 +272,7 @@
       "quantity": 5,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "artisan-tools",
@@ -283,7 +283,7 @@
       "quantity": 1,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "disguise-kit",
@@ -294,7 +294,7 @@
       "quantity": 25,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "forgery-kit",
@@ -305,7 +305,7 @@
       "quantity": 15,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "herbalism-kit",
@@ -316,7 +316,7 @@
       "quantity": 5,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "musical-instrument",
@@ -327,7 +327,7 @@
       "quantity": 5,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "navigators-tools",
@@ -338,7 +338,7 @@
       "quantity": 25,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "poisoners-kit",
@@ -349,7 +349,7 @@
       "quantity": 25,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   },
   {
     "id": "thieves-tools",
@@ -360,6 +360,6 @@
       "quantity": 25,
       "unit": "gp"
     },
-    "source": "SRD 5.1"
+    "source": "SRD 5.2"
   }
 ]

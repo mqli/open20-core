@@ -29,7 +29,7 @@ describe('Content Management (R26)', () => {
       // Register SRD content (already registered by default)
       const packs = dataLoader.getContentPacks();
       expect(packs.length).toBeGreaterThan(0);
-      expect(packs[0]?.id).toBe('srd-5.1');
+      expect(packs[0]?.id).toBe('srd-5.2');
     });
 
     it('should unregister a content pack', () => {
@@ -83,7 +83,7 @@ describe('Content Management (R26)', () => {
 
     it('should filter spells by source', () => {
       // Spells in static/srd/ have various sources
-      const srdSpells = dataLoader.getSpellsBySource('SRD 5.1');
+      const srdSpells = dataLoader.getSpellsBySource('SRD 5.2');
       expect(srdSpells.length).toBeGreaterThan(0);
 
       // Also check PHB 2024 spells
@@ -135,7 +135,7 @@ describe('Content Management (R26)', () => {
       expect(srdFireball).toBeDefined();
       // First registered (SRD) wins for getSpell()
       // Note: SRD spells have source: 'Free Basic Rules (2024)'
-      expect(['SRD 5.1', "Free Basic Rules (2024)"].includes(srdFireball?.source ?? '')).toBe(true);
+      expect(['SRD 5.2', "Free Basic Rules (2024)"].includes(srdFireball?.source ?? '')).toBe(true);
 
       // But we can filter by source
       const homebrewSpells = dataLoader.getSpellsBySource('Homebrew');
@@ -151,7 +151,7 @@ describe('Content Management (R26)', () => {
       // This tests the IO functions
       const pack = loadContentPack('static/srd/');
       expect(pack.meta).toBeDefined();
-      expect(pack.meta.id).toBe('srd-5.1');
+      expect(pack.meta.id).toBe('srd-5.2');
       expect(pack.species).toBeDefined();
       expect(pack.spells).toBeDefined();
     });

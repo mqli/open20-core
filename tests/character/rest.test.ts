@@ -81,7 +81,7 @@ function createMockDataLoader(): DataLoader {
     },
     getWeaponMasteryProperties: () => [],
     getConditionNames: () => [],
-  };
+  } as any as DataLoader;
 }
 
 // ── Character Builders ─────────────────────────────────────────

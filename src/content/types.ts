@@ -14,10 +14,10 @@ import type { Spell } from '../types/spell';
  * or `meta` field for unified ContentPack objects.
  */
 export interface ContentPackMeta {
-  id: string;              // Unique content pack ID (e.g., 'srd-5.1', 'phb-2024')
-  name: string;            // Display name (e.g., 'SRD 5.1')
+  id: string;              // Unique content pack ID (e.g., 'srd-5.2', 'phb-2024')
+  name: string;            // Display name (e.g., 'SRD 5.2')
   version: string;         // SemVer (e.g., '1.0.0')
-  source: string;          // Tag for all content in this pack (e.g., 'SRD 5.1')
+  source: string;          // Tag for all content in this pack (e.g., 'SRD 5.2')
   author?: string;         // Author name
   url?: string;            // Link to source
   priority?: number;       // Higher = wins ID conflicts (default: 0)

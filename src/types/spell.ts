@@ -72,7 +72,7 @@ export interface Spell {
   readonly heal?: SpellHeal;
   readonly save?: AbilityName;
   readonly attack?: boolean;
-  readonly source: string; // '2024 PHB' | '2014 PHB' | 'SRD 5.1' | 'Player\'s Handbook (2024)'
+  readonly source: string; // '2024 PHB' | '2014 PHB' | 'SRD 5.2' | 'Player\'s Handbook (2024)'
   readonly upcast?: string; // 升环施法说明
 }
 

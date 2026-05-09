@@ -199,7 +199,7 @@ function createMockDataLoader(): DataLoader {
     getConditionNames(): readonly string[] {
       return [];
     },
-  };
+  } as any as DataLoader;
 }
 
 // ── 辅助函数 ─────────────────────────────────────────────────────

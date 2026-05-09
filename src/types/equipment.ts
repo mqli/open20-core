@@ -6,7 +6,7 @@ export interface EquipmentItem {
   readonly id: string;
   readonly name: string;
   readonly type: 'weapon' | 'armor' | 'shield' | 'gear' | 'consumable';
-  readonly source?: '2024 PHB' | '2014 PHB' | 'SRD 5.1'; // 数据来源（可选，测试中可以省略）
+  readonly source?: string; // '2024 PHB' | '2014 PHB' | 'SRD 5.2' | ...（可选，测试中可以省略）
   readonly weight: number; // 重量（磅），0=无重量
   readonly cost?: string; // 价格（如 "15 gp"）
   readonly equipped: boolean; // 是否装备（影响AC/攻击加值）

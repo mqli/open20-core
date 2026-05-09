@@ -229,9 +229,9 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
       return [
         {
           id: 'srd-5.1',
-          name: 'SRD 5.1',
+          name: 'SRD 5.2',
           version: '1.0.0',
-          source: 'SRD 5.1',
+          source: 'SRD 5.2',
           author: 'Wizards of the Coast',
           url: 'https://www.dndbeyond.com/srd',
           priority: 0,
