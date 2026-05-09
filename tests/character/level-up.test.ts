@@ -102,7 +102,7 @@ function makeMockDataLoader(fighterClass?: Class, wizardClass?: Class): DataLoad
     getPactMagicSlots: () => ({ slots: 0, slotLevel: 1 }),
     getWeaponMasteryProperties: () => [],
     getConditionNames: () => [],
-  } as DataLoader;
+  } as any as DataLoader;
 }
 
 function makeLevel1Fighter(_overrides?: Partial<Character>): Character {

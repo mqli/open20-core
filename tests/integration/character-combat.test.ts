@@ -6,7 +6,7 @@ import { longRest } from '../../src/character/rest';
 import { calculateTypedDamage } from '../../src/engine/damage-calculator';
 import { applyTypedDamage } from '../../src/character/mutate';
 import type { DamageDefenses } from '../../src/types/damage';
-import lookupTables from '../../static/lookup-tables.json';
+import lookupTables from '../../static/srd/lookup-tables.json';
 
 const dataLoader = createDataLoader(lookupTables);
 

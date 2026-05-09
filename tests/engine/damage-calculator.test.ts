@@ -16,7 +16,7 @@ import type { DamageDefenses } from '../../src/types/damage';
 import { createDataLoader } from '../../src/data/loader';
 import { createCharacter } from '../../src/character/create';
 import { modifyHP } from '../../src/character/mutate';
-import lookupTables from '../../static/lookup-tables.json';
+import lookupTables from '../../static/srd/lookup-tables.json';
 const dataLoader = createDataLoader(lookupTables);
 
 describe('DamageType parsing', () => {

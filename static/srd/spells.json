@@ -25,7 +25,8 @@
     },
     "heal": null,
     "save": null,
-    "attack": true
+    "attack": true,
+    "source": "SRD 5.1"
   },
   {
     "id": "blade-ward",
@@ -177,7 +178,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "druidcraft",
@@ -300,7 +302,8 @@
     },
     "heal": null,
     "save": null,
-    "attack": true
+    "attack": true,
+    "source": "SRD 5.1"
   },
   {
     "id": "friends",
@@ -401,7 +404,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "gust",
@@ -495,7 +499,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "lightning-lure",
@@ -545,7 +550,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "magic-stone",
@@ -588,7 +594,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "message",
@@ -609,7 +616,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "mind-sliver",
@@ -659,7 +667,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "mold-earth",
@@ -709,7 +718,8 @@
     },
     "heal": null,
     "save": "Constitution",
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "prestidigitation",
@@ -788,7 +798,8 @@
     },
     "heal": null,
     "save": null,
-    "attack": true
+    "attack": true,
+    "source": "SRD 5.1"
   },
   {
     "id": "ray-of-frost",
@@ -816,7 +827,8 @@
     },
     "heal": null,
     "save": null,
-    "attack": true
+    "attack": true,
+    "source": "SRD 5.1"
   },
   {
     "id": "resistance",
@@ -837,7 +849,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "sacred-flame",
@@ -865,7 +878,8 @@
     },
     "heal": null,
     "save": "Dexterity",
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "sapping-sting",
@@ -1010,7 +1024,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "starry-wisp",
@@ -1089,7 +1104,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "thorn-whip",
@@ -1197,7 +1213,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "vicious-mockery",
@@ -1437,7 +1454,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "burning-hands",
@@ -1465,7 +1483,8 @@
     },
     "heal": null,
     "save": "Dexterity",
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "catapult",
@@ -1603,7 +1622,8 @@
     "damage": null,
     "heal": null,
     "save": "Wisdom",
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "chromatic-orb",
@@ -1646,7 +1666,8 @@
     "damage": null,
     "heal": null,
     "save": "Wisdom",
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "command",
@@ -1667,7 +1688,8 @@
     "damage": null,
     "heal": null,
     "save": "Wisdom",
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "compelled-duel",
@@ -1756,7 +1778,8 @@
       "dice": "1d8"
     },
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "detect-evil-and-good",
@@ -1799,7 +1822,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "detect-poison-and-disease",
@@ -1842,7 +1866,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "dissonant-whispers",
@@ -1921,7 +1946,8 @@
     },
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "divine-smite",
@@ -2000,7 +2026,8 @@
     "damage": null,
     "heal": null,
     "save": "Strength",
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "entangle",
@@ -2021,7 +2048,8 @@
     "damage": null,
     "heal": null,
     "save": "Strength",
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "expeditious-retreat",
@@ -2042,7 +2070,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "faerie-fire",
@@ -2063,7 +2092,8 @@
     "damage": null,
     "heal": null,
     "save": "Dexterity",
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "false-life",
@@ -2084,7 +2114,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "feather-fall",
@@ -2105,7 +2136,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "find-familar",
@@ -2126,7 +2158,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "find-familiar",
@@ -2191,7 +2224,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "frost-fingers",
@@ -2265,7 +2299,8 @@
       "dice": "1"
     },
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "grease",
@@ -2286,7 +2321,8 @@
     "damage": null,
     "heal": null,
     "save": "Dexterity",
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "guidng-bolt",
@@ -2314,7 +2350,8 @@
     },
     "heal": null,
     "save": null,
-    "attack": true
+    "attack": true,
+    "source": "SRD 5.1"
   },
   {
     "id": "guiding-bolt",
@@ -2395,7 +2432,8 @@
       "dice": "1d4"
     },
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "hellish-rebuke",
@@ -2445,7 +2483,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "hex",
@@ -2495,7 +2534,8 @@
     "damage": null,
     "heal": null,
     "save": "Wisdom",
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "hunter's-mark",
@@ -2523,7 +2563,8 @@
     },
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "hunters-mark",
@@ -2602,7 +2643,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "illusory-script",
@@ -2652,7 +2694,8 @@
     },
     "heal": null,
     "save": null,
-    "attack": true
+    "attack": true,
+    "source": "SRD 5.1"
   },
   {
     "id": "jims-magic-missile",
@@ -2702,7 +2745,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "longstrider",
@@ -2723,7 +2767,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "mage-armor",
@@ -2773,7 +2818,8 @@
     },
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "magnify-gravity",
@@ -2823,7 +2869,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "purify-food-and-drink",
@@ -2946,7 +2993,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "shield-of-faith",
@@ -2989,7 +3037,8 @@
     "damage": null,
     "heal": null,
     "save": null,
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "silvery-barbs",
@@ -3032,7 +3081,8 @@
     "damage": null,
     "heal": null,
     "save": "Wisdom",
-    "attack": false
+    "attack": false,
+    "source": "SRD 5.1"
   },
   {
     "id": "snare",

@@ -53,7 +53,7 @@ function createMockDataLoader(armorData: Record<string, Armor> = {}): DataLoader
     getPactMagicSlots: () => ({ slots: 0, slotLevel: 0 }),
     getWeaponMasteryProperties: () => [],
     getConditionNames: () => [],
-  } as DataLoader;
+  } as any as DataLoader;
 }
 
 // ── 标准护甲数据 ──────────────────────────────────────

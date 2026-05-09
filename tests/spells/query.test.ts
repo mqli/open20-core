@@ -137,7 +137,7 @@ function createMockDataLoader(spells: Spell[] = MOCK_SPELLS): DataLoader {
     getPactMagicSlots: () => ({ slots: 0, slotLevel: 0 }),
     getWeaponMasteryProperties: () => [],
     getConditionNames: () => [],
-  } as DataLoader;
+  } as any as DataLoader;
 }
 
 // ── Mock Character ─────────────────────────────────────────────

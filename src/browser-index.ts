@@ -19,6 +19,9 @@ export type { DieType } from './types';
 export type { DataLoader, LookupTables } from './data';
 export { createBrowserDataLoader } from './data/browser-loader';
 
+// ── Content (R26: Content Pack Types only, no IO) ─────
+export type { ContentPack, ContentPackMeta } from './content';
+
 // ── Engine (pure functions) ──────────────────────────────────────
 export { getModifier, getTotalScore } from './engine';
 export { getProficiencyBonus } from './engine';

@@ -4,7 +4,7 @@ import { createCharacter } from '../../src/character/create';
 import { modifyHP, applyTypedDamage } from '../../src/character/mutate';
 import { shortRest, longRest } from '../../src/character/rest';
 import { validateCharacter } from '../../src/character/validate';
-import lookupTables from '../../static/lookup-tables.json';
+import lookupTables from '../../static/srd/lookup-tables.json';
 
 const dataLoader = createDataLoader(lookupTables);
 

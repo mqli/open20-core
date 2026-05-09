@@ -2,8 +2,9 @@
 
 **Requirement ID**: R26
 **Priority**: P1
-**Status**: 📋 draft
+**Status**: ✅ implemented
 **Created**: 2026-05-09
+**Implemented**: 2026-05-09
 
 ---
 

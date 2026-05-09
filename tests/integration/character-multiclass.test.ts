@@ -3,7 +3,7 @@ import { createDataLoader } from '../../src/data/loader';
 import { createCharacter } from '../../src/character/create';
 import { levelUp } from '../../src/character/level-up';
 import { validateCharacter } from '../../src/character/validate';
-import lookupTables from '../../static/lookup-tables.json';
+import lookupTables from '../../static/srd/lookup-tables.json';
 
 const dataLoader = createDataLoader(lookupTables);
 

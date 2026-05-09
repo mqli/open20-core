@@ -21,7 +21,8 @@
     "cost": {
       "quantity": 1,
       "unit": "sp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "dagger",
@@ -47,7 +48,8 @@
     "cost": {
       "quantity": 2,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "greatclub",
@@ -71,7 +73,8 @@
     "cost": {
       "quantity": 2,
       "unit": "sp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "handaxe",
@@ -96,7 +99,8 @@
     "cost": {
       "quantity": 5,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "javelin",
@@ -120,7 +124,8 @@
     "cost": {
       "quantity": 5,
       "unit": "sp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "light-hammer",
@@ -145,7 +150,8 @@
     "cost": {
       "quantity": 2,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "mace",
@@ -167,7 +173,8 @@
     "cost": {
       "quantity": 5,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "quarterstaff",
@@ -191,7 +198,8 @@
     "cost": {
       "quantity": 2,
       "unit": "sp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "sickle",
@@ -215,7 +223,8 @@
     "cost": {
       "quantity": 1,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "spear",
@@ -240,7 +249,8 @@
     "cost": {
       "quantity": 1,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "light-crossbow",
@@ -266,7 +276,8 @@
     "cost": {
       "quantity": 25,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "dart",
@@ -291,7 +302,8 @@
     "cost": {
       "quantity": 5,
       "unit": "cp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "shortbow",
@@ -316,7 +328,8 @@
     "cost": {
       "quantity": 25,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "sling",
@@ -340,7 +353,8 @@
     "cost": {
       "quantity": 1,
       "unit": "sp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "battleaxe",
@@ -364,7 +378,8 @@
     "cost": {
       "quantity": 10,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "flail",
@@ -386,7 +401,8 @@
     "cost": {
       "quantity": 10,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "glaive",
@@ -412,7 +428,8 @@
     "cost": {
       "quantity": 20,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "greataxe",
@@ -437,7 +454,8 @@
     "cost": {
       "quantity": 30,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "greatsword",
@@ -462,7 +480,8 @@
     "cost": {
       "quantity": 50,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "halberd",
@@ -488,7 +507,8 @@
     "cost": {
       "quantity": 20,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "lance",
@@ -512,7 +532,8 @@
     "cost": {
       "quantity": 10,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "longsword",
@@ -536,7 +557,8 @@
     "cost": {
       "quantity": 15,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "maul",
@@ -561,7 +583,8 @@
     "cost": {
       "quantity": 10,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "morningstar",
@@ -583,7 +606,8 @@
     "cost": {
       "quantity": 15,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "pike",
@@ -609,7 +633,8 @@
     "cost": {
       "quantity": 5,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "rapier",
@@ -633,7 +658,8 @@
     "cost": {
       "quantity": 25,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "scimitar",
@@ -658,7 +684,8 @@
     "cost": {
       "quantity": 25,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "shortsword",
@@ -683,7 +710,8 @@
     "cost": {
       "quantity": 10,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "trident",
@@ -708,7 +736,8 @@
     "cost": {
       "quantity": 5,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "war-pick",
@@ -730,7 +759,8 @@
     "cost": {
       "quantity": 5,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "warhammer",
@@ -754,7 +784,8 @@
     "cost": {
       "quantity": 15,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "whip",
@@ -779,7 +810,8 @@
     "cost": {
       "quantity": 2,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "longbow",
@@ -805,7 +837,8 @@
     "cost": {
       "quantity": 50,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "heavy-crossbow",
@@ -832,7 +865,8 @@
     "cost": {
       "quantity": 50,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "blowgun",
@@ -857,7 +891,8 @@
     "cost": {
       "quantity": 10,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "hand-crossbow",
@@ -883,7 +918,8 @@
     "cost": {
       "quantity": 75,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "pistol",
@@ -908,7 +944,8 @@
     "cost": {
       "quantity": 250,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "musket",
@@ -934,6 +971,7 @@
     "cost": {
       "quantity": 500,
       "unit": "gp"
-    }
+    },
+    "source": "SRD 5.1"
   }
 ]

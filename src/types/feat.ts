@@ -7,7 +7,7 @@ export type FeatCategory = 'Origin' | 'General' | 'Fighting Style' | 'Epic Boon'
 // 专长条目
 export interface Feat {
   readonly id: string;
-  readonly source: '2024 PHB' | '2014 PHB';
+  readonly source: string; // '2024 PHB' | '2014 PHB' | 'SRD 5.1' | ...
   readonly name?: string; // 显示名称（无则用id）
   readonly description: string;
   readonly category: FeatCategory;

@@ -10,6 +10,7 @@ import type { Feat, FeatCategory } from '../types/feat';
 import type { Weapon, Armor, GearItem } from '../types/equipment';
 import type { Spell } from '../types/spell';
 import type { DieType } from '../types/dice';
+import type { ContentPack, ContentPackMeta } from '../content/types';
 
 // ── DataLoader 接口 ───────────────────────────────────────────────
 // 所有读取规则数据的函数集中在此接口
@@ -19,37 +20,56 @@ import type { DieType } from '../types/dice';
 export interface DataLoader {
   // ── 物种（Species）───
   getSpecies(id: string): Species | undefined;
+  getSpeciesBySource(source: string): Species[];
   getSpeciesSubtype(speciesId: string, subtypeId: string): SpeciesSubtype | undefined;
   getAllSpecies(): Species[];
 
   // ── 背景（Background）───
   getBackground(id: string): Background | undefined;
+  getBackgroundsBySource(source: string): Background[];
   getAllBackgrounds(): Background[];
 
   // ── 职业（Class）/ 子职业（Subclass）───
   getClass(id: string): Class | undefined;
+  getClassesBySource(source: string): Class[];
   getAllClasses(): Class[];
   getSubclass(id: string): Subclass | undefined;
+  getSubclassesBySource(source: string): Subclass[];
   getSubclassesForClass(classId: string): Subclass[];
   getAllSubclasses(): Subclass[];
 
   // ── 专长（Feat）───
   getFeat(id: string): Feat | undefined;
+  getFeatsBySource(source: string): Feat[];
   getFeatsByCategory(category: FeatCategory): Feat[];
   getAllFeats(): Feat[];
 
   // ── 装备 / 武器 / 护甲 ──────────────────────────────
   getWeapon(id: string): Weapon | undefined;
+  getWeaponsBySource(source: string): Weapon[];
   getAllWeapons(): Weapon[];
   getArmor(id: string): Armor | undefined;
+  getArmorBySource(source: string): Armor[];
   getAllArmor(): Armor[];
   getGearItem(id: string): GearItem | undefined;
+  getGearBySource(source: string): GearItem[];
   getAllGear(): GearItem[];
 
   // ── 法术（Spell）───
   getSpell(id: string): Spell | undefined;
+  getSpellsBySource(source: string): Spell[];
   getSpellsByLevel(level: SpellLevel): Spell[];
   getAllSpells(): Spell[];
+
+  // ── 内容包管理（R26）─────────────────────
+  /** 注册内容包（从目录或 ContentPack 对象） */
+  registerContentPack(source: string | ContentPack): void;
+
+  /** 注销内容包（按 ID） */
+  unregisterContentPack(packId: string): void;
+
+  /** 获取所有已注册的内容包元数据 */
+  getContentPacks(): ContentPackMeta[];
 
   // ── 查表数据（Lookup Tables）────────────────────
   // 熟练加值表：level → proficiency bonus

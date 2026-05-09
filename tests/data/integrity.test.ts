@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import _lookupTables from '../../static/lookup-tables.json';
-import _species from '../../static/species.json';
-import _backgrounds from '../../static/backgrounds.json';
-import _classes from '../../static/classes.json';
-import _subclasses from '../../static/subclasses.json';
-import _feats from '../../static/feats.json';
-import _weapons from '../../static/weapons.json';
-import _armors from '../../static/armor.json';
-import _spells from '../../static/spells.json';
+import _lookupTables from '../../static/srd/lookup-tables.json';
+import _species from '../../static/srd/species.json';
+import _backgrounds from '../../static/srd/backgrounds.json';
+import _classes from '../../static/srd/classes.json';
+import _subclasses from '../../static/srd/subclasses.json';
+import _feats from '../../static/srd/feats.json';
+import _weapons from '../../static/srd/weapons.json';
+import _armors from '../../static/srd/armor.json';
+import _spells from '../../static/srd/spells.json';
 
 // Cast JSON imports to any to allow dynamic property access in integrity tests
 const lookupTables: any = _lookupTables;

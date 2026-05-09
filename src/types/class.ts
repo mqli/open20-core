@@ -25,7 +25,7 @@ export interface Feature {
 export interface Class {
   readonly id: string;
   readonly name: string;
-  readonly source: '2024 PHB' | '2014 PHB';
+  readonly source: string; // '2024 PHB' | '2014 PHB' | 'SRD 5.1' | ...
   readonly hitDie: import('./dice').DieType;
   readonly savingThrowProficiencies: readonly import('./ability').AbilityName[];
   readonly armorTraining: readonly string[]; // 许可的护甲类型

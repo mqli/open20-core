@@ -4,230 +4,362 @@
     "name": "Backpack",
     "category": "Adventuring Gear",
     "weight": 5,
-    "cost": { "quantity": 2, "unit": "gp" }
+    "cost": {
+      "quantity": 2,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "bedroll",
     "name": "Bedroll",
     "category": "Adventuring Gear",
     "weight": 7,
-    "cost": { "quantity": 1, "unit": "gp" }
+    "cost": {
+      "quantity": 1,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "rations",
     "name": "Rations (1 day)",
     "category": "Adventuring Gear",
     "weight": 2,
-    "cost": { "quantity": 5, "unit": "sp" }
+    "cost": {
+      "quantity": 5,
+      "unit": "sp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "rope-hempen",
     "name": "Rope, Hempen (50 feet)",
     "category": "Adventuring Gear",
     "weight": 10,
-    "cost": { "quantity": 1, "unit": "gp" }
+    "cost": {
+      "quantity": 1,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "rope-silk",
     "name": "Rope, Silk (50 feet)",
     "category": "Adventuring Gear",
     "weight": 5,
-    "cost": { "quantity": 10, "unit": "gp" }
+    "cost": {
+      "quantity": 10,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "torch",
     "name": "Torch",
     "category": "Adventuring Gear",
     "weight": 1,
-    "cost": { "quantity": 1, "unit": "cp" }
+    "cost": {
+      "quantity": 1,
+      "unit": "cp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "waterskin",
     "name": "Waterskin",
     "category": "Adventuring Gear",
     "weight": 5,
-    "cost": { "quantity": 2, "unit": "sp" }
+    "cost": {
+      "quantity": 2,
+      "unit": "sp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "flint-and-steel",
     "name": "Flint and Steel",
     "category": "Adventuring Gear",
     "weight": 0.25,
-    "cost": { "quantity": 5, "unit": "sp" }
+    "cost": {
+      "quantity": 5,
+      "unit": "sp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "mess-kit",
     "name": "Mess Kit",
     "category": "Adventuring Gear",
     "weight": 1,
-    "cost": { "quantity": 2, "unit": "sp" }
+    "cost": {
+      "quantity": 2,
+      "unit": "sp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "tinderbox",
     "name": "Tinderbox",
     "category": "Adventuring Gear",
     "weight": 1,
-    "cost": { "quantity": 5, "unit": "sp" }
+    "cost": {
+      "quantity": 5,
+      "unit": "sp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "candle",
     "name": "Candle",
     "category": "Adventuring Gear",
     "weight": 0,
-    "cost": { "quantity": 1, "unit": "cp" }
+    "cost": {
+      "quantity": 1,
+      "unit": "cp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "lantern-bullseye",
     "name": "Lantern, Bullseye",
     "category": "Adventuring Gear",
     "weight": 2,
-    "cost": { "quantity": 10, "unit": "gp" }
+    "cost": {
+      "quantity": 10,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "lantern-hooded",
     "name": "Lantern, Hooded",
     "category": "Adventuring Gear",
     "weight": 2,
-    "cost": { "quantity": 5, "unit": "gp" }
+    "cost": {
+      "quantity": 5,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "oil-flask",
     "name": "Oil (flask)",
     "category": "Adventuring Gear",
     "weight": 1,
-    "cost": { "quantity": 1, "unit": "sp" }
+    "cost": {
+      "quantity": 1,
+      "unit": "sp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "iron-pot",
     "name": "Iron Pot",
     "category": "Adventuring Gear",
     "weight": 10,
-    "cost": { "quantity": 2, "unit": "gp" }
+    "cost": {
+      "quantity": 2,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "sack",
     "name": "Sack",
     "category": "Adventuring Gear",
     "weight": 0.5,
-    "cost": { "quantity": 1, "unit": "cp" }
+    "cost": {
+      "quantity": 1,
+      "unit": "cp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "signaling-whistle",
     "name": "Signaling Whistle",
     "category": "Adventuring Gear",
     "weight": 0,
-    "cost": { "quantity": 5, "unit": "cp" }
+    "cost": {
+      "quantity": 5,
+      "unit": "cp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "soap",
     "name": "Soap",
     "category": "Adventuring Gear",
     "weight": 0.5,
-    "cost": { "quantity": 2, "unit": "cp" }
+    "cost": {
+      "quantity": 2,
+      "unit": "cp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "tent",
     "name": "Tent, Two-Person",
     "category": "Adventuring Gear",
     "weight": 20,
-    "cost": { "quantity": 2, "unit": "gp" }
+    "cost": {
+      "quantity": 2,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "arrow",
     "name": "Arrow (20)",
     "category": "Ammunition",
     "weight": 1,
-    "cost": { "quantity": 1, "unit": "gp" }
+    "cost": {
+      "quantity": 1,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "bolt",
     "name": "Bolt (20)",
     "category": "Ammunition",
     "weight": 1.5,
-    "cost": { "quantity": 1, "unit": "gp" }
+    "cost": {
+      "quantity": 1,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "bullet-blowgun",
     "name": "Blowgun Needle (50)",
     "category": "Ammunition",
     "weight": 0.1,
-    "cost": { "quantity": 1, "unit": "gp" }
+    "cost": {
+      "quantity": 1,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "bullet-firearm",
     "name": "Firearm Bullet (10) and Gunpowder (10 shots)",
     "category": "Ammunition",
     "weight": 2,
-    "cost": { "quantity": 3, "unit": "gp" }
+    "cost": {
+      "quantity": 3,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "sling-bullet",
     "name": "Sling Bullet (20)",
     "category": "Ammunition",
     "weight": 1.5,
-    "cost": { "quantity": 4, "unit": "cp" }
+    "cost": {
+      "quantity": 4,
+      "unit": "cp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "healers-kit",
     "name": "Healer's Kit",
     "category": "Tool",
     "weight": 3,
-    "cost": { "quantity": 5, "unit": "gp" }
+    "cost": {
+      "quantity": 5,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "artisan-tools",
     "name": "Artisan's Tools",
     "category": "Tool",
     "weight": 5,
-    "cost": { "quantity": 1, "unit": "gp" }
+    "cost": {
+      "quantity": 1,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "disguise-kit",
     "name": "Disguise Kit",
     "category": "Tool",
     "weight": 3,
-    "cost": { "quantity": 25, "unit": "gp" }
+    "cost": {
+      "quantity": 25,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "forgery-kit",
     "name": "Forgery Kit",
     "category": "Tool",
     "weight": 5,
-    "cost": { "quantity": 15, "unit": "gp" }
+    "cost": {
+      "quantity": 15,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "herbalism-kit",
     "name": "Herbalism Kit",
     "category": "Tool",
     "weight": 3,
-    "cost": { "quantity": 5, "unit": "gp" }
+    "cost": {
+      "quantity": 5,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "musical-instrument",
     "name": "Musical Instrument",
     "category": "Tool",
     "weight": 2,
-    "cost": { "quantity": 5, "unit": "gp" }
+    "cost": {
+      "quantity": 5,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "navigators-tools",
     "name": "Navigator's Tools",
     "category": "Tool",
     "weight": 2,
-    "cost": { "quantity": 25, "unit": "gp" }
+    "cost": {
+      "quantity": 25,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "poisoners-kit",
     "name": "Poisoner's Kit",
     "category": "Tool",
     "weight": 2,
-    "cost": { "quantity": 25, "unit": "gp" }
+    "cost": {
+      "quantity": 25,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "thieves-tools",
     "name": "Thieve's Tools",
     "category": "Tool",
     "weight": 1,
-    "cost": { "quantity": 25, "unit": "gp" }
+    "cost": {
+      "quantity": 25,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   }
 ]

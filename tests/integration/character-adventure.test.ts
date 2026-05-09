@@ -8,7 +8,7 @@ import { recomputeDerivedStats } from '../../src/character/recompute';
 import { serialize, deserialize } from '../../src/storage/serializer';
 import { applyTypedDamage } from '../../src/character/mutate';
 import type { DamageDefenses } from '../../src/types/damage';
-import lookupTables from '../../static/lookup-tables.json';
+import lookupTables from '../../static/srd/lookup-tables.json';
 
 const dataLoader = createDataLoader(lookupTables);
 

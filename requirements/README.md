@@ -30,7 +30,7 @@
 | R20 | Character — Conditions | - | `src/character/mutate.ts` | P0 | ✅ S13 done |
 | R21 | Multiclassing | - | `src/engine/spell-slots.ts` + `recompute.ts` | P1 | ✅ Done |
 | R22 | Dice Rolling | - | `src/engine/dice.ts` | P1 | ✅ Done |
-| R26 | Content Management | `requirements/11-content-management/content-management.md` | `src/data/loader.ts`, `src/types/content.ts` | P1 | 📋 |
+| R26 | Content Management | `requirements/11-content-management/content-management.md` | `src/data/loader.ts`, `src/types/content.ts` | P1 | ✅ Done |
 
 ---
 

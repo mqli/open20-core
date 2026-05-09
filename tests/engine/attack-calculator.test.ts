@@ -109,6 +109,7 @@ function createMockDataLoader(): DataLoader {
       id: 'Quarterstaff',
       name: 'Quarterstaff',
       type: 'weapon',
+      source: 'test',
       category: 'Simple',
       weight: 4,
       cost: '2 sp',
@@ -242,7 +243,7 @@ function createMockDataLoader(): DataLoader {
         'Concentrating',
       ];
     },
-  } as DataLoader;
+  } as any as DataLoader;
 }
 
 // ── Test Suite ──────────────────────────────────────────────────

@@ -8,7 +8,11 @@
     "maxDexBonus": null,
     "stealthDisadvantage": true,
     "weight": 8,
-    "cost": { "quantity": 5, "unit": "gp" }
+    "cost": {
+      "quantity": 5,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "leather-armor",
@@ -19,7 +23,11 @@
     "maxDexBonus": null,
     "stealthDisadvantage": false,
     "weight": 10,
-    "cost": { "quantity": 10, "unit": "gp" }
+    "cost": {
+      "quantity": 10,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "studded-leather",
@@ -30,7 +38,11 @@
     "maxDexBonus": null,
     "stealthDisadvantage": false,
     "weight": 13,
-    "cost": { "quantity": 45, "unit": "gp" }
+    "cost": {
+      "quantity": 45,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "hide-armor",
@@ -41,7 +53,11 @@
     "maxDexBonus": 2,
     "stealthDisadvantage": false,
     "weight": 12,
-    "cost": { "quantity": 10, "unit": "gp" }
+    "cost": {
+      "quantity": 10,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "chain-shirt",
@@ -52,7 +68,11 @@
     "maxDexBonus": 2,
     "stealthDisadvantage": false,
     "weight": 20,
-    "cost": { "quantity": 50, "unit": "gp" }
+    "cost": {
+      "quantity": 50,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "scale-mail",
@@ -63,7 +83,11 @@
     "maxDexBonus": 2,
     "stealthDisadvantage": true,
     "weight": 45,
-    "cost": { "quantity": 50, "unit": "gp" }
+    "cost": {
+      "quantity": 50,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "breastplate",
@@ -74,7 +98,11 @@
     "maxDexBonus": 2,
     "stealthDisadvantage": false,
     "weight": 20,
-    "cost": { "quantity": 400, "unit": "gp" }
+    "cost": {
+      "quantity": 400,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "half-plate",
@@ -85,7 +113,11 @@
     "maxDexBonus": 2,
     "stealthDisadvantage": true,
     "weight": 40,
-    "cost": { "quantity": 750, "unit": "gp" }
+    "cost": {
+      "quantity": 750,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "ring-mail",
@@ -96,7 +128,11 @@
     "maxDexBonus": null,
     "stealthDisadvantage": true,
     "weight": 40,
-    "cost": { "quantity": 30, "unit": "gp" }
+    "cost": {
+      "quantity": 30,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "chain-mail",
@@ -107,7 +143,11 @@
     "maxDexBonus": null,
     "stealthDisadvantage": true,
     "weight": 55,
-    "cost": { "quantity": 75, "unit": "gp" }
+    "cost": {
+      "quantity": 75,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "splint-mail",
@@ -118,7 +158,11 @@
     "maxDexBonus": null,
     "stealthDisadvantage": true,
     "weight": 60,
-    "cost": { "quantity": 200, "unit": "gp" }
+    "cost": {
+      "quantity": 200,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "plate-mail",
@@ -129,7 +173,11 @@
     "maxDexBonus": null,
     "stealthDisadvantage": true,
     "weight": 65,
-    "cost": { "quantity": 1500, "unit": "gp" }
+    "cost": {
+      "quantity": 1500,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "shield",
@@ -140,7 +188,11 @@
     "maxDexBonus": null,
     "stealthDisadvantage": false,
     "weight": 6,
-    "cost": { "quantity": 10, "unit": "gp" }
+    "cost": {
+      "quantity": 10,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "buckler",
@@ -151,7 +203,11 @@
     "maxDexBonus": null,
     "stealthDisadvantage": false,
     "weight": 2,
-    "cost": { "quantity": 5, "unit": "gp" }
+    "cost": {
+      "quantity": 5,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "tower-shield",
@@ -162,7 +218,11 @@
     "maxDexBonus": null,
     "stealthDisadvantage": true,
     "weight": 10,
-    "cost": { "quantity": 30, "unit": "gp" }
+    "cost": {
+      "quantity": 30,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "robe",
@@ -173,7 +233,11 @@
     "maxDexBonus": null,
     "stealthDisadvantage": false,
     "weight": 2,
-    "cost": { "quantity": 5, "unit": "sp" }
+    "cost": {
+      "quantity": 5,
+      "unit": "sp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "travelers-clothes",
@@ -184,7 +248,11 @@
     "maxDexBonus": null,
     "stealthDisadvantage": false,
     "weight": 2,
-    "cost": { "quantity": 2, "unit": "sp" }
+    "cost": {
+      "quantity": 2,
+      "unit": "sp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "winter-clothes",
@@ -195,7 +263,11 @@
     "maxDexBonus": null,
     "stealthDisadvantage": false,
     "weight": 4,
-    "cost": { "quantity": 5, "unit": "gp" }
+    "cost": {
+      "quantity": 5,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   },
   {
     "id": "fine-clothes",
@@ -206,6 +278,10 @@
     "maxDexBonus": null,
     "stealthDisadvantage": false,
     "weight": 3,
-    "cost": { "quantity": 15, "unit": "gp" }
+    "cost": {
+      "quantity": 15,
+      "unit": "gp"
+    },
+    "source": "SRD 5.1"
   }
 ]

@@ -1,6 +1,7 @@
 // data/browser-loader.ts
 // Browser-compatible DataLoader — JSON data bundled directly via import
 // For use in browser environments (no Node.js fs/path/node:module)
+// R26: Implements all DataLoader interface methods (stubs for content pack management)
 
 import type { DataLoader, LookupTables, SpellLevel } from './loader';
 import type { Species, SpeciesSubtype } from '../types/species';
@@ -12,18 +13,18 @@ import type { Weapon, Armor, GearItem } from '../types/equipment';
 import type { Spell } from '../types/spell';
 import type { DieType } from '../types/dice';
 
-// ── 静态 JSON 数据（esbuild 会直接 bundle 进输出） ─────────────
-import speciesData from '../../static/species.json';
-import backgroundsData from '../../static/backgrounds.json';
-import classesData from '../../static/classes.json';
-import subclassesData from '../../static/subclasses.json';
-import featsData from '../../static/feats.json';
-import weaponsData from '../../static/weapons.json';
-import armorData from '../../static/armor.json';
-import gearData from '../../static/gear.json';
-import spellsData from '../../static/spells.json';
+// ── 静态 JSON 数据（esbuild 会直接 bundle 进输出） ────────────
+import speciesData from '../../static/srd/species.json';
+import backgroundsData from '../../static/srd/backgrounds.json';
+import classesData from '../../static/srd/classes.json';
+import subclassesData from '../../static/srd/subclasses.json';
+import featsData from '../../static/srd/feats.json';
+import weaponsData from '../../static/srd/weapons.json';
+import armorData from '../../static/srd/armor.json';
+import gearData from '../../static/srd/gear.json';
+import spellsData from '../../static/srd/spells.json';
 
-// ── 类型转换工具 ───────────────────────────────────────────────
+// ── 类型转换工具 ─────────────────────────────────────
 
 function parseFeaturesByLevel(
   raw: Array<{ level: number; features: readonly Feature[] }>
@@ -40,7 +41,7 @@ function parseClass(raw: unknown): Class {
   return {
     id: c.id as string,
     name: (c.name as string) ?? (c.id as string),
-    source: c.source as '2024 PHB' | '2014 PHB',
+    source: c.source as Class['source'],
     hitDie: c.hitDie as DieType,
     savingThrowProficiencies: c.savingThrowProficiencies as readonly AbilityName[],
     armorTraining: c.armorTraining as readonly string[],
@@ -84,6 +85,10 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
       return species.find(s => s.id === id);
     },
 
+    getSpeciesBySource(source: string): Species[] {
+      return species.filter(s => s.source === source);
+    },
+
     getSpeciesSubtype(speciesId: string, subtypeId: string): SpeciesSubtype | undefined {
       const sp = species.find(s => s.id === speciesId);
       if (!sp?.subtypes) return undefined;
@@ -99,6 +104,10 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
       return backgrounds.find(b => b.id === id);
     },
 
+    getBackgroundsBySource(source: string): Background[] {
+      return backgrounds.filter(b => b.source === source);
+    },
+
     getAllBackgrounds(): Background[] {
       return backgrounds;
     },
@@ -108,12 +117,21 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
       return classes.find(c => c.id === id);
     },
 
+    getClassesBySource(source: string): Class[] {
+      return classes.filter(c => c.source === source);
+    },
+
     getAllClasses(): Class[] {
       return classes;
     },
 
     getSubclass(id: string): Subclass | undefined {
       return subclasses.find(s => s.id === id);
+    },
+
+    getSubclassesBySource(_source: string): Subclass[] {
+      // Subclass 没有 source 字段，暂时返回空数组
+      return [];
     },
 
     getSubclassesForClass(classId: string): Subclass[] {
@@ -129,6 +147,10 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
       return feats.find(f => f.id === id);
     },
 
+    getFeatsBySource(source: string): Feat[] {
+      return feats.filter(f => f.source === source);
+    },
+
     getFeatsByCategory(category: FeatCategory): Feat[] {
       return feats.filter(f => f.category === category);
     },
@@ -142,6 +164,10 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
       return weapons.find(w => w.id === id);
     },
 
+    getWeaponsBySource(source: string): Weapon[] {
+      return weapons.filter(w => w.source === source);
+    },
+
     getAllWeapons(): Weapon[] {
       return weapons;
     },
@@ -150,12 +176,20 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
       return armors.find(a => a.id === id);
     },
 
+    getArmorBySource(source: string): Armor[] {
+      return armors.filter(a => a.source === source);
+    },
+
     getAllArmor(): Armor[] {
       return armors;
     },
 
     getGearItem(id: string): GearItem | undefined {
       return gear.find(g => g.id === id);
+    },
+
+    getGearBySource(source: string): GearItem[] {
+      return gear.filter(g => g.source === source);
     },
 
     getAllGear(): GearItem[] {
@@ -167,12 +201,42 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
       return spells.find(s => s.id === id);
     },
 
+    getSpellsBySource(source: string): Spell[] {
+      return spells.filter(s => s.source === source);
+    },
+
     getSpellsByLevel(level: SpellLevel): Spell[] {
       return spells.filter(s => s.level === level);
     },
 
     getAllSpells(): Spell[] {
       return spells;
+    },
+
+    // ── 内容包管理（R26，Browser 环境为 stub）─────────────────────
+    registerContentPack(_source: string | import('../content/types').ContentPack): void {
+      // Browser 环境不支持动态注册，抛出错误
+      throw new Error('registerContentPack() is not supported in browser environment');
+    },
+
+    unregisterContentPack(_packId: string): void {
+      // Browser 环境不支持动态注销，抛出错误
+      throw new Error('unregisterContentPack() is not supported in browser environment');
+    },
+
+    getContentPacks(): import('../content/types').ContentPackMeta[] {
+      // Browser 环境只返回 SRD 元数据（从 bundled 数据）
+      return [
+        {
+          id: 'srd-5.1',
+          name: 'SRD 5.1',
+          version: '1.0.0',
+          source: 'SRD 5.1',
+          author: 'Wizards of the Coast',
+          url: 'https://www.dndbeyond.com/srd',
+          priority: 0,
+        }
+      ];
     },
 
     // ── 查表数据（Lookup Tables）────────────────────
@@ -214,7 +278,6 @@ export function createBrowserDataLoader(tables: LookupTables): DataLoader {
       const slotsObj = tables.multiclassSpellSlots[totalSpellcastingLevel];
       if (!slotsObj) return emptySlotRecord();
 
-      // JSON uses string keys like "1", "2", convert to numeric
       const result: Record<number, number> = {};
       const slotsRecord = slotsObj as Record<string, number>;
       for (const key of Object.keys(slotsRecord)) {
