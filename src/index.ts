@@ -37,6 +37,7 @@ export {
 } from './engine';
 export {
   calculateSpellSlots,
+  calculateSpellSlotsFromClasses,
   calculatePactMagic,
   getMulticlassSpellcasterLevel,
   calculateMulticlassSpellSlots,
@@ -58,6 +59,8 @@ export {
   consumeSpellSlot,
   recoverSpellSlot,
   toggleCondition,
+  addAlwaysPreparedSpell,
+  removeAlwaysPreparedSpell,
   equipItem,
   unequipItem,
   equipItemAndRecompute,
@@ -71,8 +74,8 @@ export {
 export { validateCharacter } from './character';
 export { recomputeDerivedStats } from './character';
 
-// ── Spells (query functions) ────────────────────────────
-export type { SpellFilter } from './spells';
+// ── Spells (query + preparation rules) ─────────────────
+export type { SpellFilter, PreparationRule, PreparationChangeLimit } from './spells';
 export {
   getSpell as getSpellData,
   searchSpells,
@@ -81,6 +84,9 @@ export {
   getPreparedSpells,
   isSpellPrepared,
   knowsSpell,
+  getPreparationRule,
+  canChangePreparedSpells,
+  getMaxPreparedSpellChanges,
 } from './spells';
 
 // ── Monsters (query + combat) ─────────────────────────
@@ -169,6 +175,48 @@ export {
   rollAttack,
   rollDamage,
   rollInitiative,
+} from './engine';
+
+// ── Engine: Critical Hit/Fail Helpers ────────────────
+export { isCriticalHit, isCriticalFail } from './engine';
+
+// ── Engine: Concentration Management ─────────────────
+export type { ConcentrationCheckResult } from './engine';
+export {
+  isConcentrating,
+  getConcentratingSpellId,
+  calculateConcentrationDC,
+} from './engine';
+
+// ── Engine: Combat Helpers ───────────────────────────
+export {
+  applyHPChange,
+  applyTypedDamageToHP,
+  setTemporaryHPShared,
+  isDefeatedShared,
+  getCharacterCurrentHP,
+  getCharacterMaxHP,
+  getCharacterTemporaryHP,
+  getMonsterCurrentHP,
+  getMonsterMaxHP,
+  getMonsterTemporaryHP,
+  addDamageResistance,
+  addDamageImmunity,
+  addDamageVulnerability,
+  emptyDefenses,
+  mergeDefenses,
+} from './engine';
+
+// ── Engine: Spell Casting ────────────────────────────
+export {
+  canCastAsRitual,
+  castAsRitual,
+  getRitualCastingTime,
+  isCantrip,
+  canCastCantrip,
+  canUpcast,
+  getUpcastDescription,
+  castSpell,
 } from './engine';
 
 // Layer 4: Application (rolls module)
