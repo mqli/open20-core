@@ -13,131 +13,19 @@ import {
 import type { DataLoader } from '../../src/data/loader';
 import type { Spell, SpellLevel, SpellSchool } from '../../src/types/spell';
 
-// ── Mock Spell Data ───────────────────────────────────────────
+// ── Shared Fixtures ───────────────────────────────────────────
 
-const MOCK_SPELLS: Spell[] = [
-  {
-    id: 'fireball',
-    name: 'Fireball',
-    level: 3 as SpellLevel,
-    school: 'Evocation' as SpellSchool,
-    castingTime: 'Action',
-    range: '150 ft.',
-    components: ['V', 'S', 'M'],
-    duration: 'Instantaneous',
-    description: 'A bright streak flashes from your pointing finger...',
-    source: 'SRD',
-    concentration: false,
-    ritual: false,
-  },
-  {
-    id: 'shield',
-    name: 'Shield',
-    level: 1 as SpellLevel,
-    school: 'Abjuration' as SpellSchool,
-    castingTime: 'Reaction',
-    range: 'Self',
-    components: ['V', 'S'],
-    duration: '1 round',
-    description: 'An invisible barrier of magical force appears...',
-    source: 'SRD',
-    concentration: false,
-    ritual: false,
-  },
-  {
-    id: 'mage-armor',
-    name: 'Mage Armor',
-    level: 1 as SpellLevel,
-    school: 'Abjuration' as SpellSchool,
-    castingTime: 'Action',
-    range: 'Touch',
-    components: ['V', 'S', 'M'],
-    duration: '8 hours',
-    description: 'You touch a willing creature...',
-    source: 'SRD',
-    concentration: false,
-    ritual: false,
-  },
-  {
-    id: 'fire-bolt',
-    name: 'Fire Bolt',
-    level: 0 as SpellLevel,
-    school: 'Evocation' as SpellSchool,
-    castingTime: 'Action',
-    range: '120 ft.',
-    components: ['V', 'S'],
-    duration: 'Instantaneous',
-    description: 'You hurl a mote of fire...',
-    source: 'SRD',
-    concentration: false,
-    ritual: false,
-  },
-  {
-    id: 'healing-word',
-    name: 'Healing Word',
-    level: 1 as SpellLevel,
-    school: 'Evocation' as SpellSchool,
-    castingTime: 'Bonus Action',
-    range: '60 ft.',
-    components: ['V'],
-    duration: 'Instantaneous',
-    description: 'A creature of your choice that you can see...',
-    source: 'SRD',
-    concentration: false,
-    ritual: false,
-  },
-  {
-    id: 'guidance',
-    name: 'Guidance',
-    level: 0 as SpellLevel,
-    school: 'Divination' as SpellSchool,
-    castingTime: 'Action',
-    range: 'Touch',
-    components: ['V', 'S'],
-    duration: 'Concentration, up to 1 minute',
-    description: 'You touch one willing creature...',
-    source: 'SRD',
-    concentration: true,
-    ritual: false,
-  },
-];
+import { createMockDataLoader } from '../fixtures/data-loader';
+import { MOCK_SPELLS } from '../fixtures/spells';
 
 // ── Mock DataLoader ────────────────────────────────────────────
 
-function createMockDataLoader(spells: Spell[] = MOCK_SPELLS): DataLoader {
-  return {
+function createMockDataLoaderWithSpells(spells: Spell[] = MOCK_SPELLS): DataLoader {
+  return createMockDataLoader({
     getSpell: (id: string) => spells.find(s => s.id === id),
     getAllSpells: () => spells,
     getSpellsByLevel: (level: SpellLevel) => spells.filter(s => s.level === level),
-
-    // Unused methods (return defaults)
-    getSpecies: () => undefined,
-    getSpeciesSubtype: () => undefined,
-    getAllSpecies: () => [],
-    getBackground: () => undefined,
-    getAllBackgrounds: () => [],
-    getClass: () => undefined,
-    getAllClasses: () => [],
-    getSubclass: () => undefined,
-    getSubclassesForClass: () => [],
-    getAllSubclasses: () => [],
-    getFeat: () => undefined,
-    getFeatsByCategory: () => [],
-    getAllFeats: () => [],
-    getWeapon: () => undefined,
-    getAllWeapons: () => [],
-    getArmor: () => undefined,
-    getAllArmor: () => [],
-    getGearItem: () => undefined,
-    getAllGear: () => [],
-    getProficiencyBonus: () => 2,
-    getHitDieFixedValue: () => 6,
-    getSpellSlots: () => ({}),
-    getMulticlassSpellSlots: () => ({}),
-    getPactMagicSlots: () => ({ slots: 0, slotLevel: 0 }),
-    getWeaponMasteryProperties: () => [],
-    getConditionNames: () => [],
-  } as any as DataLoader;
+  });
 }
 
 // ── Mock Character ─────────────────────────────────────────────
@@ -157,7 +45,7 @@ const MOCK_CHARACTER = {
 // ── Tests ─────────────────────────────────────────────────────
 
 describe('getSpell', () => {
-  const data = createMockDataLoader();
+  const data = createMockDataLoaderWithSpells();
 
   it('should return spell by id', () => {
     const spell = getSpell('fireball', data);
@@ -172,7 +60,7 @@ describe('getSpell', () => {
 });
 
 describe('searchSpells', () => {
-  const data = createMockDataLoader();
+  const data = createMockDataLoaderWithSpells();
 
   it('should return all spells when no filter', () => {
     const results = searchSpells({}, data);
@@ -222,7 +110,7 @@ describe('searchSpells', () => {
 });
 
 describe('getSpellsForCharacter', () => {
-  const data = createMockDataLoader();
+  const data = createMockDataLoaderWithSpells();
 
   it('should return known spells with full data', () => {
     const results = getSpellsForCharacter(MOCK_CHARACTER as any, data);
@@ -251,7 +139,7 @@ describe('getSpellsForCharacter', () => {
 });
 
 describe('getPreparedSpells', () => {
-  const data = createMockDataLoader();
+  const data = createMockDataLoaderWithSpells();
 
   it('should return prepared spells with full data', () => {
     const results = getPreparedSpells(MOCK_CHARACTER as any, data);

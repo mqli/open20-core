@@ -5,83 +5,25 @@ import { describe, it, expect } from 'vitest';
 import { recomputeDerivedStats } from '../../src/character/recompute';
 import { createCharacter } from '../../src/character/create';
 import type { DataLoader } from '../../src/data/loader';
-import type { Species } from '../../src/types/species';
-import type { Background } from '../../src/types/background';
 import type { Class, Feature, Subclass } from '../../src/types/class';
 
-// ── Mock Data ──────────────────────────────────────────────────
+// ── Shared Fixtures ─────────────────────────
 
-const HUMAN_SPECIES: Species = {
-  id: 'Human',
-  source: '2024 PHB',
-  description: 'Versatile and ambitious',
-  size: 'Medium',
-  speed: 30,
-  languages: ['Common'],
-  abilityBonuses: {},
-  baseTraits: [],
-};
+import { createMockDataLoader } from '../fixtures/data-loader';
+import {
+  HUMAN_SPECIES,
+  DWARF_SPECIES,
+  SOLDIER_BACKGROUND,
+  SAGE_BACKGROUND,
+  FIGHTER_FEATURES_L1,
+  FIGHTER_FEATURES_L5,
+  FIGHTER_CLASS,
+  BARBARIAN_CLASS,
+  WIZARD_CLASS,
+  CHAMPION_SUBCLASS,
+} from '../fixtures/characters';
 
-const DWARF_SPECIES: Species = {
-  id: 'Dwarf',
-  source: '2024 PHB',
-  description: 'Stout and resilient',
-  size: 'Medium',
-  speed: 30,
-  languages: ['Common', 'Dwarvish'],
-  abilityBonuses: { Constitution: 2 },
-  baseTraits: [],
-};
-
-const SOLDIER_BACKGROUND: Background = {
-  id: 'Soldier',
-  source: '2024 PHB',
-  name: 'Soldier',
-  description: 'Military veteran',
-  skillProficiencies: ['Athletics', 'Intimidation'],
-  toolProficiencies: ['Land Vehicles'],
-  languages: [],
-  originFeatId: 'Savage Attacker',
-  startingGold: 10,
-};
-
-const SAGE_BACKGROUND: Background = {
-  id: 'Sage',
-  source: '2024 PHB',
-  name: 'Sage',
-  description: 'Scholarly researcher',
-  skillProficiencies: ['Arcana', 'History'],
-  toolProficiencies: [],
-  languages: [],
-  originFeatId: 'Magic Initiate',
-  startingGold: 10,
-};
-
-const FIGHTER_FEATURES_L1: Feature[] = [
-  { name: 'Fighting Style', description: 'Choose a fighting style', level: 1 },
-  { name: 'Second Wind', description: 'Heal yourself', resourceId: 'Second Wind', level: 1 },
-  { name: 'Weapon Mastery', description: 'Master weapons', level: 1 },
-];
-
-const FIGHTER_FEATURES_L5: Feature[] = [
-  { name: 'Extra Attack', description: 'Attack twice', level: 5 },
-];
-
-const BARBARIAN_FEATURES_L1: Feature[] = [
-  { name: 'Rage', description: 'Enter a rage', resourceId: 'Rage', level: 1 },
-  { name: 'Unarmored Defense', description: 'AC = 10 + Dex + Con', level: 1 },
-  { name: 'Weapon Mastery', description: 'Master weapons', level: 1 },
-];
-
-const WIZARD_FEATURES_L1: Feature[] = [
-  { name: 'Spellcasting', description: 'Cast wizard spells', level: 1 },
-  {
-    name: 'Arcane Recovery',
-    description: 'Recover spell slots',
-    resourceId: 'Arcane Recovery',
-    level: 1,
-  },
-];
+// ── Additional Test Data ─────────────────────────
 
 const CHAMPION_FEATURES_L3: Feature[] = [
   { name: 'Improved Critical', description: 'Crit on 19-20', level: 3 },
@@ -95,53 +37,14 @@ const CHAMPION_FEATURES_L7: Feature[] = [
   },
 ];
 
-const CHAMPION_SUBCLASS: Subclass = {
+const CHAMPION_SUBCLASS_EXTENDED: Subclass = {
   id: 'Champion',
-  parentClass: 'Fighter',
+  parentClass: 'fighter',
   grantedAtLevel: 3,
   featuresByLevel: new Map([
     [3, CHAMPION_FEATURES_L3],
     [7, CHAMPION_FEATURES_L7],
   ]),
-};
-
-const FIGHTER_CLASS: Class = {
-  id: 'Fighter',
-  name: 'Fighter',
-  source: '2024 PHB',
-  hitDie: 'd10',
-  savingThrowProficiencies: ['Strength', 'Constitution'],
-  armorTraining: ['Light', 'Medium', 'Heavy', 'Shield'],
-  weaponMastery: true,
-  featuresByLevel: new Map([
-    [1, FIGHTER_FEATURES_L1],
-    [5, FIGHTER_FEATURES_L5],
-  ]),
-  spellcasting: null,
-};
-
-const BARBARIAN_CLASS: Class = {
-  id: 'Barbarian',
-  name: 'Barbarian',
-  source: '2024 PHB',
-  hitDie: 'd12',
-  savingThrowProficiencies: ['Strength', 'Constitution'],
-  armorTraining: ['Light', 'Medium', 'Shield'],
-  weaponMastery: true,
-  featuresByLevel: new Map([[1, BARBARIAN_FEATURES_L1]]),
-  spellcasting: null,
-};
-
-const WIZARD_CLASS: Class = {
-  id: 'Wizard',
-  name: 'Wizard',
-  source: '2024 PHB',
-  hitDie: 'd6',
-  savingThrowProficiencies: ['Intelligence', 'Wisdom'],
-  armorTraining: [],
-  weaponMastery: false,
-  featuresByLevel: new Map([[1, WIZARD_FEATURES_L1]]),
-  spellcasting: { ability: 'Intelligence', prepares: true },
 };
 
 const WARLOCK_FEATURES_L1: Feature[] = [
@@ -160,70 +63,49 @@ const WARLOCK_CLASS: Class = {
   spellcasting: { ability: 'Charisma', prepares: false },
 };
 
-// ── Mock DataLoader ────────────────────────────────────────────
+// ── Mock DataLoader ─────────────────────────────
 
-function createMockDataLoader(): DataLoader {
-  const speciesMap: Record<string, Species> = {
-    Human: HUMAN_SPECIES,
-    Dwarf: DWARF_SPECIES,
-  };
-  const backgroundMap: Record<string, Background> = {
-    Soldier: SOLDIER_BACKGROUND,
-    Sage: SAGE_BACKGROUND,
-  };
-  const classMap: Record<string, Class> = {
-    Fighter: FIGHTER_CLASS,
-    Barbarian: BARBARIAN_CLASS,
-    Wizard: WIZARD_CLASS,
-    Warlock: WARLOCK_CLASS,
-  };
-  const subclassMap: Record<string, Subclass> = {
-    Champion: CHAMPION_SUBCLASS,
-  };
-
+function createMockDataLoaderExtended(): DataLoader {
+  // Full caster spell slot table
   const fullCasterSlots: Record<number, Record<number, number>> = {
     1: { 1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
     2: { 1: 3, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
     5: { 1: 4, 2: 3, 3: 2, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
   };
 
+  // Pact magic table
   const pactMagicSlots: Record<number, { slots: number; slotLevel: number }> = {
     1: { slots: 1, slotLevel: 1 },
     2: { slots: 2, slotLevel: 1 },
     5: { slots: 3, slotLevel: 3 },
   };
 
-  return {
-    getSpecies: (id: string) => speciesMap[id],
-    getSpeciesSubtype: () => undefined,
-    getAllSpecies: () => Object.values(speciesMap),
-    getBackground: (id: string) => backgroundMap[id],
-    getAllBackgrounds: () => Object.values(backgroundMap),
-    getClass: (id: string) => classMap[id],
-    getAllClasses: () => Object.values(classMap),
-    getSubclass: (id: string) => subclassMap[id],
-    getSubclassesForClass: () => [],
-    getAllSubclasses: () => Object.values(subclassMap),
-    getFeat: () => undefined,
-    getFeatsByCategory: () => [],
-    getAllFeats: () => [],
-    getWeapon: () => undefined,
-    getAllWeapons: () => [],
-    getArmor: () => undefined,
-    getAllArmor: () => [],
-    getGearItem: () => undefined,
-    getAllGear: () => [],
-    getSpell: () => undefined,
-    getSpellsByLevel: () => [],
-    getAllSpells: () => [],
-    getProficiencyBonus: (level: number) => {
-      if (level <= 4) return 2;
-      if (level <= 8) return 3;
-      if (level <= 12) return 4;
-      if (level <= 16) return 5;
-      return 6;
+  return createMockDataLoader({
+    getSpecies: (id: string) => {
+      if (id === 'Human') return HUMAN_SPECIES;
+      if (id === 'Dwarf') return DWARF_SPECIES;
+      return undefined;
     },
-    getHitDieFixedValue: () => 6,
+    getAllSpecies: () => [HUMAN_SPECIES, DWARF_SPECIES],
+    getBackground: (id: string) => {
+      if (id === 'Soldier') return SOLDIER_BACKGROUND;
+      if (id === 'Sage') return SAGE_BACKGROUND;
+      return undefined;
+    },
+    getAllBackgrounds: () => [SOLDIER_BACKGROUND, SAGE_BACKGROUND],
+    getClass: (id: string) => {
+      if (id === 'Fighter') return FIGHTER_CLASS;
+      if (id === 'Barbarian') return BARBARIAN_CLASS;
+      if (id === 'Wizard') return WIZARD_CLASS;
+      if (id === 'Warlock') return WARLOCK_CLASS;
+      return undefined;
+    },
+    getAllClasses: () => [FIGHTER_CLASS, BARBARIAN_CLASS, WIZARD_CLASS, WARLOCK_CLASS],
+    getSubclass: (id: string) => {
+      if (id === 'Champion') return CHAMPION_SUBCLASS_EXTENDED;
+      return undefined;
+    },
+    getAllSubclasses: () => [CHAMPION_SUBCLASS_EXTENDED],
     getSpellSlots: (classId: string, classLevel: number) => {
       const nonCasters = ['Fighter', 'Rogue', 'Barbarian', 'Monk'];
       if (nonCasters.includes(classId)) {
@@ -234,7 +116,6 @@ function createMockDataLoader(): DataLoader {
       );
     },
     getMulticlassSpellSlots: (level: number) => {
-      // Standard multiclass spell slot table
       const multiclassSlots: Record<number, Record<number, number>> = {
         1: { 1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
         2: { 1: 3, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
@@ -247,9 +128,7 @@ function createMockDataLoader(): DataLoader {
     getPactMagicSlots: (warlockLevel: number) => {
       return pactMagicSlots[warlockLevel] || { slots: 0, slotLevel: 0 };
     },
-    getWeaponMasteryProperties: () => [],
-    getConditionNames: () => [],
-  } as any as DataLoader;
+  });
 }
 
 // ── Helper: mutate character (bypass readonly) ─────────────────
@@ -258,10 +137,10 @@ function mutate<T extends object>(obj: T): { -readonly [K in keyof T]: T[K] } {
   return obj as { -readonly [K in keyof T]: T[K] };
 }
 
-// ── Tests ──────────────────────────────────────────────────────
+// ── Tests ─────────────────────────────────────
 
 describe('recomputeDerivedStats', () => {
-  const data = createMockDataLoader();
+  const data = createMockDataLoaderExtended();
 
   it('recalculates proficiency bonus', () => {
     let char = createCharacter(

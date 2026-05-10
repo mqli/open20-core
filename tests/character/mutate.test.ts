@@ -5,13 +5,9 @@ import { describe, it, expect } from 'vitest';
 import { createCharacter } from '../../src/character/create';
 import type { CreateCharacterParams } from '../../src/character/create';
 import type { DataLoader } from '../../src/data/loader';
-import type { Species } from '../../src/types/species';
-import type { Background } from '../../src/types/background';
-import type { Class, Feature } from '../../src/types/class';
 import type { AbilityName } from '../../src/types/ability';
 import type { EquipmentItem } from '../../src/types/equipment';
 import type { ConditionName } from '../../src/types/character';
-
 
 import {
   modifyHP,
@@ -30,116 +26,20 @@ import {
   modifyCurrency,
 } from '../../src/character/mutate';
 
-// ── Mock Data ──────────────────────────────────────────────────
+// ── Shared Fixtures ──────────────────────────────────────────
 
-const HUMAN_SPECIES: Species = {
-  id: 'Human',
-  source: '2024 PHB',
-  description: 'Versatile and ambitious',
-  size: 'Medium',
-  speed: 30,
-  languages: ['Common'],
-  abilityBonuses: {},
-  baseTraits: [],
-};
+import {
+  createMockDataLoader,
+} from '../fixtures/data-loader';
 
-const SOLDIER_BACKGROUND: Background = {
-  id: 'Soldier',
-  source: '2024 PHB',
-  name: 'Soldier',
-  description: 'Military veteran',
-  skillProficiencies: ['Athletics', 'Intimidation'],
-  toolProficiencies: [],
-  languages: [],
-  originFeatId: 'Savage Attacker',
-  startingGold: 10,
-};
-
-const FIGHTER_FEATURES_L1: Feature[] = [
-  { name: 'Second Wind', description: 'Heal yourself', resourceId: 'Second Wind', level: 1 },
-  { name: 'Weapon Mastery', description: 'Master weapons', level: 1 },
-];
-
-const FIGHTER_CLASS: Class = {
-  id: 'Fighter',
-  name: 'Fighter',
-  source: '2024 PHB',
-  hitDie: 'd10',
-  savingThrowProficiencies: ['Strength', 'Constitution'],
-  armorTraining: ['Light', 'Medium', 'Heavy', 'Shield'],
-  weaponMastery: true,
-  featuresByLevel: new Map([[1, FIGHTER_FEATURES_L1]]),
-  spellcasting: null,
-};
-
-const WIZARD_FEATURES_L1: Feature[] = [
-  { name: 'Spellcasting', description: 'Cast wizard spells', level: 1 },
-  {
-    name: 'Arcane Recovery',
-    description: 'Recover spell slots',
-    resourceId: 'Arcane Recovery',
-    level: 1,
-  },
-];
-
-const WIZARD_CLASS: Class = {
-  id: 'Wizard',
-  name: 'Wizard',
-  source: '2024 PHB',
-  hitDie: 'd6',
-  savingThrowProficiencies: ['Intelligence', 'Wisdom'],
-  armorTraining: [],
-  weaponMastery: false,
-  featuresByLevel: new Map([[1, WIZARD_FEATURES_L1]]),
-  spellcasting: { ability: 'Intelligence', prepares: true },
-};
-
-function createMockDataLoader(): DataLoader {
-  const speciesMap: Record<string, Species> = { Human: HUMAN_SPECIES };
-  const backgroundMap: Record<string, Background> = { Soldier: SOLDIER_BACKGROUND };
-  const classMap: Record<string, Class> = { Fighter: FIGHTER_CLASS, Wizard: WIZARD_CLASS };
-
-  const fullCasterSlots: Record<number, Record<number, number>> = {
-    1: { 1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-  };
-
-  return {
-    getSpecies: (id: string) => speciesMap[id],
-    getSpeciesSubtype: () => undefined,
-    getAllSpecies: () => Object.values(speciesMap),
-    getBackground: (id: string) => backgroundMap[id],
-    getAllBackgrounds: () => Object.values(backgroundMap),
-    getClass: (id: string) => classMap[id],
-    getAllClasses: () => Object.values(classMap),
-    getSubclass: () => undefined,
-    getSubclassesForClass: () => [],
-    getAllSubclasses: () => [],
-    getFeat: () => undefined,
-    getFeatsByCategory: () => [],
-    getAllFeats: () => [],
-    getWeapon: () => undefined,
-    getAllWeapons: () => [],
-    getArmor: () => undefined,
-    getAllArmor: () => [],
-    getGearItem: () => undefined,
-    getAllGear: () => [],
-    getSpell: () => undefined,
-    getSpellsByLevel: () => [],
-    getAllSpells: () => [],
-    getProficiencyBonus: (level: number) => (level <= 4 ? 2 : 3),
-    getHitDieFixedValue: () => 6,
-    getSpellSlots: (classId: string, classLevel: number) => {
-      if (classId === 'Fighter') return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
-      return (
-        fullCasterSlots[classLevel] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
-      );
-    },
-    getMulticlassSpellSlots: () => ({}),
-    getPactMagicSlots: () => ({ slots: 0, slotLevel: 0 }),
-    getWeaponMasteryProperties: () => [],
-    getConditionNames: () => [],
-  } as any as DataLoader;
-}
+import {
+  HUMAN_SPECIES,
+  SOLDIER_BACKGROUND,
+  FIGHTER_FEATURES_L1,
+  FIGHTER_CLASS,
+  WIZARD_FEATURES_L1,
+  WIZARD_CLASS,
+} from '../fixtures/characters';
 
 // ── Helpers ────────────────────────────────────────────────────
 
@@ -153,7 +53,23 @@ const STANDARD_SCORES: Record<AbilityName, number> = {
 };
 
 function makeFighter(): ReturnType<typeof createCharacter> {
-  const data = createMockDataLoader();
+  const data = createMockDataLoader({
+    getSpecies: (id: string) => (id === 'Human' ? HUMAN_SPECIES : undefined),
+    getAllSpecies: () => [HUMAN_SPECIES],
+    getBackground: (id: string) => (id === 'Soldier' ? SOLDIER_BACKGROUND : undefined),
+    getAllBackgrounds: () => [SOLDIER_BACKGROUND],
+    getClass: (id: string) => {
+      if (id === 'Fighter') return FIGHTER_CLASS;
+      if (id === 'Wizard') return WIZARD_CLASS;
+      return undefined;
+    },
+    getAllClasses: () => [FIGHTER_CLASS, WIZARD_CLASS],
+    getSpellSlots: (classId: string) => {
+      if (classId === 'Fighter') return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+      // Wizard: full caster
+      return { 1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+    },
+  });
   const params: CreateCharacterParams = {
     name: 'Aragorn',
     speciesId: 'Human',
@@ -165,7 +81,23 @@ function makeFighter(): ReturnType<typeof createCharacter> {
 }
 
 function makeWizard(): ReturnType<typeof createCharacter> {
-  const data = createMockDataLoader();
+  const data = createMockDataLoader({
+    getSpecies: (id: string) => (id === 'Human' ? HUMAN_SPECIES : undefined),
+    getAllSpecies: () => [HUMAN_SPECIES],
+    getBackground: (id: string) => (id === 'Soldier' ? SOLDIER_BACKGROUND : undefined),
+    getAllBackgrounds: () => [SOLDIER_BACKGROUND],
+    getClass: (id: string) => {
+      if (id === 'Fighter') return FIGHTER_CLASS;
+      if (id === 'Wizard') return WIZARD_CLASS;
+      return undefined;
+    },
+    getAllClasses: () => [FIGHTER_CLASS, WIZARD_CLASS],
+    getSpellSlots: (classId: string) => {
+      if (classId === 'Fighter') return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+      // Wizard: full caster
+      return { 1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+    },
+  });
   const params: CreateCharacterParams = {
     name: 'Gandalf',
     speciesId: 'Human',

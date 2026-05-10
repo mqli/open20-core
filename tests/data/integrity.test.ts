@@ -20,6 +20,49 @@ const weapons: any = _weapons;
 const armors: any = _armors;
 const spells: any = _spells;
 
+// ─── Helper Functions ─────────────────────────────────────────────────────────
+
+function assertRequiredFields(collection: any[], requiredFields: string[]) {
+  for (const item of collection) {
+    for (const field of requiredFields) {
+      expect(item[field]).toBeDefined();
+    }
+  }
+}
+
+// ─── Shared Validation Lists ──────────────────────────────────────────────────
+
+const VALID_ABILITIES = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+const VALID_SKILLS = [
+  'Acrobatics', 'Animal Handling', 'Arcana', 'Athletics', 'Deception',
+  'History', 'Insight', 'Intimidation', 'Investigation', 'Medicine',
+  'Nature', 'Perception', 'Performance', 'Persuasion', 'Religion',
+  'Sleight of Hand', 'Stealth', 'Survival',
+];
+const VALID_FEAT_CATEGORIES = ['Origin', 'General', 'Fighting Style', 'Epic Boon'];
+const VALID_HIT_DICE = ['d6', 'd8', 'd10', 'd12'];
+const VALID_DAMAGE_TYPES = ['bludgeoning', 'piercing', 'slashing'];
+const VALID_CASTER_TYPES = ['Wizard', 'Cleric', 'Druid', 'Sorcerer', 'Bard', 'Paladin', 'Ranger'];
+
+const EXPECTED_WEAPON_MASTERY_PROPERTIES = ['Push', 'Slow', 'Topple', 'Vex', 'Sap', 'Graze', 'Nick', 'Cleave'];
+const EXPECTED_CONDITIONS = [
+  'Blinded', 'Charmed', 'Deafened', 'Exhaustion', 'Frightened', 'Grappled',
+  'Incapacitated', 'Invisible', 'Paralyzed', 'Petrified', 'Poisoned', 'Prone',
+  'Restrained', 'Stunned', 'Unconscious', 'Concentrating',
+];
+
+// ─── Expected Counts ──────────────────────────────────────────────────────────
+
+const EXPECTED_COUNTS = {
+  species: 12,
+  backgrounds: 16,
+  classes: 12,
+  feats: 75,
+  weapons: 30,
+  armors: 15,
+  spells: 50,
+} as const;
+
 describe('Data Integrity Tests', () => {
   describe('lookup-tables.json', () => {
     it('should have proficiency bonus for all levels 1-20', () => {
@@ -59,80 +102,31 @@ describe('Data Integrity Tests', () => {
     });
 
     it('should have all 8 weapon mastery properties', () => {
-      const expectedProperties = [
-        'Push',
-        'Slow',
-        'Topple',
-        'Vex',
-        'Sap',
-        'Graze',
-        'Nick',
-        'Cleave',
-      ];
-      for (const prop of expectedProperties) {
+      for (const prop of EXPECTED_WEAPON_MASTERY_PROPERTIES) {
         expect(lookupTables.weaponMasteryProperties).toContain(prop);
       }
     });
 
     it('should have all condition names', () => {
-      const expectedConditions = [
-        'Blinded',
-        'Charmed',
-        'Deafened',
-        'Exhaustion',
-        'Frightened',
-        'Grappled',
-        'Incapacitated',
-        'Invisible',
-        'Paralyzed',
-        'Petrified',
-        'Poisoned',
-        'Prone',
-        'Restrained',
-        'Stunned',
-        'Unconscious',
-        'Concentrating',
-      ];
-      for (const condition of expectedConditions) {
+      for (const condition of EXPECTED_CONDITIONS) {
         expect(lookupTables.conditionNames).toContain(condition);
       }
     });
   });
 
   describe('species.json', () => {
-    it('should have 12 species', () => {
-      expect(species.length).toBe(12);
+    it(`should have ${EXPECTED_COUNTS.species} species`, () => {
+      expect(species.length).toBe(EXPECTED_COUNTS.species);
     });
 
     it('should have all required fields', () => {
-      const requiredFields = [
-        'id',
-        'source',
-        'size',
-        'speed',
-        'abilityBonuses',
-        'baseTraits',
-        'subtypes',
-      ];
-      for (const spec of species) {
-        for (const field of requiredFields) {
-          expect(spec[field]).toBeDefined();
-        }
-      }
+      assertRequiredFields(species, ['id', 'source', 'size', 'speed', 'abilityBonuses', 'baseTraits', 'subtypes']);
     });
 
     it('should use full ability names in abilityBonuses', () => {
-      const validAbilities = [
-        'Strength',
-        'Dexterity',
-        'Constitution',
-        'Intelligence',
-        'Wisdom',
-        'Charisma',
-      ];
       for (const spec of species) {
         for (const [ability, bonus] of Object.entries(spec.abilityBonuses || {})) {
-          expect(validAbilities).toContain(ability);
+          expect(VALID_ABILITIES).toContain(ability);
           expect(bonus).toBeGreaterThan(0);
         }
       }
@@ -140,8 +134,8 @@ describe('Data Integrity Tests', () => {
   });
 
   describe('backgrounds.json', () => {
-    it('should have 16 backgrounds', () => {
-      expect(backgrounds.length).toBe(16);
+    it(`should have ${EXPECTED_COUNTS.backgrounds} backgrounds`, () => {
+      expect(backgrounds.length).toBe(EXPECTED_COUNTS.backgrounds);
     });
 
     it('should have originFeatId (not originFeat object)', () => {
@@ -152,53 +146,22 @@ describe('Data Integrity Tests', () => {
     });
 
     it('should have skillProficiencies', () => {
-      const validSkills = [
-        'Acrobatics',
-        'Animal Handling',
-        'Arcana',
-        'Athletics',
-        'Deception',
-        'History',
-        'Insight',
-        'Intimidation',
-        'Investigation',
-        'Medicine',
-        'Nature',
-        'Perception',
-        'Performance',
-        'Persuasion',
-        'Religion',
-        'Sleight of Hand',
-        'Stealth',
-        'Survival',
-      ];
       for (const bg of backgrounds) {
         expect(bg.skillProficiencies.length).toBeGreaterThan(0);
         for (const skill of bg.skillProficiencies) {
-          expect(validSkills).toContain(skill);
+          expect(VALID_SKILLS).toContain(skill);
         }
       }
     });
   });
 
   describe('classes.json', () => {
-    it('should have 12 classes', () => {
-      expect(classes.length).toBe(12);
+    it(`should have ${EXPECTED_COUNTS.classes} classes`, () => {
+      expect(classes.length).toBe(EXPECTED_COUNTS.classes);
     });
 
     it('should have all required fields', () => {
-      const requiredFields = [
-        'id',
-        'source',
-        'hitDie',
-        'savingThrowProficiencies',
-        'featuresByLevel',
-      ];
-      for (const cls of classes) {
-        for (const field of requiredFields) {
-          expect(cls[field]).toBeDefined();
-        }
-      }
+      assertRequiredFields(classes, ['id', 'source', 'hitDie', 'savingThrowProficiencies', 'featuresByLevel']);
     });
 
     it('should have featuresByLevel as array format', () => {
@@ -213,9 +176,8 @@ describe('Data Integrity Tests', () => {
     });
 
     it('should have valid hit die values', () => {
-      const validDice = ['d6', 'd8', 'd10', 'd12'];
       for (const cls of classes) {
-        expect(validDice).toContain(cls.hitDie);
+        expect(VALID_HIT_DICE).toContain(cls.hitDie);
       }
     });
   });
@@ -238,39 +200,28 @@ describe('Data Integrity Tests', () => {
   });
 
   describe('feats.json', () => {
-    it('should have 75+ feats', () => {
-      expect(feats.length).toBeGreaterThanOrEqual(75);
+    it(`should have ${EXPECTED_COUNTS.feats}+ feats`, () => {
+      expect(feats.length).toBeGreaterThanOrEqual(EXPECTED_COUNTS.feats);
     });
 
     it('should have all required fields', () => {
-      const requiredFields = ['id', 'source', 'name', 'description', 'category'];
-      for (const feat of feats) {
-        for (const field of requiredFields) {
-          expect(feat[field]).toBeDefined();
-        }
-      }
+      assertRequiredFields(feats, ['id', 'source', 'name', 'description', 'category']);
     });
 
     it('should have valid categories', () => {
-      const validCategories = ['Origin', 'General', 'Fighting Style', 'Epic Boon'];
       for (const feat of feats) {
-        expect(validCategories).toContain(feat.category);
+        expect(VALID_FEAT_CATEGORIES).toContain(feat.category);
       }
     });
   });
 
   describe('weapons.json', () => {
-    it('should have 30+ weapons', () => {
-      expect(weapons.length).toBeGreaterThanOrEqual(30);
+    it(`should have ${EXPECTED_COUNTS.weapons}+ weapons`, () => {
+      expect(weapons.length).toBeGreaterThanOrEqual(EXPECTED_COUNTS.weapons);
     });
 
     it('should have all required fields', () => {
-      const requiredFields = ['id', 'name', 'category', 'damage', 'properties'];
-      for (const weapon of weapons) {
-        for (const field of requiredFields) {
-          expect(weapon[field]).toBeDefined();
-        }
-      }
+      assertRequiredFields(weapons, ['id', 'name', 'category', 'damage', 'properties']);
     });
 
     it('should have valid damage structure', () => {
@@ -278,47 +229,28 @@ describe('Data Integrity Tests', () => {
         expect(weapon.damage.entries.length).toBeGreaterThan(0);
         const firstEntry = weapon.damage.entries[0];
         expect(firstEntry?.dice).toMatch(/^\d+d\d+$/);
-        expect(['bludgeoning', 'piercing', 'slashing']).toContain(firstEntry?.type?.toLowerCase());
+        expect(VALID_DAMAGE_TYPES).toContain(firstEntry?.type?.toLowerCase());
       }
     });
   });
 
   describe('armor.json', () => {
-    it('should have 15+ armors', () => {
-      expect(armors.length).toBeGreaterThanOrEqual(15);
+    it(`should have ${EXPECTED_COUNTS.armors}+ armors`, () => {
+      expect(armors.length).toBeGreaterThanOrEqual(EXPECTED_COUNTS.armors);
     });
 
     it('should have all required fields', () => {
-      const requiredFields = ['id', 'name', 'category', 'ac'];
-      for (const armor of armors) {
-        for (const field of requiredFields) {
-          expect(armor[field]).toBeDefined();
-        }
-      }
+      assertRequiredFields(armors, ['id', 'name', 'category', 'ac']);
     });
   });
 
   describe('spells.json', () => {
-    it('should have 50+ spells (currently partial)', () => {
-      expect(spells.length).toBeGreaterThanOrEqual(50);
+    it(`should have ${EXPECTED_COUNTS.spells}+ spells (currently partial)`, () => {
+      expect(spells.length).toBeGreaterThanOrEqual(EXPECTED_COUNTS.spells);
     });
 
     it('should have all required fields', () => {
-      const requiredFields = [
-        'id',
-        'name',
-        'level',
-        'school',
-        'castingTime',
-        'range',
-        'components',
-        'duration',
-      ];
-      for (const spell of spells) {
-        for (const field of requiredFields) {
-          expect(spell[field]).toBeDefined();
-        }
-      }
+      assertRequiredFields(spells, ['id', 'name', 'level', 'school', 'castingTime', 'range', 'components', 'duration']);
     });
 
     it('should have valid level (0-9)', () => {

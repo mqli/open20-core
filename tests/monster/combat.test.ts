@@ -18,40 +18,24 @@ import {
   addMonsterDamageVulnerability,
 } from '../../src/monster/combat';
 
+// ── Shared Fixtures ───────────────────────────────────────
+
+import { MOCK_GOBLIN, createMockMonster } from '../fixtures/monsters';
+
 // ── Mock Monster ─────────────────────────────────────────
 
-const mockMonster: Monster = {
-  id: 'goblin',
-  name: 'Goblin',
-  source: 'SRD 5.2',
-  size: 'Small',
-  type: 'Humanoid',
-  alignment: 'neutral evil',
-  armorClass: [{ value: 15, type: 'hide armor' }],
-  hitPoints: { value: 7, formula: '2d6+2' },
-  speed: { walk: 30 },
-  abilityScores: {
-    base: { Strength: 8, Dexterity: 14, Constitution: 10, Intelligence: 10, Wisdom: 8, Charisma: 8 },
-    racialBonuses: {},
-    featBonuses: {},
-    temporaryBonuses: {},
-  },
-  challengeRating: { rating: '1/4', xp: 50 },
-  damageDefenses: {
-    resistances: [],
-    immunities: [],
-    vulnerabilities: [],
-  },
-};
+const mockMonster: Monster = MOCK_GOBLIN;
 
-const mockMonsterWithDefenses: Monster = {
-  ...mockMonster,
+const mockMonsterWithDefenses: Monster = createMockMonster({
+  id: 'goblin-with-defenses',
+  name: 'Goblin',
+  hitPoints: { value: 7, formula: '2d6+2' },
   damageDefenses: {
     resistances: ['Bludgeoning'],
     immunities: ['Fire'],
     vulnerabilities: ['Cold'],
   },
-};
+});
 
 const mockAttack: MonsterAttack = {
   name: 'Scimitar',
