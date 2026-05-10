@@ -8,7 +8,7 @@
 
 **Project**: Open20 Core - Headless D&D 5e 2024 Game Engine
 **Goal**: A TypeScript library for D&D 5e 2024 rules engine, spell management, and character management. No UI - pure logic, testable via unit tests, usable by any framework.
-**Status**: S1-S21 complete (633+ tests passing)
+**Status**: S1-S21 complete (724+ tests passing)
 
 ### Key Design Decisions
 - **Headless**: Zero UI dependency. Pure functions, immutable state.
@@ -277,6 +277,8 @@ npx vitest run tests/engine/ability-modifier.test.ts
 
 # Lint (MUST pass before committing)
 npm run lint
+# or with auto-fix:
+npm run lint:fix
 
 # Type check (MUST pass before committing)
 npm run typecheck
@@ -286,6 +288,9 @@ npx vitest run --coverage
 
 # Build browser bundles
 npm run build:browser
+
+# Full validation (run before committing)
+npm run lint && npm run typecheck && npx vitest run
 ```
 
 **Target**: 100% coverage for `engine/` and `character/` modules.
@@ -624,12 +629,14 @@ Examples:
 | Task | Command |
 |------|---------|
 | Lint | `npm run lint` |
+| Lint with auto-fix | `npm run lint:fix` |
 | Type check | `npm run typecheck` |
 | Run all tests | `npx vitest run` |
 | Run single test | `npx vitest run tests/path/to/test.test.ts` |
 | Install deps | `npm install` |
 | Check coverage | `npx vitest run --coverage` |
 | Import spells | `python3 scripts/import_srd_spells.py` |
+| Full validation | `npm run lint && npm run typecheck && npx vitest run` |
 
 | File | Purpose |
 |------|---------|
@@ -658,5 +665,5 @@ If you're stuck or unsure:
 
 ---
 
-*Last updated: 2026-05-09 (added sections 9 Requirement Management and 10 Documentation Maintenance)*
+*Last updated: 2026-05-10 (updated test count to 724+, added lint:fix and full validation commands)*
 *Maintained by: AI agents working on this project*

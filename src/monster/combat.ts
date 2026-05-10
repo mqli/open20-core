@@ -6,6 +6,8 @@ import type { Monster } from './types';
 import type { MonsterAttack } from '../types/monster';
 import type { DamageType, DamageDefenses, DamageResult } from '../types/damage';
 import type { DataLoader } from '../data/loader';
+import type { DieType } from '../types/dice';
+import { rollDie, rollDice, defaultRandom } from '../engine/dice';
 import { calculateTypedDamage } from '../engine/damage-calculator';
 import { calculateMonsterAttackBonus } from './calculator';
 import {
@@ -18,6 +20,19 @@ import {
   addDamageVulnerability,
   emptyDefenses,
 } from '../engine/combat';
+
+// Helper to parse dice string to DieType and count
+function parseDiceNotation(diceStr: string): { count: number; die: DieType } | null {
+  const match = diceStr.match(/^(\d*)d(\d+)$/i);
+  if (!match) return null;
+
+  const count = parseInt(match[1] || '1', 10);
+  const sides = parseInt(match[2] ?? '1', 10);
+
+  // Map sides to DieType
+  const dieType = `d${sides}` as DieType;
+  return { count, die: dieType };
+}
 
 // ── Damage Roll ─────────────────────────────────────────────
 
@@ -42,25 +57,10 @@ export function rollMonsterAttackDamage(attack: MonsterAttack): number {
 
   let total = 0;
   for (const entry of attack.damageEntries) {
-    total += rollDice(entry.dice) + (entry.bonus || 0);
-  }
-  return total;
-}
-
-/**
- * Roll dice string (e.g., "2d6", "1d10")
- * Returns the sum of all dice rolled
- */
-function rollDice(diceStr: string): number {
-  const match = diceStr.match(/^(\d*)d(\d+)$/i);
-  if (!match) return 0;
-
-  const count = parseInt(match[1] || '1');
-  const sides = parseInt(match[2] || '1');
-
-  let total = 0;
-  for (let i = 0; i < count; i++) {
-    total += Math.floor(Math.random() * sides) + 1;
+    const parsed = parseDiceNotation(entry.dice);
+    if (parsed) {
+      total += rollDice(defaultRandom, parsed.die, parsed.count) + (entry.bonus || 0);
+    }
   }
   return total;
 }
@@ -238,7 +238,7 @@ export function rollMonsterAttack(
   monster: Monster,
   data: DataLoader
 ): { d20: number; total: number; critical: boolean } {
-  const d20 = Math.floor(Math.random() * 20) + 1;
+  const d20 = rollDie(defaultRandom, 'd20');
   const attackBonus = attack.attackBonus ?? calculateMonsterAttackBonus(monster, attack, data);
   const critical = d20 === 20;
 
