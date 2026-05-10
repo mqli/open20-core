@@ -13,12 +13,10 @@ import {
   addMonsterDamageVulnerability,
 } from '../../../src/monster/combat';
 import {
-  applyHPChange,
   applyTypedDamageToHP,
-  setTemporaryHPShared,
-  isDefeatedShared,
   addDamageResistance,
   addDamageImmunity,
+  addDamageVulnerability,
   emptyDefenses,
   mergeDefenses,
   getCharacterCurrentHP,
@@ -26,7 +24,6 @@ import {
   getCharacterTemporaryHP,
   getMonsterCurrentHP,
   getMonsterMaxHP,
-  getMonsterTemporaryHP,
 } from '../../../src/engine/combat';
 import type { DamageDefenses } from '../../../src/types/damage';
 import lookupTables from '../../../static/srd/lookup-tables.json';

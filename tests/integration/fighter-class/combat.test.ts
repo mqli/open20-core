@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createDataLoader } from '../../../src/data/loader';
 import { createCharacter } from '../../../src/character/create';
-import { modifyHP, applyTypedDamage } from '../../../src/character/mutate';
+import { applyTypedDamage } from '../../../src/character/mutate';
 import { shortRest, longRest } from '../../../src/character/rest';
 import lookupTables from '../../../static/srd/lookup-tables.json';
 
