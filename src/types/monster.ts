@@ -3,7 +3,6 @@
 
 import type { BaseAttack } from './attack';
 import type { AbilityName } from './ability';
-import type { DamageType } from './damage';
 
 // Monster size categories
 export type MonsterSize = 'Tiny' | 'Small' | 'Medium' | 'Large' | 'Huge' | 'Gargantuan';
@@ -78,7 +77,7 @@ export interface SpellcastingDetails {
 export interface MonsterAttack extends BaseAttack {
   readonly reach?: number;
   readonly range?: { normal: number; long?: number };
-  readonly damageEntries?: readonly MonsterDamageEntry[]; // Optional: some attacks don't deal damage (e.g., Grapple)
+  // damageEntries is now inherited from BaseAttack
   
   // R28.10 - Damage Notation
   readonly damageNotation?: {
@@ -95,11 +94,4 @@ export interface MonsterSpellcasting {
   readonly ignoresComponents?: readonly ('V' | 'S' | 'M')[];
   readonly atWill?: readonly string[]; // Spells that can be cast at will
   readonly daily?: ReadonlyArray<{ spell: string; times: number }>; // Spells with limited usage
-}
-
-// Structured damage entry for monster attacks
-export interface MonsterDamageEntry {
-  readonly dice: string; // e.g., "1d6"
-  readonly type: DamageType;
-  readonly bonus?: number; // e.g., +2 from Str mod
 }

@@ -46,3 +46,13 @@ export interface DamageResult {
     readonly damageType: DamageType;
   }[];
 }
+
+/**
+ * Structured damage entry for attacks
+ * Supports multiple damage types per attack (e.g., flame tongue: 1d6 slashing + 1d6 fire)
+ */
+export interface DamageEntry {
+  readonly dice: string; // e.g., "1d6"
+  readonly type: DamageType;
+  readonly bonus?: number; // e.g., +2 from Str mod
+}

@@ -12,7 +12,7 @@ export type { BaseAttack } from './attack';
 
 // 怪物类型
 export type { MonsterSize, MonsterType, ChallengeRating } from './monster';
-export type { MonsterAttack, MonsterDamageEntry } from './monster';
+export type { MonsterAttack } from './monster';
 export type { InitiativeInfo, SensesInfo, ChallengeRatingInfo } from './monster';
 export type { AttackNotation, SavingThrowEffect, MonsterSpellcasting } from './monster';
 
@@ -20,7 +20,7 @@ export type { AttackNotation, SavingThrowEffect, MonsterSpellcasting } from './m
 export type { DieType } from './dice';
 
 // 伤害类型
-export type { DamageType, DamageDefenses, DamageDefenseSource, DamageResult } from './damage';
+export type { DamageType, DamageDefenses, DamageDefenseSource, DamageResult, DamageEntry } from './damage';
 
 // 属性
 export type { AbilityName, AbilityScores } from './ability';

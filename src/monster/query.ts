@@ -2,7 +2,7 @@
 // Monster query functions — filter, search, and retrieve monsters
 
 import type { Monster, MonsterAction, MonsterFeature, MonsterReaction, MonsterLegendaryAction } from './types';
-import type { MonsterSize, MonsterType, ChallengeRating } from '../types/monster';
+import type { MonsterSize, MonsterType, ChallengeRating, AttackNotation } from '../types/monster';
 import type { DataLoader } from '../data/loader';
 
 // ── MonsterFilter Interface ─────────────────────────────────────
@@ -405,7 +405,7 @@ export function getActionSavingThrowEffect(
  * parseAttackNotation("Melee Attack Roll: +5. Hit: 7 (1d6+4) piercing damage.")
  * // { hit: "7 (1d6+4) piercing damage." }
  */
-export function parseAttackNotation(description: string): { hit?: string; miss?: string; hitOrMiss?: string } | undefined {
+export function parseAttackNotation(description: string): AttackNotation | undefined {
   if (!description) return undefined;
 
   let hit: string | undefined;
@@ -461,7 +461,7 @@ export function getActionAttackNotation(
   monsterId: string,
   actionName: string,
   data: DataLoader
-): { hit?: string; miss?: string; hitOrMiss?: string } | undefined {
+): AttackNotation | undefined {
   const actions = getMonsterActions(monsterId, data);
   const action = actions.find(a => a.name === actionName || a.name.toLowerCase().includes(actionName.toLowerCase()));
   

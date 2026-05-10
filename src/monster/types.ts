@@ -1,7 +1,7 @@
 // monsters/types.ts
 // Monster data structures for D&D 5e monster support
 
-import type { MonsterSize, MonsterType, ChallengeRating, MonsterAttack, MonsterDamageEntry, MonsterSpellcasting } from '../types/monster';
+import type { MonsterSize, MonsterType, ChallengeRating, MonsterAttack, MonsterSpellcasting } from '../types/monster';
 import type { AbilityScores } from '../types/ability';
 import type { DamageType, DamageDefenses } from '../types/damage';
 import type { InitiativeInfo, SensesInfo } from '../types/monster';
