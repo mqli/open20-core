@@ -66,6 +66,7 @@ export {
 } from '../dice/mechanics';
 
 // ── Combat Helpers ─────────────────────────────────────
+export type { DamageResult, DamageDefenses } from '../types/damage';
 export {
   applyHPChange,
   applyTypedDamageToHP,

@@ -19,7 +19,9 @@ export type {
   MonsterSize,
   MonsterType,
   ChallengeRating,
-  MonsterAttack
+  MonsterAttack,
+  AttackNotation,
+  SavingThrowEffect,
 } from '../types/monster';
 
 // Query functions

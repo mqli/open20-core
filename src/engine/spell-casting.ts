@@ -26,7 +26,7 @@ export function canCastAsRitual(char: Character, spell: Spell, data: DataLoader)
   if (!spell.ritual) return false;
 
   // Check if character has the Ritual Caster feat
-  const hasRitualCasterFeat = char.feats?.some(f => f.id === 'ritual-caster') ?? false;
+  const hasRitualCasterFeat = char.feats?.includes('ritual-caster') ?? false;
   if (hasRitualCasterFeat) return true;
 
   // Check if character's class(es) have ritual casting feature
@@ -95,7 +95,7 @@ export function getRitualCastingTime(normalTime: string): string {
   // If casting time is in minutes, add 10
   const minuteMatch = normalTime.match(/^(\d+)\s*minute/);
   if (minuteMatch) {
-    const minutes = parseInt(minuteMatch[1], 10) + 10;
+    const minutes = parseInt(minuteMatch[1]!, 10) + 10;
     return `${minutes} minutes`;
   }
 

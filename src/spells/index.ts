@@ -3,6 +3,7 @@
 
 export type { SpellFilter, PreparationRule, PreparationChangeLimit } from './query';
 export {
+  getSpell,
   getSpell as getSpellData,
   searchSpells,
   getSpellsByClass,
