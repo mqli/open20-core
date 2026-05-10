@@ -179,22 +179,3 @@ export function rollMonsterInitiative(
     rng,
   });
 }
-
-// ── Deprecated Functions (Backward Compatibility) ─────────
-
-/** @deprecated Use rollMonsterFullAttack instead */
-export function rollMonsterAttack_OLD(
-  attack: MonsterAttack,
-  monster: Monster,
-  data: import('../data/loader').DataLoader,
-  rng: RandomProvider = defaultRandom
-): { d20: number; total: number; critical: boolean } {
-  return rollMonsterFullAttack({ attack, monster, data, rng });
-}
-
-/** @deprecated Use rollMonsterDamage instead */
-export function rollMonsterAttackDamage_OLD(
-  attack: MonsterAttack
-): number {
-  return rollMonsterAttackDamage(attack);
-}

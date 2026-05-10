@@ -12,7 +12,7 @@ import {
   type RandomProvider,
 } from '../../src/dice';
 import { rollCharacterAttack, rollCharacterSkillCheck, rollCharacterSavingThrow } from '../../src/rolls/character';
-import { rollWeaponDamage } from '../../src/rolls/character';
+import { rollCharacterWeaponDamage } from '../../src/rolls/character';
 import { rollSpellDamage } from '../../src/rolls/character';
 import { getModifier, getTotalScore } from '../../src/engine/ability-modifier';
 import type { Character } from '../../src/types/character';
@@ -378,7 +378,7 @@ describe('rollSavingThrow', () => {
   });
 });
 
-describe('rollWeaponDamage', () => {
+describe('rollCharacterWeaponDamage', () => {
   it('calculates weapon damage correctly', () => {
     const rng = createMockRNG([4]); // 1d8
     const character = createMockCharacter();
@@ -393,7 +393,7 @@ describe('rollWeaponDamage', () => {
       properties: [],
     };
 
-    const result = rollWeaponDamage(rng, character, weapon);
+    const result = rollCharacterWeaponDamage({ rng, character, weapon });
 
     expect(result.entries).toHaveLength(1);
     expect(result.entries[0]?.die).toBe('d8');
@@ -420,7 +420,7 @@ describe('rollWeaponDamage', () => {
       properties: [],
     };
 
-    const result = rollWeaponDamage(rng, character, weapon, true);
+    const result = rollCharacterWeaponDamage({ rng, character, weapon, isCritical: true });
 
     expect(result.entries[0]?.count).toBe(2); // Doubled!
     expect(result.entries[0]?.results).toEqual([4, 6]);
@@ -447,7 +447,7 @@ describe('rollWeaponDamage', () => {
       properties: ['Ammunition', 'Range', 'Two-Handed'],
     };
 
-    const result = rollWeaponDamage(rng, character, weapon);
+    const result = rollCharacterWeaponDamage({ rng, character, weapon });
 
     // Should have 2 roll entries: Piercing and Poison
     expect(result.entries).toHaveLength(2);
@@ -484,7 +484,7 @@ describe('rollWeaponDamage', () => {
       properties: [],
     };
 
-    const result = rollWeaponDamage(rng, character, weapon);
+    const result = rollCharacterWeaponDamage({ rng, character, weapon });
 
     // Slashing should include Str modifier (+4)
     expect(result.typedDamage['Slashing']).toBe(4 + 4); // 1d8 = 4, +4 Str

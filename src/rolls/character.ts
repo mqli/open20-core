@@ -361,35 +361,3 @@ export function applyDamageWithDefenses(
     defenses,
   };
 }
-
-// ── Deprecated Functions (Backward Compatibility) ─────────
-
-/** @deprecated Use rollCharacterWeaponDamage instead */
-export function rollWeaponDamage(
-  _rng: RandomProvider,
-  character: Character,
-  weapon: Weapon,
-  isCritical: boolean = false
-): DamageRollResult {
-  return rollCharacterWeaponDamage({
-    character,
-    weapon,
-    isCritical,
-    rng: _rng,
-  });
-}
-
-/** @deprecated Use rollSpellDamage instead */
-export function rollSpellDamage_DEPRECATED(
-  _rng: RandomProvider,
-  character: Character,
-  spell: Spell,
-  slotLevel: SpellLevel
-): DamageRollResult {
-  return rollSpellDamage({
-    character,
-    spell,
-    slotLevel,
-    rng: _rng,
-  });
-}

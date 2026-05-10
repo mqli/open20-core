@@ -31,11 +31,11 @@ describe('Browser Artifact Tests (dist/open20-core.esm.js ESM)', () => {
 
   test('dice rolling should work', () => {
     const result = Open20Core.rollDie(Open20Core.defaultRandom, 'd6');
-    expect(result).toBeGreaterThanOrEqual(1);
-    expect(result).toBeLessThanOrEqual(6);
+    expect(result.total).toBeGreaterThanOrEqual(1);
+    expect(result.total).toBeLessThanOrEqual(6);
 
-    const total = Open20Core.rollDice(Open20Core.defaultRandom, 'd6', 2);
-    expect(total).toBeGreaterThanOrEqual(2);
-    expect(total).toBeLessThanOrEqual(12);
+    const rollResult = Open20Core.rollDice(Open20Core.defaultRandom, 'd6', 2);
+    expect(rollResult.total).toBeGreaterThanOrEqual(2);
+    expect(rollResult.total).toBeLessThanOrEqual(12);
   });
 });
