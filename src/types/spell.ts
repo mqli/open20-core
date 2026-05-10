@@ -74,6 +74,7 @@ export interface Spell {
   readonly attack?: boolean;
   readonly source: string; // '2024 PHB' | '2014 PHB' | 'SRD 5.2' | 'Player\'s Handbook (2024)'
   readonly upcast?: string; // 升环施法说明
+  readonly classes?: readonly string[]; // Which classes have this spell
 }
 
 // 法术法术学校

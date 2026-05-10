@@ -2,7 +2,8 @@
 // Spell query functions — filter, search, and retrieve spells
 // Corresponds to requirement R11
 
-import type { Spell, SpellLevel, SpellSchool } from '../types/spell';
+import type { Spell, SpellLevel, SpellSchool, CastingTime } from '../types/spell';
+import type { DamageType } from '../types/damage';
 import type { Character } from '../types/character';
 import type { DataLoader } from '../data/loader';
 
@@ -11,10 +12,14 @@ import type { DataLoader } from '../data/loader';
 export interface SpellFilter {
   name?: string;
   level?: SpellLevel[];
-  school?: SpellSchool;
+  school?: SpellSchool[];
+  class?: string[];              // Filter by which class can cast
+  damageType?: DamageType[];     // Filter by damage type
+  castingTime?: CastingTime[];  // Filter by casting time
+  range?: string;                // Filter by range
   concentration?: boolean;
   ritual?: boolean;
-  source?: string;
+  source?: string[];
 }
 
 // ── Query Functions ────────────────────────────────────────────
@@ -58,8 +63,32 @@ export function searchSpells(filter: SpellFilter, data: DataLoader): Spell[] {
     spells = spells.filter(s => levelSet.has(s.level));
   }
 
-  if (filter.school) {
-    spells = spells.filter(s => s.school === filter.school);
+  if (filter.school && filter.school.length > 0) {
+    const schoolSet = new Set(filter.school);
+    spells = spells.filter(s => schoolSet.has(s.school));
+  }
+
+  if (filter.class && filter.class.length > 0) {
+    const classSet = new Set(filter.class);
+    spells = spells.filter(s => s.classes?.some(c => classSet.has(c)));
+  }
+
+  if (filter.damageType && filter.damageType.length > 0) {
+    const damageTypeSet = new Set(filter.damageType);
+    spells = spells.filter(s =>
+      s.damage?.entries.some(e => damageTypeSet.has(e.type as DamageType)) ||
+      s.damage?.additional?.some(e => damageTypeSet.has(e.type as DamageType))
+    );
+  }
+
+  if (filter.castingTime && filter.castingTime.length > 0) {
+    const castingTimeSet = new Set(filter.castingTime);
+    spells = spells.filter(s => castingTimeSet.has(s.castingTime));
+  }
+
+  if (filter.range) {
+    const rangeLower = filter.range.toLowerCase();
+    spells = spells.filter(s => s.range.toLowerCase().includes(rangeLower));
   }
 
   if (filter.concentration !== undefined) {
@@ -70,8 +99,9 @@ export function searchSpells(filter: SpellFilter, data: DataLoader): Spell[] {
     spells = spells.filter(s => s.ritual === filter.ritual);
   }
 
-  if (filter.source) {
-    spells = spells.filter(s => s.source === filter.source);
+  if (filter.source && filter.source.length > 0) {
+    const sourceSet = new Set(filter.source);
+    spells = spells.filter(s => sourceSet.has(s.source));
   }
 
   return spells;
@@ -124,4 +154,20 @@ export function isSpellPrepared(char: Character, spellId: string): boolean {
  */
 export function knowsSpell(char: Character, spellId: string): boolean {
   return char.spells.knownSpells.includes(spellId);
+}
+
+/**
+ * Get all spells for a specific class
+ *
+ * @param classId - Class ID (e.g., 'wizard', 'cleric')
+ * @param data - DataLoader
+ * @returns Array of spells available to the class
+ *
+ * @example
+ * getSpellsByClass('wizard', data) // All wizard spells
+ */
+export function getSpellsByClass(classId: string, data: DataLoader): Spell[] {
+  return data.getAllSpells().filter(s =>
+    s.classes?.includes(classId)
+  );
 }

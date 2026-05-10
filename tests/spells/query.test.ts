@@ -80,7 +80,7 @@ describe('searchSpells', () => {
   });
 
   it('should filter by school', () => {
-    const results = searchSpells({ school: 'Evocation' }, data);
+    const results = searchSpells({ school: ['Evocation'] }, data);
     expect(results.length).toBeGreaterThan(0);
     expect(results.every(s => s.school === 'Evocation')).toBe(true);
   });
@@ -100,7 +100,7 @@ describe('searchSpells', () => {
     const results = searchSpells(
       {
         level: [1],
-        school: 'Evocation',
+        school: ['Evocation'],
       },
       data
     );

@@ -12,7 +12,7 @@ import type { DamageType, DamageDefenses, DamageResult } from '../types/damage';
 import type { EquipmentItem } from '../types/equipment';
 import type { SpellLevel } from '../types/spell';
 import type { DataLoader } from '../data/loader';
-import { calculateTypedDamage } from '../engine/damage-calculator';
+// calculateTypedDamage is used in applyTypedDamage function
 import { applyHPChange, applyTypedDamageToHP, setTemporaryHPShared } from '../engine/combat';
 import { recomputeDerivedStats } from './recompute';
 
@@ -28,24 +28,16 @@ function withUpdate(char: Character, patch: Partial<Character>): Character {
 
 // ── HP Mutations ────────────────────────────────────────────────
 
-export function modifyHP(
-  char: Character,
-  delta: number,
-  damageType?: DamageType,
-  defenses?: DamageDefenses
-): Character {
-  // Apply damage type modifiers if provided
-  let effectiveDelta = delta;
-  if (damageType !== undefined && defenses !== undefined && delta < 0) {
-    const result = calculateTypedDamage(Math.abs(delta), damageType, defenses);
-    effectiveDelta = -result.effectiveDamage;
-  }
-
+/**
+ * Modify character HP (healing or untyped damage)
+ * For typed damage, use applyTypedDamage instead
+ */
+export function modifyHP(char: Character, delta: number): Character {
   const { currentHP, temporaryHP } = applyHPChange(
     char.hitPoints.current,
     char.hitPoints.max,
     char.hitPoints.temporary,
-    effectiveDelta
+    delta
   );
 
   return withUpdate(char, {

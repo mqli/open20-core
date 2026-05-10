@@ -267,7 +267,7 @@ describe('searchMonsters', () => {
   });
 
   it('should filter by source', () => {
-    const result = searchMonsters({ source: 'SRD 5.2' }, mockDataLoader);
+    const result = searchMonsters({ source: ['SRD 5.2'] }, mockDataLoader);
     expect(result.length).toBe(4);
   });
 });

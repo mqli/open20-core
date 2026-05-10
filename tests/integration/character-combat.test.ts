@@ -175,7 +175,8 @@ describe('D&D Player Behavior - Combat and Damage', () => {
       };
 
       const originalHP = _dwarf.hitPoints.current;
-      const damaged = modifyHP(_dwarf, -8, 'Poison', defenses);
+      const { char: damaged, result } = applyTypedDamage(_dwarf, 8, 'Poison', defenses);
+      expect(result.effectiveDamage).toBe(4);
       expect(originalHP - damaged.hitPoints.current).toBe(4);
     });
 

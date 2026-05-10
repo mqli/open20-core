@@ -46,7 +46,7 @@ interface Spell {
   name: string;
   level: number;                 // 0-9 (0 = cantrip)
   school: SpellSchool;
-  castingTime: string;
+  castingTime: CastingTime;
   range: string;
   components: SpellComponents;
   duration: string;
@@ -57,7 +57,7 @@ interface Spell {
   damage?: SpellDamage;
   heal?: SpellHeal;
   save?: Ability;
-  attack?: 'ranged' | 'melee';
+  attack?: boolean;
   source: string;
   classes: string[];             // Which classes have this in spell list
 }
@@ -69,28 +69,40 @@ interface Spell {
 
 ```typescript
 // Get single spell by ID
-function getSpell(id: string): Spell | undefined;
+function getSpell(id: string, data: DataLoader): Spell | undefined;
 
 // Search/filter spells
-function searchSpells(filter: SpellFilter): Spell[];
+function searchSpells(filter: SpellFilter, data: DataLoader): Spell[];
 
 // Get class spell list
-function getSpellsByClass(className: string): Spell[];
+function getSpellsByClass(classId: string, data: DataLoader): Spell[];
 
 // Get spells for character (known/prepared)
-function getSpellsForCharacter(char: Character): Spell[];
+function getSpellsForCharacter(char: Character, data: DataLoader): Spell[];
+
+// Get prepared spells for character
+function getPreparedSpells(char: Character, data: DataLoader): Spell[];
+
+// Check if spell is prepared
+function isSpellPrepared(char: Character, spellId: string): boolean;
+
+// Check if character knows spell
+function knowsSpell(char: Character, spellId: string): boolean;
 ```
 
 **SpellFilter Interface**:
 ```typescript
 interface SpellFilter {
   name?: string;
-  level?: number[];
-  school?: SpellSchool;
+  level?: SpellLevel[];
+  school?: SpellSchool[];
+  class?: string[];              // Filter by which class can cast
+  damageType?: DamageType[];     // Filter by damage type
+  castingTime?: CastingTime[];   // Filter by casting time
+  range?: string;                // Filter by range
   concentration?: boolean;
   ritual?: boolean;
-  classes?: string[];
-  source?: string;
+  source?: string[];
 }
 ```
 

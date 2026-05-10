@@ -3,8 +3,9 @@
 
 export type { SpellFilter } from './query';
 export {
-  getSpell,
+  getSpell as getSpellData,
   searchSpells,
+  getSpellsByClass,
   getSpellsForCharacter,
   getPreparedSpells,
   isSpellPrepared,

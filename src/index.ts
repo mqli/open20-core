@@ -76,6 +76,7 @@ export type { SpellFilter } from './spells';
 export {
   getSpell as getSpellData,
   searchSpells,
+  getSpellsByClass,
   getSpellsForCharacter,
   getPreparedSpells,
   isSpellPrepared,
@@ -94,6 +95,8 @@ export type {
   MonsterReaction,
   MonsterLegendaryAction,
   MonsterFilter,
+  AttackNotation,
+  SavingThrowEffect,
 } from './monster';
 export {
   getMonster,
@@ -156,6 +159,8 @@ export type {
   DamageRollParams,
   DamageEntry,
   DamageRollResult,
+  DamageResult,
+  DamageDefenses,
   InitiativeRollParams,
 } from './engine';
 export {

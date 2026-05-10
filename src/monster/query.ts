@@ -3,6 +3,7 @@
 
 import type { Monster, MonsterAction, MonsterFeature, MonsterReaction, MonsterLegendaryAction } from './types';
 import type { MonsterSize, MonsterType, ChallengeRating, AttackNotation } from '../types/monster';
+import type { DamageType } from '../types/damage';
 import type { DataLoader } from '../data/loader';
 
 // ── MonsterFilter Interface ─────────────────────────────────────
@@ -14,7 +15,11 @@ export interface MonsterFilter {
   minCR?: ChallengeRating;
   maxCR?: ChallengeRating;
   environment?: string[];
-  source?: string;
+  source?: string[];
+  damageResistances?: DamageType[];    // Filter by damage resistances
+  damageImmunities?: DamageType[];     // Filter by damage immunities
+  damageVulnerabilities?: DamageType[]; // Filter by damage vulnerabilities
+  conditionImmunities?: string[];      // Filter by condition immunities
 }
 
 // ── Query Functions ────────────────────────────────────────────
@@ -79,8 +84,37 @@ export function searchMonsters(filter: MonsterFilter, data: DataLoader): Monster
     );
   }
 
-  if (filter.source) {
-    monsters = monsters.filter(m => m.source === filter.source);
+  if (filter.source && filter.source.length > 0) {
+    const sourceSet = new Set(filter.source);
+    monsters = monsters.filter(m => sourceSet.has(m.source));
+  }
+
+  if (filter.damageResistances && filter.damageResistances.length > 0) {
+    const resSet = new Set(filter.damageResistances);
+    monsters = monsters.filter(m =>
+      m.resistances?.some(r => resSet.has(r))
+    );
+  }
+
+  if (filter.damageImmunities && filter.damageImmunities.length > 0) {
+    const immSet = new Set(filter.damageImmunities);
+    monsters = monsters.filter(m =>
+      m.damageDefenses?.immunities.some(i => immSet.has(i))
+    );
+  }
+
+  if (filter.damageVulnerabilities && filter.damageVulnerabilities.length > 0) {
+    const vulnSet = new Set(filter.damageVulnerabilities);
+    monsters = monsters.filter(m =>
+      m.vulnerabilities?.some(v => vulnSet.has(v))
+    );
+  }
+
+  if (filter.conditionImmunities && filter.conditionImmunities.length > 0) {
+    const condSet = new Set(filter.conditionImmunities);
+    monsters = monsters.filter(m =>
+      m.conditionImmunities?.some(c => condSet.has(c))
+    );
   }
 
   return monsters;
