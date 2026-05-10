@@ -92,22 +92,19 @@ describe('R28.10 - Damage Notation', () => {
       }
     ];
 
-    const mockDataLoader: DataLoader = {
+    const mockDataLoader = {
       getMonster: (id: string) => mockMonsters.find(m => m.id === id),
-      getAllMonsters: () => mockMonsters,
       getSpell: () => undefined,
       getAllSpells: () => [],
       getClass: () => undefined,
       getAllClasses: () => [],
-      getRace: () => undefined,
-      getAllRaces: () => [],
+      getSpecies: () => undefined,
+      getAllSpecies: () => [],
       getBackground: () => undefined,
       getAllBackgrounds: () => [],
       getFeat: () => undefined,
       getAllFeats: () => [],
-      getItem: () => undefined,
-      getAllItems: () => [],
-    };
+    } as unknown as DataLoader;
 
     it('should get damage notation from stored field', () => {
       const result = getAttackDamageNotation('test-dragon', 'Rend', undefined, mockDataLoader);

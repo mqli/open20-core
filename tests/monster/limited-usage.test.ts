@@ -149,22 +149,19 @@ describe('R28.12 - Limited Usage', () => {
       }
     ];
 
-    const mockDataLoader: DataLoader = {
+    const mockDataLoader = {
       getMonster: (id: string) => mockMonsters.find(m => m.id === id),
-      getAllMonsters: () => mockMonsters,
       getSpell: () => undefined,
       getAllSpells: () => [],
       getClass: () => undefined,
       getAllClasses: () => [],
-      getRace: () => undefined,
-      getAllRaces: () => [],
+      getSpecies: () => undefined,
+      getAllSpecies: () => [],
       getBackground: () => undefined,
       getAllBackgrounds: () => [],
       getFeat: () => undefined,
       getAllFeats: () => [],
-      getItem: () => undefined,
-      getAllItems: () => [],
-    };
+    } as unknown as DataLoader;
 
     it('should get limited usage from stored field', () => {
       const result = getActionLimitedUsage('adult-red-dragon', 'Fire Breath', mockDataLoader);

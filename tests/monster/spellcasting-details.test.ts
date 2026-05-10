@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { DataLoader } from '../../src/data/loader';
-import type { Monster, MonsterSpellcasting } from '../../src/monster/types';
+import type { Monster } from '../../src/monster/types';
+import type { MonsterSpellcasting } from '../../src/types/monster';
 
 describe('R28.11 - Spellcasting Details', () => {
   describe('MonsterSpellcasting interface', () => {
@@ -20,7 +21,7 @@ describe('R28.11 - Spellcasting Details', () => {
         saveDC: 17,
         ignoresComponents: ['M']
       };
-      expect(spellcasting.ignoresComponents).toContain('M');
+      expect(spellcasting.ignoresComponents!).toContain('M');
     });
 
     it('should have atWill field', () => {
@@ -29,8 +30,8 @@ describe('R28.11 - Spellcasting Details', () => {
         saveDC: 17,
         atWill: ['Command', 'Detect Magic', 'Scorching Ray']
       };
-      expect(spellcasting.atWill).toContain('Command');
-      expect(spellcasting.atWill).toHaveLength(3);
+      expect(spellcasting.atWill!).toContain('Command');
+      expect(spellcasting.atWill!).toHaveLength(3);
     });
 
     it('should have daily field', () => {
@@ -39,9 +40,9 @@ describe('R28.11 - Spellcasting Details', () => {
         saveDC: 17,
         daily: [{ spell: 'Fireball', times: 1 }]
       };
-      expect(spellcasting.daily).toHaveLength(1);
-      expect(spellcasting.daily![0].spell).toBe('Fireball');
-      expect(spellcasting.daily![0].times).toBe(1);
+      expect(spellcasting.daily!).toHaveLength(1);
+      expect(spellcasting.daily![0]!.spell).toBe('Fireball');
+      expect(spellcasting.daily![0]!.times).toBe(1);
     });
   });
 
@@ -94,22 +95,19 @@ describe('R28.11 - Spellcasting Details', () => {
       }
     ];
 
-    const mockDataLoader: DataLoader = {
+    const mockDataLoader = {
       getMonster: (id: string) => mockMonsters.find(m => m.id === id),
-      getAllMonsters: () => mockMonsters,
       getSpell: () => undefined,
       getAllSpells: () => [],
       getClass: () => undefined,
       getAllClasses: () => [],
-      getRace: () => undefined,
-      getAllRaces: () => [],
+      getSpecies: () => undefined,
+      getAllSpecies: () => [],
       getBackground: () => undefined,
       getAllBackgrounds: () => [],
       getFeat: () => undefined,
       getAllFeats: () => [],
-      getItem: () => undefined,
-      getAllItems: () => [],
-    };
+    } as unknown as DataLoader;
 
     it('should have spellcasting field', () => {
       const monster = mockDataLoader.getMonster('young-red-dragon');
@@ -119,31 +117,36 @@ describe('R28.11 - Spellcasting Details', () => {
 
     it('should have correct spellcasting ability', () => {
       const monster = mockDataLoader.getMonster('young-red-dragon');
-      expect(monster!.spellcasting![0].ability).toBe('Charisma');
+      const spellcasting = monster!.spellcasting![0]!;
+      expect(spellcasting.ability).toBe('Charisma');
     });
 
     it('should have correct save DC', () => {
       const monster = mockDataLoader.getMonster('young-red-dragon');
-      expect(monster!.spellcasting![0].saveDC).toBe(17);
+      const spellcasting = monster!.spellcasting![0]!;
+      expect(spellcasting.saveDC).toBe(17);
     });
 
     it('should ignore Material components', () => {
       const monster = mockDataLoader.getMonster('young-red-dragon');
-      expect(monster!.spellcasting![0].ignoresComponents).toContain('M');
+      const spellcasting = monster!.spellcasting![0]!;
+      expect(spellcasting.ignoresComponents).toContain('M');
     });
 
     it('should have at-will spells', () => {
       const monster = mockDataLoader.getMonster('young-red-dragon');
-      expect(monster!.spellcasting![0].atWill).toContain('Command');
-      expect(monster!.spellcasting![0].atWill).toContain('Detect Magic');
-      expect(monster!.spellcasting![0].atWill).toContain('Scorching Ray');
+      const spellcasting = monster!.spellcasting![0]!;
+      expect(spellcasting.atWill).toContain('Command');
+      expect(spellcasting.atWill).toContain('Detect Magic');
+      expect(spellcasting.atWill).toContain('Scorching Ray');
     });
 
     it('should have daily spells', () => {
       const monster = mockDataLoader.getMonster('young-red-dragon');
-      expect(monster!.spellcasting![0].daily).toHaveLength(1);
-      expect(monster!.spellcasting![0].daily![0].spell).toBe('Fireball');
-      expect(monster!.spellcasting![0].daily![0].times).toBe(1);
+      const spellcasting = monster!.spellcasting![0]!;
+      expect(spellcasting.daily!).toHaveLength(1);
+      expect(spellcasting.daily![0]!.spell).toBe('Fireball');
+      expect(spellcasting.daily![0]!.times).toBe(1);
     });
   });
 });

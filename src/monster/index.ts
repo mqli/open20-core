@@ -19,8 +19,7 @@ export type {
   MonsterSize,
   MonsterType,
   ChallengeRating,
-  MonsterAttack,
-  MonsterDamageEntry
+  MonsterAttack
 } from '../types/monster';
 
 // Query functions

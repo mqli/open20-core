@@ -1,6 +1,8 @@
 // types/equipment.ts
 // 装备相关类型定义（零依赖）
 
+import type { DamageType } from './damage';
+
 // 装备条目基础接口
 export interface EquipmentItem {
   readonly id: string;
@@ -27,7 +29,7 @@ export interface Weapon extends EquipmentItem {
 // 武器伤害条目（统一结构，消除 dice/type 与 additional 的冗余）
 export interface WeaponDamageEntry {
   readonly dice: string; // 如 "1d8", "2d6", "1d4"
-  readonly type: string; // 伤害类型，如 "Piercing", "Slashing", "Poison", "Fire"
+  readonly type: DamageType; // 伤害类型，如 "Piercing", "Slashing", "Poison", "Fire"
 }
 
 // 武器伤害（统一使用 entries 数组）

@@ -89,22 +89,19 @@ describe('R28.9 - Saving Throw Effect Notation', () => {
       }
     ];
 
-    const mockDataLoader: DataLoader = {
+    const mockDataLoader = {
       getMonster: (id: string) => mockMonsters.find(m => m.id === id),
-      getAllMonsters: () => mockMonsters,
       getSpell: () => undefined,
       getAllSpells: () => [],
       getClass: () => undefined,
       getAllClasses: () => [],
-      getRace: () => undefined,
-      getAllRaces: () => [],
+      getSpecies: () => undefined,
+      getAllSpecies: () => [],
       getBackground: () => undefined,
       getAllBackgrounds: () => [],
       getFeat: () => undefined,
       getAllFeats: () => [],
-      getItem: () => undefined,
-      getAllItems: () => [],
-    };
+    } as unknown as DataLoader;
 
     it('should get saving throw effect from stored field', () => {
       const result = getActionSavingThrowEffect('test-dragon', 'Fire Breath', mockDataLoader);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getMonster, getAllMonsters } from '../../src/monster/query';
+import { getMonster } from '../../src/monster/query';
 import type { DataLoader } from '../../src/data/loader';
 import type { Monster } from '../../src/monster/types';
 
@@ -67,22 +67,19 @@ const mockMonsters: Monster[] = [
   }
 ];
 
-const mockDataLoader: DataLoader = {
+const mockDataLoader = {
   getMonster: (id: string) => mockMonsters.find(m => m.id === id),
-  getAllMonsters: () => mockMonsters,
   getSpell: () => undefined,
   getAllSpells: () => [],
   getClass: () => undefined,
   getAllClasses: () => [],
-  getRace: () => undefined,
-  getAllRaces: () => [],
+  getSpecies: () => undefined,
+  getAllSpecies: () => [],
   getBackground: () => undefined,
   getAllBackgrounds: () => [],
   getFeat: () => undefined,
   getAllFeats: () => [],
-  getItem: () => undefined,
-  getAllItems: () => [],
-};
+} as unknown as DataLoader;
 
 describe('R28.7 - Missing Monster Fields', () => {
   const data = mockDataLoader;
