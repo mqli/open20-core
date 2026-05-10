@@ -9,216 +9,61 @@ import {
   calculateMulticlassSpellSlots,
   type SpellSlotEntry,
 } from '../../src/engine/spell-slots';
-import type { DataLoader } from '../../src/data/loader';
+import { createMockDataLoader } from '../fixtures/data-loader';
+import {
+  FULL_CASTER_SLOTS,
+  MULTICLASS_SLOTS,
+  PACT_MAGIC_SLOTS,
+  NON_CASTER_CLASSES,
+  zeroSlots,
+} from '../fixtures/spell-slots';
+import type { Class } from '../../src/types/class';
 import type { CharacterClass } from '../../src/types/character';
 
-// ── Mock DataLoader ───────────────────────────────────────────────
+// ── Mock Class Data ──────────────────────────────────────
 
-/**
- * 创建模拟的 DataLoader
- * 包含测试所需的法术位数据
- */
-function createMockDataLoader(): DataLoader {
-  // 全施法者法术位表（Wizard/Cleric等）
-  const fullCasterSlots: Record<number, Record<number, number>> = {
-    1: { 1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    2: { 1: 3, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    3: { 1: 4, 2: 2, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    4: { 1: 4, 2: 3, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    5: { 1: 4, 2: 3, 3: 2, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    6: { 1: 4, 2: 3, 3: 3, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    7: { 1: 4, 2: 3, 3: 3, 4: 1, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    8: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    9: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1, 6: 0, 7: 0, 8: 0, 9: 0 },
-    10: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 0, 7: 0, 8: 0, 9: 0 },
-    11: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 0, 8: 0, 9: 0 },
-    12: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 0, 8: 0, 9: 0 },
-    13: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 0, 9: 0 },
-    14: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 0, 9: 0 },
-    15: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 0 },
-    16: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 0 },
-    17: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 },
-    18: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 },
-    19: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 },
-    20: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 },
-  };
+const SPELLCASTING_CLASSES: Record<string, Class> = {
+  Wizard: { id: 'Wizard', name: 'Wizard', source: '2024 PHB', hitDie: 'd6', savingThrowProficiencies: ['Intelligence', 'Wisdom'], armorTraining: [], weaponMastery: false, featuresByLevel: new Map(), spellcasting: { ability: 'Intelligence', prepares: true } },
+  Cleric: { id: 'Cleric', name: 'Cleric', source: '2024 PHB', hitDie: 'd8', savingThrowProficiencies: ['Wisdom', 'Charisma'], armorTraining: ['Light', 'Medium', 'Shield'], weaponMastery: false, featuresByLevel: new Map(), spellcasting: { ability: 'Wisdom', prepares: true } },
+  Bard: { id: 'Bard', name: 'Bard', source: '2024 PHB', hitDie: 'd8', savingThrowProficiencies: ['Dexterity', 'Charisma'], armorTraining: ['Light'], weaponMastery: false, featuresByLevel: new Map(), spellcasting: { ability: 'Charisma', prepares: false } },
+  Sorcerer: { id: 'Sorcerer', name: 'Sorcerer', source: '2024 PHB', hitDie: 'd6', savingThrowProficiencies: ['Constitution', 'Charisma'], armorTraining: [], weaponMastery: false, featuresByLevel: new Map(), spellcasting: { ability: 'Charisma', prepares: false } },
+  Druid: { id: 'Druid', name: 'Druid', source: '2024 PHB', hitDie: 'd8', savingThrowProficiencies: ['Intelligence', 'Wisdom'], armorTraining: ['Light', 'Medium', 'Shield'], weaponMastery: false, featuresByLevel: new Map(), spellcasting: { ability: 'Wisdom', prepares: true } },
+  Paladin: { id: 'Paladin', name: 'Paladin', source: '2024 PHB', hitDie: 'd10', savingThrowProficiencies: ['Wisdom', 'Charisma'], armorTraining: ['Light', 'Medium', 'Heavy', 'Shield'], weaponMastery: true, featuresByLevel: new Map(), spellcasting: { ability: 'Charisma', prepares: true } },
+  Ranger: { id: 'Ranger', name: 'Ranger', source: '2024 PHB', hitDie: 'd10', savingThrowProficiencies: ['Strength', 'Dexterity'], armorTraining: ['Light', 'Medium', 'Shield'], weaponMastery: true, featuresByLevel: new Map(), spellcasting: { ability: 'Wisdom', prepares: true } },
+  Warlock: { id: 'Warlock', name: 'Warlock', source: '2024 PHB', hitDie: 'd8', savingThrowProficiencies: ['Wisdom', 'Charisma'], armorTraining: ['Light'], weaponMastery: false, featuresByLevel: new Map(), spellcasting: { ability: 'Charisma', prepares: false } },
+  Fighter: { id: 'Fighter', name: 'Fighter', source: '2024 PHB', hitDie: 'd10', savingThrowProficiencies: ['Strength', 'Constitution'], armorTraining: ['Light', 'Medium', 'Heavy', 'Shield'], weaponMastery: true, featuresByLevel: new Map(), spellcasting: null },
+  Rogue: { id: 'Rogue', name: 'Rogue', source: '2024 PHB', hitDie: 'd8', savingThrowProficiencies: ['Dexterity', 'Intelligence'], armorTraining: ['Light'], weaponMastery: true, featuresByLevel: new Map(), spellcasting: null },
+  Barbarian: { id: 'Barbarian', name: 'Barbarian', source: '2024 PHB', hitDie: 'd12', savingThrowProficiencies: ['Strength', 'Constitution'], armorTraining: ['Light', 'Medium', 'Shield'], weaponMastery: true, featuresByLevel: new Map(), spellcasting: null },
+  Monk: { id: 'Monk', name: 'Monk', source: '2024 PHB', hitDie: 'd8', savingThrowProficiencies: ['Strength', 'Dexterity'], armorTraining: ['Light'], weaponMastery: true, featuresByLevel: new Map(), spellcasting: null },
+};
 
-  // 多维职业法术位表
-  const multiclassSlots: Record<number, Record<number, number>> = {
-    1: { 1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    2: { 1: 3, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    3: { 1: 4, 2: 2, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    4: { 1: 4, 2: 3, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    5: { 1: 4, 2: 3, 3: 2, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    6: { 1: 4, 2: 3, 3: 3, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    7: { 1: 4, 2: 3, 3: 3, 4: 1, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    8: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-    9: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1, 6: 0, 7: 0, 8: 0, 9: 0 },
-    10: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 0, 7: 0, 8: 0, 9: 0 },
-  };
+// ── Mock Data Loader ──────────────────────────────────────
 
-  // Pact Magic 表（Warlock）
-  const pactMagicSlots: Record<number, { slots: number; slotLevel: number }> = {
-    1: { slots: 1, slotLevel: 1 },
-    2: { slots: 2, slotLevel: 1 },
-    3: { slots: 2, slotLevel: 2 },
-    4: { slots: 2, slotLevel: 2 },
-    5: { slots: 2, slotLevel: 3 },
-    6: { slots: 2, slotLevel: 3 },
-    7: { slots: 2, slotLevel: 4 },
-    8: { slots: 2, slotLevel: 4 },
-    9: { slots: 2, slotLevel: 5 },
-    10: { slots: 2, slotLevel: 5 },
-    11: { slots: 3, slotLevel: 5 },
-    12: { slots: 3, slotLevel: 5 },
-    13: { slots: 3, slotLevel: 5 },
-    14: { slots: 3, slotLevel: 5 },
-    15: { slots: 3, slotLevel: 5 },
-    16: { slots: 3, slotLevel: 5 },
-    17: { slots: 3, slotLevel: 5 },
-    18: { slots: 3, slotLevel: 5 },
-    19: { slots: 3, slotLevel: 5 },
-    20: { slots: 3, slotLevel: 5 },
-  };
+const data = createMockDataLoader({
+  getSpellSlots: (classId: string, classLevel: number) => {
+    if (NON_CASTER_CLASSES.includes(classId)) return zeroSlots();
+    return FULL_CASTER_SLOTS[classLevel] ?? zeroSlots();
+  },
+  getMulticlassSpellSlots: (level: number) => MULTICLASS_SLOTS[level] ?? zeroSlots(),
+  getPactMagicSlots: (warlockLevel: number) => PACT_MAGIC_SLOTS[warlockLevel] ?? { slots: 0, slotLevel: 0 },
+  getClass: (id: string) => SPELLCASTING_CLASSES[id] ?? undefined,
+});
 
-  // 职业数据（简化版，仅包含 spellcasting 相关信息）
-  const classData: Record<string, { spellcasting?: object }> = {
-    Wizard: { spellcasting: {} },
-    Cleric: { spellcasting: {} },
-    Bard: { spellcasting: {} },
-    Sorcerer: { spellcasting: {} },
-    Druid: { spellcasting: {} },
-    Paladin: { spellcasting: {} },
-    Ranger: { spellcasting: {} },
-    Warlock: { spellcasting: {} },
-    Fighter: {},
-    Rogue: {},
-    Barbarian: {},
-    Monk: {},
-  };
+// ── Helper Functions ──────────────────────────────────────
 
-  return {
-    // 法术位相关
-    getSpellSlots(classId: string, classLevel: number): Record<number, number> {
-      // 非施法者返回全零
-      const nonCasters = ['Fighter', 'Rogue', 'Barbarian', 'Monk'];
-      if (nonCasters.includes(classId)) {
-        return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
-      }
-      return (
-        fullCasterSlots[classLevel] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
-      );
-    },
-
-    getMulticlassSpellSlots(level: number): Record<number, number> {
-      return multiclassSlots[level] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
-    },
-
-    getPactMagicSlots(warlockLevel: number): { slots: number; slotLevel: number } {
-      return pactMagicSlots[warlockLevel] || { slots: 0, slotLevel: 0 };
-    },
-
-    // 职业相关
-    getClass(id: string): import('../../src/types/class').Class | undefined {
-      return classData[id] as import('../../src/types/class').Class | undefined;
-    },
-
-    // 以下方法在测试中不会被调用，返回默认值
-    getSpecies(): undefined {
-      return undefined;
-    },
-    getSpeciesSubtype(): undefined {
-      return undefined;
-    },
-    getAllSpecies(): never[] {
-      return [];
-    },
-    getBackground(): undefined {
-      return undefined;
-    },
-    getAllBackgrounds(): never[] {
-      return [];
-    },
-    getAllClasses(): never[] {
-      return [];
-    },
-    getSubclass(): undefined {
-      return undefined;
-    },
-    getSubclassesForClass(): never[] {
-      return [];
-    },
-    getAllSubclasses(): never[] {
-      return [];
-    },
-    getFeat(): undefined {
-      return undefined;
-    },
-    getFeatsByCategory(): never[] {
-      return [];
-    },
-    getAllFeats(): never[] {
-      return [];
-    },
-    getWeapon(): undefined {
-      return undefined;
-    },
-    getAllWeapons(): never[] {
-      return [];
-    },
-    getArmor(): undefined {
-      return undefined;
-    },
-    getAllArmor(): never[] {
-      return [];
-    },
-    getGearItem(): undefined {
-      return undefined;
-    },
-    getAllGear(): never[] {
-      return [];
-    },
-    getSpell(): undefined {
-      return undefined;
-    },
-    getSpellsByLevel(): never[] {
-      return [];
-    },
-    getAllSpells(): never[] {
-      return [];
-    },
-    getProficiencyBonus(): 0 {
-      return 0;
-    },
-    getHitDieFixedValue(): 0 {
-      return 0;
-    },
-    getWeaponMasteryProperties(): readonly string[] {
-      return [];
-    },
-    getConditionNames(): readonly string[] {
-      return [];
-    },
-  } as any as DataLoader;
-}
-
-// ── 辅助函数 ─────────────────────────────────────────────────────
-
-/** 创建 CharacterClass 对象 */
+/** Create CharacterClass object */
 function makeClass(classId: string, level: number): CharacterClass {
   return { classId, level } as CharacterClass;
 }
 
-/** 获取法术位总数（用于断言） */
+/** Get spell slot total (for assertions) */
 function getSlotTotal(result: Record<number, SpellSlotEntry>, level: number): number {
   return result[level]?.total ?? 0;
 }
 
-// ── 测试用例 ─────────────────────────────────────────────────────
+// ── Test Cases ─────────────────────────────────────────────
 
 describe('calculateSpellSlots', () => {
-  const data = createMockDataLoader();
-
   it('should return 2 level-1 slots for Wizard level 1', () => {
     const result = calculateSpellSlots('Wizard', 1, data);
     expect(getSlotTotal(result, 1)).toBe(2);
@@ -282,8 +127,6 @@ describe('calculateSpellSlots', () => {
 });
 
 describe('calculatePactMagic', () => {
-  const data = createMockDataLoader();
-
   it('should return { slotLevel: 1, slots: 1 } for Warlock level 1', () => {
     const result = calculatePactMagic(1, data);
     expect(result).not.toBeNull();
@@ -318,15 +161,13 @@ describe('calculatePactMagic', () => {
   });
 
   it('should return null for unknown warlock level (if data returns falsy)', () => {
-    // 创建一个返回 null 的 mock
+    // Create a mock that returns zeros
     const nullData = {
-      ...createMockDataLoader(),
-      getPactMagicSlots(): { slots: number; slotLevel: number } {
-        return { slots: 0, slotLevel: 0 };
-      },
+      ...data,
+      getPactMagicSlots: () => ({ slots: 0, slotLevel: 0 }),
     };
-    // 注意：实际实现中，如果 pactData 是 { slots: 0, slotLevel: 0 }，它不会是 null/falsy
-    // 所以这个测试验证边界情况
+    // Note: In actual implementation, if pactData is { slots: 0, slotLevel: 0 }, it won't be null/falsy
+    // So this test verifies edge case
     const result = calculatePactMagic(1, nullData);
     expect(result).not.toBeNull();
     expect(result!.slots).toBe(0);
@@ -334,8 +175,6 @@ describe('calculatePactMagic', () => {
 });
 
 describe('getMulticlassSpellcasterLevel', () => {
-  const data = createMockDataLoader();
-
   it('should return 5 for single full caster (Wizard 5)', () => {
     const classes = [makeClass('Wizard', 5)];
     const result = getMulticlassSpellcasterLevel(classes, data);
@@ -402,8 +241,6 @@ describe('getMulticlassSpellcasterLevel', () => {
 });
 
 describe('calculateMulticlassSpellSlots', () => {
-  const data = createMockDataLoader();
-
   it('should return {1:4, 2:2, ...} for total level 3', () => {
     const result = calculateMulticlassSpellSlots(3, data);
     expect(getSlotTotal(result, 1)).toBe(4);
@@ -460,8 +297,6 @@ describe('calculateMulticlassSpellSlots', () => {
 });
 
 describe('integration: multiclass spell slots flow', () => {
-  const data = createMockDataLoader();
-
   it('should calculate correct multiclass slots for Fighter 5 + Wizard 3', () => {
     const classes = [makeClass('Fighter', 5), makeClass('Wizard', 3)];
     const totalLevel = getMulticlassSpellcasterLevel(classes, data);

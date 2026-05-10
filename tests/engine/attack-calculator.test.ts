@@ -3,53 +3,30 @@
 
 import { describe, it, expect } from 'vitest';
 import { calculateAttacks } from '../../src/engine/attack-calculator';
-import type {
-  AbilityScores,
-  Weapon,
-  Armor,
-  Feature,
-  EquipmentItem,
-} from '../../src/types';
-import type { DataLoader } from '../../src/data/loader';
+import type { Feature, EquipmentItem } from '../../src/types';
+import { makeScores } from '../fixtures/ability-scores';
+import { createMockDataLoader } from '../fixtures/data-loader';
+import { getStandardWeapons } from '../fixtures/equipment';
+
+// ── Mock DataLoader ──────────────────────────────────────
+
+const mockData = createMockDataLoader({
+  getWeapon: (id: string) => getStandardWeapons()[id] ?? undefined,
+  getAllWeapons: () => Object.values(getStandardWeapons()),
+});
 
 // ── Helper Functions ──────────────────────────────────────
 
-/**
- * Create AbilityScores with a base value for all abilities
- */
-function makeScores(baseStr: number, baseDex: number = 10, baseCon: number = 10): AbilityScores {
-  return {
-    base: {
-      Strength: baseStr,
-      Dexterity: baseDex,
-      Constitution: baseCon,
-      Intelligence: 10,
-      Wisdom: 10,
-      Charisma: 10,
-    },
-    racialBonuses: {},
-    featBonuses: {},
-    temporaryBonuses: {},
-  };
-}
-
-/**
- * Create an equipped weapon EquipmentItem
- */
-function makeEquippedWeapon(id: string, overrides?: Partial<EquipmentItem>): EquipmentItem {
+function makeEquippedWeapon(id: string): EquipmentItem {
   return {
     id,
     name: id,
     type: 'weapon',
     weight: 3,
     equipped: true,
-    ...overrides,
   };
 }
 
-/**
- * Create an equipped armor EquipmentItem
- */
 function makeEquippedArmor(id: string): EquipmentItem {
   return {
     id,
@@ -60,196 +37,9 @@ function makeEquippedArmor(id: string): EquipmentItem {
   };
 }
 
-// ── Mock DataLoader ──────────────────────────────────────
-
-/**
- * Create a mock DataLoader for testing
- * Only implements the methods needed by calculateAttacks
- */
-function createMockDataLoader(): DataLoader {
-  const weapons: Record<string, Weapon> = {
-    Longsword: {
-      id: 'Longsword',
-      name: 'Longsword',
-      type: 'weapon',
-      category: 'Martial',
-      weight: 3,
-      cost: '15 gp',
-      equipped: false,
-      damage: { entries: [{ dice: 'd8', type: 'Slashing' }], ability: 'Strength', bonus: 0 },
-      properties: ['Versatile'],
-      versatileDamage: 'd10',
-      mastery: 'Topple',
-    },
-    Dagger: {
-      id: 'Dagger',
-      name: 'Dagger',
-      type: 'weapon',
-      category: 'Simple',
-      weight: 1,
-      cost: '2 gp',
-      equipped: false,
-      damage: { entries: [{ dice: 'd4', type: 'Piercing' }], ability: 'Strength', bonus: 0 },
-      properties: ['Finesse', 'Light', 'Thrown'],
-      mastery: 'Nick',
-    },
-    Shortbow: {
-      id: 'Shortbow',
-      name: 'Shortbow',
-      type: 'weapon',
-      category: 'Simple',
-      weight: 2,
-      cost: '25 gp',
-      equipped: false,
-      damage: { entries: [{ dice: 'd6', type: 'Piercing' }], ability: 'Dexterity', bonus: 0 },
-      properties: ['Ammunition', 'Two-Handed'],
-      mastery: 'Vex',
-    },
-    Quarterstaff: {
-      id: 'Quarterstaff',
-      name: 'Quarterstaff',
-      type: 'weapon',
-      source: 'test',
-      category: 'Simple',
-      weight: 4,
-      cost: '2 sp',
-      equipped: false,
-      damage: { entries: [{ dice: 'd6', type: 'Bludgeoning' }], ability: 'Strength', bonus: 0 },
-      properties: ['Versatile'],
-      versatileDamage: 'd8',
-      mastery: 'Sap',
-    },
-  };
-
-  return {
-    // Weapon methods
-    getWeapon(id: string): Weapon | undefined {
-      return weapons[id];
-    },
-    getAllWeapons(): Weapon[] {
-      return Object.values(weapons);
-    },
-
-    // Armor methods (stubs)
-    getArmor(_id: string): Armor | undefined {
-      return undefined;
-    },
-    getAllArmor(): Armor[] {
-      return [];
-    },
-
-    // Gear methods (stubs)
-    getGearItem(_id: string): any {
-      return undefined;
-    },
-    getAllGear(): any[] {
-      return [];
-    },
-
-    // Species methods (stubs)
-    getSpecies(_id: string): any {
-      return undefined;
-    },
-    getSpeciesSubtype(_speciesId: string, _subtypeId: string): any {
-      return undefined;
-    },
-    getAllSpecies(): any[] {
-      return [];
-    },
-
-    // Background methods (stubs)
-    getBackground(_id: string): any {
-      return undefined;
-    },
-    getAllBackgrounds(): any[] {
-      return [];
-    },
-
-    // Class methods (stubs)
-    getClass(_id: string): any {
-      return undefined;
-    },
-    getAllClasses(): any[] {
-      return [];
-    },
-    getSubclass(_id: string): any {
-      return undefined;
-    },
-    getSubclassesForClass(_classId: string): any[] {
-      return [];
-    },
-    getAllSubclasses(): any[] {
-      return [];
-    },
-
-    // Feat methods (stubs)
-    getFeat(_id: string): any {
-      return undefined;
-    },
-    getFeatsByCategory(_category: string): any[] {
-      return [];
-    },
-    getAllFeats(): any[] {
-      return [];
-    },
-
-    // Spell methods (stubs)
-    getSpell(_id: string): any {
-      return undefined;
-    },
-    getSpellsByLevel(_level: number): any[] {
-      return [];
-    },
-    getAllSpells(): any[] {
-      return [];
-    },
-
-    // Lookup table methods (stubs)
-    getProficiencyBonus(_level: number): number {
-      return 2;
-    },
-    getHitDieFixedValue(_die: string): number {
-      return 0;
-    },
-    getSpellSlots(_classId: string, _classLevel: number): Record<number, number> {
-      return {};
-    },
-    getMulticlassSpellSlots(_totalLevel: number): Record<number, number> {
-      return {};
-    },
-    getPactMagicSlots(_warlockLevel: number): { slots: number; slotLevel: number } {
-      return { slots: 0, slotLevel: 0 };
-    },
-    getWeaponMasteryProperties(): readonly string[] {
-      return ['Cleave', 'Graze', 'Nick', 'Push', 'Sap', 'Slow', 'Topple', 'Vex'];
-    },
-    getConditionNames(): readonly string[] {
-      return [
-        'Blinded',
-        'Charmed',
-        'Deafened',
-        'Exhaustion',
-        'Frightened',
-        'Grappled',
-        'Incapacitated',
-        'Invisible',
-        'Paralyzed',
-        'Petrified',
-        'Poisoned',
-        'Prone',
-        'Restrained',
-        'Stunned',
-        'Unconscious',
-        'Concentrating',
-      ];
-    },
-  } as any as DataLoader;
-}
-
 // ── Test Suite ──────────────────────────────────────────
 
 describe('calculateAttacks', () => {
-  const mockData = createMockDataLoader();
   const emptyFeatures: readonly Feature[] = [];
   // All weapon proficiencies for testing (Simple + Martial)
   const allWeaponProficiencies: readonly string[] = ['Simple', 'Martial'];

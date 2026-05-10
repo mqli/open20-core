@@ -6,63 +6,76 @@ import {
   calculateHPIncrement,
   calculateMaxHP,
 } from '../../src/engine/hp-calculator';
-import type { DataLoader } from '../../src/data/loader';
+import { createMockDataLoader } from '../fixtures/data-loader';
+import type { Class } from '../../src/types/class';
+
+// ── Mock Class Data ──────────────────────────────────────
+
+const MOCK_CLASSES: Record<string, Class> = {
+  Fighter: {
+    id: 'Fighter',
+    name: 'Fighter',
+    source: '2024 PHB',
+    hitDie: 'd10',
+    savingThrowProficiencies: ['Strength', 'Constitution'],
+    armorTraining: ['Light', 'Medium', 'Heavy', 'Shield'],
+    weaponMastery: true,
+    featuresByLevel: new Map(),
+    spellcasting: null,
+  },
+  Wizard: {
+    id: 'Wizard',
+    name: 'Wizard',
+    source: '2024 PHB',
+    hitDie: 'd6',
+    savingThrowProficiencies: ['Intelligence', 'Wisdom'],
+    armorTraining: [],
+    weaponMastery: false,
+    featuresByLevel: new Map(),
+    spellcasting: { ability: 'Intelligence', prepares: true },
+  },
+  Barbarian: {
+    id: 'Barbarian',
+    name: 'Barbarian',
+    source: '2024 PHB',
+    hitDie: 'd12',
+    savingThrowProficiencies: ['Strength', 'Constitution'],
+    armorTraining: ['Light', 'Medium', 'Shield'],
+    weaponMastery: true,
+    featuresByLevel: new Map(),
+    spellcasting: null,
+  },
+  Sorcerer: {
+    id: 'Sorcerer',
+    name: 'Sorcerer',
+    source: '2024 PHB',
+    hitDie: 'd6',
+    savingThrowProficiencies: ['Constitution', 'Charisma'],
+    armorTraining: [],
+    weaponMastery: false,
+    featuresByLevel: new Map(),
+    spellcasting: { ability: 'Charisma', prepares: false },
+  },
+  Rogue: {
+    id: 'Rogue',
+    name: 'Rogue',
+    source: '2024 PHB',
+    hitDie: 'd8',
+    savingThrowProficiencies: ['Dexterity', 'Intelligence'],
+    armorTraining: ['Light'],
+    weaponMastery: true,
+    featuresByLevel: new Map(),
+    spellcasting: null,
+  },
+};
 
 // ── Mock DataLoader ──────────────────────────────────────
-function createMockDataLoader(): DataLoader {
-  return {
-    getSpecies: () => undefined,
-    getSpeciesSubtype: () => undefined,
-    getAllSpecies: () => [],
-    getBackground: () => undefined,
-    getAllBackgrounds: () => [],
-    getClass: (id: string) => {
-      const classes: Record<string, { hitDie: 'd6' | 'd8' | 'd10' | 'd12' }> = {
-        Fighter: { hitDie: 'd10' },
-        Wizard: { hitDie: 'd6' },
-        Barbarian: { hitDie: 'd12' },
-        Sorcerer: { hitDie: 'd6' },
-        Rogue: { hitDie: 'd8' },
-      };
-      const c = classes[id];
-      return c
-        ? {
-            id,
-            source: '2024 PHB' as const,
-            hitDie: c.hitDie,
-            savingThrowProficiencies: [],
-            armorTraining: [],
-            weaponMastery: false,
-            featuresByLevel: new Map(),
-            spellcasting: null,
-          }
-        : undefined;
-    },
-    getAllClasses: () => [],
-    getSubclass: () => undefined,
-    getSubclassesForClass: () => [],
-    getAllSubclasses: () => [],
-    getFeat: () => undefined,
-    getFeatsByCategory: () => [],
-    getAllFeats: () => [],
-    getWeapon: () => undefined,
-    getAllWeapons: () => [],
-    getArmor: () => undefined,
-    getAllArmor: () => [],
-    getGearItem: () => undefined,
-    getAllGear: () => [],
-    getSpell: () => undefined,
-    getSpellsByLevel: () => [],
-    getAllSpells: () => [],
-    getProficiencyBonus: () => 2,
-    getHitDieFixedValue: () => 6,
-    getSpellSlots: () => ({}),
-    getMulticlassSpellSlots: () => ({}),
-    getPactMagicSlots: () => ({ slots: 0, slotLevel: 0 }),
-    getWeaponMasteryProperties: () => [],
-    getConditionNames: () => [],
-  } as any as DataLoader;
-}
+
+const data = createMockDataLoader({
+  getClass: (id: string) => MOCK_CLASSES[id] ?? undefined,
+});
+
+// ── Tests ──────────────────────────────────────────────────
 
 describe('getHitDieFixedValue', () => {
   it('returns 4 for d6', () => expect(getHitDieFixedValue('d6')).toBe(4));
@@ -108,12 +121,10 @@ describe('calculateHPIncrement', () => {
 });
 
 describe('calculateMaxHP', () => {
-  const data = createMockDataLoader();
-
   it('calculates 5-level Fighter Con +3 = 49', () => {
-    // 1级: 10+3=13
-    // 2-5级: 4 * (6+3) = 36
-    // 总计: 13 + 36 = 49
+    // Level 1: 10+3=13
+    // Levels 2-5: 4 * (6+3) = 36
+    // Total: 13 + 36 = 49
     const char = [
       {
         classId: 'Fighter',
@@ -139,10 +150,10 @@ describe('calculateMaxHP', () => {
     expect(calculateMaxHP(char, 2, data)).toBe(8);
   });
 
-  it('calculates 3-level Barbarian Con +4 = 35', () => {
-    // 1级: 12+4=16
-    // 2-3级: 2 * (7+4) = 22
-    // 总计: 16 + 22 = 38
+  it('calculates 3-level Barbarian Con +4 = 38', () => {
+    // Level 1: 12+4=16
+    // Levels 2-3: 2 * (7+4) = 22
+    // Total: 16 + 22 = 38
     const char = [
       {
         classId: 'Barbarian',

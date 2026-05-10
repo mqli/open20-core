@@ -1,89 +1,17 @@
 import { describe, it, expect } from 'vitest';
 import { getMonster } from '../../src/monster/query';
-import type { DataLoader } from '../../src/data/loader';
-import type { Monster } from '../../src/monster/types';
+import { createMockDataLoader } from '../fixtures/data-loader';
+import { YOUNG_RED_DRAGON, MOCK_GOBLIN } from '../fixtures/monsters';
 
-// Mock DataLoader with test data
-const mockMonsters: Monster[] = [
-  {
-    id: 'young-red-dragon',
-    name: 'Young Red Dragon',
-    source: 'SRD 5.2',
-    size: 'Large',
-    type: 'Dragon',
-    descriptiveTags: ['Chromatic'],
-    alignment: 'chaotic evil',
-    armorClass: [{ value: 18, type: 'natural armor' }],
-    hitPoints: { value: 178, formula: '17d10+85' },
-    speed: { walk: 40, climb: 40, fly: 80 },
-    initiative: { modifier: 0, score: 10 },
-    abilityScores: {
-      base: { Strength: 23, Dexterity: 10, Constitution: 21, Intelligence: 14, Wisdom: 11, Charisma: 19 },
-      racialBonuses: {},
-      featBonuses: {},
-      temporaryBonuses: {}
-    },
-    savingThrows: { Dexterity: 4, Wisdom: 4 },
-    skills: { Perception: 7, Stealth: 4 },
-    challengeRating: { rating: 10, xp: 5900 },
-    resistances: [],
-    vulnerabilities: [],
-    damageDefenses: { resistances: [], immunities: ['Fire'], vulnerabilities: [] },
-    senses: { blindsight: 30, darkvision: 120, passivePerception: 17 },
-    languages: ['Common', 'Draconic'],
-    conditionImmunities: ['Charmed', 'Frightened', 'Poisoned'],
-    traits: [],
-    actions: [],
-    reactions: [],
-    legendaryActions: [],
-    environments: ['mountain'],
-    currentHP: 178,
-    temporaryHP: 0
+const data = createMockDataLoader({
+  getMonster: (id: string) => {
+    if (id === 'young-red-dragon') return YOUNG_RED_DRAGON;
+    if (id === 'goblin') return MOCK_GOBLIN;
+    return undefined;
   },
-  {
-    id: 'goblin',
-    name: 'Goblin',
-    source: 'SRD 5.2',
-    size: 'Small',
-    type: 'Humanoid',
-    alignment: 'neutral evil',
-    armorClass: [{ value: 15, type: 'hide armor' }],
-    hitPoints: { value: 7, formula: '2d6+2' },
-    speed: { walk: 30 },
-    abilityScores: {
-      base: { Strength: 8, Dexterity: 14, Constitution: 10, Intelligence: 10, Wisdom: 8, Charisma: 8 },
-      racialBonuses: {},
-      featBonuses: {},
-      temporaryBonuses: {}
-    },
-    challengeRating: { rating: '1/4', xp: 50 },
-    traits: [],
-    actions: [],
-    reactions: [],
-    legendaryActions: [],
-    environments: ['forest', 'hill'],
-    currentHP: 7,
-    temporaryHP: 0
-  }
-];
-
-const mockDataLoader = {
-  getMonster: (id: string) => mockMonsters.find(m => m.id === id),
-  getSpell: () => undefined,
-  getAllSpells: () => [],
-  getClass: () => undefined,
-  getAllClasses: () => [],
-  getSpecies: () => undefined,
-  getAllSpecies: () => [],
-  getBackground: () => undefined,
-  getAllBackgrounds: () => [],
-  getFeat: () => undefined,
-  getAllFeats: () => [],
-} as unknown as DataLoader;
+});
 
 describe('R28.7 - Missing Monster Fields', () => {
-  const data = mockDataLoader;
-
   describe('Initiative field', () => {
     it('should have initiative field for young-red-dragon', () => {
       const monster = getMonster('young-red-dragon', data);
@@ -210,7 +138,6 @@ describe('R28.7 - Missing Monster Fields', () => {
     it('should allow gear field on monster', () => {
       // Gear is optional, just test the type structure
       const monster = getMonster('goblin', data);
-      // Goblins don't have gear in SRD, but the field should exist on type
       expect(monster).toBeDefined();
     });
   });
@@ -226,7 +153,7 @@ describe('R28.7 - Missing Monster Fields', () => {
   describe('Query functions with new fields', () => {
     it('should return monster with all new fields', () => {
       const monster = getMonster('young-red-dragon', data);
-      
+
       expect(monster).toMatchObject({
         id: 'young-red-dragon',
         name: 'Young Red Dragon',

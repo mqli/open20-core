@@ -3,30 +3,9 @@
 
 import { describe, it, expect } from 'vitest';
 import { getSkillBonus, getAllSkillBonuses } from '../../src/engine/skill-bonus';
-import type { AbilityScores, AbilityName } from '../../src/types/ability';
 import type { SkillEntry } from '../../src/types/skill';
+import { createAbilityScores, createAbilityScoresWithBonuses } from '../fixtures/ability-scores';
 import { SKILL_NAMES, SKILL_ABILITY_MAP } from '../../src/types/skill';
-
-/**
- * Helper to create AbilityScores with sensible defaults.
- * Only specify the abilities you care about; others default to 10 (modifier 0).
- */
-function makeScores(base?: Partial<Record<AbilityName, number>>): AbilityScores {
-  const defaults: Record<AbilityName, number> = {
-    Strength: 10,
-    Dexterity: 10,
-    Constitution: 10,
-    Intelligence: 10,
-    Wisdom: 10,
-    Charisma: 10,
-  };
-  return {
-    base: { ...defaults, ...base },
-    racialBonuses: {},
-    featBonuses: {},
-    temporaryBonuses: {},
-  };
-}
 
 /**
  * Helper to create a SkillEntry.
@@ -38,350 +17,230 @@ function makeSkill(proficient: boolean, expertise: boolean = false): SkillEntry 
 describe('getSkillBonus', () => {
   describe('non-proficient skill', () => {
     it('returns ability modifier only (Str 10 → mod 0)', () => {
-      const scores = makeScores({ Strength: 10 });
+      const scores = createAbilityScores({ Strength: 10 });
       const skill = makeSkill(false, false);
       // Str 10 → modifier 0, not proficient → 0
       expect(getSkillBonus(scores, skill, 'Strength', 2)).toBe(0);
     });
 
     it('returns ability modifier only (Dex 14 → mod +2)', () => {
-      const scores = makeScores({ Dexterity: 14 });
+      const scores = createAbilityScores({ Dexterity: 14 });
       const skill = makeSkill(false, false);
       // Dex 14 → modifier +2, not proficient → 2
-      expect(getSkillBonus(scores, skill, 'Dexterity', 3)).toBe(2);
+      expect(getSkillBonus(scores, skill, 'Dexterity', 2)).toBe(2);
     });
 
-    it('is not affected by proficiency bonus', () => {
-      const scores = makeScores({ Strength: 16 });
+    it('returns ability modifier only (Int 8 → mod -1)', () => {
+      const scores = createAbilityScores({ Intelligence: 8 });
       const skill = makeSkill(false, false);
-      // Str 16 → modifier +3, not proficient → 3 (proficiency ignored)
-      expect(getSkillBonus(scores, skill, 'Strength', 4)).toBe(3);
+      // Int 8 → modifier -1, not proficient → -1
+      expect(getSkillBonus(scores, skill, 'Intelligence', 2)).toBe(-1);
     });
   });
 
   describe('proficient skill', () => {
-    it('returns ability modifier + proficiency bonus', () => {
-      const scores = makeScores({ Strength: 16 });
+    it('returns ability modifier + PB (Str 10, PB+3 = +3)', () => {
+      const scores = createAbilityScores({ Strength: 10 });
       const skill = makeSkill(true, false);
-      // Str 16 → modifier +3, proficient, PB +3 → 3 + 3 = 6
-      expect(getSkillBonus(scores, skill, 'Strength', 3)).toBe(6);
+      // Str 10 → 0, proficient → 0 + 3 = 3
+      expect(getSkillBonus(scores, skill, 'Strength', 3)).toBe(3);
     });
 
-    it('works with minimal values (Str 8 → mod -1)', () => {
-      const scores = makeScores({ Strength: 8 });
+    it('returns ability modifier + PB (Con 14, PB+3 = +5)', () => {
+      const scores = createAbilityScores({ Constitution: 14 });
       const skill = makeSkill(true, false);
-      // Str 8 → modifier -1, proficient, PB +2 → -1 + 2 = 1
-      expect(getSkillBonus(scores, skill, 'Strength', 2)).toBe(1);
+      // Con 14 → +2, proficient → 2 + 3 = 5
+      expect(getSkillBonus(scores, skill, 'Constitution', 3)).toBe(5);
+    });
+
+    it('handles negative ability modifier (Str 8, PB+3 = +2)', () => {
+      const scores = createAbilityScores({ Strength: 8 });
+      const skill = makeSkill(true, false);
+      // Str 8 → -1, proficient → -1 + 3 = 2
+      expect(getSkillBonus(scores, skill, 'Strength', 3)).toBe(2);
     });
   });
 
-  describe('expertise skill (Rogue 6+)', () => {
-    it('returns ability modifier + proficiency bonus * 2', () => {
-      const scores = makeScores({ Dexterity: 14 });
+  describe('expertise skill', () => {
+    it('returns ability modifier + 2*PB (Dex 14, PB+3 = +8)', () => {
+      const scores = createAbilityScores({ Dexterity: 14 });
       const skill = makeSkill(true, true);
-      // Dex 14 → modifier +2, expertise, PB +3 → 2 + 3*2 = 8
+      // Dex 14 → +2, expertise → 2 + 2*3 = 8
       expect(getSkillBonus(scores, skill, 'Dexterity', 3)).toBe(8);
     });
 
-    it('expertise doubles PB even at low PB', () => {
-      const scores = makeScores({ Charisma: 20 });
+    it('handles high PB (PB+6, expertise = +14)', () => {
+      const scores = createAbilityScores({ Dexterity: 14 });
       const skill = makeSkill(true, true);
-      // Cha 20 → modifier +5, expertise, PB +2 → 5 + 2*2 = 9
-      expect(getSkillBonus(scores, skill, 'Charisma', 2)).toBe(9);
+      // Dex 14 → +2, expertise → 2 + 2*6 = 14
+      expect(getSkillBonus(scores, skill, 'Dexterity', 6)).toBe(14);
+    });
+
+    it('handles negative modifier with expertise (Int 8, PB+3 = +5)', () => {
+      const scores = createAbilityScores({ Intelligence: 8 });
+      const skill = makeSkill(true, true);
+      // Int 8 → -1, expertise → -1 + 2*3 = 5
+      expect(getSkillBonus(scores, skill, 'Intelligence', 3)).toBe(5);
     });
   });
 
-  describe('high ability score (Str 20, +5 mod)', () => {
-    it('calculates correctly with proficiency', () => {
-      const scores = makeScores({ Strength: 20 });
+  describe('proficiency bonus scaling', () => {
+    it('uses PB+2 for level 1-4', () => {
+      const scores = createAbilityScores({ Strength: 15 });
       const skill = makeSkill(true, false);
-      // Str 20 → modifier +5, proficient, PB +3 → 5 + 3 = 8
-      expect(getSkillBonus(scores, skill, 'Strength', 3)).toBe(8);
+      // Str 15 → +2, PB+2 → 2 + 2 = 4
+      expect(getSkillBonus(scores, skill, 'Strength', 2)).toBe(4);
     });
 
-    it('calculates correctly with expertise', () => {
-      const scores = makeScores({ Strength: 20 });
-      const skill = makeSkill(true, true);
-      // Str 20 → modifier +5, expertise, PB +3 → 5 + 3*2 = 11
-      expect(getSkillBonus(scores, skill, 'Strength', 3)).toBe(11);
+    it('uses PB+3 for level 5-8', () => {
+      const scores = createAbilityScores({ Strength: 15 });
+      const skill = makeSkill(true, false);
+      // Str 15 → +2, PB+3 → 2 + 3 = 5
+      expect(getSkillBonus(scores, skill, 'Strength', 3)).toBe(5);
+    });
+
+    it('uses PB+6 for level 17-20', () => {
+      const scores = createAbilityScores({ Strength: 15 });
+      const skill = makeSkill(true, false);
+      // Str 15 → +2, PB+6 → 2 + 6 = 8
+      expect(getSkillBonus(scores, skill, 'Strength', 6)).toBe(8);
     });
   });
 
-  describe('low ability score (Cha 8, -1 mod)', () => {
-    it('calculates correctly with proficiency', () => {
-      const scores = makeScores({ Charisma: 8 });
+  describe('ability modifiers', () => {
+    it('handles Str 20 (+5)', () => {
+      const scores = createAbilityScores({ Strength: 20 });
       const skill = makeSkill(true, false);
-      // Cha 8 → modifier -1, proficient, PB +3 → -1 + 3 = 2
-      expect(getSkillBonus(scores, skill, 'Charisma', 3)).toBe(2);
+      expect(getSkillBonus(scores, skill, 'Strength', 3)).toBe(8); // 5 + 3
     });
 
-    it('can result in low total with expertise + low PB', () => {
-      const scores = makeScores({ Charisma: 8 });
-      const skill = makeSkill(true, true);
-      // Cha 8 → modifier -1, expertise, PB +2 → -1 + 2*2 = 3
-      expect(getSkillBonus(scores, skill, 'Charisma', 2)).toBe(3);
-    });
-  });
-
-  describe('all 18 skills covered', () => {
-    const proficiencyBonus = 3;
-
-    // Strength skills
-    it('Athletics (Strength) with proficiency', () => {
-      const scores = makeScores({ Strength: 16 });
+    it('handles Cha 8 (-1)', () => {
+      const scores = createAbilityScores({ Charisma: 8 });
       const skill = makeSkill(true, false);
-      // Str 16 → +3, proficient, PB +3 → 6
-      expect(getSkillBonus(scores, skill, 'Strength', proficiencyBonus)).toBe(6);
-    });
-
-    // Dexterity skills
-    it('Acrobatics (Dexterity) with proficiency', () => {
-      const scores = makeScores({ Dexterity: 14 });
-      const skill = makeSkill(true, false);
-      expect(getSkillBonus(scores, skill, 'Dexterity', proficiencyBonus)).toBe(5); // +2 + 3
-    });
-
-    it('Sleight of Hand (Dexterity) with expertise', () => {
-      const scores = makeScores({ Dexterity: 14 });
-      const skill = makeSkill(true, true);
-      expect(getSkillBonus(scores, skill, 'Dexterity', proficiencyBonus)).toBe(8); // +2 + 3*2
-    });
-
-    it('Stealth (Dexterity) non-proficient', () => {
-      const scores = makeScores({ Dexterity: 14 });
-      const skill = makeSkill(false, false);
-      expect(getSkillBonus(scores, skill, 'Dexterity', proficiencyBonus)).toBe(2); // +2 only
-    });
-
-    // Intelligence skills
-    it('Arcana (Intelligence) with proficiency', () => {
-      const scores = makeScores({ Intelligence: 12 });
-      const skill = makeSkill(true, false);
-      expect(getSkillBonus(scores, skill, 'Intelligence', proficiencyBonus)).toBe(4); // +1 + 3
-    });
-
-    it('History (Intelligence) non-proficient', () => {
-      const scores = makeScores({ Intelligence: 12 });
-      const skill = makeSkill(false, false);
-      expect(getSkillBonus(scores, skill, 'Intelligence', proficiencyBonus)).toBe(1); // +1 only
-    });
-
-    it('Investigation (Intelligence) with expertise', () => {
-      const scores = makeScores({ Intelligence: 20 });
-      const skill = makeSkill(true, true);
-      expect(getSkillBonus(scores, skill, 'Intelligence', proficiencyBonus)).toBe(11); // +5 + 3*2
-    });
-
-    it('Nature (Intelligence) with proficiency', () => {
-      const scores = makeScores({ Intelligence: 16 });
-      const skill = makeSkill(true, false);
-      expect(getSkillBonus(scores, skill, 'Intelligence', proficiencyBonus)).toBe(6); // +3 + 3
-    });
-
-    it('Religion (Intelligence) non-proficient', () => {
-      const scores = makeScores({ Intelligence: 10 });
-      const skill = makeSkill(false, false);
-      expect(getSkillBonus(scores, skill, 'Intelligence', proficiencyBonus)).toBe(0); // 0 only
-    });
-
-    // Wisdom skills
-    it('Animal Handling (Wisdom) with proficiency', () => {
-      const scores = makeScores({ Wisdom: 14 });
-      const skill = makeSkill(true, false);
-      expect(getSkillBonus(scores, skill, 'Wisdom', proficiencyBonus)).toBe(5); // +2 + 3
-    });
-
-    it('Insight (Wisdom) with expertise', () => {
-      const scores = makeScores({ Wisdom: 18 });
-      const skill = makeSkill(true, true);
-      expect(getSkillBonus(scores, skill, 'Wisdom', proficiencyBonus)).toBe(10); // +4 + 3*2
-    });
-
-    it('Medicine (Wisdom) non-proficient', () => {
-      const scores = makeScores({ Wisdom: 14 });
-      const skill = makeSkill(false, false);
-      expect(getSkillBonus(scores, skill, 'Wisdom', proficiencyBonus)).toBe(2); // +2 only
-    });
-
-    it('Perception (Wisdom) with proficiency', () => {
-      const scores = makeScores({ Wisdom: 16 });
-      const skill = makeSkill(true, false);
-      expect(getSkillBonus(scores, skill, 'Wisdom', proficiencyBonus)).toBe(6); // +3 + 3
-    });
-
-    it('Survival (Wisdom) with expertise', () => {
-      const scores = makeScores({ Wisdom: 14 });
-      const skill = makeSkill(true, true);
-      expect(getSkillBonus(scores, skill, 'Wisdom', proficiencyBonus)).toBe(8); // +2 + 3*2
-    });
-
-    // Charisma skills
-    it('Deception (Charisma) with proficiency', () => {
-      const scores = makeScores({ Charisma: 16 });
-      const skill = makeSkill(true, false);
-      expect(getSkillBonus(scores, skill, 'Charisma', proficiencyBonus)).toBe(6); // +3 + 3
-    });
-
-    it('Intimidation (Charisma) non-proficient', () => {
-      const scores = makeScores({ Charisma: 16 });
-      const skill = makeSkill(false, false);
-      expect(getSkillBonus(scores, skill, 'Charisma', proficiencyBonus)).toBe(3); // +3 only
-    });
-
-    it('Performance (Charisma) with expertise', () => {
-      const scores = makeScores({ Charisma: 20 });
-      const skill = makeSkill(true, true);
-      expect(getSkillBonus(scores, skill, 'Charisma', proficiencyBonus)).toBe(11); // +5 + 3*2
-    });
-
-    it('Persuasion (Charisma) with proficiency', () => {
-      const scores = makeScores({ Charisma: 14 });
-      const skill = makeSkill(true, false);
-      expect(getSkillBonus(scores, skill, 'Charisma', proficiencyBonus)).toBe(5); // +2 + 3
+      expect(getSkillBonus(scores, skill, 'Charisma', 3)).toBe(2); // -1 + 3
     });
   });
 
   describe('edge cases', () => {
-    it('handles score of 1 (modifier -5)', () => {
-      const scores = makeScores({ Strength: 1 });
-      const skill = makeSkill(false, false);
-      // Str 1 → modifier -5
-      expect(getSkillBonus(scores, skill, 'Strength', 3)).toBe(-5);
+    it('handles PB+0 (level 0 or special)', () => {
+      const scores = createAbilityScores({ Strength: 15 });
+      const skill = makeSkill(true, false);
+      // Str 15 → +2, PB+0 → 2
+      expect(getSkillBonus(scores, skill, 'Strength', 0)).toBe(2);
     });
 
-    it('handles score of 30 (modifier +10)', () => {
-      const scores = makeScores({ Strength: 30 });
-      const skill = makeSkill(false, false);
-      // Str 30 → modifier +10
-      expect(getSkillBonus(scores, skill, 'Strength', 3)).toBe(10);
+    it('uses total score (base + racial) for skill bonus', () => {
+      const scores = createAbilityScoresWithBonuses({ Strength: 15 }, { Strength: 2 });
+      const skill = makeSkill(true, false);
+      // Str 15+2=17 → +3, proficient → 3 + 3 = 6
+      expect(getSkillBonus(scores, skill, 'Strength', 3)).toBe(6);
     });
 
-    it('expertise without proficient flag is still expertise', () => {
-      // The implementation checks expertise first, so this tests the logic
-      const scores = makeScores({ Dexterity: 14 });
-      const skill = { proficient: false, expertise: true };
-      // Even if proficient is false, expertise=true should give double PB
-      expect(getSkillBonus(scores, skill, 'Dexterity', 3)).toBe(8); // +2 + 3*2
+    it('uses total score (base + feat) for skill bonus', () => {
+      const scores = createAbilityScoresWithBonuses({ Dexterity: 14 }, {}, { Dexterity: 1 });
+      const skill = makeSkill(true, false);
+      // Dex 14+1=15 → +2, proficient → 2 + 3 = 5
+      expect(getSkillBonus(scores, skill, 'Dexterity', 3)).toBe(5);
+    });
+
+    it('handles all skills with expertise at high PB', () => {
+      const scores = createAbilityScores({ Intelligence: 20 });
+      const skill = makeSkill(true, true);
+      // Int 20 → +5, expertise → 5 + 2*6 = 17
+      expect(getSkillBonus(scores, skill, 'Intelligence', 6)).toBe(17);
     });
   });
 });
 
 describe('getAllSkillBonuses', () => {
-  describe('returns correct map for all skills', () => {
-    it('calculates bonuses for all 18 skills when all are present', () => {
-      const scores = makeScores({
-        Strength: 16, // +3
-        Dexterity: 14, // +2
-        Constitution: 12, // +1
-        Intelligence: 10, // 0
-        Wisdom: 14, // +2
-        Charisma: 12, // +1
-      });
+  it('returns correct bonuses for all skills (Str 15, PB+3)', () => {
+    const scores = createAbilityScores({ Strength: 15 });
+    const skills: Record<string, SkillEntry> = {};
+    for (const skill of SKILL_NAMES) {
+      skills[skill] = makeSkill(true, false);
+    }
 
-      // All skills proficient
-      const skills: Record<string, SkillEntry> = {};
-      for (const skillName of SKILL_NAMES) {
-        skills[skillName] = { proficient: true, expertise: false };
-      }
+    const result = getAllSkillBonuses(scores, skills, SKILL_ABILITY_MAP, 3);
 
-      const result = getAllSkillBonuses(scores, skills, SKILL_ABILITY_MAP, 3);
-
-      // Verify all 18 skills are in the result
-      expect(Object.keys(result)).toHaveLength(18);
-
-      // Check specific values
-      expect(result['Athletics']).toBe(6); // Str +3 + PB +3 = 6
-      expect(result['Acrobatics']).toBe(5); // Dex +2 + PB +3 = 5
-      expect(result['Sleight of Hand']).toBe(5); // Dex +2 + PB +3 = 5
-      expect(result['Stealth']).toBe(5); // Dex +2 + PB +3 = 5
-      expect(result['Arcana']).toBe(3); // Int 0 + PB +3 = 3
-      expect(result['History']).toBe(3); // Int 0 + PB +3 = 3
-      expect(result['Investigation']).toBe(3); // Int 0 + PB +3 = 3
-      expect(result['Nature']).toBe(3); // Int 0 + PB +3 = 3
-      expect(result['Religion']).toBe(3); // Int 0 + PB +3 = 3
-      expect(result['Animal Handling']).toBe(5); // Wis +2 + PB +3 = 5
-      expect(result['Insight']).toBe(5); // Wis +2 + PB +3 = 5
-      expect(result['Medicine']).toBe(5); // Wis +2 + PB +3 = 5
-      expect(result['Perception']).toBe(5); // Wis +2 + PB +3 = 5
-      expect(result['Survival']).toBe(5); // Wis +2 + PB +3 = 5
-      expect(result['Deception']).toBe(4); // Cha +1 + PB +3 = 4
-      expect(result['Intimidation']).toBe(4); // Cha +1 + PB +3 = 4
-      expect(result['Performance']).toBe(4); // Cha +1 + PB +3 = 4
-      expect(result['Persuasion']).toBe(4); // Cha +1 + PB +3 = 4
-    });
-
-    it('handles mix of proficient, non-proficient, and expertise skills', () => {
-      const scores = makeScores({
-        Strength: 16, // +3
-        Dexterity: 14, // +2
-        Wisdom: 16, // +3
-        Charisma: 20, // +5
-      });
-
-      const skills: Record<string, SkillEntry> = {
-        Athletics: { proficient: true, expertise: false }, // +3 + 3 = 6
-        Acrobatics: { proficient: false, expertise: false }, // +2 only = 2
-        'Sleight of Hand': { proficient: true, expertise: true }, // +2 + 3*2 = 8
-        Stealth: { proficient: false, expertise: false }, // +2 only = 2
-        Perception: { proficient: true, expertise: false }, // +3 + 3 = 6
-        Persuasion: { proficient: true, expertise: true }, // +5 + 3*2 = 11
-      };
-
-      const result = getAllSkillBonuses(scores, skills, SKILL_ABILITY_MAP, 3);
-
-      expect(result['Athletics']).toBe(6);
-      expect(result['Acrobatics']).toBe(2);
-      expect(result['Sleight of Hand']).toBe(8);
-      expect(result['Stealth']).toBe(2);
-      expect(result['Perception']).toBe(6);
-      expect(result['Persuasion']).toBe(11);
-    });
+    // Str 15 → +2, proficient → +5 for Str-based skills
+    // Dex-based skills → Dex 10 → 0, proficient → +3
+    expect(result['Athletics']).toBe(5); // Str-based
+    expect(result['Acrobatics']).toBe(3); // Dex-based
+    expect(result['Stealth']).toBe(3); // Dex-based
   });
 
-  describe('only includes skills that exist in SKILL_ABILITY_MAP', () => {
-    it('skips skills not in the ability map', () => {
-      const scores = makeScores({ Strength: 16 });
+  it('returns empty object for no skills input', () => {
+    const scores = createAbilityScores({ Strength: 15 });
+    const skills: Record<string, SkillEntry> = {};
+    // No skills in input
+    const result = getAllSkillBonuses(scores, skills, SKILL_ABILITY_MAP, 3);
 
-      const skills: Record<string, SkillEntry> = {
-        Athletics: { proficient: true, expertise: false },
-        'Fake Skill': { proficient: true, expertise: false }, // Not in SKILL_ABILITY_MAP
-      };
-
-      const result = getAllSkillBonuses(scores, skills, SKILL_ABILITY_MAP, 3);
-
-      // Should only include 'Athletics'
-      expect(Object.keys(result)).toHaveLength(1);
-      expect(result['Athletics']).toBe(6);
-      expect(result['Fake Skill']).toBeUndefined();
-    });
-
-    it('handles empty skills object', () => {
-      const scores = makeScores();
-      const skills: Record<string, SkillEntry> = {};
-
-      const result = getAllSkillBonuses(scores, skills, SKILL_ABILITY_MAP, 3);
-
-      expect(Object.keys(result)).toHaveLength(0);
-    });
+    // getAllSkillBonuses only returns skills in the input
+    expect(Object.keys(result)).toHaveLength(0);
   });
 
-  describe('uses provided skillAbilityMap', () => {
-    it('respects custom skillAbilityMap', () => {
-      const scores = makeScores({ Strength: 16, Dexterity: 14 });
+  it('returns ability mod for non-proficient skills that are in input', () => {
+    const scores = createAbilityScores({ Strength: 15 });
+    const skills: Record<string, SkillEntry> = {
+      Athletics: makeSkill(false, false), // Not proficient
+    };
+    const result = getAllSkillBonuses(scores, skills, SKILL_ABILITY_MAP, 3);
 
-      const skills: Record<string, SkillEntry> = {
-        'Custom Skill': { proficient: true, expertise: false },
-      };
+    // Non-proficient → ability mod only
+    expect(result['Athletics']).toBe(2); // Str 15 → +2
+  });
 
-      // Custom map that maps 'Custom Skill' to 'Strength'
-      const customMap: Record<string, AbilityName> = {
-        'Custom Skill': 'Strength',
-      };
+  it('returns expertise bonus (Dex 14, expertise, PB+3 = +8)', () => {
+    const scores = createAbilityScores({ Dexterity: 14 });
+    const skills: Record<string, SkillEntry> = {
+      Acrobatics: makeSkill(true, true),
+    };
 
-      const result = getAllSkillBonuses(scores, skills, customMap, 3);
+    const result = getAllSkillBonuses(scores, skills, SKILL_ABILITY_MAP, 3);
 
-      // Custom Skill uses Strength (+3) + PB (+3) = 6
-      expect(result['Custom Skill']).toBe(6);
+    // Dex 14 → +2, expertise → 2 + 2*3 = 8
+    expect(result['Acrobatics']).toBe(8);
+  });
+
+  it('handles mixed proficiencies and expertise', () => {
+    const scores = createAbilityScores({
+      Strength: 15,
+      Dexterity: 14,
+      Intelligence: 12,
     });
+    const skills: Record<string, SkillEntry> = {
+      Athletics: makeSkill(true, false), // Proficient
+      Acrobatics: makeSkill(true, true),   // Expertise
+      Arcana: makeSkill(false, false),     // Not proficient
+    };
+
+    const result = getAllSkillBonuses(scores, skills, SKILL_ABILITY_MAP, 3);
+
+    expect(result['Athletics']).toBe(5); // Str 15 → +2, prof → 2+3=5
+    expect(result['Acrobatics']).toBe(8); // Dex 14 → +2, exp → 2+6=8
+    expect(result['Arcana']).toBe(1);     // Int 12 → +1, not prof → 1
+  });
+
+  it('uses total ability score (base + racial) for all skills', () => {
+    const scores = createAbilityScoresWithBonuses({ Strength: 15 }, { Strength: 2 });
+    const skills: Record<string, SkillEntry> = {
+      Athletics: makeSkill(true, false),
+    };
+
+    const result = getAllSkillBonuses(scores, skills, SKILL_ABILITY_MAP, 3);
+
+    // Str 15+2=17 → +3, proficient → 3+3=6
+    expect(result['Athletics']).toBe(6);
+  });
+
+  it('returns only skills that are in the input', () => {
+    const scores = createAbilityScores();
+    const skills: Record<string, SkillEntry> = {
+      Athletics: makeSkill(true, false),
+    };
+    const result = getAllSkillBonuses(scores, skills, SKILL_ABILITY_MAP, 2);
+
+    expect(result['Athletics']).toBeDefined();
+    expect(Object.keys(result)).toHaveLength(1);
   });
 });

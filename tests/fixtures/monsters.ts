@@ -136,3 +136,68 @@ export const FIRE_IMMUNITY: DamageDefenses = createMockDefenses({
 export const COLD_VULNERABILITY: DamageDefenses = createMockDefenses({
   vulnerabilities: ['Cold'],
 });
+
+// ── Pre-built Dragon Monsters ──────────────────────────
+
+export const YOUNG_RED_DRAGON: Monster = {
+  id: 'young-red-dragon',
+  name: 'Young Red Dragon',
+  source: 'SRD 5.2',
+  size: 'Large',
+  type: 'Dragon',
+  descriptiveTags: ['Chromatic'],
+  alignment: 'chaotic evil',
+  armorClass: [{ value: 18, type: 'natural armor' }],
+  hitPoints: { value: 178, formula: '17d10+85' },
+  speed: { walk: 40, climb: 40, fly: 80 },
+  initiative: { modifier: 0, score: 10 },
+  abilityScores: {
+    base: { Strength: 23, Dexterity: 10, Constitution: 21, Intelligence: 14, Wisdom: 11, Charisma: 19 },
+    racialBonuses: {},
+    featBonuses: {},
+    temporaryBonuses: {},
+  },
+  savingThrows: { Dexterity: 4, Wisdom: 4 },
+  skills: { Perception: 7, Stealth: 4 },
+  challengeRating: { rating: 10, xp: 5900 },
+  resistances: [],
+  vulnerabilities: [],
+  damageDefenses: { resistances: [], immunities: ['Fire'], vulnerabilities: [] },
+  senses: { blindsight: 30, darkvision: 120, passivePerception: 17 },
+  languages: ['Common', 'Draconic'],
+  conditionImmunities: ['Charmed', 'Frightened', 'Poisoned'],
+  traits: [],
+  actions: [],
+  reactions: [],
+  legendaryActions: [],
+  environments: ['mountain'],
+  currentHP: 178,
+  temporaryHP: 0,
+};
+
+export const ADULT_RED_DRAGON: Monster = {
+  id: 'adult-red-dragon',
+  name: 'Adult Red Dragon',
+  source: 'SRD 5.2',
+  size: 'Gargantuan',
+  type: 'Dragon',
+  alignment: 'chaotic evil',
+  armorClass: [{ value: 19, type: 'natural armor' }],
+  hitPoints: { value: 256, formula: '24d12+120' },
+  speed: { walk: 40, fly: 80 },
+  abilityScores: {
+    base: { Strength: 27, Dexterity: 10, Constitution: 25, Intelligence: 16, Wisdom: 13, Charisma: 21 },
+    racialBonuses: {},
+    featBonuses: {},
+    temporaryBonuses: {},
+  },
+  challengeRating: { rating: 17, xp: 18000 },
+  environments: ['mountain'],
+  damageDefenses: { resistances: [], immunities: ['Fire'], vulnerabilities: [] },
+  traits: [],
+  actions: [],
+  reactions: [],
+  legendaryActions: [],
+  currentHP: 256,
+  temporaryHP: 0,
+};
