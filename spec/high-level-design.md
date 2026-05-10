@@ -1,7 +1,7 @@
 # Open20 Core — High Level Design
 
-**Version**: 2.0 (Headless Engine)
-**Date**: 2026-05-08
+**Version**: 3.0 (Layered Architecture)
+**Date**: 2026-05-10
 **Status**: Active
 **Positioning**: Headless TypeScript game engine for D&D 5e 2024
 
@@ -9,7 +9,7 @@
 
 ## 0. One-Sentence Architecture
 
-> **Pure function rule engine + immutable character state + injectable dependencies = headless core usable by any framework.**
+> **Layered architecture: Foundation → Mechanics → Entities → Application. Each layer only depends on lower layers.**
 
 ---
 
@@ -25,49 +25,87 @@
 | A6 | **Barrel Exports** | Each module exports public API via `index.ts` | Clear module boundaries, internal implementations can be freely refactored |
 | A7 | **Data-Driven Rules** | Rule data (species/classes/spells) separated from logic code | Rule updates only change JSON, not code |
 | A8 | **Headless by Design** | No UI components, no rendering logic, no state management opinions | Framework-agnostic, let consumers choose their stack |
+| A9 | **Layered Dependencies** | Each layer only depends on lower layers, never on same or higher layer | Clear dependency direction, easy to understand, test, and refactor |
 
 ---
 
-## 2. Module Architecture
+## 2. Layered Architecture
+
+### 2.1 Layers (Dependency Flow: L1 ← L2 ← L3 ← L4)
+
+| Layer | Name | Modules | Dependencies | Description |
+|-------|------|---------|--------------|-------------|
+| L1 | Foundation | `types/`, `dice/` | None | Pure types and dice rolling |
+| L2 | Mechanics | `engine/`, `spells/` | L1 | Game rule calculations |
+| L3 | Entities | `character/`, `monster/` | L1, L2 | State management and mutations |
+| L4 | Application | `rolls/` | L1, L2, L3 | Apply mechanics to entities |
+
+### 2.2 Dependency Graph
 
 ```
-┌──────────────────────────────────────────────────┐
-│                  open20-core                      │
-│                   (this package)                 │
-├──────────┬──────────┬──────────┬─────────────────┤
-│  types   │   data   │  engine  │   character     │
-│  types   │  rules   │  pure    │   state mgmt     │
-│  defs    │  data    │  fns     │   create/mutate  │
-├──────────┴──────────┴──────────┴─────────────────┤
-│                spells                              │
-│            spell data & queries                    │
-├──────────────────────────────────────────────────┤
-│                   storage                         │
-│            persistence abstraction                 │
-└──────────────────────────────────────────────────┘
-         │                              │
-         ▼                              ▼
-   ┌───────────┐                 ┌───────────┐
-   │  CLI App  │                 │  Web App  │
-   │ (future)  │                 │ (future)   │
-   └───────────┘                 └───────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│                      open20-core (package)                       │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                │
+│  L1: Foundation              L2: Mechanics                      │
+│  ┌──────────────┐             ┌──────────────┐                  │
+│  │   types/     │◄────────────│   engine/    │                  │
+│  └──────────────┘             └──────────────┘                  │
+│  ┌──────────────┐             ┌──────────────┐                  │
+│  │    dice/     │◄────────────│    spells/   │                  │
+│  └──────────────┘             └──────────────┘                  │
+│                                                                │
+│  L3: Entities              L4: Application                      │
+│  ┌──────────────┐             ┌──────────────┐                  │
+│  │  character/  │◄────────────│    rolls/    │                  │
+│  └──────────────┘             └──────────────┘                  │
+│  ┌──────────────┐             ┌──────────────┐                  │
+│  │   monster/   │◄────────────│    rolls/    │                  │
+│  └──────────────┘             └──────────────┘                  │
+│                                                                │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
-**Dependency Direction (unidirectional, reverse prohibited)**:
+**Dependency Rules**:
+- **L1 (Foundation)**: No dependencies on other modules
+- **L2 (Mechanics)**: Can import from L1 only
+- **L3 (Entities)**: Can import from L1 and L2 only
+- **L4 (Application)**: Can import from L1, L2, and L3
 
-```
-types ← data ← engine ← character ← storage
-                ↑                   │
-                └───────────────────┘ (character references engine functions)
-```
+### 2.3 Module Responsibilities
 
-**Prohibited**:
-- `types` must not import from any other module
-- `data` can only import from `types`
-- `engine` can only import from `types` and `data`
-- `character` can import from `types`, `data`, `engine`
-- `storage` can import from `types`, `character`
-- `spells` can import from `types`, `data`
+#### L1: Foundation (No Dependencies)
+- **`types/`**: All TypeScript interfaces and type definitions
+  - Zero dependencies on other modules
+- **`dice/`**: Pure dice rolling functions
+  - No game logic, no entity references
+
+#### L2: Mechanics (Depends on L1)
+- **`engine/`**: Pure functions for D&D 5e rule calculations
+  - All functions pure: `(input) => output`
+- **`spells/`**: Spell data queries and calculations
+
+#### L3: Entities (Depends on L1, L2)
+- **`character/`**: Character state management
+  - All mutations return new Character (immutable)
+- **`monster/`**: Monster state management
+  - Monster state mutations and queries
+
+#### L4: Application (Depends on L1, L2, L3)
+- **`rolls/`**: Apply game mechanics to entities
+  - Thin orchestration layer
+
+### 2.4 ESLint Enforcement
+
+| Module | CAN Import From | CANNOT Import From |
+|--------|-----------------|-------------------|
+| `types/` | (nothing) | (anything) |
+| `dice/` | `types/` | `engine/`, `spells/`, `character/`, `monster/`, `rolls/` |
+| `engine/` | `types/`, `dice/` | `character/`, `monster/`, `rolls/` |
+| `spells/` | `types/`, `dice/`, `engine/` | `character/`, `monster/`, `rolls/` |
+| `character/` | `types/`, `dice/`, `engine/`, `spells/` | `monster/`, `rolls/` |
+| `monster/` | `types/`, `dice/`, `engine/`, `spells/` | `character/`, `rolls/` |
+| `rolls/` | `types/`, `dice/`, `engine/`, `spells/`, `character/`, `monster/` | (nothing - top layer) |
 
 ---
 
@@ -76,153 +114,36 @@ types ← data ← engine ← character ← storage
 ```
 open20-core/
 ├── src/
-│   ├── types/                    # A1: Type definitions (zero dependencies)
-│   │   ├── character.ts          #   Character, CharacterClass, HitPoints, DeathSaves,
-│   │   │                         #   CombatStats, Attack, ActiveCondition, ConditionName,
-│   │   │                         #   Currency, DieType
-│   │   ├── species.ts            #   Species, SpeciesTrait, SpeciesGrant, SpeciesSubtype
-│   │   ├── background.ts         #   Background (with originFeatId)
-│   │   ├── class.ts              #   Class, Subclass, Feature, Spellcasting, MulticlassSpellSlotEntry
-│   │   ├── ability.ts            #   AbilityName, AbilityScores, ABILITY_NAMES
-│   │   ├── skill.ts              #   SkillName, SkillEntry, SKILL_ABILITY_MAP
-│   │   ├── feat.ts               #   Feat, FeatCategory, FeatPrerequisite, FeatGrant
-│   │   ├── equipment.ts          #   EquipmentItem, Weapon, Armor, GearItem, WeaponMasteryProperty
-│   │   ├── spell.ts              #   Spell, CharacterSpells, SpellSlotEntry, PactMagicSlots, SpellSchool
-│   │   ├── resource.ts           #   Resource, ResetType, DisplayType
-│   │   └── index.ts              #   barrel export
-│   │
-│   ├── data/                     # A7: Rule data (depends only on types)
-│   │   ├── loader.ts             #   DataLoader interface + LookupTables type + createDataLoader factory
-│   │   ├── default-loader.ts     #   Default DataLoader implementation (loads from static/srd/content.json)
-│   │   ├── browser-loader.ts     #   Browser-compatible DataLoader (bundles JSON via esbuild)
-│   │   ├── content-registry.ts   #   Content pack registry (R26: register/unregister packs)
-│   │   └── index.ts
-│   │
-│   ├── content/                  # R26: Content pack types & utilities
-│   │   ├── types.ts              #   ContentPack, ContentPackMeta interfaces
-│   │   └── index.ts
-│   │
-│   ├── engine/                   # A1: Pure function calculations (no side effects)
-│   │   ├── ability-modifier.ts   #   getModifier(score), getTotalScore(...)
-│   │   ├── proficiency-bonus.ts  #   getProficiencyBonus(level)
-│   │   ├── skill-bonus.ts        #   getSkillBonus(char, skillName, data)
-│   │   ├── saving-throw.ts       #   getSavingThrowBonus(char, ability, data)
-│   │   ├── ac-calculator.ts      #   calculateAC(char, data) → number
-│   │   ├── hp-calculator.ts      #   calculateMaxHP(char, data) → number
-│   │   ├── spell-slots.ts        #   calculateSpellSlots(char, data) → SpellSlotMap
-│   │   ├── initiative.ts         #   calculateInitiative(char, data) → number
-│   │   ├── passive-perception.ts #   calculatePassivePerception(char, data) → number
-│   │   ├── attack-calculator.ts  #   calculateAttacks(char, data) → Attack[]
-│   │   └── index.ts
-│   │
-│   ├── character/                # A2+A3: State management (immutable + injectable)
-│   │   ├── create.ts             #   createCharacter(params) → Character
-│   │   ├── level-up.ts           #   levelUp(char, options, data, rng?) → Character
-│   │   ├── rest.ts               #   shortRest(char, data) → Character; longRest(char, data) → Character
-│   │   ├── mutate.ts             #   All state mutation functions
-│   │   │                         #     modifyHP(char, delta) → Character
-│   │   │                         #     setTemporaryHP(char, value) → Character
-│   │   │                         #     consumeResource(char, id) → Character
-│   │   │                         #     recoverResource(char, id) → Character
-│   │   │                         #     consumeSpellSlot(char, level) → Character
-│   │   │                         #     recoverSpellSlot(char, level) → Character
-│   │   │                         #     toggleCondition(char, conditionId) → Character
-│   │   │                         #     equipItem(char, itemId) → Character
-│   │   │                         #     unequipItem(char, itemId) → Character
-│   │   │                         #     prepareSpell(char, spellId) → Character
-│   │   │                         #     unprepareSpell(char, spellId) → Character
-│   │   ├── validate.ts           #   validateCharacter(char, data) → ValidationResult
-│   │   ├── recompute.ts          #   recomputeDerivedStats(char, data) → Character
-│   │   └── index.ts
-│   │
-│   ├── spells/                   # NEW: Spell management module
-│   │   ├── query.ts              #   getSpell(id), searchSpells(filter), getSpellsByClass(class)
-│   │   ├── filter.ts             #   Filter helpers for spell queries
-│   │   ├── types.ts              #   Spell types and interfaces
-│   │   └── index.ts
-│   │
-│   ├── schemas/                  # NEW: Zod schemas for runtime validation
-│   │   ├── character.ts          #   CharacterSchema
-│   │   ├── spell.ts              #   SpellSchema
-│   │   └── index.ts
-│   │
-│   ├── storage/                  # A3: Persistence (interface + implementations)
-│   │   ├── interface.ts          #   ICharacterStorage interface
-│   │   ├── memory.ts             #   InMemoryStorage (for tests)
-│   │   ├── json-file.ts          #   JsonFileStorage (CLI use)
-│   │   ├── serializer.ts         #   serialize(char) → JSON; deserialize(json) → Character
-│   │   └── index.ts
-│   │
+│   ├── types/                    # L1: Foundation - Type definitions
+│   ├── dice/                     # L1: Foundation - Pure dice rolling
+│   ├── data/                     # L1: Foundation - Rule data loading
+│   ├── engine/                   # L2: Mechanics - Pure rule calculations
+│   ├── spells/                   # L2: Mechanics - Spell queries
+│   ├── character/                # L3: Entities - Character state & mutations
+│   ├── monster/                  # L3: Entities - Monster state & queries
+│   ├── rolls/                    # L4: Application - Apply mechanics to entities
+│   ├── content/                  # Content pack types & utilities
+│   ├── storage/                  # Persistence (interface + implementations)
 │   ├── index.ts                  # Public API barrel export (Node.js)
-│   └── browser-index.ts          # Public API barrel export (Browser, excludes Node.js storage)
+│   └── browser-index.ts          # Public API barrel export (Browser)
 │
 ├── static/                       # Static JSON data files
-│   └── srd/                      # SRD content (separate files for maintainability)
-│       ├── meta.json              # Content pack metadata
-│       ├── species.json           # Species[]
-│       ├── backgrounds.json       # Background[]
-│       ├── classes.json           # Class[]
-│       ├── subclasses.json        # Subclass[]
-│       ├── feats.json             # Feat[]
-│       ├── spells.json            # Spell[]
-│       ├── weapons.json           # Weapon[]
-│       ├── armor.json             # Armor[]
-│       ├── gear.json              # GearItem[]
-│       └── lookup-tables.json    # Proficiency, HP, spell slots, etc.
+│   └── srd/                      # SRD content
 │
-│                           # Future content packs (separate packages):
-│                           # @open20/content-phb2024/
-│                           #   ├── meta.json
-│                           #   ├── species.json
-│                           #   └── ...
-│                           # @open20/content-xgte/
-│                           # my-homebrew/
-
-├── scripts/
-│   ├── bundle.mjs                # Browser bundle builder (esbuild)
-│   └── import_srd_spells.py     # Import SRD spells from dnd-data GitHub repo
+├── scripts/                      # Build and import scripts
 │
-├── tests/
-│   ├── engine/                   # Rule engine unit tests
-│   │   ├── ability-modifier.test.ts
-│   │   ├── proficiency-bonus.test.ts
-│   │   ├── skill-bonus.test.ts
-│   │   ├── saving-throw.test.ts
-│   │   ├── ac-calculator.test.ts
-│   │   ├── hp-calculator.test.ts
-│   │   ├── spell-slots.test.ts
-│   │   ├── initiative.test.ts
-│   │   ├── passive-perception.test.ts
-│   │   └── attack-calculator.test.ts
-│   ├── character/                # State management tests
-│   │   ├── create.test.ts
-│   │   ├── level-up.test.ts
-│   │   ├── mutate.test.ts
-│   │   ├── rest.test.ts
-│   │   ├── validate.test.ts
-│   │   └── recompute.test.ts
-│   ├── spells/                   # Spell management tests
-│   │   └── query.test.ts
+├── tests/                        # Test suites (mirrors src/ structure)
+│   ├── engine/                   # L2: Mechanics unit tests
+│   ├── character/                # L3: Character tests
+│   ├── monster/                  # L3: Monster tests
+│   ├── rolls/                    # L4: Application tests
+│   ├── spells/                   # L2: Spell tests
 │   ├── storage/                  # Persistence tests
-│   │   └── serializer.test.ts
 │   ├── data/                     # Data integrity tests
-│   │   └── spells.test.ts
 │   └── integration/              # Integration tests
-│       └── create-and-calculate.test.ts
-│
-├── dist/                         # Build output
-│   ├── index.js                  # Node.js bundle
-│   ├── open20-core.js            # Browser UMD bundle
-│   └── open20-core.esm.js       # Browser ESM bundle
 │
 ├── spec/                         # Documentation
-│   ├── high-level-design.md      # This file
-│   ├── data-model.md             # TypeScript interfaces & JSON schema
-│   └── test-plan.md              # Test plan and coverage goals
-│
 ├── requirements/                 # Requirements traceability
-│   └── README.md
-│
 ├── PRD.md                        # Product Requirements Document
 ├── agent.md                      # Developer guide for AI agents
 ├── package.json                  # ESM, vitest, typescript
@@ -234,13 +155,13 @@ open20-core/
 
 ## 4. Core Module Specifications
 
-### 4.1 Engine Module (`src/engine/`)
+### 4.1 Engine Module (`src/engine/`) — L2: Mechanics
 
 **Purpose**: Pure functions for D&D 5e 2024 rule calculations.
 
 **Design Constraints**:
 - All functions must be pure (no side effects)
-- Accept character state as input, return computed values
+- Accept state as input, return computed values
 - Support both single-class and multiclass calculations
 - Handle edge cases: Mage Armor, Unarmored Defense, Fighting Styles, etc.
 
@@ -259,10 +180,11 @@ open20-core/
 | `calculateInitiative` | `(char, data) => number` | Dex mod + initiative bonuses |
 | `calculatePassivePerception` | `(char, data) => number` | 10 + Perception bonus |
 | `calculateAttacks` | `(char, data) => Attack[]` | Weapon attacks with bonuses |
+| `calculateTypedDamage` | `(defenses, damage, type) => DamageResult` | Apply resistances/immunities/vulnerabilities |
 
-### 4.2 Character Module (`src/character/`)
+### 4.2 Character Module (`src/character/`) — L3: Entities
 
-**Purpose**: Character creation, validation, and level-up logic.
+**Purpose**: Character creation, validation, and state management.
 
 **Design Constraints**:
 - All mutation functions return new `Character` object (immutable)
@@ -282,17 +204,19 @@ open20-core/
 | `recomputeDerivedStats` | `(char, data?) => Character` | Recompute all derived stats |
 | `modifyHP` | `(char, delta) => Character` | Modify current HP |
 | `setTemporaryHP` | `(char, value) => Character` | Set temporary HP |
+| `applyDamage` | `(char, damageResult) => Character` | Apply typed damage to character |
+| `addCondition` | `(char, condition) => Character` | Add condition to character |
+| `removeCondition` | `(char, condition) => Character` | Remove condition from character |
 | `consumeResource` | `(char, id) => Character` | Consume a resource use |
 | `recoverResource` | `(char, id) => Character` | Recover a resource use |
 | `consumeSpellSlot` | `(char, level) => Character` | Consume a spell slot |
 | `recoverSpellSlot` | `(char, level) => Character` | Recover a spell slot |
-| `toggleCondition` | `(char, conditionId) => Character` | Toggle condition on/off |
 | `equipItem` | `(char, itemId) => Character` | Equip an item |
 | `unequipItem` | `(char, itemId) => Character` | Unequip an item |
 | `prepareSpell` | `(char, spellId) => Character` | Mark spell as prepared |
 | `unprepareSpell` | `(char, spellId) => Character` | Unmark spell as prepared |
 
-### 4.3 Spells Module (`src/spells/`)
+### 4.3 Spells Module (`src/spells/`) — L2: Mechanics
 
 **Purpose**: Comprehensive spell data and spell-related queries.
 
@@ -327,25 +251,47 @@ interface SpellFilter {
 }
 ```
 
-### 4.4 Schemas Module (`src/schemas/`)
+### 4.4 Monster Module (`src/monster/`) — L3: Entities
 
-**Purpose**: Zod schemas for runtime validation of all data structures.
+**Purpose**: Monster data queries and state management.
 
 **Design Constraints**:
-- All data structures must have corresponding Zod schema
-- Schemas used for JSON import validation
-- Schemas exported for consumer use
-- Error messages should be helpful
+- Provide query functions for monster data
+- Support monster combat state management
+- Handle damage resistances/immunities/vulnerabilities
 
-**Schemas**:
+**Functions**:
 
-| Schema | Validates |
-|---|---|
-| `CharacterSchema` | Character object structure and rules |
-| `SpellSchema` | Spell object structure |
-| `SpeciesSchema` | Species object structure |
-| `ClassSchema` | Class object structure |
-| `FeatSchema` | Feat object structure |
+| Function | Signature | Description |
+|---|---|---|
+| `getMonster` | `(id: string) => Monster \| undefined` | Get single monster by ID |
+| `searchMonsters` | `(filter: MonsterFilter) => Monster[]` | Search/filter monsters |
+| `getMonstersByCR` | `(cr: number) => Monster[]` | Get monsters by challenge rating |
+| `getMonstersByType` | `(type: MonsterType) => Monster[]` | Get monsters by type |
+| `initializeMonsterForCombat` | `(monster: Monster) => MonsterState` | Initialize monster for combat |
+| `applyMonsterDamage` | `(monster: MonsterState, damageResult) => MonsterState` | Apply damage to monster |
+| `addMonsterCondition` | `(monster: MonsterState, condition) => MonsterState` | Add condition to monster |
+
+### 4.5 Rolls Module (`src/rolls/`) — L4: Application
+
+**Purpose**: Apply game mechanics to entities.
+
+**Design Constraints**:
+- Thin orchestration layer
+- Combines L2 (mechanics) with L3 (entities)
+- No complex logic, just coordination
+
+**Functions**:
+
+| Function | Signature | Description |
+|---|---|---|
+| `rollCharacterSkillCheck` | `(char, skill, data?) => RollResult` | Roll skill check for character |
+| `rollCharacterSavingThrow` | `(char, ability, data?) => RollResult` | Roll saving throw for character |
+| `rollCharacterAttack` | `(char, attack, target, data?) => AttackResult` | Roll attack for character |
+| `rollCharacterDamage` | `(char, attack, data?) => DamageResult` | Roll damage for character attack |
+| `rollMonsterAttack` | `(monster, attack, target, data?) => AttackResult` | Roll attack for monster |
+| `rollMonsterDamage` | `(monster, attack, data?) => DamageResult` | Roll damage for monster attack |
+| `rollSpellAttack` | `(char, spell, target, data?) => SpellAttackResult` | Roll spell attack |
 
 ---
 
@@ -373,8 +319,9 @@ interface SpellFilter {
 | S18 | Storage: Interface + implementations | ✅ | `storage/` module |
 | S19 | Public API barrel exports | ✅ | `index.ts`, `browser-index.ts` |
 | S20 | Integration tests | ✅ | `tests/integration/` |
+| S21 | Layered architecture refactoring | 📋 | Planned - reorganize into L1/L2/L3/L4 |
 
-**Current Test Status**: **560+ tests passing**, `tsc --noEmit` ✅
+**Current Test Status**: **699+ tests passing**, `tsc --noEmit` ✅
 
 ---
 
@@ -420,6 +367,19 @@ calculateAC(character, equipment, dataLoader)
 7. Return final AC number
 ```
 
+### 6.4 Roll Application Flow (L4)
+
+```
+rollCharacterAttack(character, attack, target, dataLoader)
+    ↓
+1. Calculate attack bonus (L2: engine/)
+2. Roll attack dice (L1: dice/)
+3. Check if hit (compare to target AC)
+4. If hit, calculate damage (L2: engine/)
+5. Apply damage to target (L3: character/mutate.ts)
+6. Return result
+```
+
 ---
 
 ## 7. Testing Strategy
@@ -428,11 +388,13 @@ calculateAC(character, equipment, dataLoader)
 - **Engine functions**: 100% coverage, property-based testing with fast-check
 - **Character mutations**: Test immutability, validation, edge cases
 - **Spell queries**: Test all filter combinations, edge cases
+- **Dice functions**: Test all dice rolling functions with deterministic RNG
 
 ### 7.2 Integration Tests
 - **Create + Calculate**: Create character, calculate all derived stats
 - **Level Up + Validate**: Level up, validate resulting character
 - **Rest + Recover**: Short/long rest, verify resource recovery
+- **Combat Scenarios**: Character vs monster combat simulations
 
 ### 7.3 Data Integrity Tests
 - **JSON validation**: All static JSON files valid against schemas
@@ -482,31 +444,7 @@ calculateAC(character, equipment, dataLoader)
 - `static/srd/` — Separate JSON files for SRD content (source: 'SRD 5.2')
 - No-override rule: same ID = separate items coexist
 
-**Usage**:
-```typescript
-import { createDataLoader, loadContentPack } from '@open20/core';
-
-// Load SRD content (separate files, loaded by default)
-const dataLoader = createDataLoader(lookupTables);
-
-// Get all registered content packs
-const packs = dataLoader.getContentPacks();
-console.log(packs[0].name); // 'SRD 5.2'
-
-// Register custom content pack
-dataLoader.registerContentPack({
-  meta: { id: 'my-homebrew', name: 'My Homebrew', version: '1.0.0', source: 'Homebrew', priority: 10 },
-  spells: [{ id: 'custom-spell', name: 'Custom Spell', source: 'Homebrew', ... }]
-});
-
-// Filter by source
-const homebrewSpells = dataLoader.getSpellsBySource('Homebrew');
-
-// Unregister content pack
-dataLoader.unregisterContentPack('my-homebrew');
-```
-
 ---
 
-*Last updated: 2026-05-09*
-*Version: 2.1 (R26 Implemented)*
+*Last updated: 2026-05-10*
+*Version: 3.0 (Layered Architecture)*

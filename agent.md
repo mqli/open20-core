@@ -21,18 +21,35 @@
 
 ## 2. Architecture & Module Dependencies
 
+### 2.1 Layered Architecture
+
+The codebase is organized into 4 layers with unidirectional dependencies:
+
 ```
-types  ←  data  ←  engine  ←  character  ←  storage
-(leaf)    ↓        ↓           ↓              ↓
-       JSON files  pure       mutations    persistence
-                    functions
+L1: Foundation  ←  L2: Mechanics  ←  L3: Entities  ←  L4: Application
+types/, dice/        engine/, spells/    character/,        rolls/
+                        data/          monster/
 ```
 
-**Rules enforced by ESLint** (`no-restricted-imports`):
-- `data` CANNOT import from `engine`, `character`, `storage`
-- `engine` CANNOT import from `character`, `storage`
-- `character` CANNOT import from `storage`
-- `storage` CANNOT import from `engine`, `character`
+**Dependency Rules**:
+- **L1 (Foundation)**: No dependencies on other modules
+- **L2 (Mechanics)**: Can import from L1 only
+- **L3 (Entities)**: Can import from L1 and L2 only
+- **L4 (Application)**: Can import from L1, L2, and L3
+
+### 2.2 Dependency Matrix
+
+| Module | CAN Import From | CANNOT Import From |
+|--------|-----------------|-------------------|
+| `types/` | (nothing) | (anything) |
+| `dice/` | `types/` | `engine/`, `spells/`, `character/`, `monster/`, `rolls/` |
+| `data/` | `types/` | `engine/`, `spells/`, `character/`, `monster/`, `rolls/` |
+| `engine/` | `types/`, `dice/`, `data/` | `spells/`, `character/`, `monster/`, `rolls/` |
+| `spells/` | `types/`, `dice/`, `data/` | `engine/`, `character/`, `monster/`, `rolls/` |
+| `character/` | `types/`, `dice/`, `data/`, `engine/`, `spells/` | `monster/`, `rolls/` |
+| `monster/` | `types/`, `dice/`, `data/`, `engine/`, `spells/` | `character/`, `rolls/` |
+| `rolls/` | `types/`, `dice/`, `data/`, `engine/`, `spells/`, `character/`, `monster/` | (nothing - top layer) |
+| `storage/` | `types/`, `character/` | `engine/`, `spells/`, `monster/`, `rolls/` |
 
 **Import path convention**: Use relative paths (e.g., `../types`, `../../data/loader`). Do NOT use `@/` aliases in test files (Vitest doesn't resolve them reliably).
 
@@ -51,11 +68,11 @@ open20-core/
 │   ├── bundle.mjs             # Browser bundle builder (esbuild)
 │   └── import_srd_spells.py   # Import SRD spells from dnd-data repo
 ├── spec/
-│   ├── high-level-design.md    # HLD v2.1 (S1-S20, R26 complete)
+│   ├── high-level-design.md    # HLD v3.0 (Layered Architecture)
 │   ├── data-model.md           # TypeScript interfaces & JSON schema
 │   └── test-plan.md           # Test plan and coverage goals
 ├── requirements/
-│   └── README.md               # R1-R21 requirements traceability
+│   └── README.md               # R1-R26 requirements traceability
 ├── static/
 │   └── srd/                   # SRD 5.2 content (included in core)
 │       ├── meta.json           # Content pack metadata
@@ -65,7 +82,6 @@ open20-core/
 │       ├── subclasses.json     # Subclasses for SRD classes
 │       ├── feats.json          # Limited feats (SRD 5.2)
 │       ├── spells.json         # 391+ spells (SRD 5.2)
-│       ├── monsters.json       # ~3 SRD monsters (sample)
 │       ├── weapons.json        # ~30 weapons (SRD 5.2)
 │       ├── armor.json          # ~15 armors (SRD 5.2)
 │       ├── gear.json           # ~20 gear items (SRD 5.2)
@@ -73,13 +89,34 @@ open20-core/
 ├── src/
 │   ├── index.ts                # Node.js barrel export (includes storage)
 │   ├── browser-index.ts        # Browser barrel export (excludes Node.js storage)
-│   ├── types/
-│   │   └── index.ts           # All TypeScript interfaces/types
-│   ├── data/
-│   │   ├── loader.ts          # DataLoader interface (20+ methods)
-│   │   ├── browser-loader.ts  # Browser-compatible DataLoader (bundles JSON)
-│   │   └── default-loader.ts  # Node.js JSON file implementation
-│   ├── engine/                 # Pure functions for rule calculations
+│   │
+│   ├── types/                  # L1: Foundation - Type definitions (zero dependencies)
+│   │   ├── ability.ts
+│   │   ├── skill.ts
+│   │   ├── damage.ts
+│   │   ├── attack.ts          # BaseAttack (shared)
+│   │   ├── character.ts
+│   │   ├── species.ts
+│   │   ├── background.ts
+│   │   ├── class.ts
+│   │   ├── feat.ts
+│   │   ├── equipment.ts
+│   │   ├── spell.ts
+│   │   ├── resource.ts
+│   │   ├── monster.ts         # MonsterSize, MonsterType, etc.
+│   │   └── index.ts           # Barrel export
+│   │
+│   ├── dice/                   # L1: Foundation - Pure dice rolling (zero dependencies)
+│   │   ├── core.ts
+│   │   └── index.ts
+│   │
+│   ├── data/                   # L1: Foundation - Rule data loading (depends on types/)
+│   │   ├── loader.ts          # DataLoader interface
+│   │   ├── browser-loader.ts  # Browser-compatible DataLoader
+│   │   ├── default-loader.ts  # Node.js JSON file implementation
+│   │   └── index.ts
+│   │
+│   ├── engine/                 # L2: Mechanics - Pure rule calculations (depends on L1)
 │   │   ├── ability-modifier.ts
 │   │   ├── proficiency-bonus.ts
 │   │   ├── skill-bonus.ts
@@ -91,55 +128,60 @@ open20-core/
 │   │   ├── passive-perception.ts
 │   │   ├── attack-calculator.ts
 │   │   ├── damage-calculator.ts
-│   │   └── combat.ts           # Shared HP helpers (character + monster)
-│   ├── character/              # Character creation & validation
+│   │   └── index.ts
+│   │
+│   ├── spells/                 # L2: Mechanics - Spell queries (depends on L1)
+│   │   ├── query.ts           # getSpell(), searchSpells(), etc.
+│   │   └── index.ts
+│   │
+│   ├── character/              # L3: Entities - Character state & mutations (depends on L1, L2)
 │   │   ├── create.ts          # createCharacter()
-│   │   ├── mutate.ts          # Immutable mutation functions
+│   │   ├── mutate.ts          # modifyHP(), applyDamage(), etc.
 │   │   ├── rest.ts            # shortRest(), longRest()
 │   │   ├── level-up.ts        # levelUp()
 │   │   ├── validate.ts        # validateCharacter()
 │   │   ├── recompute.ts       # recomputeDerivedStats()
 │   │   └── index.ts           # Barrel export
-│   ├── spells/                 # Spell data & queries
-│   │   ├── query.ts           # getSpell(), searchSpells(), etc.
-│   │   ├── types.ts           # Spell types
-│   │   └── index.ts           # Barrel export
-│   ├── monster/               # Monster data & queries (R28)
+│   │
+│   ├── monster/               # L3: Entities - Monster state & queries (depends on L1, L2)
+│   │   ├── types.ts           # Monster interface
 │   │   ├── query.ts           # getMonster(), searchMonsters(), etc.
 │   │   ├── calculator.ts      # getMonsterProficiencyBonus(), etc.
-│   │   ├── combat.ts          # HP management, damage dealing/taking
-│   │   ├── types.ts           # Monster types
+│   │   ├── combat.ts          # applyDamage(), addCondition(), etc.
 │   │   └── index.ts           # Barrel export
-│   ├── content/                # R26: Content pack types & utilities
-│   │   ├── types.ts           #   ContentPack, ContentPack, ContentPackMeta interfacess
-│   │   ├── io.ts             #   exportContentPack(), importContentPack()
-│   │   └── index.ts           # Barrel export
-│   ├── types/
-│   │   ├── attack.ts          # BaseAttack (shared)
-│   │   ├── monster.ts         # MonsterSize, MonsterType, etc.
-│   │   └── index.ts           # All TypeScript interfaces/types
-│   ├── schemas/                # Zod schemas
-│   │   ├── character.ts
-│   │   ├── spell.ts
+│   │
+│   ├── rolls/                  # L4: Application - Apply mechanics to entities (depends on L1+L2+L3)
+│   │   ├── character-rolls.ts  # rollCharacterSkillCheck(), etc.
+│   │   ├── monster-rolls.ts  # rollMonsterAttack(), etc.
+│   │   ├── spell-rolls.ts    # rollSpellAttack(), etc.
 │   │   └── index.ts
+│   │
+│   ├── content/                # Content pack types & utilities
+│   │   ├── types.ts           # ContentPack, ContentPackMeta interfaces
+│   │   ├── io.ts             # exportContentPack(), importContentPack()
+│   │   └── index.ts           # Barrel export
+│   │
 │   └── storage/                # Persistence (interface + implementations)
 │       ├── interface.ts        # ICharacterStorage interface
 │       ├── serializer.ts       # JSON serialize/deserialize
 │       ├── memory.ts           # InMemoryStorage (for tests)
 │       ├── json-file.ts        # JsonFileStorage (file system)
 │       └── index.ts           # Barrel export
+│
 ├── dist/                      # Build output
 │   ├── index.js               # Node.js bundle
 │   ├── open20-core.js         # Browser UMD bundle
 │   └── open20-core.esm.js     # Browser ESM bundle
+│
 └── tests/
-    ├── engine/*.test.ts        # 11 test files
-    ├── character/*.test.ts      # 6 test files
-    ├── monster/*.test.ts       # 3 test files (query, calculator, combat)
-    ├── storage/*.test.ts       # 1 test file
-    ├── data/*.test.ts          # 1 test file
-    ├── content/*.test.ts       # 1 test file
-    └── integration/*.test.ts   # 8 test files
+    ├── engine/                   # L2: Mechanics unit tests
+    ├── character/                # L3: Character tests
+    ├── monster/                  # L3: Monster tests
+    ├── rolls/                    # L4: Application tests
+    ├── spells/                   # L2: Spell tests
+    ├── storage/                  # Persistence tests
+    ├── data/                     # Data integrity tests
+    └── integration/              # Integration tests
 ```
 
 ---
@@ -188,12 +230,29 @@ export function modifyHP(char: Character, delta: number): Character {
 }
 ```
 
-### 4.4 Function Naming Conventions
-- `calculate*` - Derived values (no side effects, pure functions)
-- `get*` - Lookups from data store
-- `create*` - New object creation
-- `search*` - Query/filter operations
-- `modify*` / `set*` / `toggle*` - State mutations (return new Character)
+### 4.4 Function Naming Conventions (by Layer)
+
+#### L1: Foundation
+- `types/`: Type definitions only (no functions)
+- `dice/core.ts`: `rollDie()`, `rollDice()`, `parseDiceExpression()`, etc.
+  - Pure dice rolling, no game logic
+
+#### L2: Mechanics
+- `engine/`: `calculate*` (pure calculations), `get*` (lookups)
+  - `calculateAC()`, `getModifier()`, `getSkillBonus()`, etc.
+- `spells/`: `get*` (queries), `search*` (filter operations)
+  - `getSpell()`, `searchSpells()`, etc.
+
+#### L3: Entities
+- `character/`: `create*` (creation), `modify*` (mutations), `apply*` (apply effects)
+  - `createCharacter()`, `modifyHP()`, `applyDamage()`, etc.
+- `monster/`: `get*` (queries), `apply*` (apply effects)
+  - `getMonster()`, `applyDamage()`, `addCondition()`, etc.
+
+#### L4: Application
+- `rolls/`: `rollCharacter*()`, `rollMonster*()`, `rollSpell*()`
+  - `rollCharacterSkillCheck()`, `rollMonsterAttack()`, `rollSpellDamage()`, etc.
+  - Thin orchestration layer, no complex logic
 
 ### 4.5 Export Syntax
 **WRONG**:

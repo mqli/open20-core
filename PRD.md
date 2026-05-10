@@ -169,49 +169,39 @@ static/srd/
 
 ## 3. Architecture
 
+### 3.1 Layered Architecture
+
+The codebase is organized into 4 layers with unidirectional dependencies:
+
+| Layer | Name | Modules | Dependencies | Description |
+|-------|------|---------|--------------|-------------|
+| L1 | Foundation | `types/`, `dice/` | None | Pure types and dice rolling |
+| L2 | Mechanics | `engine/`, `spells/` | L1 | Game rule calculations |
+| L3 | Entities | `character/`, `monster/` | L1, L2 | State management and mutations |
+| L4 | Application | `rolls/` | L1, L2, L3 | Apply mechanics to entities |
+
+**Dependency Rules**:
+- L1: No dependencies on other modules
+- L2: Can import from L1 only
+- L3: Can import from L1 and L2 only
+- L4: Can import from L1, L2, and L3
+
+### 3.2 Directory Structure
+
 ```
 src/
-├── engine/           # Rule calculations (pure functions)
-│   ├── ability-modifier.ts
-│   ├── proficiency-bonus.ts
-│   ├── skill-bonus.ts
-│   ├── saving-throw.ts
-│   ├── ac-calculator.ts
-│   ├── hp-calculator.ts
-│   ├── spell-slots.ts
-│   ├── initiative.ts
-│   ├── passive-perception.ts
-│   ├── attack-calculator.ts
-│   ├── damage-calculator.ts
-│   └── dice.ts
-├── character/        # Character creation & validation
-│   ├── create.ts
-│   ├── validate.ts
-│   ├── level-up.ts
-│   ├── recompute.ts
-│   ├── mutate.ts
-│   └── rest.ts
-├── spells/           # Spell data & queries
-│   ├── query.ts
-│   └── types.ts
-├── data/             # Content loading & management (R26)
-│   ├── loader.ts             # DataLoader interface
-│   ├── default-loader.ts     # Default implementation (loads SRD)
-│   ├── browser-loader.ts     # Browser-compatible loader
-│   └── content-registry.ts  # Content pack registry (R26.3)
-├── content/          # Content pack types & utilities (R26)
-│   ├── types.ts              # ContentPack interface
-│   └── index.ts
-├── schemas/          # Zod schemas
-│   ├── character.ts
-│   ├── spell.ts
-│   └── index.ts
-├── storage/          # Persistence (serializer, storage implementations)
-│   ├── interface.ts
-│   ├── serializer.ts
-│   ├── memory.ts
-│   └── json-file.ts
-└── index.ts          # Public API
+├── types/              # L1: Foundation - Type definitions (zero dependencies)
+├── dice/               # L1: Foundation - Pure dice rolling (zero dependencies)
+├── data/               # L1: Foundation - Rule data loading (depends on types/)
+├── engine/             # L2: Mechanics - Pure rule calculations (depends on L1)
+├── spells/             # L2: Mechanics - Spell queries (depends on L1)
+├── character/          # L3: Entities - Character state & mutations (depends on L1, L2)
+├── monster/            # L3: Entities - Monster state & queries (depends on L1, L2)
+├── rolls/              # L4: Application - Apply mechanics to entities (depends on L1+L2+L3)
+├── content/            # Content pack types & utilities
+├── storage/            # Persistence (interface + implementations)
+├── index.ts            # Public API barrel export (Node.js)
+└── browser-index.ts    # Public API barrel export (Browser)
 ```
 
 **Static Data** (`static/`):
