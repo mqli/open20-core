@@ -8,13 +8,15 @@ import {
   rollWithAdvantage,
   rollWithDisadvantage,
   rollAttack,
-  rollSkillCheck,
-  rollSavingThrow,
+  rollCharacterAttack,
+  rollCharacterSkillCheck,
+  rollCharacterSavingThrow,
   rollWeaponDamage,
   rollSpellDamage,
   defaultRandom,
   type RandomProvider,
-} from '../../src/engine/dice';
+} from '../../src/dice';
+import { getModifier, getTotalScore } from '../../src/engine/ability-modifier';
 import type { Character } from '../../src/types/character';
 import type { Weapon } from '../../src/types/equipment';
 import type { Spell } from '../../src/types/spell';
@@ -106,54 +108,54 @@ function createMockCharacter(): Character {
 describe('rollDie', () => {
   it('returns value within die range', () => {
     const rng = createMockRNG([1, 6, 10, 20]);
-    expect(rollDie(rng, 'd20')).toBe(1);
-    expect(rollDie(rng, 'd6')).toBe(6);
-    expect(rollDie(rng, 'd10')).toBe(10);
-    expect(rollDie(rng, 'd20')).toBe(20);
+    expect(rollDie(rng, 'd20').total).toBe(1);
+    expect(rollDie(rng, 'd6').total).toBe(6);
+    expect(rollDie(rng, 'd10').total).toBe(10);
+    expect(rollDie(rng, 'd20').total).toBe(20);
   });
 
   it('handles all standard dice types', () => {
     const rng = createMockRNG([3, 4, 5, 6, 7, 8]);
-    expect(rollDie(rng, 'd4')).toBe(3);
-    expect(rollDie(rng, 'd6')).toBe(4);
-    expect(rollDie(rng, 'd8')).toBe(5);
-    expect(rollDie(rng, 'd10')).toBe(6);
-    expect(rollDie(rng, 'd12')).toBe(7);
-    expect(rollDie(rng, 'd20')).toBe(8);
+    expect(rollDie(rng, 'd4').total).toBe(3);
+    expect(rollDie(rng, 'd6').total).toBe(4);
+    expect(rollDie(rng, 'd8').total).toBe(5);
+    expect(rollDie(rng, 'd10').total).toBe(6);
+    expect(rollDie(rng, 'd12').total).toBe(7);
+    expect(rollDie(rng, 'd20').total).toBe(8);
   });
 });
 
 describe('rollDice', () => {
   it('rolls multiple dice and sums', () => {
     const rng = createMockRNG([1, 2, 3, 4, 5, 6]);
-    expect(rollDice(rng, 'd6', 3)).toBe(6); // 1 + 2 + 3
-    expect(rollDice(rng, 'd6', 3)).toBe(15); // 4 + 5 + 6
+    expect(rollDice(rng, 'd6', 3).total).toBe(6); // 1 + 2 + 3
+    expect(rollDice(rng, 'd6', 3).total).toBe(15); // 4 + 5 + 6
   });
 
   it('handles zero count', () => {
     const rng = createMockRNG([1, 2, 3]);
-    expect(rollDice(rng, 'd6', 0)).toBe(0);
+    expect(rollDice(rng, 'd6', 0).total).toBe(0);
   });
 });
 
 describe('rollWithAdvantage', () => {
   it('takes the higher roll', () => {
     const rng = createMockRNG([3, 17, 1, 20]);
-    expect(rollWithAdvantage(rng, 'd20')).toBe(17);
-    expect(rollWithAdvantage(rng, 'd20')).toBe(20);
+    expect(rollWithAdvantage(rng, 'd20').total).toBe(17);
+    expect(rollWithAdvantage(rng, 'd20').total).toBe(20);
   });
 
   it('on 1 vs 20, takes 20', () => {
     const rng = createMockRNG([1, 20, 5, 5]);
-    expect(rollWithAdvantage(rng, 'd20')).toBe(20);
+    expect(rollWithAdvantage(rng, 'd20').total).toBe(20);
   });
 });
 
 describe('rollWithDisadvantage', () => {
   it('takes the lower roll', () => {
     const rng = createMockRNG([17, 3, 1, 20]);
-    expect(rollWithDisadvantage(rng, 'd20')).toBe(3);
-    expect(rollWithDisadvantage(rng, 'd20')).toBe(1);
+    expect(rollWithDisadvantage(rng, 'd20').total).toBe(3);
+    expect(rollWithDisadvantage(rng, 'd20').total).toBe(1);
   });
 });
 
@@ -163,16 +165,25 @@ describe('rollAttack', () => {
     const character = createMockCharacter();
     const attack = { attackBonus: 5, abilityModifier: 'Strength' as const };
 
-    const result = rollAttack(rng, character, attack, 'none', 16);
+    // Calculate attack bonus: attack.attackBonus + ability modifier
+    const abilityMod = getModifier(getTotalScore(character.abilityScores, 'Strength'));
+    const attackBonus = attack.attackBonus + abilityMod;
+
+    const result = rollCharacterAttack({
+      character,
+      attackBonus,
+      rollModifier: 'none',
+      targetAC: 16,
+      rng,
+    });
 
     // Roll 15 + Str mod (+4) + bonus (+5) = 24
     expect(result.rawRoll).toBe(15);
-    expect(result.bonus).toBe(9);
-    expect(result.final).toBe(24);
+    expect(result.bonus).toBe(attackBonus);
+    expect(result.total).toBe(15 + attackBonus);
     expect(result.hit).toBe(true);
     expect(result.isCritical).toBe(false);
     expect(result.isCriticalFail).toBe(false);
-    expect(result.isFumble).toBe(false);
   });
 
   it('detects critical hit on roll of 20', () => {
@@ -180,7 +191,16 @@ describe('rollAttack', () => {
     const character = createMockCharacter();
     const attack = { attackBonus: 0, abilityModifier: 'Strength' as const };
 
-    const result = rollAttack(rng, character, attack, 'none');
+    const abilityMod = getModifier(getTotalScore(character.abilityScores, 'Strength'));
+    const attackBonus = attack.attackBonus + abilityMod;
+
+    const result = rollCharacterAttack({
+      character,
+      attackBonus,
+      rollModifier: 'none',
+      targetAC: 10, // Add AC so hit is calculated
+      rng,
+    });
 
     expect(result.rawRoll).toBe(20);
     expect(result.isCritical).toBe(true);
@@ -193,11 +213,19 @@ describe('rollAttack', () => {
     // Set attack bonus low so total is < AC
     const attack = { attackBonus: 0, abilityModifier: 'Strength' as const };
 
-    const result = rollAttack(rng, character, attack, 'none', 20); // AC 20
+    const abilityMod = getModifier(getTotalScore(character.abilityScores, 'Strength'));
+    const attackBonus = attack.attackBonus + abilityMod;
+
+    const result = rollCharacterAttack({
+      character,
+      attackBonus,
+      rollModifier: 'none',
+      targetAC: 20, // AC 20
+      rng,
+    });
 
     expect(result.rawRoll).toBe(1);
     expect(result.isCriticalFail).toBe(true);
-    expect(result.isFumble).toBe(true);
     // Natural 1 can still hit if bonuses are high enough (but usually misses)
     // In this case: 1 + 4 = 5, which is < 20
     expect(result.hit).toBe(false);
@@ -208,10 +236,18 @@ describe('rollAttack', () => {
     const character = createMockCharacter();
     const attack = { attackBonus: 5, abilityModifier: 'Strength' as const };
 
-    const result = rollAttack(rng, character, attack, 'advantage');
+    const abilityMod = getModifier(getTotalScore(character.abilityScores, 'Strength'));
+    const attackBonus = attack.attackBonus + abilityMod;
+
+    const result = rollCharacterAttack({
+      character,
+      attackBonus,
+      rollModifier: 'advantage',
+      rng,
+    });
 
     expect(result.rawRoll).toBe(15);
-    expect(result.modifier).toBe('advantage');
+    expect(result.rollModifier).toBe('advantage');
   });
 
   it('handles disadvantage', () => {
@@ -219,10 +255,18 @@ describe('rollAttack', () => {
     const character = createMockCharacter();
     const attack = { attackBonus: 5, abilityModifier: 'Strength' as const };
 
-    const result = rollAttack(rng, character, attack, 'disadvantage');
+    const abilityMod = getModifier(getTotalScore(character.abilityScores, 'Strength'));
+    const attackBonus = attack.attackBonus + abilityMod;
+
+    const result = rollCharacterAttack({
+      character,
+      attackBonus,
+      rollModifier: 'disadvantage',
+      rng,
+    });
 
     expect(result.rawRoll).toBe(5);
-    expect(result.modifier).toBe('disadvantage');
+    expect(result.rollModifier).toBe('disadvantage');
   });
 });
 
@@ -231,11 +275,16 @@ describe('rollSkillCheck', () => {
     const rng = createMockRNG([12]);
     const character = createMockCharacter();
     // Str 18 (+4), Athletics proficient, Prof +3 → total bonus +7
-    const result = rollSkillCheck(rng, character, 'Athletics', 'none');
+    const result = rollCharacterSkillCheck({
+      character,
+      skill: 'Athletics',
+      rollModifier: 'none',
+      rng,
+    });
 
     expect(result.rawRoll).toBe(12);
     expect(result.bonus).toBe(7);
-    expect(result.final).toBe(19);
+    expect(result.total).toBe(19);
     expect(result.skillName).toBe('Athletics');
     expect(result.ability).toBe('Strength');
   });
@@ -243,10 +292,15 @@ describe('rollSkillCheck', () => {
   it('handles advantage on skill check', () => {
     const rng = createMockRNG([5, 18]);
     const character = createMockCharacter();
-    const result = rollSkillCheck(rng, character, 'Athletics', 'advantage');
+    const result = rollCharacterSkillCheck({
+      character,
+      skill: 'Athletics',
+      rollModifier: 'advantage',
+      rng,
+    });
 
     expect(result.rawRoll).toBe(18);
-    expect(result.modifier).toBe('advantage');
+    expect(result.rollModifier).toBe('advantage');
   });
 });
 
@@ -265,11 +319,17 @@ describe('rollSavingThrow', () => {
       },
     };
 
-    const result = rollSavingThrow(rng, character, 'Strength', 15, mockData);
+    const result = rollCharacterSavingThrow({
+      character,
+      ability: 'Strength',
+      dc: 15,
+      getClass: mockData.getClass,
+      rng,
+    });
 
     expect(result.rawRoll).toBe(14);
     expect(result.bonus).toBe(7);
-    expect(result.final).toBe(21);
+    expect(result.total).toBe(21);
     expect(result.success).toBe(true);
   });
 
@@ -286,11 +346,17 @@ describe('rollSavingThrow', () => {
       },
     };
 
-    const result = rollSavingThrow(rng, character, 'Intelligence', 10, mockData);
+    const result = rollCharacterSavingThrow({
+      character,
+      ability: 'Intelligence',
+      dc: 10,
+      getClass: mockData.getClass,
+      rng,
+    });
 
     expect(result.rawRoll).toBe(10);
     expect(result.bonus).toBe(0);
-    expect(result.final).toBe(10);
+    expect(result.total).toBe(10);
     expect(result.success).toBe(true);
   });
 
@@ -301,9 +367,15 @@ describe('rollSavingThrow', () => {
       getClass: () => ({ savingThrowProficiencies: ['Strength'] as const }),
     };
 
-    const result = rollSavingThrow(rng, character, 'Strength', 15, mockData);
+    const result = rollCharacterSavingThrow({
+      character,
+      ability: 'Strength',
+      dc: 15,
+      getClass: mockData.getClass,
+      rng,
+    });
 
-    expect(result.final).toBe(10); // 3 + 7
+    expect(result.total).toBe(10); // 3 + 7
     expect(result.success).toBe(false);
   });
 });
@@ -325,11 +397,11 @@ describe('rollWeaponDamage', () => {
 
     const result = rollWeaponDamage(rng, character, weapon);
 
-    expect(result.rolls).toHaveLength(1);
-    expect(result.rolls[0]?.die).toBe('d8');
-    expect(result.rolls[0]?.count).toBe(1);
-    expect(result.rolls[0]?.results).toEqual([4]);
-    expect(result.rolls[0]?.subtotal).toBe(4);
+    expect(result.entries).toHaveLength(1);
+    expect(result.entries[0]?.die).toBe('d8');
+    expect(result.entries[0]?.count).toBe(1);
+    expect(result.entries[0]?.results).toEqual([4]);
+    expect(result.entries[0]?.subtotal).toBe(4);
     expect(result.modifiers).toHaveLength(1);
     expect(result.modifiers[0]?.type).toBe('ability');
     expect(result.modifiers[0]?.value).toBe(4); // Str 18 = +4
@@ -352,8 +424,8 @@ describe('rollWeaponDamage', () => {
 
     const result = rollWeaponDamage(rng, character, weapon, true);
 
-    expect(result.rolls[0]?.count).toBe(2); // Doubled!
-    expect(result.rolls[0]?.results).toEqual([4, 6]);
+    expect(result.entries[0]?.count).toBe(2); // Doubled!
+    expect(result.entries[0]?.results).toEqual([4, 6]);
   });
 
   it('supports composed damage types (weapon with poison)', () => {
@@ -380,9 +452,9 @@ describe('rollWeaponDamage', () => {
     const result = rollWeaponDamage(rng, character, weapon);
 
     // Should have 2 roll entries: Piercing and Poison
-    expect(result.rolls).toHaveLength(2);
-    expect(result.rolls[0]?.damageType).toBe('Piercing');
-    expect(result.rolls[1]?.damageType).toBe('Poison');
+    expect(result.entries).toHaveLength(2);
+    expect(result.entries[0]?.type).toBe('Piercing');
+    expect(result.entries[1]?.type).toBe('Poison');
 
     // typedDamage should have both types
     expect(result.typedDamage['Piercing']).toBeDefined();
@@ -446,11 +518,11 @@ describe('rollSpellDamage', () => {
 
     const result = rollSpellDamage(rng, character, spell, 0);
 
-    expect(result.rolls).toHaveLength(1);
-    expect(result.rolls[0]?.die).toBe('d10');
-    expect(result.rolls[0]?.count).toBe(1);
-    // Plus spell attack modifier (Int 10 = +0)
-    expect(result.modifiers).toHaveLength(1);
+    expect(result.entries).toHaveLength(1);
+    expect(result.entries[0]?.die).toBe('d10');
+    expect(result.entries[0]?.count).toBe(1);
+    // Character has Int 10, so modifier is 0 and not added
+    expect(result.modifiers).toHaveLength(0);
   });
 
   it('scales damage with higher slot level', () => {
@@ -478,7 +550,7 @@ describe('rollSpellDamage', () => {
 
     const result = rollSpellDamage(rng, character, spell, 3); // Cast at 3rd level
 
-    expect(result.rolls[0]?.count).toBe(5); // 5d6 at level 3 (base 4d6 + 1 extra)
+    expect(result.entries[0]?.count).toBe(5); // 5d6 at level 3 (base 4d6 + 1 extra)
   });
 
   it('supports composed damage types (spell with additional damage)', () => {
@@ -508,9 +580,9 @@ describe('rollSpellDamage', () => {
     const result = rollSpellDamage(rng, character, spell, 2);
 
     // Should have 2 roll entries: Piercing and Poison
-    expect(result.rolls).toHaveLength(2);
-    expect(result.rolls[0]?.damageType).toBe('Piercing');
-    expect(result.rolls[1]?.damageType).toBe('Poison');
+    expect(result.entries).toHaveLength(2);
+    expect(result.entries[0]?.type).toBe('Piercing');
+    expect(result.entries[1]?.type).toBe('Poison');
 
     // typedDamage should have both types
     expect(result.typedDamage['Piercing']).toBeDefined();

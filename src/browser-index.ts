@@ -14,7 +14,7 @@ export type { Spell, CharacterSpells, SpellSlotEntry, PactMagicSlots } from './t
 export type { Resource, ResetType } from './types';
 export type { CombatStats, CharacterAttack, ActiveCondition, ConditionName } from './types';
 export type { BaseAttack } from './types';
-export type { DieType } from './types';
+// DieType is now exported from './engine' (dice-core)
 
 // ── Data (Browser-compatible loader) ──────────────────────────────
 export type { DataLoader, LookupTables } from './data';
@@ -71,26 +71,68 @@ export {
 export { validateCharacter } from './character';
 export { recomputeDerivedStats } from './character';
 
-// ── Dice Rolling ──────────────────────────────────────
+// ── Dice Rolling (New Layered Architecture) ───────────
+// Layer 1: Core Dice
 export type {
   RandomProvider,
-  AttackModifier,
-  AttackRollResult,
-  SkillCheckResult,
-  SavingThrowResult,
-  DamageRollResult,
-  DamageRollEntry,
-  DamageModifier,
+  DieType,
+  DiceRollResult,
+  RollModifier,
+  DiceTerm,
+  DiceExpression,
 } from './engine';
 export {
   rollDie,
   rollDice,
   rollWithAdvantage,
   rollWithDisadvantage,
-  rollAttack,
+  rollD20WithModifier,
+  parseDiceExpression,
+  rollExpression,
+  rollDiceExpression,
+  defaultRandom,
+  createDeterministicRNG,
+} from './engine';
+
+// Layer 2: Game Mechanics
+export type {
+  RollResult,
+  CheckResult,
+  SkillCheckParams,
+  SavingThrowParams,
+  AttackRollParams,
+  AttackRollResult,
+  DamageRollParams,
+  DamageEntry,
+  DamageRollResult,
+  InitiativeRollParams,
+} from './engine';
+export {
   rollSkillCheck,
   rollSavingThrow,
-  rollWeaponDamage,
+  rollAttack,
+  rollDamage,
+  rollInitiative,
+} from './engine';
+
+// Layer 3: Entity Application
+export type {
+  CharacterSkillCheckParams,
+  CharacterSavingThrowParams,
+  CharacterAttackParams,
+  CharacterWeaponDamageParams,
+  SpellAttackParams,
+  SpellDamageParams,
+  MonsterAttackParams,
+  MonsterDamageParams,
+} from './engine';
+export {
+  rollCharacterSkillCheck,
+  rollCharacterSavingThrow,
+  rollCharacterAttack,
+  rollCharacterWeaponDamage,
+  rollSpellAttack,
   rollSpellDamage,
-  defaultRandom,
+  rollMonsterAttack,
+  rollMonsterDamage,
 } from './engine';

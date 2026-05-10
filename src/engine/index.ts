@@ -23,28 +23,79 @@ export type { SpellSlotEntry, PactMagicResult } from './spell-slots';
 export { calculateInitiative } from './initiative';
 export { calculatePassivePerception } from './passive-perception';
 export { calculateAttacks } from './attack-calculator';
+
+// ── Dice System (New Layered Architecture) ─────────────
+// Import from dice/ folder
 export {
+  type RandomProvider,
+  defaultRandom,
+  createDeterministicRNG,
+  type DieType,
+  type DiceRollResult,
   rollDie,
   rollDice,
   rollWithAdvantage,
   rollWithDisadvantage,
-  rollAttack,
+  type RollModifier,
+  rollD20WithModifier,
+  type DiceTerm,
+  type DiceExpression,
+  parseDiceExpression,
+  rollExpression,
+  rollDiceExpression,
+  isCriticalHit,
+  isCriticalFail,
+} from '../dice/core';
+
+export {
+  type RollResult,
+  type CheckResult,
+  type SkillCheckParams,
+  type SavingThrowParams,
+  type AttackRollParams,
+  type AttackRollResult,
+  type DamageRollParams,
+  type DamageEntry,
+  type DamageRollResult,
+  type InitiativeRollParams,
   rollSkillCheck,
   rollSavingThrow,
-  rollWeaponDamage,
+  rollAttack,
+  rollDamage,
+  rollInitiative,
+} from '../dice/mechanics';
+
+export {
+  type CharacterSkillCheckParams,
+  type CharacterSavingThrowParams,
+  type CharacterAttackParams,
+  type CharacterWeaponDamageParams,
+  type SpellAttackParams,
+  type SpellDamageParams,
+  type MonsterAttackParams,
+  type MonsterDamageParams,
+  type CharacterInitiativeParams,
+  type MonsterInitiativeParams,
+  rollCharacterSkillCheck,
+  rollCharacterSavingThrow,
+  rollCharacterAttack,
+  rollCharacterWeaponDamage,
+  rollSpellAttack,
   rollSpellDamage,
-  defaultRandom,
-} from './dice';
-export type {
-  RandomProvider,
-  AttackModifier,
-  AttackRollResult,
-  SkillCheckResult,
-  SavingThrowResult,
-  DamageRollResult,
-  DamageRollEntry,
-  DamageModifier,
-} from './dice';
+  rollMonsterAttack,
+  rollMonsterDamage,
+  rollCharacterInitiative,
+  rollMonsterInitiative,
+} from '../dice/entity';
+
+// Backward Compatibility (from dice/index.ts)
+export {
+  rollAttack as rollAttackLegacy,
+  rollSkillCheck as rollSkillCheckLegacy,
+  rollSavingThrow as rollSavingThrowLegacy,
+  rollWeaponDamage as rollWeaponDamageLegacy,
+  rollSpellDamage as rollSpellDamageLegacy,
+} from '../dice';
 
 // ── Combat Helpers ─────────────────────────────────────
 export {
