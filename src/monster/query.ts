@@ -157,6 +157,327 @@ function crToNumber(cr: ChallengeRating): number {
   }
 }
 
+// ── Limited Usage (R28.12) ──────────────────────
+
+/**
+ * Parse limited usage from action name/description
+ * Identifies "X/Day", "Recharge X-Y", "Recharge after Short/Long Rest"
+ *
+ * @param actionName - Action name (e.g., "Fire Breath (Recharge 5-6)")
+ * @param description - Action description
+ * @returns Limited usage object or undefined if no limited usage found
+ */
+export function parseLimitedUsage(actionName: string, description?: string): { type: 'x_per_day' | 'recharge' | 'recharge_after_rest'; uses?: number; rechargeRange?: [number, number]; rechargeOn?: 'short_rest' | 'long_rest' } | undefined {
+  const text = `${actionName} ${description || ''}`;
+  
+  // Check for "Recharge X-Y"
+  const rechargeMatch = text.match(/Recharge\s+(\d+)\s*-\s*(\d+)/i);
+  if (rechargeMatch) {
+    return {
+      type: 'recharge',
+      rechargeRange: [parseInt(rechargeMatch[1]!, 10), parseInt(rechargeMatch[2]!, 10)]
+    };
+  }
+  
+  // Check for "X/Day"
+  const xPerDayMatch = text.match(/(\d+)\s*\/\s*Day/i);
+  if (xPerDayMatch) {
+    return {
+      type: 'x_per_day',
+      uses: parseInt(xPerDayMatch[1]!, 10)
+    };
+  }
+  
+  // Check for "Recharge after Short/Long Rest"
+  if (text.toLowerCase().includes('recharge after')) {
+    const restType = text.toLowerCase().includes('short') ? 'short_rest' : 'long_rest';
+    return {
+      type: 'recharge_after_rest',
+      rechargeOn: restType
+    };
+  }
+  
+  return undefined;
+}
+
+/**
+ * Get limited usage for a specific action
+ *
+ * @param monsterId - Monster ID
+ * @param actionName - Action name
+ * @param data - DataLoader
+ * @returns Limited usage or undefined
+ */
+export function getActionLimitedUsage(
+  monsterId: string,
+  actionName: string,
+  data: DataLoader
+): { type: 'x_per_day' | 'recharge' | 'recharge_after_rest'; uses?: number; rechargeRange?: [number, number]; rechargeOn?: 'short_rest' | 'long_rest' } | undefined {
+  const actions = getMonsterActions(monsterId, data);
+  const action = actions.find(a => a.name === actionName || a.name.toLowerCase().includes(actionName.toLowerCase()));
+  
+  if (!action) return undefined;
+  
+  // If limitedUsage is already parsed and stored, return it
+  if (action.limitedUsage) {
+    // Explicitly create a new object with mutable tuple for return type compatibility
+    return {
+      type: action.limitedUsage.type,
+      uses: action.limitedUsage.uses,
+      rechargeRange: action.limitedUsage.rechargeRange ? [...action.limitedUsage.rechargeRange] as [number, number] : undefined,
+      rechargeOn: action.limitedUsage.rechargeOn
+    };
+  }
+    
+  // Otherwise, try to parse from action name and description
+  return parseLimitedUsage(action.name, action.description);
+}
+
+// ── Damage Notation (R28.10) ────────────────────────
+
+/**
+ * Parse damage notation from attack description
+ * Extracts fixed value and die expression
+ *
+ * @param description - Attack description text
+ * @returns Damage notation object or undefined if no notation found
+ *
+ * @example
+ * parseDamageNotation("13 (1d10 + 8) Slashing damage")
+ * // { fixedValue: 13, dieExpression: "1d10 + 8" }
+ */
+export function parseDamageNotation(description: string): { fixedValue?: number; dieExpression?: string } | undefined {
+  if (!description) return undefined;
+
+  // Look for pattern: "N (XdY + Z)" or "N (XdY)" or "N (XdY - Z)"
+  const damageNotationRegex = /(\d+)\s*\(\s*(\d*d\d+(?:\s*[+-]\s*\d+)?)\s*\)/;
+  const match = description.match(damageNotationRegex);
+  
+  if (match) {
+    const fixedValue = parseInt(match[1]!, 10);
+    const dieExpression = match[2]!.replace(/\s+/g, '');
+    return { fixedValue, dieExpression };
+  }
+
+  return undefined;
+}
+
+/**
+ * Get damage notation for a specific attack
+ *
+ * @param monsterId - Monster ID
+ * @param actionName - Action name
+ * @param attackName - Attack name (optional, uses first attack if not specified)
+ * @param data - DataLoader
+ * @returns Damage notation or undefined
+ */
+export function getAttackDamageNotation(
+  monsterId: string,
+  actionName: string,
+  attackName: string | undefined,
+  data: DataLoader
+): { fixedValue?: number; dieExpression?: string } | undefined {
+  const actions = getMonsterActions(monsterId, data);
+  const action = actions.find(a => a.name === actionName || a.name.toLowerCase().includes(actionName.toLowerCase()));
+  
+  if (!action || !action.attacks || action.attacks.length === 0) return undefined;
+  
+  // Find the specific attack
+  const attack = attackName 
+    ? action.attacks.find(a => a.name === attackName || a.name.toLowerCase().includes(attackName.toLowerCase()))
+    : action.attacks[0];
+  
+  if (!attack) return undefined;
+  
+  // If damageNotation is already parsed and stored, return it
+  if (attack.damageNotation) return attack.damageNotation;
+  
+  // Otherwise, try to parse from action description
+  if (action.description) {
+    return parseDamageNotation(action.description);
+  }
+  
+  return undefined;
+}
+
+// ── Saving Throw Effect Notation (R28.9) ─────────────────────
+
+/**
+ * Parse saving throw effect notation from action description
+ * Extracts save type, DC, description, success/failure effects
+ *
+ * @param description - Action description text
+ * @returns SavingThrowEffect object or undefined if no notation found
+ *
+ * @example
+ * parseSavingThrowEffect("*Dexterity Saving Throw*: DC 21, each creature in a 60-foot Cone. *Failure:* 59 (17d6) Fire damage. *Success:* Half damage.")
+ * // { saveType: "Dexterity", dc: 21, description: "each creature in a 60-foot Cone", onSaveFailure: "59 (17d6) Fire damage.", onSaveSuccess: "Half damage.", halfDamageOnSuccess: true }
+ */
+export function parseSavingThrowEffect(description: string): { saveType?: string; dc?: number; description?: string; onSaveSuccess?: string; onSaveFailure?: string; halfDamageOnSuccess?: boolean } | undefined {
+  if (!description) return undefined;
+
+  const result: { saveType?: string; dc?: number; description?: string; onSaveSuccess?: string; onSaveFailure?: string; halfDamageOnSuccess?: boolean } = {};
+
+  // Look for "Saving Throw:" or "Saving Throw*:" notation
+  const saveMatch = description.match(/[*]?\s*(\w+)\s+Saving Throw[*]?\s*:\s*DC\s*(\d+)/i);
+  if (saveMatch) {
+    result.saveType = saveMatch[1]!;
+    result.dc = parseInt(saveMatch[2]!, 10);
+  }
+
+  // Look for description between DC and "*Failure:" or "*Success:"
+  const descMatch = description.match(/DC\s*\d+\s*,\s*([^]*?)(?=\s*[*]\s*(?:Failure|Success):)/i);
+  if (descMatch) {
+    result.description = descMatch[1]!.trim();
+  }
+
+  // Look for "*Failure:" notation
+  const failureMatch = description.match(/[*]\s*Failure\s*:\s*([^]*?)(?=\s*[*]\s*Success\s*:|$)/i);
+  if (failureMatch) {
+    result.onSaveFailure = failureMatch[1]!.trim();
+  }
+
+  // Look for "*Success:" notation
+  const successMatch = description.match(/[*]\s*Success\s*:\s*([^]*?)$/i);
+  if (successMatch) {
+    result.onSaveSuccess = successMatch[1]!.trim();
+    // Check if success means half damage
+    if (result.onSaveSuccess.toLowerCase().includes('half')) {
+      result.halfDamageOnSuccess = true;
+    }
+  }
+
+  if (result.saveType || result.dc) {
+    return result;
+  }
+
+  return undefined;
+}
+
+/**
+ * Get saving throw effect for a specific action
+ *
+ * @param monsterId - Monster ID
+ * @param actionName - Action name
+ * @param data - DataLoader
+ * @returns SavingThrowEffect or undefined
+ */
+export function getActionSavingThrowEffect(
+  monsterId: string,
+  actionName: string,
+  data: DataLoader
+): { saveType?: string; dc?: number; description?: string; onSaveSuccess?: string; onSaveFailure?: string; halfDamageOnSuccess?: boolean } | undefined {
+  const actions = getMonsterActions(monsterId, data);
+  const action = actions.find(a => a.name === actionName || a.name.toLowerCase().includes(actionName.toLowerCase()));
+  
+  if (!action) return undefined;
+  
+  // If savingThrowEffect is already parsed and stored, return it
+  if (action.savingThrowEffect) {
+    return {
+      saveType: action.savingThrowEffect.saveType,
+      dc: action.savingThrowEffect.dc,
+      description: action.savingThrowEffect.description,
+      onSaveSuccess: action.savingThrowEffect.onSaveSuccess,
+      onSaveFailure: action.savingThrowEffect.onSaveFailure,
+      halfDamageOnSuccess: action.savingThrowEffect.halfDamageOnSuccess
+    };
+  }
+  
+  // Otherwise, try to parse from description
+  if (action.description) {
+    return parseSavingThrowEffect(action.description);
+  }
+  
+  return undefined;
+}
+
+// ── Attack Notation Parsing (R28.8) ─────────────────────
+
+/**
+ * Parse attack notation from action description
+ * Extracts "Hit:", "Miss:", and "Hit or Miss:" sections
+ *
+ * @param description - Action description text
+ * @returns AttackNotation object or undefined if no notation found
+ *
+ * @example
+ * parseAttackNotation("Melee Attack Roll: +5. Hit: 7 (1d6+4) piercing damage.")
+ * // { hit: "7 (1d6+4) piercing damage." }
+ */
+export function parseAttackNotation(description: string): { hit?: string; miss?: string; hitOrMiss?: string } | undefined {
+  if (!description) return undefined;
+
+  let hit: string | undefined;
+  let miss: string | undefined;
+  let hitOrMiss: string | undefined;
+
+  // Look for "Hit or Miss:" notation first (most specific)
+  const hitOrMissIndex = description.search(/Hit or Miss:/i);
+  if (hitOrMissIndex !== -1) {
+    hitOrMiss = description.substring(hitOrMissIndex + "Hit or Miss:".length).trim();
+  }
+
+  // Look for "Hit:" notation
+  const hitIndex = description.search(/Hit:/i);
+  if (hitIndex !== -1) {
+    const endIndex = hitOrMissIndex !== -1 ? hitOrMissIndex : description.search(/Miss:/i);
+    if (endIndex === -1 || endIndex > hitIndex) {
+      const hitText = endIndex === -1 
+        ? description.substring(hitIndex + "Hit:".length)
+        : description.substring(hitIndex + "Hit:".length, endIndex);
+      hit = hitText.trim();
+    }
+  }
+
+  // Look for "Miss:" notation
+  const missIndex = description.search(/Miss:/i);
+  if (missIndex !== -1) {
+    const endIndex = hitOrMissIndex !== -1 ? hitOrMissIndex : description.length;
+    if (missIndex > hitIndex || hitIndex === -1) {
+      const missText = missIndex + "Miss:".length >= endIndex
+        ? ''
+        : description.substring(missIndex + "Miss:".length, endIndex);
+      miss = missText.trim();
+    }
+  }
+
+  if (hit || miss || hitOrMiss) {
+    return { hit, miss, hitOrMiss };
+  }
+
+  return undefined;
+}
+
+/**
+ * Get attack notation for a specific action
+ *
+ * @param monsterId - Monster ID
+ * @param actionName - Action name
+ * @param data - DataLoader
+ * @returns AttackNotation or undefined
+ */
+export function getActionAttackNotation(
+  monsterId: string,
+  actionName: string,
+  data: DataLoader
+): { hit?: string; miss?: string; hitOrMiss?: string } | undefined {
+  const actions = getMonsterActions(monsterId, data);
+  const action = actions.find(a => a.name === actionName || a.name.toLowerCase().includes(actionName.toLowerCase()));
+  
+  if (!action) return undefined;
+  
+  // If attackNotation is already parsed and stored, return it
+  if (action.attackNotation) return action.attackNotation;
+  
+  // Otherwise, try to parse from description
+  if (action.description) {
+    return parseAttackNotation(action.description);
+  }
+  
+  return undefined;
+}
+
 // ── Action/Trait/Reaction Query Functions ─────────────────────
 
 /**

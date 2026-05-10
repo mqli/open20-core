@@ -2,9 +2,30 @@
 
 **Requirement ID**: R28
 **Priority**: P2
-**Status**: ✅ Complete
+**Status**: 🔶 In Progress
 **Created**: 2026-05-09
-**Updated**: 2026-05-09
+**Updated**: 2026-05-10
+
+---
+
+## Current Status Summary
+
+Based on comparison with SRD 5.2 Monsters document:
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Data Model | ✅ Complete | All SRD 5.2 fields added (R28.7) |
+| Query Functions | ✅ Complete | All basic queries implemented |
+| Calculator Functions | ✅ Complete | Proficiency, attack bonus, save DC |
+| Combat Functions | ✅ Complete | HP management, damage defenses |
+| DataLoader Integration | ✅ Complete | Loader interface updated |
+| Attack Notation | ✅ Complete | Hit, Miss, Hit or Miss notations (R28.8) |
+| Saving Throw Notation | ✅ Complete | For effects forcing saves (R28.9) |
+| Damage Notation | ✅ Complete | Fixed value vs die expression (R28.10) |
+| Spellcasting Details | ✅ Complete | Components, at-will, daily (R28.11) |
+| Limited Usage | ✅ Complete | X/Day, Recharge mechanics (R28.12) |
+| SRD Data Import | 🔶 Partial | 4 sample monsters, need ~300 more |
+| Zod Schema | ❌ Missing | Validation not implemented (R28.13) |
 
 ---
 
@@ -278,9 +299,249 @@ export interface DataLoader {
 
 ---
 
+### R28.7 — Missing Monster Fields (NEW)
+
+**Description**: Add missing SRD 5.2 fields to the Monster type definition.
+
+**Missing Fields** (from SRD 5.2 Monsters document):
+1. **Initiative**: `initiativeModifier` and `initiativeScore` (e.g., "+4 (14)")
+2. **Bonus Actions**: Separate from Actions
+3. **Descriptive Tags**: Tags in parentheses after creature type (e.g., "Dragon (Chromatic)")
+4. **Gear**: Equipment entry
+5. **Resistances and Vulnerabilities**: Separate entries (currently in `damageDefenses`, but SRD lists them separately)
+6. **Skills**: Skill bonuses (e.g., "Perception +13, Stealth +6")
+7. **Senses**: Senses including Passive Perception (e.g., "blindsight 60 ft., darkvision 120 ft.; Passive Perception 23")
+8. **Languages**: Spoken languages (e.g., "Common, Draconic")
+9. **Saving Throws**: Override ability save bonuses (e.g., DEX save +6 when mod is +0)
+10. **Lair XP**: CR with lair XP (e.g., "CR 17 (XP 18,000, or 20,000 in lair)")
+
+**Updated Monster Interface**:
+```typescript
+export interface Monster {
+  // ... existing fields ...
+  readonly initiative?: {
+    modifier: number;
+    score?: number;
+  };
+  readonly bonusActions?: MonsterAction[];
+  readonly descriptiveTags?: string[];
+  readonly gear?: string[];
+  readonly resistances?: DamageType[];
+  readonly vulnerabilities?: DamageType[];
+  readonly skills?: Record<string, number>;  // Skill name -> bonus
+  readonly senses?: {
+    darkvision?: number;
+    blindsight?: number;
+    tremorsense?: number;
+    truesight?: number;
+    passivePerception: number;
+  };
+  readonly languages?: string[];
+  readonly savingThrows?: Record<string, number>;  // Ability name -> save bonus
+  readonly challengeRating?: {
+    rating: ChallengeRating;
+    xp: number;
+    lairXp?: number;
+  };
+}
+```
+
+**Acceptance Criteria**:
+- [x] Add `initiative` field to `Monster` interface
+- [x] Add `bonusActions` field to `Monster` interface
+- [x] Add `descriptiveTags` field to `Monster` interface
+- [x] Add `gear` field to `Monster` interface
+- [x] Add `resistances` and `vulnerabilities` fields to `Monster` interface
+- [x] Add `skills` field to `Monster` interface
+- [x] Add `senses` field to `Monster` interface
+- [x] Add `languages` field to `Monster` interface
+- [x] Add `savingThrows` field to `Monster` interface
+- [x] Update `challengeRating` to support lair XP
+- [x] Update sample data to include these fields
+- [x] Tests created and passing (18 tests in `tests/monster/r28-7-fields.test.ts`)
+
+---
+
+### R28.8 — Attack Notation (NEW)
+
+**Description**: Implement Attack Notation parsing (Hit, Miss, Hit or Miss) from SRD 5.2.
+
+**Notation Types**:
+1. **Hit**: Effects on successful attack
+2. **Miss**: Effects on failed attack
+3. **Hit or Miss**: Effects regardless of attack outcome
+
+**Updated Action Structure**:
+```typescript
+export interface MonsterAction {
+  // ... existing fields ...
+  attackNotation?: {
+    hit?: string;
+    miss?: string;
+    hitOrMiss?: string;
+  };
+}
+```
+
+**Acceptance Criteria**:
+- [x] Add `attackNotation` field to `MonsterAction` interface
+- [x] Implement parsing for Hit notation
+- [x] Implement parsing for Miss notation
+- [x] Implement parsing for Hit or Miss notation
+- [x] Update sample data with attack notation
+- [x] Tests created and passing (9 tests in `tests/monster/r28-8-attack-notation.test.ts`)
+
+---
+
+### R28.9 — Saving Throw Effect Notation (NEW)
+
+**Description**: Implement Saving Throw Effect Notation for effects that force saves.
+
+**Notation**: Identifies save type, DC, creatures affected, and effects on success/failure.
+
+**New Interface**:
+```typescript
+export interface SavingThrowEffect {
+  saveType: AbilityName;
+  dc: number;
+  description: string;
+  onSaveSuccess?: string;
+  onSaveFailure: string;
+  halfDamageOnSuccess?: boolean;
+}
+```
+
+**Acceptance Criteria**:
+- [x] Create `SavingThrowEffect` interface
+- [x] Add to `MonsterAction` interface
+- [x] Implement parsing for saving throw effects
+- [x] Update sample data with saving throw effects
+- [x] Tests created and passing (8 tests in `tests/monster/r28-9-saving-throw-notation.test.ts`)
+
+---
+
+### R28.10 — Damage Notation (NEW)
+
+**Description**: Implement Damage Notation (number vs die expression) from SRD 5.2.
+
+**Notation**: Both a number and a die expression are provided (e.g., "4 (1d4 + 2)").
+
+**Updated Attack Structure**:
+```typescript
+export interface MonsterAttack {
+  // ... existing fields ...
+  damageNotation?: {
+    fixedValue?: number;
+    dieExpression?: string;
+  };
+}
+```
+
+**Acceptance Criteria**:
+- [x] Add `damageNotation` field to `MonsterAttack` interface
+- [x] Implement parsing for damage notation
+- [x] Update sample data with damage notation
+- [x] Tests created and passing (9 tests in `tests/monster/r28-10-damage-notation.test.ts`)
+
+---
+
+### R28.11 — Spellcasting Details (NEW)
+
+**Description**: Implement detailed Spellcasting rules from SRD 5.2.
+
+**Details**:
+1. **Spell Components**: Whether components are ignored
+2. **Casting Times of 1+ Minutes**: Special handling
+3. **Self Only Restrictions**: Some spells have restrictions
+
+**Updated Spellcasting Interface**:
+```typescript
+export interface MonsterSpellcasting {
+  // ... existing fields ...
+  ignoresComponents?: ('V' | 'S' | 'M')[];
+  castingTime?: string;
+  restrictions?: string[];
+}
+```
+
+**Acceptance Criteria**:
+- [x] Add `ignoresComponents` field to `MonsterSpellcasting` interface
+- [x] Add `atWill` field to `MonsterSpellcasting` interface
+- [x] Add `daily` field to `MonsterSpellcasting` interface
+- [x] Add `spellcasting` field to `Monster` interface
+- [x] Implement handling for spell components
+- [x] Update sample data with spellcasting details
+- [x] Tests created and passing (10 tests in `tests/monster/r28-11-spellcasting-details.test.ts`)
+
+---
+
+### R28.12 — Limited Usage (NEW)
+
+**Description**: Implement Limited Usage notation from SRD 5.2.
+
+**Usage Types**:
+1. **X/Day**: Use X times, recharge on Long Rest
+2. **Recharge X–Y**: Recharge on d6 roll of X-Y
+3. **Recharge after Short or Long Rest**: Recharge on rest
+
+**Updated Action Interface**:
+```typescript
+export interface MonsterAction {
+  // ... existing fields ...
+  limitedUsage?: {
+    type: 'x_per_day' | 'recharge' | 'recharge_after_rest';
+    uses?: number;  // for x_per_day
+    rechargeRange?: [number, number];  // for recharge
+    rechargeOn?: 'short_rest' | 'long_rest';  // for recharge_after_rest
+  };
+}
+```
+
+**Acceptance Criteria**:
+- [x] Add `limitedUsage` field to `MonsterAction` interface
+- [x] Implement X/Day usage tracking
+- [x] Implement Recharge X-Y mechanics
+- [x] Implement Recharge after Rest mechanics
+- [x] Update sample data with limited usage
+- [x] Tests created and passing (11 tests in `tests/monster/r28-12-limited-usage.test.ts`)
+
+---
+
+### R28.13 — Zod Schema Validation (NEW)
+
+**Description**: Create Zod schema for monster data validation.
+
+**Schema File**: `src/schemas/monster.ts`
+
+**Acceptance Criteria**:
+- [ ] Create `src/schemas/monster.ts` with Zod schemas
+- [ ] Validate all monster data against schema
+- [ ] Add schema validation to import script
+- [ ] Export schemas via `src/schemas/index.ts`
+- [ ] Tests created and passing
+
+---
+
+### R28.14 — Full SRD Data Import (NEW)
+
+**Description**: Create import script and import full SRD 5.2 monster data.
+
+**Import Script**: `scripts/import_srd_monsters.py`
+
+**Acceptance Criteria**:
+- [ ] Create `scripts/import_srd_monsters.py` script
+- [ ] Script parses SRD 5.2 format
+- [ ] Script validates data against Zod schema
+- [ ] Import full SRD monster data (~300 monsters)
+- [ ] All imported data passes validation
+- [ ] Update `static/srd/monsters.json` with full data
+- [ ] Tests updated to cover more monsters
+
+---
+
 ## 3. Data Model Changes
 
-### 3.1 New Types (in `src/types/monster.ts`)
+### 3.1 New Types (in `src/types/monster.ts`) — Updated for SRD 5.2
 
 ```typescript
 export type MonsterSize = 'Tiny' | 'Small' | 'Medium' | 'Large' | 'Huge' | 'Gargantuan';
@@ -291,9 +552,52 @@ export type MonsterType =
   | 'Monstrosity' | 'Ooze' | 'Plant' | 'Undead';
 
 export type ChallengeRating = number | '1/8' | '1/4' | '1/2';
+
+// R28.7 - Missing SRD Fields
+export interface InitiativeInfo {
+  modifier: number;
+  score?: number;
+}
+
+export interface SensesInfo {
+  darkvision?: number;
+  blindsight?: number;
+  tremorsense?: number;
+  truesight?: number;
+  passivePerception: number;
+}
+
+export interface ChallengeRatingInfo {
+  rating: ChallengeRating;
+  xp: number;
+  lairXp?: number;
+}
+
+export interface SavingThrowEffect {
+  saveType: AbilityName;
+  dc: number;
+  description: string;
+  onSaveSuccess?: string;
+  onSaveFailure: string;
+  halfDamageOnSuccess?: boolean;
+}
+
+// R28.8 - Attack Notation
+export interface AttackNotation {
+  hit?: string;
+  miss?: string;
+  hitOrMiss?: string;
+}
+
+// R28.11 - Spellcasting Details
+export interface SpellcastingDetails {
+  ignoresComponents?: ('V' | 'S' | 'M')[];
+  castingTime?: string;
+  restrictions?: string[];
+}
 ```
 
-### 3.2 Monster Interface (in `src/monsters/types.ts`)
+### 3.2 Monster Interface (in `src/monster/types.ts`) — Updated for SRD 5.2
 
 ```typescript
 export interface Monster {
@@ -303,33 +607,73 @@ export interface Monster {
   readonly size: MonsterSize;
   readonly type: MonsterType;
   readonly alignment: string;
+  readonly descriptiveTags?: string[];  // R28.7 - e.g., "(Chromatic)"
   readonly armorClass: ArmorClassEntry[];
   readonly hitPoints: HPInfo;
   readonly speed: SpeedInfo;
-  readonly abilityScores: AbilityScores; // Shared with Character
-  readonly challengeRating: ChallengeRatingInfo;
+  readonly initiative?: InitiativeInfo;  // R28.7
+  readonly abilityScores: AbilityScores;
+  readonly savingThrows?: Record<string, number>;  // R28.7 - Override save bonuses
+  readonly skills?: Record<string, number>;  // R28.7 - e.g., { "Perception": 13 }
+  readonly challengeRating: ChallengeRatingInfo;  // Updated for lair XP
+  readonly resistances?: DamageType[];  // R28.7 - Separate from damageDefenses
+  readonly vulnerabilities?: DamageType[];  // R28.7 - Separate from damageDefenses
+  readonly senses?: SensesInfo;  // R28.7 - Senses and Passive Perception
+  readonly languages?: string[];  // R28.7 - Spoken languages
+  readonly gear?: string[];  // R28.7 - Equipment
+  
+  // Existing fields
   readonly traits?: MonsterFeature[];
   readonly actions?: MonsterAction[];
+  readonly bonusActions?: MonsterAction[];  // R28.7 - Separate from actions
   readonly reactions?: MonsterReaction[];
   readonly legendaryActions?: MonsterLegendaryAction[];
   readonly environments?: readonly string[];
+  readonly damageDefenses?: DamageDefenses;
+  readonly conditionImmunities?: readonly string[];
+  readonly currentHP?: number;
+  readonly temporaryHP?: number;
 }
 
-export interface MonsterAttack extends Attack {
-  // Inherited: name, attackBonus, damage, damageType, mastery
+export interface MonsterAction {
+  readonly name: string;
+  readonly description?: string;
+  readonly attacks?: MonsterAttack[];
+  
+  // R28.8 - Attack Notation
+  readonly attackNotation?: AttackNotation;
+  
+  // R28.9 - Saving Throw Effect
+  readonly savingThrowEffect?: SavingThrowEffect;
+  
+  // R28.12 - Limited Usage
+  readonly limitedUsage?: {
+    type: 'x_per_day' | 'recharge' | 'recharge_after_rest';
+    uses?: number;
+    rechargeRange?: [number, number];
+    rechargeOn?: 'short_rest' | 'long_rest';
+  };
+  
+  readonly legendary?: boolean;
+}
+
+export interface MonsterAttack {
+  // ... existing fields ...
+  readonly name: string;
+  readonly attackBonus?: number;
   readonly reach?: number;
   readonly range?: { normal: number; long?: number };
   readonly damageEntries: readonly MonsterDamageEntry[];
-}
-
-export interface MonsterDamageEntry {
-  readonly dice: string;
-  readonly type: DamageType;
-  readonly bonus?: number;
+  
+  // R28.10 - Damage Notation
+  readonly damageNotation?: {
+    fixedValue?: number;
+    dieExpression?: string;
+  };
 }
 ```
 
-### 3.3 Updated DataLoader Interface
+### 3.3 DataLoader Interface
 
 ```typescript
 // src/data/loader.ts
@@ -371,15 +715,15 @@ export interface DataLoader {
 5. [x] Tests created and passing (14 tests)
 
 ### Phase 5: Monster Data (3-4 hours) 📋
-1. [ ] Create `scripts/import_srd_monsters.py`
-2. [ ] Import from dnd-data repo or SRD 5.2
-3. [ ] Validate data against schema
-4. [x] Add sample data to `static/srd/monsters.json` (3 monsters)
+1. [ ] Create `scripts/import_srd_monsters.py` (R28.14)
+2. [ ] Import from dnd-data repo or SRD 5.2 (R28.14)
+3. [ ] Validate data against schema (R28.13)
+4. [x] Add sample data to `static/srd/monsters.json` (4 monsters)
 
 ### Phase 6: Tests (2-3 hours) ✅
-1. [x] Create `tests/monsters/query.test.ts` (30 tests)
-2. [x] Create `tests/monsters/calculator.test.ts` (14 tests)
-3. [x] Create `tests/monsters/combat.test.ts` (29 tests)
+1. [x] Create `tests/monster/query.test.ts` (30 tests)
+2. [x] Create `tests/monster/calculator.test.ts` (14 tests)
+3. [x] Create `tests/monster/combat.test.ts` (29 tests)
 4. [x] Test all query, calculation, and combat functions
 5. [x] Test edge cases (fractional CR, damage defenses, etc.)
 
@@ -403,10 +747,79 @@ export interface DataLoader {
 12. [x] Update all imports across codebase
 13. [x] Add tests for shared combat helpers (31 tests)
 
+### Phase 9: Missing Monster Fields (3-4 hours) ✅ (R28.7)
+1. [x] Add `initiative` field to `Monster` interface
+2. [x] Add `bonusActions` field to `Monster` interface
+3. [x] Add `descriptiveTags` field to `Monster` interface
+4. [x] Add `gear` field to `Monster` interface
+5. [x] Add `resistances` and `vulnerabilities` fields to `Monster` interface
+6. [x] Add `skills` field to `Monster` interface
+7. [x] Add `senses` field to `Monster` interface
+8. [x] Add `languages` field to `Monster` interface
+9. [x] Add `savingThrows` field to `Monster` interface
+10. [x] Update `challengeRating` to support lair XP
+11. [x] Update sample data to include these fields
+12. [x] Tests created and passing (18 tests in `tests/monster/r28-7-fields.test.ts`)
+
+### Phase 10: Attack Notation (2-3 hours) ✅ (R28.8)
+1. [x] Add `attackNotation` field to `MonsterAction` interface
+2. [x] Implement parsing for Hit notation
+3. [x] Implement parsing for Miss notation
+4. [x] Implement parsing for Hit or Miss notation
+5. [x] Update sample data with attack notation
+6. [x] Tests created and passing (9 tests in `tests/monster/r28-8-attack-notation.test.ts`)
+
+### Phase 11: Saving Throw Effect Notation (2-3 hours) ✅ (R28.9)
+1. [x] Create `SavingThrowEffect` interface
+2. [x] Add to `MonsterAction` interface
+3. [x] Implement parsing for saving throw effects
+4. [x] Update sample data with saving throw effects
+5. [x] Tests created and passing (8 tests in `tests/monster/r28-9-saving-throw-notation.test.ts`)
+
+### Phase 12: Damage Notation (2-3 hours) ✅ (R28.10)
+1. [x] Add `damageNotation` field to `MonsterAttack` interface
+2. [x] Implement parsing for damage notation
+3. [x] Update sample data with damage notation
+4. [x] Tests created and passing (9 tests in `tests/monster/r28-10-damage-notation.test.ts`)
+
+### Phase 13: Spellcasting Details (2-3 hours) ✅ (R28.11)
+1. [x] Add `ignoresComponents` field to `MonsterSpellcasting` interface
+2. [x] Add `atWill` field to `MonsterSpellcasting` interface
+3. [x] Add `daily` field to `MonsterSpellcasting` interface
+4. [x] Add `spellcasting` field to `Monster` interface
+5. [x] Implement handling for spell components
+6. [x] Update sample data with spellcasting details
+7. [x] Tests created and passing (10 tests in `tests/monster/r28-11-spellcasting-details.test.ts`)
+
+### Phase 14: Limited Usage (2-3 hours) ✅ (R28.12)
+1. [x] Add `limitedUsage` field to `MonsterAction` interface
+2. [x] Implement X/Day usage tracking
+3. [x] Implement Recharge X-Y mechanics
+4. [x] Implement Recharge after Rest mechanics
+5. [x] Update sample data with limited usage
+6. [x] Tests created and passing (11 tests in `tests/monster/r28-12-limited-usage.test.ts`)
+
+### Phase 15: Zod Schema Validation (2-3 hours) 📋 (R28.13)
+1. [ ] Create `src/schemas/monster.ts` with Zod schemas
+2. [ ] Validate all monster data against schema
+3. [ ] Add schema validation to import script
+4. [ ] Export schemas via `src/schemas/index.ts`
+5. [ ] Tests created and passing
+
+### Phase 16: Full SRD Data Import (4-5 hours) 📋 (R28.14)
+1. [ ] Create `scripts/import_srd_monsters.py` script
+2. [ ] Script parses SRD 5.2 format
+3. [ ] Script validates data against Zod schema
+4. [ ] Import full SRD monster data (~300 monsters)
+5. [ ] All imported data passes validation
+6. [ ] Update `static/srd/monsters.json` with full data
+7. [ ] Tests updated to cover more monsters
+
 ---
 
 ## 5. Edge Cases
 
+### Existing Edge Cases
 1. **Fractional CR**: Monsters can have CR "1/8", "1/4", "1/2" — need special handling for filtering
 2. **Multiple Armor Class entries**: Some monsters have conditional AC (e.g., "13 (natural armor), 15 (while not incapacitated)")
 3. **Legendary Actions**: Cost can be 1, 2, or 3 actions — need to handle cost field
@@ -414,10 +827,27 @@ export interface DataLoader {
 5. **Environment filtering**: Monsters can have multiple environments (e.g., "forest" and "hill")
 6. **Missing data**: Some monsters missing speed, senses, etc. — need defaults
 
+### New Edge Cases (from SRD 5.2)
+7. **Initiative**: Some monsters have additional modifiers (e.g., Proficiency Bonus) applied to Initiative
+8. **Bonus Actions**: Monsters may have Bonus Actions that need to be used optimally in combat
+9. **Descriptive Tags**: Tags in parentheses after creature type (e.g., "Dragon (Chromatic)") — need to handle for filtering
+10. **Gear**: Monsters may have retrievable equipment — need to handle loot generation
+11. **Attack Notation**: Some attacks have effects on miss or regardless of hit/miss
+12. **Saving Throw Effects**: Some effects force saving throws with different outcomes for success/failure
+13. **Damage Notation**: Both fixed value and die expression provided — need to handle both
+14. **Limited Usage**: Recharge mechanics need d6 roll simulation
+15. **Saving Throws Override**: Monster save bonuses can differ from ability modifiers (e.g., DEX mod +0, save +6)
+16. **Skills**: Monsters may have skill bonuses that differ from ability modifiers
+17. **Senses**: Multiple senses with different ranges (darkvision, blindsight, etc.)
+18. **Lair XP**: Challenge rating may have different XP when in lair
+19. **Multiattack Replacement**: Multiattack may allow replacing one attack with another action (e.g., "replace one attack with a use of Spellcasting")
+20. **Spellcasting at Will vs Limited**: Spells can be "At Will" or "X/Day Each"
+
 ---
 
 ## 6. References
 
+- **SRD 5.2 Monsters**: `requirements/28-monster-support/srd-5.2-monsters.md` (correct version)
 - **SRD 5.2**: https://www.dndbeyond.com/srd
 - **dnd-data repo**: https://github.com/nick-aschenbach/dnd-data (for import)
 - **PRD Section 1.3**: Spell Management (follows same pattern)
@@ -428,6 +858,7 @@ export interface DataLoader {
 
 ## 7. Open Questions
 
+### Existing Questions
 1. **Should `Monster` have `CombatStats` like `Character`?**
    - Option A: Yes, for consistency
    - Option B: No, monsters don't need derived stats cached
@@ -443,6 +874,27 @@ export interface DataLoader {
    - Option B: Create separate `MonsterSpellcasting` interface
    - **Decision**: Create separate interface (monsters cast differently)
 
+### New Questions (from SRD 5.2 update)
+4. **Should `initiative` be calculated or stored?**
+   - Option A: Store both modifier and score (as SRD provides)
+   - Option B: Calculate score from modifier (10 + modifier)
+   - **Decision**: Store both (SRD provides both)
+
+5. **How to handle Bonus Actions separately from Actions?**
+   - Option A: Separate `bonusActions` field
+   - Option B: Add `type: 'action' | 'bonus_action'` to `MonsterAction`
+   - **Decision**: Separate field (clearer separation)
+
+6. **How to handle Attack Notation (Hit, Miss, Hit or Miss)?**
+   - Option A: Add to `MonsterAttack` interface
+   - Option B: Add to `MonsterAction` interface
+   - **Decision**: Add to `MonsterAction` (notation is per-action, not per-attack)
+
+7. **How to simulate Recharge X-Y mechanics?**
+   - Option A: Roll d6 at start of each turn
+   - Option B: Let user manually recharge
+   - **Decision**: Automatic roll at start of turn (as per SRD)
+
 ---
 
-*Last updated: 2026-05-09*
+*Last updated: 2026-05-10*

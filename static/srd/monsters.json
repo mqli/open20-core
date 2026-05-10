@@ -212,6 +212,7 @@
     "source": "SRD 5.2",
     "size": "Large",
     "type": "Dragon",
+    "descriptiveTags": ["Chromatic"],
     "alignment": "chaotic evil",
     "armorClass": [
       {
@@ -225,7 +226,12 @@
     },
     "speed": {
       "walk": 40,
+      "climb": 40,
       "fly": 80
+    },
+    "initiative": {
+      "modifier": 0,
+      "score": 10
     },
     "abilityScores": {
       "Strength": 23,
@@ -235,16 +241,42 @@
       "Wisdom": 11,
       "Charisma": 19
     },
+    "savingThrows": {
+      "Dexterity": 4,
+      "Wisdom": 4
+    },
+    "skills": {
+      "Perception": 7,
+      "Stealth": 4
+    },
     "challengeRating": {
       "rating": 10,
       "xp": 5900
     },
+    "resistances": [],
+    "vulnerabilities": [],
     "damageDefenses": {
       "resistances": [],
       "immunities": ["Fire"],
       "vulnerabilities": []
     },
+    "senses": {
+      "blindsight": 30,
+      "darkvision": 120,
+      "passivePerception": 17
+    },
+    "languages": ["Common", "Draconic"],
     "conditionImmunities": ["Charmed", "Frightened", "Poisoned"],
+    "spellcasting": [
+      {
+        "ability": "Charisma",
+        "saveDC": 17,
+        "attackBonus": 9,
+        "ignoresComponents": ["M"],
+        "atWill": ["Command", "Detect Magic", "Scorching Ray"],
+        "daily": [{"spell": "Fireball", "times": 1}]
+      }
+    ],
     "traits": [
       {
         "name": "Fire Aura",
@@ -270,13 +302,29 @@
                 "type": "Piercing",
                 "bonus": 6
               }
-            ]
+            ],
+            "damageNotation": {
+              "fixedValue": 17,
+              "dieExpression": "2d10+6"
+            }
           }
         ]
       },
       {
-        "name": "Fire Breath (Recharge 5-6)",
-        "description": "The dragon exhales fire in a 30-foot cone. Each creature in that area must make a DC 18 Dexterity saving throw, taking 56 (16d6) fire damage on a failed save, or half as much damage on a successful one."
+        "name": "Fire Breath",
+        "description": "The dragon exhales fire in a 30-foot cone.",
+        "limitedUsage": {
+          "type": "recharge",
+          "rechargeRange": [5, 6]
+        },
+        "savingThrowEffect": {
+          "saveType": "Dexterity",
+          "dc": 18,
+          "description": "Each creature in a 30-foot Cone",
+          "onSaveFailure": "56 (16d6) Fire damage",
+          "onSaveSuccess": "Half damage",
+          "halfDamageOnSuccess": true
+        }
       }
     ],
     "reactions": [

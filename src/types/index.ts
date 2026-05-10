@@ -13,6 +13,8 @@ export type { BaseAttack } from './attack';
 // 怪物类型
 export type { MonsterSize, MonsterType, ChallengeRating } from './monster';
 export type { MonsterAttack, MonsterDamageEntry } from './monster';
+export type { InitiativeInfo, SensesInfo, ChallengeRatingInfo } from './monster';
+export type { AttackNotation, SavingThrowEffect, MonsterSpellcasting } from './monster';
 
 // 骰子类型
 export type { DieType } from './dice';
