@@ -12,11 +12,11 @@ import {
   setMonsterTemporaryHP,
   isMonsterDefeated,
   getMonsterAC,
-  rollMonsterAttackDamage,
   addMonsterDamageResistance,
   addMonsterDamageImmunity,
   addMonsterDamageVulnerability,
 } from '../../src/monster/combat';
+import { rollMonsterAttackDamage } from '../../src/rolls/monster';
 
 // ── Shared Fixtures ───────────────────────────────────────
 

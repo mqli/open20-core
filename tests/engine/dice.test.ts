@@ -8,14 +8,12 @@ import {
   rollWithAdvantage,
   rollWithDisadvantage,
   rollAttack,
-  rollCharacterAttack,
-  rollCharacterSkillCheck,
-  rollCharacterSavingThrow,
-  rollWeaponDamage,
-  rollSpellDamage,
   defaultRandom,
   type RandomProvider,
 } from '../../src/dice';
+import { rollCharacterAttack, rollCharacterSkillCheck, rollCharacterSavingThrow } from '../../src/rolls/character';
+import { rollWeaponDamage } from '../../src/rolls/character';
+import { rollSpellDamage } from '../../src/rolls/character';
 import { getModifier, getTotalScore } from '../../src/engine/ability-modifier';
 import type { Character } from '../../src/types/character';
 import type { Weapon } from '../../src/types/equipment';
@@ -516,7 +514,7 @@ describe('rollSpellDamage', () => {
       source: '2024 PHB',
     };
 
-    const result = rollSpellDamage(rng, character, spell, 0);
+    const result = rollSpellDamage({ rng, character, spell, slotLevel: 0 });
 
     expect(result.entries).toHaveLength(1);
     expect(result.entries[0]?.die).toBe('d10');
@@ -548,7 +546,7 @@ describe('rollSpellDamage', () => {
       source: '2024 PHB',
     };
 
-    const result = rollSpellDamage(rng, character, spell, 3); // Cast at 3rd level
+    const result = rollSpellDamage({ rng, character, spell, slotLevel: 3 }); // Cast at 3rd level
 
     expect(result.entries[0]?.count).toBe(5); // 5d6 at level 3 (base 4d6 + 1 extra)
   });
@@ -577,7 +575,7 @@ describe('rollSpellDamage', () => {
       source: '2024 PHB',
     };
 
-    const result = rollSpellDamage(rng, character, spell, 2);
+    const result = rollSpellDamage({ rng, character, spell, slotLevel: 2 });
 
     // Should have 2 roll entries: Piercing and Poison
     expect(result.entries).toHaveLength(2);

@@ -1,12 +1,11 @@
 // engine/damage-calculator.ts
-// Damage type & defense calculation — pure functions
+// Damage type & defense calculation — pure functions (Layer 2: Mechanics)
 // Corresponds to PRD §4.5
 
 import type { Character } from '../types/character';
 import type { DamageType, DamageDefenses, DamageDefenseSource, DamageResult } from '../types/damage';
 export type { DamageDefenses, DamageDefenseSource, DamageResult } from '../types/damage';
 import type { DataLoader } from '../data/loader';
-import { modifyHP } from '../character/mutate';
 
 /**
  * Check if character has a specific defense against a damage type
@@ -458,25 +457,4 @@ export function getActiveDamageDefenses(
  */
 export function getDamageDefenses(char: Character, dataLoader: DataLoader): DamageDefenses {
   return getActiveDamageDefenses(char, dataLoader).defenses;
-}
-
-/**
- * Apply typed damage with character's active defenses
- * Combines damage calculation with automatic defense aggregation
- */
-export function applyDamageWithDefenses(
-  char: Character,
-  damage: number,
-  damageType: DamageType,
-  dataLoader: DataLoader
-): { char: Character; result: DamageResult; defenses: DamageDefenses } {
-  const { defenses } = getActiveDamageDefenses(char, dataLoader);
-  const result = calculateTypedDamage(damage, damageType, defenses);
-  const updatedChar = modifyHP(char, -result.effectiveDamage);
-
-  return {
-    char: updatedChar,
-    result,
-    defenses,
-  };
 }

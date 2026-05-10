@@ -115,7 +115,7 @@ export {
   rollInitiative,
 } from './engine';
 
-// Layer 3: Entity Application
+// Layer 4: Application (rolls module)
 export type {
   CharacterSkillCheckParams,
   CharacterSavingThrowParams,
@@ -125,7 +125,10 @@ export type {
   SpellDamageParams,
   MonsterAttackParams,
   MonsterDamageParams,
-} from './engine';
+  MonsterFullAttackParams,
+  CharacterInitiativeParams,
+  MonsterInitiativeParams,
+} from './rolls';
 export {
   rollCharacterSkillCheck,
   rollCharacterSavingThrow,
@@ -133,6 +136,10 @@ export {
   rollCharacterWeaponDamage,
   rollSpellAttack,
   rollSpellDamage,
+  rollCharacterInitiative,
   rollMonsterAttack,
   rollMonsterDamage,
-} from './engine';
+  rollMonsterAttackDamage,
+  rollMonsterFullAttack,
+  rollMonsterInitiative,
+} from './rolls';

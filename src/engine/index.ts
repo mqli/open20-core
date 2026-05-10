@@ -65,38 +65,6 @@ export {
   rollInitiative,
 } from '../dice/mechanics';
 
-export {
-  type CharacterSkillCheckParams,
-  type CharacterSavingThrowParams,
-  type CharacterAttackParams,
-  type CharacterWeaponDamageParams,
-  type SpellAttackParams,
-  type SpellDamageParams,
-  type MonsterAttackParams,
-  type MonsterDamageParams,
-  type CharacterInitiativeParams,
-  type MonsterInitiativeParams,
-  rollCharacterSkillCheck,
-  rollCharacterSavingThrow,
-  rollCharacterAttack,
-  rollCharacterWeaponDamage,
-  rollSpellAttack,
-  rollSpellDamage,
-  rollMonsterAttack,
-  rollMonsterDamage,
-  rollCharacterInitiative,
-  rollMonsterInitiative,
-} from '../dice/entity';
-
-// Backward Compatibility (from dice/index.ts)
-export {
-  rollAttack as rollAttackLegacy,
-  rollSkillCheck as rollSkillCheckLegacy,
-  rollSavingThrow as rollSavingThrowLegacy,
-  rollWeaponDamage as rollWeaponDamageLegacy,
-  rollSpellDamage as rollSpellDamageLegacy,
-} from '../dice';
-
 // ── Combat Helpers ─────────────────────────────────────
 export {
   applyHPChange,

@@ -116,9 +116,7 @@ export {
   applyMonsterTypedDamage,
   setMonsterTemporaryHP,
   isMonsterDefeated,
-  rollMonsterAttack,
   getMonsterAC,
-  rollMonsterAttackDamage,
   addMonsterDamageResistance,
   addMonsterDamageImmunity,
   addMonsterDamageVulnerability,
@@ -168,7 +166,7 @@ export {
   rollInitiative,
 } from './engine';
 
-// Layer 3: Entity Application
+// Layer 4: Application (rolls module)
 export type {
   CharacterSkillCheckParams,
   CharacterSavingThrowParams,
@@ -178,7 +176,10 @@ export type {
   SpellDamageParams,
   MonsterAttackParams,
   MonsterDamageParams,
-} from './engine';
+  MonsterFullAttackParams,
+  CharacterInitiativeParams,
+  MonsterInitiativeParams,
+} from './rolls';
 export {
   rollCharacterSkillCheck,
   rollCharacterSavingThrow,
@@ -186,9 +187,13 @@ export {
   rollCharacterWeaponDamage,
   rollSpellAttack,
   rollSpellDamage,
-  rollMonsterAttack as rollMonsterAttackEntity,
+  rollCharacterInitiative,
+  rollMonsterAttack,
   rollMonsterDamage,
-} from './engine';
+  rollMonsterAttackDamage,
+  rollMonsterFullAttack,
+  rollMonsterInitiative,
+} from './rolls';
 
 // ── Storage ──────────────────────────────────────────────
 export type { ICharacterStorage, CharacterSummary } from './storage';

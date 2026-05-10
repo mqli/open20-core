@@ -49,7 +49,7 @@ export {
   calculateMonsterHP
 } from './calculator';
 
-// Combat functions
+// Combat functions (L3: Entity State Management)
 export type { DamageResult } from '../types/damage';
 export {
   initializeMonsterForCombat,
@@ -57,9 +57,7 @@ export {
   applyMonsterTypedDamage,
   setMonsterTemporaryHP,
   isMonsterDefeated,
-  rollMonsterAttack,
   getMonsterAC,
-  rollMonsterAttackDamage,
   addMonsterDamageResistance,
   addMonsterDamageImmunity,
   addMonsterDamageVulnerability

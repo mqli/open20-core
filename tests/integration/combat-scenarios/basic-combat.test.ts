@@ -7,10 +7,13 @@ import {
   initializeMonsterForCombat,
   modifyMonsterHP,
   isMonsterDefeated,
-  rollMonsterAttack,
   getMonsterAC,
-  rollMonsterAttackDamage,
 } from '../../../src/monster/combat';
+
+import {
+  rollMonsterAttack,
+  rollMonsterAttackDamage,
+} from '../../../src/rolls/monster';
 import {
   applyHPChange,
   isDefeatedShared,
@@ -22,6 +25,8 @@ import {
   getMonsterMaxHP,
   getMonsterTemporaryHP,
 } from '../../../src/engine/combat';
+import { defaultRandom } from '../../../src/dice/core';
+import { calculateMonsterAttackBonus } from '../../../src/monster/calculator';
 import lookupTables from '../../../static/srd/lookup-tables.json';
 import monstersArray from '../../../static/srd/monsters.json';
 
@@ -122,8 +127,10 @@ describe('Combat Scenarios - Basic Combat (Fighter vs Goblin)', () => {
       damageEntries: [{ dice: '1d6', bonus: 2, type: 'Slashing' }],
     };
 
-    const { total, critical } = rollMonsterAttack(goblinAttack, goblin, dataLoader);
-    const hits = critical || total >= fighterAC;
+    const attackBonus = goblinAttack.attackBonus ?? calculateMonsterAttackBonus(goblin, goblinAttack, dataLoader);
+    const result = rollMonsterAttack({ monster: goblin, attackBonus, rng: defaultRandom });
+    const { total, isCritical } = result;
+    const hits = isCritical || total >= fighterAC;
 
     if (hits) {
       const damage = rollMonsterAttackDamage(goblinAttack);
@@ -180,7 +187,8 @@ describe('Combat Scenarios - Multi-Round Combat', () => {
           damageEntries: [{ dice: '1d6', bonus: 2, type: 'Slashing' }],
         };
 
-        const monsterAttack = rollMonsterAttack(goblinAttack, currentGoblin1, dataLoader);
+        const attackBonus = goblinAttack.attackBonus ?? calculateMonsterAttackBonus(currentGoblin1, goblinAttack, dataLoader);
+        const monsterAttack = rollMonsterAttack({ monster: currentGoblin1, attackBonus, rng: defaultRandom });
         if (monsterAttack.total >= currentFighter.combatStats.AC) {
           const damage = rollMonsterAttackDamage(goblinAttack);
           currentFighter = modifyHP(currentFighter, -damage);
@@ -206,13 +214,15 @@ describe('Combat Scenarios - Multi-Round Combat', () => {
       damageEntries: [{ dice: '1d6', bonus: 2, type: 'Slashing' }],
     };
 
-    const attack1 = rollMonsterAttack(goblinAttack, goblin1, dataLoader);
+    const attackBonus1 = goblinAttack.attackBonus ?? calculateMonsterAttackBonus(goblin1, goblinAttack, dataLoader);
+    const attack1 = rollMonsterAttack({ monster: goblin1, attackBonus: attackBonus1, rng: defaultRandom });
     if (attack1.total >= currentFighter.combatStats.AC) {
       const damage = rollMonsterAttackDamage(goblinAttack);
       currentFighter = modifyHP(currentFighter, -damage);
     }
 
-    const attack2 = rollMonsterAttack(goblinAttack, goblin2, dataLoader);
+    const attackBonus2 = goblinAttack.attackBonus ?? calculateMonsterAttackBonus(goblin2, goblinAttack, dataLoader);
+    const attack2 = rollMonsterAttack({ monster: goblin2, attackBonus: attackBonus2, rng: defaultRandom });
     if (attack2.total >= currentFighter.combatStats.AC) {
       const damage = rollMonsterAttackDamage(goblinAttack);
       currentFighter = modifyHP(currentFighter, -damage);

@@ -21,7 +21,7 @@ describe('Node.js Artifact Tests (dist/index.js)', () => {
     expect(Open20Core.rollDie).toBeDefined();
     expect(Open20Core.rollDice).toBeDefined();
     expect(Open20Core.rollAttack).toBeDefined();
-    expect(Open20Core.rollWeaponDamage).toBeDefined();
+    expect(Open20Core.rollCharacterWeaponDamage).toBeDefined();
     expect(Open20Core.rollSpellDamage).toBeDefined();
     expect(Open20Core.defaultRandom).toBeDefined();
   });
@@ -40,15 +40,15 @@ describe('Node.js Artifact Tests (dist/index.js)', () => {
   test('dice rolling should work with default random', () => {
     const rng = Open20Core.defaultRandom;
 
-    // rollDie(rng, die) returns number
+    // rollDie(rng, die) returns DiceRollResult object
     const result = Open20Core.rollDie(rng, 'd6');
-    expect(result).toBeGreaterThanOrEqual(1);
-    expect(result).toBeLessThanOrEqual(6);
+    expect(result.total).toBeGreaterThanOrEqual(1);
+    expect(result.total).toBeLessThanOrEqual(6);
 
-    // rollDice(rng, die, count) returns number (total)
-    const total = Open20Core.rollDice(rng, 'd6', 2);
-    expect(total).toBeGreaterThanOrEqual(2);
-    expect(total).toBeLessThanOrEqual(12);
+    // rollDice(rng, die, count) returns DiceRollResult object
+    const rollResult = Open20Core.rollDice(rng, 'd6', 2);
+    expect(rollResult.total).toBeGreaterThanOrEqual(2);
+    expect(rollResult.total).toBeLessThanOrEqual(12);
   });
 
   test('InMemoryStorage should be instantiable', () => {

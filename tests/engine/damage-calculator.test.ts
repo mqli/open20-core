@@ -8,10 +8,10 @@ import {
   isValidDamageType,
   getActiveDamageDefenses,
   getDamageDefenses,
-  applyDamageWithDefenses,
   ALL_DAMAGE_TYPES,
   DAMAGE_TYPE_CATEGORIES,
 } from '../../src/engine/damage-calculator';
+import { applyDamageWithDefenses } from '../../src/rolls/character';
 import type { DamageDefenses } from '../../src/types/damage';
 import { createDataLoader } from '../../src/data/loader';
 import { createCharacter } from '../../src/character/create';
