@@ -1,7 +1,7 @@
 // src/spells/index.ts
 // Barrel export for spell query functions
 
-export type { SpellFilter } from './query';
+export type { SpellFilter, PreparationRule, PreparationChangeLimit } from './query';
 export {
   getSpell as getSpellData,
   searchSpells,
@@ -10,4 +10,7 @@ export {
   getPreparedSpells,
   isSpellPrepared,
   knowsSpell,
+  getPreparationRule,
+  canChangePreparedSpells,
+  getMaxPreparedSpellChanges,
 } from './query';

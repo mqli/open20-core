@@ -27,6 +27,7 @@ export interface CharacterSpells {
   readonly spellAttackBonus: number;
   readonly knownSpells: readonly string[]; // Spell.id 列表
   readonly preparedSpells: readonly string[]; // 已准备法术（施法者用）
+  readonly alwaysPreparedSpells?: readonly string[]; // 始终准备的法术（不计入准备数量）
   readonly spellSlots: Record<SpellLevel, SpellSlotEntry>;
   readonly pactMagicSlots: PactMagicSlots | null;
 }

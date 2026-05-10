@@ -12,6 +12,14 @@ import type { DamageType, DamageDefenses, DamageResult } from '../types/damage';
 import type { EquipmentItem } from '../types/equipment';
 import type { SpellLevel } from '../types/spell';
 import type { DataLoader } from '../data/loader';
+import type { RandomProvider } from '../dice/core';
+import { rollSavingThrow } from '../dice/mechanics';
+import {
+  isConcentrating,
+  getConcentratingSpellId,
+  calculateConcentrationDC,
+  type ConcentrationCheckResult,
+} from '../engine/concentration';
 // calculateTypedDamage is used in applyTypedDamage function
 import { applyHPChange, applyTypedDamageToHP, setTemporaryHPShared } from '../engine/combat';
 import { recomputeDerivedStats } from './recompute';
@@ -196,6 +204,173 @@ export function toggleCondition(char: Character, conditionId: ConditionName): Ch
   });
 }
 
+// ── Concentration Mutations ───────────────────────────────────
+
+/**
+ * Start concentrating on a spell
+ * SRD: "Only one concentration spell can be active at a time"
+ * If already concentrating, ends previous concentration first
+ *
+ * @param char - The character
+ * @param spellId - The spell ID to concentrate on
+ * @returns Updated character with Concentrating condition
+ *
+ * @example
+ * startConcentration(char, 'bless')
+ */
+export function startConcentration(char: Character, spellId: string): Character {
+  // End any existing concentration first
+  let updated = char;
+  if (isConcentrating(char)) {
+    updated = endConcentration(char);
+  }
+
+  // Add Concentrating condition with spell ID as source
+  const newCondition: ActiveCondition = {
+    id: 'Concentrating',
+    source: spellId,
+    appliedAt: new Date().toISOString(),
+  };
+
+  return withUpdate(updated, {
+    conditions: [...updated.conditions, newCondition],
+  });
+}
+
+/**
+ * End concentration (remove Concentrating condition)
+ * SRD: Concentration ends when you cast another concentration spell,
+ * become incapacitated, or the spell's duration ends
+ *
+ * @param char - The character
+ * @returns Updated character without Concentrating condition
+ *
+ * @example
+ * endConcentration(char)
+ */
+export function endConcentration(char: Character): Character {
+  const conditionIdx = char.conditions.findIndex(c => c.id === 'Concentrating');
+  if (conditionIdx === -1) return char;
+
+  return withUpdate(char, {
+    conditions: char.conditions.filter((_, i) => i !== conditionIdx),
+  });
+}
+
+/**
+ * Make a concentration check when taking damage
+ * SRD: "If the save fails, the spell ends. The DC equals 10 or half the
+ * damage taken, whichever is higher."
+ *
+ * @param char - The character
+ * @param damageAmount - Amount of damage taken
+ * @param data - DataLoader (for class save proficiencies)
+ * @param rng - Random provider for dice rolling
+ * @returns Object with updated character and check result
+ *
+ * @example
+ * makeConcentrationCheck(char, 20, data, defaultRandom)
+ */
+export function makeConcentrationCheck(
+  char: Character,
+  damageAmount: number,
+  data: DataLoader,
+  rng: RandomProvider
+): { char: Character; result: ConcentrationCheckResult } {
+  // Calculate DC
+  const dc = calculateConcentrationDC(damageAmount);
+
+  // Get Constitution modifier
+  const conScore = char.abilityScores.base.Constitution
+    + (char.abilityScores.racialBonuses.Constitution ?? 0)
+    + (char.abilityScores.featBonuses.Constitution ?? 0)
+    + (char.abilityScores.temporaryBonuses.Constitution ?? 0);
+  const conMod = Math.floor((conScore - 10) / 2);
+
+  // Check if proficient in Constitution saves
+  // A character is proficient if any of their classes has Con as a save proficiency
+  let isProficient = false;
+  for (const charClass of char.classes) {
+    const classData = data.getClass(charClass.classId);
+    if (classData?.savingThrowProficiencies.includes('Constitution')) {
+      isProficient = true;
+      break;
+    }
+  }
+
+  // Roll the save
+  const check = rollSavingThrow({
+    abilityMod: conMod,
+    proficiencyBonus: isProficient ? char.combatStats.proficiencyBonus : 0,
+    isProficient,
+    dc,
+    rng,
+  });
+
+  // If failed, end concentration
+  let updatedChar = char;
+  if (!check.success) {
+    updatedChar = endConcentration(char);
+  }
+
+  return {
+    char: updatedChar,
+    result: {
+      check,
+      dc,
+      maintained: check.success ?? false,
+    },
+  };
+}
+
+// ── Always-Prepared Spells ───────────────────────────────────
+
+/**
+ * Add a spell to the always-prepared list
+ * SRD: Some features give spells that are always prepared and don't count
+ * against the prepared spell limit.
+ *
+ * @param char - The character
+ * @param spellId - The spell ID to add
+ * @returns Updated character with the spell in alwaysPreparedSpells
+ *
+ * @example
+ * addAlwaysPreparedSpell(char, 'shield-of-faith')
+ */
+export function addAlwaysPreparedSpell(char: Character, spellId: string): Character {
+  const current = char.spells.alwaysPreparedSpells ?? [];
+  if (current.includes(spellId)) return char;
+
+  return withUpdate(char, {
+    spells: {
+      ...char.spells,
+      alwaysPreparedSpells: [...current, spellId],
+    },
+  });
+}
+
+/**
+ * Remove a spell from the always-prepared list
+ *
+ * @param char - The character
+ * @param spellId - The spell ID to remove
+ * @returns Updated character without the spell in alwaysPreparedSpells
+ *
+ * @example
+ * removeAlwaysPreparedSpell(char, 'shield-of-faith')
+ */
+export function removeAlwaysPreparedSpell(char: Character, spellId: string): Character {
+  const current = char.spells.alwaysPreparedSpells ?? [];
+  if (!current.includes(spellId)) return char;
+
+  return withUpdate(char, {
+    spells: {
+      ...char.spells,
+      alwaysPreparedSpells: current.filter(id => id !== spellId),
+    },
+  });
+}
+
 // ── Equipment Mutations ─────────────────────────────────────────
 
 export function equipItem(char: Character, itemId: string): Character {
@@ -283,6 +458,8 @@ export function prepareSpell(char: Character, spellId: string): Character {
 }
 
 export function unprepareSpell(char: Character, spellId: string): Character {
+  // Cannot unprepare always-prepared spells
+  if ((char.spells.alwaysPreparedSpells ?? []).includes(spellId)) return char;
   if (!char.spells.preparedSpells.includes(spellId)) return char;
 
   return withUpdate(char, {

@@ -349,6 +349,7 @@ export function buildInitialSpells(
     spellAttackBonus,
     knownSpells: [],
     preparedSpells: [],
+    alwaysPreparedSpells: [],
     spellSlots,
     pactMagicSlots,
   };
@@ -368,6 +369,7 @@ export function emptyCharacterSpells(): CharacterSpells {
     spellAttackBonus: 0,
     knownSpells: [],
     preparedSpells: [],
+    alwaysPreparedSpells: [],
     spellSlots,
     pactMagicSlots: null,
   };

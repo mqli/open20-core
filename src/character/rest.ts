@@ -143,7 +143,7 @@ export function longRest(char: Character, _data: DataLoader): Character {
     spells: { ...result.spells, spellSlots: newSpellSlots },
   });
 
-  // 4. Recover pact magic
+  // 4. Recover pact magic (Warlocks regain on Short OR Long Rest)
   if (result.spells.pactMagicSlots) {
     result = withUpdate(result, {
       spells: {
@@ -153,7 +153,7 @@ export function longRest(char: Character, _data: DataLoader): Character {
     });
   }
 
-  // 5 & 6. Reset Long Rest and Short Rest resources
+  // 5. Reset Long Rest and Short Rest resources
   const newResources = result.resources.map((r: Resource) => {
     if (r.resetOn === ResetType.LongRest || r.resetOn === ResetType.ShortRest) {
       return { ...r, used: 0 };

@@ -226,7 +226,7 @@ function parseDefenseFromDescription(description: string): DamageType[] {
  * Check if a character has the 'Raging' condition active
  */
 function isRaging(char: Character): boolean {
-  return char.conditions.some(c => c.id === 'Raging' || c.id === 'Concentrating');
+  return char.conditions.some(c => c.id === 'Raging');
 }
 
 /**

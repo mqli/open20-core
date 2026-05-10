@@ -83,3 +83,23 @@ export {
   emptyDefenses,
   mergeDefenses,
 } from './combat';
+
+// ── Concentration Management ────────────────────────
+export {
+  isConcentrating,
+  getConcentratingSpellId,
+  calculateConcentrationDC,
+  type ConcentrationCheckResult,
+} from './concentration';
+
+// ── Spell Casting ──────────────────────────────────
+export {
+  canCastAsRitual,
+  castAsRitual,
+  getRitualCastingTime,
+  isCantrip,
+  canCastCantrip,
+  canUpcast,
+  getUpcastDescription,
+  castSpell,
+} from './spell-casting';
