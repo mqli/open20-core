@@ -8,7 +8,7 @@
 
 **Project**: Open20 Core - Headless D&D 5e 2024 Game Engine
 **Goal**: A TypeScript library for D&D 5e 2024 rules engine, spell management, and character management. No UI - pure logic, testable via unit tests, usable by any framework.
-**Status**: S1-S21 complete (724+ tests passing)
+**Status**: S1-S21 complete (753+ tests passing)
 
 ### Key Design Decisions
 - **Headless**: Zero UI dependency. Pure functions, immutable state.
@@ -322,34 +322,68 @@ spellSlots: Record<string, Record<number, readonly number[]>>;
 
 ## 6. How to Run Tests & Build
 
+> **CRITICAL**: Before committing, you MUST run the same validation steps as CI (see `.github/workflows/ci.yml`).
+
 ```bash
 cd /workspaces/open20-core
 
 # Install dependencies (first time only)
 npm install
 
-# Run all tests
-npx vitest run
+# Run all tests (same as CI Step 5)
+npm test
 
 # Run specific test file
 npx vitest run tests/engine/ability-modifier.test.ts
 
-# Lint (MUST pass before committing)
+# Lint (MUST pass before committing - same as CI Step 4)
 npm run lint
 # or with auto-fix:
 npm run lint:fix
 
-# Type check (MUST pass before committing)
+# Type check (MUST pass before committing - same as CI Step 3)
 npm run typecheck
 
 # Run tests with coverage
-npx vitest run --coverage
+npm test -- --coverage
 
-# Build browser bundles
-npm run build:browser
+# Build Node.js bundle (same as CI Step 6)
+npm run build
 
-# Full validation (run before committing)
-npm run lint && npm run typecheck && npx vitest run
+# Build browser bundles (same as CI Step 7)
+npm run build:bundle
+
+# Test Node.js artifact (same as CI Step 8)
+npm run test:artifact
+
+# Test browser artifact (same as CI Step 9)
+npm run test:browser-artifact
+
+# Minimum required before commit (Steps 3-5):
+npm run typecheck && npm run lint && npm test
+
+# Full CI validation (run before committing):
+npm run typecheck && npm run lint && npm test && npm run build && npm run build:bundle && npm run test:artifact && npm run test:browser-artifact
+```
+
+### 6.1 CI Validation Steps
+
+These are the **exact steps** run in CI (see `.github/workflows/ci.yml`). Run them locally before committing:
+
+| Step | Command | CI Step |
+|------|---------|---------|
+| 1 | `npm ci` | Install deps |
+| 2 | `npm run typecheck` | Type check |
+| 3 | `npm run lint` | Lint |
+| 4 | `npm test` | Run tests |
+| 5 | `npm run build` | Build Node.js |
+| 6 | `npm run build:bundle` | Build browser bundle |
+| 7 | `npm run test:artifact` | Test Node.js artifact |
+| 8 | `npm run test:browser-artifact` | Test browser artifact |
+
+**Minimum required before commit** (Steps 2-4):
+```bash
+npm run typecheck && npm run lint && npm test
 ```
 
 **Target**: 100% coverage for `engine/` and `character/` modules.
@@ -690,12 +724,12 @@ Examples:
 | Lint | `npm run lint` |
 | Lint with auto-fix | `npm run lint:fix` |
 | Type check | `npm run typecheck` |
-| Run all tests | `npx vitest run` |
+| Run all tests | `npm test` |
 | Run single test | `npx vitest run tests/path/to/test.test.ts` |
 | Install deps | `npm install` |
-| Check coverage | `npx vitest run --coverage` |
+| Check coverage | `npm test -- --coverage` |
 | Import spells | `python3 scripts/import_srd_spells.py` |
-| Full validation | `npm run lint && npm run typecheck && npx vitest run` |
+| Full CI validation | `npm run typecheck && npm run lint && npm test && npm run build && npm run build:bundle && npm run test:artifact && npm run test:browser-artifact` |
 
 | File | Purpose |
 |------|---------|
@@ -724,5 +758,5 @@ If you're stuck or unsure:
 
 ---
 
-*Last updated: 2026-05-10 (updated test count to 724+, added lint:fix and full validation commands)*
+*Last updated: 2026-05-10 (updated CI validation steps, test count to 753+, added section 6.1)*
 *Maintained by: AI agents working on this project*

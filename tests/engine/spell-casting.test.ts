@@ -20,9 +20,9 @@ const mockSpell: Spell = {
   name: 'Detect Magic',
   level: 1,
   school: 'Divination',
-  castingTime: '1 action',
+  castingTime: 'Action',
   range: 'Self',
-  components: { verbal: true, somatic: true, material: false },
+  components: ['V', 'S'] as const,
   duration: 'Concentration, up to 10 minutes',
   concentration: true,
   ritual: true,
@@ -36,9 +36,9 @@ const mockCantrip: Spell = {
   name: 'Fire Bolt',
   level: 0,
   school: 'Evocation',
-  castingTime: '1 action',
+  castingTime: 'Action',
   range: '120 feet',
-  components: { verbal: true, somatic: true, material: false },
+  components: ['V', 'S'] as const,
   duration: 'Instantaneous',
   concentration: false,
   ritual: false,
@@ -52,9 +52,9 @@ const mockUpcastSpell: Spell = {
   name: 'Fireball',
   level: 3,
   school: 'Evocation',
-  castingTime: '1 action',
+  castingTime: 'Action',
   range: '150 feet',
-  components: { verbal: true, somatic: true, material: false },
+  components: ['V', 'S'] as const,
   duration: 'Instantaneous',
   concentration: false,
   ritual: false,
@@ -78,20 +78,41 @@ const mockDataLoader = {
   },
 } as any;
 
-const mockWizardChar: Character = {
-  id: 'char-1',
+const mockWizardChar = {
+  schemaVersion: '1.0.0',
   name: 'Test Wizard',
   species: 'human',
-  classes: [{ classId: 'wizard', level: 3 }],
+  speciesSubtype: null,
+  background: 'sage',
+  classes: [{ classId: 'wizard', level: 3, subclassId: null, subclassLevel: null, hitDice: { die: 6 as const, used: 0 } }],
   abilityScores: {
     base: { Strength: 10, Dexterity: 14, Constitution: 13, Intelligence: 15, Wisdom: 12, Charisma: 10 },
     racialBonuses: { Strength: 0, Dexterity: 0, Constitution: 0, Intelligence: 0, Wisdom: 0, Charisma: 0 },
     featBonuses: { Strength: 0, Dexterity: 0, Constitution: 0, Intelligence: 0, Wisdom: 0, Charisma: 0 },
     temporaryBonuses: { Strength: 0, Dexterity: 0, Constitution: 0, Intelligence: 0, Wisdom: 0, Charisma: 0 },
   },
-  skills: { athletics: false, acrobatics: false, sleightOfHand: false, stealth: false, arcana: true, history: false, investigation: false, nature: false, religion: false, animalHandling: false, insight: false, medicine: false, perception: false, survival: false, deception: false, intimidation: false, performance: false, persuasion: false },
-  savingThrows: { strength: false, dexterity: false, constitution: false, intelligence: true, wisdom: false, charisma: false },
+  skills: {
+    athletics: { proficient: false, expertise: false },
+    acrobatics: { proficient: false, expertise: false },
+    sleightOfHand: { proficient: false, expertise: false },
+    stealth: { proficient: false, expertise: false },
+    arcana: { proficient: true, expertise: false },
+    history: { proficient: false, expertise: false },
+    investigation: { proficient: false, expertise: false },
+    nature: { proficient: false, expertise: false },
+    religion: { proficient: false, expertise: false },
+    animalHandling: { proficient: false, expertise: false },
+    insight: { proficient: false, expertise: false },
+    medicine: { proficient: false, expertise: false },
+    perception: { proficient: false, expertise: false },
+    survival: { proficient: false, expertise: false },
+    deception: { proficient: false, expertise: false },
+    intimidation: { proficient: false, expertise: false },
+    performance: { proficient: false, expertise: false },
+    persuasion: { proficient: false, expertise: false },
+  },
   feats: [],
+  equipment: [],
   spells: {
     spellcastingAbility: 'Intelligence',
     spellSaveDC: 13,
@@ -113,25 +134,23 @@ const mockWizardChar: Character = {
     },
     pactMagicSlots: null,
   },
+  resources: [],
+  hitPoints: { max: 20, current: 20, temporary: 0, deathSaves: { successes: 0, failures: 0, isStable: false } },
   combatStats: {
-    armorClass: 12,
+    AC: 12,
     initiative: 2,
     speed: 30,
-    maxHitPoints: 20,
-    currentHitPoints: 20,
-    temporaryHitPoints: 0,
-    hitDice: { total: 3, used: 0, dieType: 6 },
-    deathSaves: { successes: 0, failures: 0, isStable: false },
+    passivePerception: 13,
     proficiencyBonus: 2,
+    attacks: [],
   },
-  resources: [],
-  equipment: [],
   currency: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 },
   conditions: [],
-  features: [],
-  level: 3,
-  hitPoints: { current: 20, max: 20, temporary: 0, deathSaves: { successes: 0, failures: 0, isStable: false } },
-} as any;
+  damageDefenses: { resistances: [], immunities: [], vulnerabilities: [] },
+  notes: '',
+  createdAt: '2024-01-01T00:00:00.000Z',
+  updatedAt: '2024-01-01T00:00:00.000Z',
+} as unknown as Character;
 
 describe('spell-casting', () => {
   describe('canCastAsRitual', () => {
@@ -144,7 +163,7 @@ describe('spell-casting', () => {
     });
 
     it('should return false if character cannot cast rituals', () => {
-      const nonCasterChar = { ...mockWizardChar, classes: [{ classId: 'fighter', level: 3 }] };
+      const nonCasterChar = { ...mockWizardChar, classes: [{ classId: 'fighter', level: 3, subclassId: null, subclassLevel: null, hitDice: { die: 'd10' as const, used: 0 } }] };
       expect(canCastAsRitual(nonCasterChar, mockSpell, mockDataLoader)).toBe(false);
     });
   });
