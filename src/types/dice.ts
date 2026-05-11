@@ -1,5 +1,5 @@
 // types/dice.ts
-// Dice type definition (zero dependencies)
+// Re-export DieType from the canonical source (dice core module)
+// This file exists for backward compatibility with existing imports
 
-// 骰子类型 — 用于生命骰和武器伤害骰
-export type DieType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20';
+export type { DieType } from '../dice/core';

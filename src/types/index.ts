@@ -16,8 +16,8 @@ export type { MonsterAttack } from './monster';
 export type { InitiativeInfo, SensesInfo, ChallengeRatingInfo } from './monster';
 export type { AttackNotation, SavingThrowEffect, MonsterSpellcasting } from './monster';
 
-// 骰子类型
-export type { DieType } from './dice';
+// 骰子类型 (canonical source: ../dice/core.ts)
+export type { DieType } from '../dice';
 
 // 伤害类型
 export type { DamageType, DamageDefenses, DamageDefenseSource, DamageResult, DamageEntry } from './damage';

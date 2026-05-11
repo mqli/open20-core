@@ -11,10 +11,16 @@
     "./data": "./dist/data/index.js",
     "./engine": "./dist/engine/index.js",
     "./character": "./dist/character/index.js",
+    "./spells": "./dist/spells/index.js",
+    "./monster": "./dist/monster/index.js",
+    "./content": "./dist/content/index.js",
+    "./rolls": "./dist/rolls/index.js",
+    "./dice": "./dist/dice/index.js",
     "./storage": "./dist/storage/index.js",
     "./browser": "./dist/browser-index.js"
   },
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsc -p tsconfig.build.json",
     "build:bundle": "npm run build && npm run bundle",
     "bundle": "node scripts/bundle.mjs",
@@ -29,7 +35,9 @@
     "lint": "eslint src/ tests/",
     "lint:fix": "eslint src/ tests/ --fix",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\""
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "release": "node scripts/release.mjs",
+    "release:dry": "node scripts/release.mjs --dry-run"
   },
   "keywords": [
     "dnd",
@@ -40,6 +48,17 @@
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/open20/open20-core.git"
+  },
+  "files": [
+    "dist/",
+    "static/",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
   "devDependencies": {
     "@types/node": "^25.6.2",
     "@typescript-eslint/eslint-plugin": "^8.59.2",
