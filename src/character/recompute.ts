@@ -88,40 +88,86 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     Array.from(weaponProficiencies)
   );
 
-  // Recalculate spell stats
+  // Recalculate per-class spell stats
   let newSpells = { ...char.spells };
+  const classSpellcasting = { ...newSpells.classSpellcasting };
 
-  if (char.spells.spellcastingAbility) {
-    const spellMod = getModifier(
-      getTotalScore(char.abilityScores, char.spells.spellcastingAbility)
-    );
-    newSpells = {
-      ...newSpells,
-      spellSaveDC: 8 + pb + spellMod,
-      spellAttackBonus: pb + spellMod,
+  // Recalculate each class's spell data
+  for (const [classId, classSpellData] of Object.entries(classSpellcasting)) {
+    const classData = data.getClass(classId);
+    if (!classData?.spellcasting) {
+      // Class no longer has spellcasting (shouldn't happen), remove it
+      delete classSpellcasting[classId];
+      continue;
+    }
+
+    const ability = classData.spellcasting.ability;
+    const abilityMod = getModifier(getTotalScore(char.abilityScores, ability));
+    const charClass = char.classes.find(c => c.classId === classId);
+    const classLevel = charClass?.level ?? 1;
+
+    classSpellcasting[classId] = {
+      ...classSpellData,
+      spellcastingAbility: ability,
+      spellSaveDC: 8 + pb + abilityMod,
+      spellAttackBonus: pb + abilityMod,
+      maxPrepared: classLevel + abilityMod,
     };
   }
 
-  // Recalculate spell slots (handles both single class and multiclass)
+  // Add any new spellcasting classes that weren't previously tracked
+  for (const charClass of char.classes) {
+    const classData = data.getClass(charClass.classId);
+    if (!classData?.spellcasting) continue;
+    if (classSpellcasting[charClass.classId]) continue; // already tracked
+
+    const ability = classData.spellcasting.ability;
+    const abilityMod = getModifier(getTotalScore(char.abilityScores, ability));
+
+    classSpellcasting[charClass.classId] = {
+      classId: charClass.classId,
+      spellcastingAbility: ability,
+      spellSaveDC: 8 + pb + abilityMod,
+      spellAttackBonus: pb + abilityMod,
+      knownSpells: [],
+      preparedSpells: [],
+      alwaysPreparedSpells: [],
+      maxPrepared: charClass.level + abilityMod,
+    };
+  }
+
+  newSpells = {
+    ...newSpells,
+    classSpellcasting,
+  };
+
+  // Recalculate Warlock Pact Magic
   const hasWarlock = char.classes.some(c => c.classId === 'Warlock');
 
   if (hasWarlock) {
-    // Handle Warlock pact magic
     const warlockLevel = char.classes.find(c => c.classId === 'Warlock')!.level;
     const pactResult = calculatePactMagic(warlockLevel, data);
-    if (pactResult && newSpells.pactMagicSlots) {
+    if (pactResult) {
+      const existingPactSlots = newSpells.pactMagicSlots;
       newSpells = {
         ...newSpells,
         pactMagicSlots: {
-          ...newSpells.pactMagicSlots,
-          total: pactResult.slots,
           level: pactResult.slotLevel,
+          total: pactResult.slots,
+          used: existingPactSlots?.used ?? 0,
+          resetOn: 'Short Rest',
         },
       };
     }
+  } else {
+    // Remove pact magic if no longer a Warlock
+    newSpells = {
+      ...newSpells,
+      pactMagicSlots: null,
+    };
   }
 
-  // Recalculate regular spell slots (using multiclass rules if multiple classes)
+  // Recalculate regular spell slots (using multiclass rules)
   const newSlots = calculateSpellSlotsFromClasses(char.classes, data);
   // Preserve used counts, update totals
   const updatedSlots = { ...newSpells.spellSlots };

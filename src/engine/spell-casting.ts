@@ -2,7 +2,7 @@
 // Spell casting mechanics — ritual casting, upcasting, cantrips
 // Corresponds to SRD 5.2 spell casting rules
 
-import type { Spell, SpellLevel } from '../types/spell';
+import type { Spell, SpellLevel, ClassSpellData } from '../types/spell';
 import type { Character } from '../types/character';
 import type { DataLoader } from '../data/loader';
 
@@ -132,7 +132,14 @@ export function isCantrip(spell: Spell): boolean {
  */
 export function canCastCantrip(char: Character, spell: Spell, data: DataLoader): boolean {
   if (!isCantrip(spell)) return false;
-  return char.spells.knownSpells.includes(spell.id);
+
+  // Check if the spell is known by any class
+  for (const classSpellData of Object.values(char.spells.classSpellcasting)) {
+    if (classSpellData.knownSpells.includes(spell.id)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // ── Upcasting ────────────────────────────────────────────
@@ -169,6 +176,30 @@ export function getUpcastDescription(spell: Spell, slotLevel: SpellLevel): strin
 }
 
 /**
+ * Find which class(es) can cast a given spell.
+ * Returns the classSpellData entries that have this spell in known or prepared spells.
+ */
+function findCastingClasses(
+  char: Character,
+  spellId: string
+): ClassSpellData[] {
+  const result: ClassSpellData[] = [];
+
+  for (const classSpellData of Object.values(char.spells.classSpellcasting)) {
+    const knowsSpell =
+      classSpellData.knownSpells.includes(spellId) ||
+      classSpellData.preparedSpells.includes(spellId) ||
+      (classSpellData.alwaysPreparedSpells ?? []).includes(spellId);
+
+    if (knowsSpell) {
+      result.push(classSpellData);
+    }
+  }
+
+  return result;
+}
+
+/**
  * Cast a spell with a specific slot level (supports upcasting).
  *
  * @param char - Character object
@@ -185,14 +216,15 @@ export function castSpell(
   spellId: string,
   slotLevel: SpellLevel,
   data: DataLoader
-): { success: boolean; char: Character; message?: string } {
+): { success: boolean; char: Character; message?: string; castingClassId?: string } {
   const spell = data.getSpell(spellId);
   if (!spell) {
     return { success: false, char, message: 'Spell not found.' };
   }
 
-  // Check if character knows the spell
-  if (!char.spells.knownSpells.includes(spellId) && !char.spells.preparedSpells.includes(spellId)) {
+  // Check if character knows the spell (in any class)
+  const castingClasses = findCastingClasses(char, spellId);
+  if (castingClasses.length === 0) {
     return { success: false, char, message: 'Character does not know this spell.' };
   }
 
@@ -202,6 +234,7 @@ export function castSpell(
       success: true,
       char,
       message: `Cast ${spell.name} (cantrip, no slot used).`,
+      castingClassId: castingClasses[0]?.classId,
     };
   }
 
@@ -214,7 +247,7 @@ export function castSpell(
     };
   }
 
-  // Check if character has the required slot
+  // Check if character has the required slot (unified pool)
   const slotEntry = char.spells.spellSlots[slotLevel];
   if (!slotEntry || slotEntry.used >= slotEntry.total) {
     return {
@@ -227,9 +260,13 @@ export function castSpell(
   // If upcasting, get the upcast description
   const upcastDesc = getUpcastDescription(spell, slotLevel);
 
+  // Use the first casting class for spell save DC (caller can choose if multiple)
+  const primaryCastingClass = castingClasses[0];
+
   return {
     success: true,
     char,
     message: `Cast ${spell.name} using a level ${slotLevel} slot.${upcastDesc ? ` ${upcastDesc}` : ''}`,
+    castingClassId: primaryCastingClass?.classId,
   };
 }

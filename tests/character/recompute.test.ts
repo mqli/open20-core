@@ -350,7 +350,7 @@ describe('recomputeDerivedStats', () => {
     );
 
     // Int 15 → +2, PB 2, DC = 8 + 2 + 2 = 12
-    expect(char.spells.spellSaveDC).toBe(12);
+    expect(char.spells.classSpellcasting['Wizard']!.spellSaveDC).toBe(12);
 
     // Increase Int to 20
     const mutated = mutate(char);
@@ -360,7 +360,7 @@ describe('recomputeDerivedStats', () => {
     };
     char = recomputeDerivedStats(mutated, data);
     // Int 20 → +5, PB 2, DC = 8 + 2 + 5 = 15
-    expect(char.spells.spellSaveDC).toBe(15);
+    expect(char.spells.classSpellcasting['Wizard']!.spellSaveDC).toBe(15);
   });
 
   it('recalculates spell attack bonus', () => {
@@ -383,14 +383,14 @@ describe('recomputeDerivedStats', () => {
     );
 
     // Int 15 → +2, PB 2, Attack = 2 + 2 = 4
-    expect(char.spells.spellAttackBonus).toBe(4);
+    expect(char.spells.classSpellcasting['Wizard']!.spellAttackBonus).toBe(4);
 
     // Level up to 5 → PB 3
     const mutated = mutate(char);
     mutated.classes = [{ ...char.classes[0]!, level: 5 }];
     char = recomputeDerivedStats(mutated, data);
     // Int 15 → +2, PB 3, Attack = 3 + 2 = 5
-    expect(char.spells.spellAttackBonus).toBe(5);
+    expect(char.spells.classSpellcasting['Wizard']!.spellAttackBonus).toBe(5);
   });
 
   it('updates spell slot totals', () => {

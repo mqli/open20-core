@@ -326,47 +326,130 @@ export function makeConcentrationCheck(
 // ── Always-Prepared Spells ───────────────────────────────────
 
 /**
- * Add a spell to the always-prepared list
+ * Add a spell to the always-prepared list for a specific class
  * SRD: Some features give spells that are always prepared and don't count
  * against the prepared spell limit.
  *
  * @param char - The character
+ * @param classId - The class ID (e.g., 'cleric', 'wizard')
  * @param spellId - The spell ID to add
- * @returns Updated character with the spell in alwaysPreparedSpells
+ * @returns Updated character with the spell in alwaysPreparedSpells for that class
  *
  * @example
- * addAlwaysPreparedSpell(char, 'shield-of-faith')
+ * addAlwaysPreparedSpell(char, 'cleric', 'shield-of-faith')
  */
-export function addAlwaysPreparedSpell(char: Character, spellId: string): Character {
-  const current = char.spells.alwaysPreparedSpells ?? [];
+export function addAlwaysPreparedSpell(char: Character, classId: string, spellId: string): Character {
+  const classSpellcasting = { ...char.spells.classSpellcasting };
+  const classData = classSpellcasting[classId];
+
+  if (!classData) {
+    // Class not found in spellcasting, can't add
+    return char;
+  }
+
+  const current = classData.alwaysPreparedSpells ?? [];
   if (current.includes(spellId)) return char;
+
+  classSpellcasting[classId] = {
+    ...classData,
+    alwaysPreparedSpells: [...current, spellId],
+  };
 
   return withUpdate(char, {
     spells: {
       ...char.spells,
-      alwaysPreparedSpells: [...current, spellId],
+      classSpellcasting,
     },
   });
 }
 
 /**
- * Remove a spell from the always-prepared list
+ * Remove a spell from the always-prepared list for a specific class
  *
  * @param char - The character
+ * @param classId - The class ID
  * @param spellId - The spell ID to remove
  * @returns Updated character without the spell in alwaysPreparedSpells
  *
  * @example
- * removeAlwaysPreparedSpell(char, 'shield-of-faith')
+ * removeAlwaysPreparedSpell(char, 'cleric', 'shield-of-faith')
  */
-export function removeAlwaysPreparedSpell(char: Character, spellId: string): Character {
-  const current = char.spells.alwaysPreparedSpells ?? [];
+export function removeAlwaysPreparedSpell(char: Character, classId: string, spellId: string): Character {
+  const classSpellcasting = { ...char.spells.classSpellcasting };
+  const classData = classSpellcasting[classId];
+
+  if (!classData) return char;
+
+  const current = classData.alwaysPreparedSpells ?? [];
   if (!current.includes(spellId)) return char;
+
+  classSpellcasting[classId] = {
+    ...classData,
+    alwaysPreparedSpells: current.filter(id => id !== spellId),
+  };
 
   return withUpdate(char, {
     spells: {
       ...char.spells,
-      alwaysPreparedSpells: current.filter(id => id !== spellId),
+      classSpellcasting,
+    },
+  });
+}
+
+/**
+ * Add a known spell to a specific class
+ *
+ * @param char - The character
+ * @param classId - The class ID
+ * @param spellId - The spell ID to add
+ * @returns Updated character with the spell in knownSpells for that class
+ */
+export function addKnownSpell(char: Character, classId: string, spellId: string): Character {
+  const classSpellcasting = { ...char.spells.classSpellcasting };
+  const classData = classSpellcasting[classId];
+
+  if (!classData) return char;
+
+  if (classData.knownSpells.includes(spellId)) return char;
+
+  classSpellcasting[classId] = {
+    ...classData,
+    knownSpells: [...classData.knownSpells, spellId],
+  };
+
+  return withUpdate(char, {
+    spells: {
+      ...char.spells,
+      classSpellcasting,
+    },
+  });
+}
+
+/**
+ * Remove a known spell from a specific class
+ *
+ * @param char - The character
+ * @param classId - The class ID
+ * @param spellId - The spell ID to remove
+ * @returns Updated character without the spell in knownSpells
+ */
+export function removeKnownSpell(char: Character, classId: string, spellId: string): Character {
+  const classSpellcasting = { ...char.spells.classSpellcasting };
+  const classData = classSpellcasting[classId];
+
+  if (!classData) return char;
+
+  if (!classData.knownSpells.includes(spellId)) return char;
+
+  classSpellcasting[classId] = {
+    ...classData,
+    knownSpells: classData.knownSpells.filter(id => id !== spellId),
+  };
+
+  return withUpdate(char, {
+    spells: {
+      ...char.spells,
+      classSpellcasting,
     },
   });
 }
@@ -446,28 +529,103 @@ export function removeEquipment(char: Character, itemId: string): Character {
 
 // ── Spell Preparation Mutations ─────────────────────────────────
 
-export function prepareSpell(char: Character, spellId: string): Character {
-  if (char.spells.preparedSpells.includes(spellId)) return char;
+/**
+ * Prepare a spell for a specific class
+ *
+ * @param char - The character
+ * @param classId - The class ID
+ * @param spellId - The spell ID to prepare
+ * @returns Updated character
+ *
+ * @example
+ * prepareSpellForClass(char, 'wizard', 'fireball')
+ */
+export function prepareSpellForClass(
+  char: Character,
+  classId: string,
+  spellId: string
+): Character {
+  const classSpellcasting = { ...char.spells.classSpellcasting };
+  const classData = classSpellcasting[classId];
+
+  if (!classData) return char;
+  if (classData.preparedSpells.includes(spellId)) return char;
+
+  // Check if we've hit the max prepared limit
+  const alwaysPrepared = classData.alwaysPreparedSpells ?? [];
+  const totalPrepared = classData.preparedSpells.length + alwaysPrepared.length;
+  if (totalPrepared >= classData.maxPrepared) {
+    // Can't prepare more spells
+    return char;
+  }
+
+  classSpellcasting[classId] = {
+    ...classData,
+    preparedSpells: [...classData.preparedSpells, spellId],
+  };
 
   return withUpdate(char, {
     spells: {
       ...char.spells,
-      preparedSpells: [...char.spells.preparedSpells, spellId],
+      classSpellcasting,
     },
   });
 }
 
-export function unprepareSpell(char: Character, spellId: string): Character {
+/**
+ * Unprepare a spell for a specific class
+ *
+ * @param char - The character
+ * @param classId - The class ID
+ * @param spellId - The spell ID to unprepare
+ * @returns Updated character
+ *
+ * @example
+ * unprepareSpellForClass(char, 'wizard', 'fireball')
+ */
+export function unprepareSpellForClass(
+  char: Character,
+  classId: string,
+  spellId: string
+): Character {
+  const classSpellcasting = { ...char.spells.classSpellcasting };
+  const classData = classSpellcasting[classId];
+
+  if (!classData) return char;
+
   // Cannot unprepare always-prepared spells
-  if ((char.spells.alwaysPreparedSpells ?? []).includes(spellId)) return char;
-  if (!char.spells.preparedSpells.includes(spellId)) return char;
+  if ((classData.alwaysPreparedSpells ?? []).includes(spellId)) return char;
+  if (!classData.preparedSpells.includes(spellId)) return char;
+
+  classSpellcasting[classId] = {
+    ...classData,
+    preparedSpells: classData.preparedSpells.filter(id => id !== spellId),
+  };
 
   return withUpdate(char, {
     spells: {
       ...char.spells,
-      preparedSpells: char.spells.preparedSpells.filter(id => id !== spellId),
+      classSpellcasting,
     },
   });
+}
+
+// Backward-compatible versions (use first spellcasting class)
+function getFirstSpellcastingClassId(char: Character): string | null {
+  const classIds = Object.keys(char.spells.classSpellcasting);
+  return classIds.length > 0 ? classIds[0]! : null;
+}
+
+export function prepareSpell(char: Character, spellId: string): Character {
+  const classId = getFirstSpellcastingClassId(char);
+  if (!classId) return char;
+  return prepareSpellForClass(char, classId, spellId);
+}
+
+export function unprepareSpell(char: Character, spellId: string): Character {
+  const classId = getFirstSpellcastingClassId(char);
+  if (!classId) return char;
+  return unprepareSpellForClass(char, classId, spellId);
 }
 
 // ── Currency Mutations ──────────────────────────────────────────

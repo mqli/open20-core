@@ -269,10 +269,13 @@ describe('createCharacter', () => {
       };
 
       const char = createCharacter(params, data);
-      expect(char.spells.spellSaveDC).toBe(0);
-      expect(char.spells.spellAttackBonus).toBe(0);
-      expect(char.spells.knownSpells).toHaveLength(0);
+      // Non-caster should have empty classSpellcasting
+      expect(Object.keys(char.spells.classSpellcasting)).toHaveLength(0);
       expect(char.spells.pactMagicSlots).toBeNull();
+      // spellSlots should all be 0
+      for (let level = 1; level <= 9; level++) {
+        expect(char.spells.spellSlots[level as keyof typeof char.spells.spellSlots].total).toBe(0);
+      }
     });
 
     it('sets currency from background startingGold', () => {
@@ -384,9 +387,11 @@ describe('createCharacter', () => {
       };
 
       const char = createCharacter(params, data);
-      expect(char.spells.spellcastingAbility).toBe('Intelligence');
-      expect(char.spells.spellSaveDC).toBeGreaterThan(0);
-      expect(char.spells.spellAttackBonus).toBeGreaterThan(0);
+      // Check per-class spell data
+      expect(char.spells.classSpellcasting['Wizard']).toBeDefined();
+      expect(char.spells.classSpellcasting['Wizard']!.spellcastingAbility).toBe('Intelligence');
+      expect(char.spells.classSpellcasting['Wizard']!.spellSaveDC).toBeGreaterThan(0);
+      expect(char.spells.classSpellcasting['Wizard']!.spellAttackBonus).toBeGreaterThan(0);
     });
 
     it('has 2 level-1 spell slots', () => {
@@ -415,7 +420,7 @@ describe('createCharacter', () => {
       };
 
       const char = createCharacter(params, data);
-      expect(char.spells.spellSaveDC).toBe(13);
+      expect(char.spells.classSpellcasting['Wizard']!.spellSaveDC).toBe(13);
     });
 
     it('calculates correct spellAttackBonus = PB + Int mod', () => {
@@ -430,7 +435,7 @@ describe('createCharacter', () => {
       };
 
       const char = createCharacter(params, data);
-      expect(char.spells.spellAttackBonus).toBe(5);
+      expect(char.spells.classSpellcasting['Wizard']!.spellAttackBonus).toBe(5);
     });
 
     it('includes Sage background skills (Arcana, History)', () => {
@@ -741,20 +746,19 @@ describe('buildInitialSpells', () => {
     const result = buildInitialSpells(WIZARD_CLASS, abilityScores, createMockDataLoader());
     // Int 16 → +3, PB = 2
     // DC = 8 + 2 + 3 = 13
-    expect(result.spellSaveDC).toBe(13);
+    expect(result.classSpellcasting['Wizard']).toBeDefined();
+    expect(result.classSpellcasting['Wizard']!.spellSaveDC).toBe(13);
     // Attack = 2 + 3 = 5
-    expect(result.spellAttackBonus).toBe(5);
-    expect(result.spellcastingAbility).toBe('Intelligence');
+    expect(result.classSpellcasting['Wizard']!.spellAttackBonus).toBe(5);
+    expect(result.classSpellcasting['Wizard']!.spellcastingAbility).toBe('Intelligence');
   });
 });
 
 describe('emptyCharacterSpells', () => {
   it('returns spell data with all zeros', () => {
     const result = emptyCharacterSpells();
-    expect(result.spellSaveDC).toBe(0);
-    expect(result.spellAttackBonus).toBe(0);
-    expect(result.knownSpells).toHaveLength(0);
-    expect(result.preparedSpells).toHaveLength(0);
+    // Non-caster has empty classSpellcasting
+    expect(Object.keys(result.classSpellcasting)).toHaveLength(0);
     expect(result.pactMagicSlots).toBeNull();
     for (let level = 0; level <= 9; level++) {
       expect(result.spellSlots[level as keyof typeof result.spellSlots].total).toBe(0);

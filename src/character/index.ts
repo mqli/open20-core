@@ -24,6 +24,8 @@ export {
   makeConcentrationCheck,
   addAlwaysPreparedSpell,
   removeAlwaysPreparedSpell,
+  addKnownSpell,
+  removeKnownSpell,
   equipItem,
   unequipItem,
   equipItemAndRecompute,
@@ -32,6 +34,8 @@ export {
   removeEquipment,
   prepareSpell,
   unprepareSpell,
+  prepareSpellForClass,
+  unprepareSpellForClass,
   modifyCurrency,
 } from './mutate';
 

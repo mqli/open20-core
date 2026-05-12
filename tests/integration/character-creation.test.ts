@@ -55,7 +55,9 @@ describe('D&D Player Behavior - Character Creation', () => {
       );
 
       expect(char.name).toBe('Elara');
-      expect(Array.isArray(char.spells.knownSpells)).toBe(true);
+      // Check per-class spell data
+      expect(char.spells.classSpellcasting['Wizard']).toBeDefined();
+      expect(Array.isArray(char.spells.classSpellcasting['Wizard']!.knownSpells)).toBe(true);
     });
   });
 

@@ -306,7 +306,7 @@ function buildSkills(
 }
 
 /**
- * 构建施法职业的初始法术数据
+ * 构建施法职业的初始法术数据（每职业追踪）
  */
 export function buildInitialSpells(
   classData: Class,
@@ -320,6 +320,18 @@ export function buildInitialSpells(
 
   const spellSaveDC = 8 + pb + abilityMod;
   const spellAttackBonus = pb + abilityMod;
+
+  // 构建该职业的法术数据
+  const classSpellData: ClassSpellData = {
+    classId: classData.id,
+    spellcastingAbility: ability,
+    spellSaveDC,
+    spellAttackBonus,
+    knownSpells: [],
+    preparedSpells: [],
+    alwaysPreparedSpells: [],
+    maxPrepared: 1 + abilityMod, // 1级 + 调整值
+  };
 
   // 计算法术位
   const slots = calculateSpellSlots(classData.id, 1, data);
@@ -344,12 +356,7 @@ export function buildInitialSpells(
   }
 
   return {
-    spellcastingAbility: ability,
-    spellSaveDC,
-    spellAttackBonus,
-    knownSpells: [],
-    preparedSpells: [],
-    alwaysPreparedSpells: [],
+    classSpellcasting: { [classData.id]: classSpellData },
     spellSlots,
     pactMagicSlots,
   };
@@ -364,12 +371,7 @@ export function emptyCharacterSpells(): CharacterSpells {
     spellSlots[level as SpellLevel] = { total: 0, used: 0 };
   }
   return {
-    spellcastingAbility: 'Intelligence',
-    spellSaveDC: 0,
-    spellAttackBonus: 0,
-    knownSpells: [],
-    preparedSpells: [],
-    alwaysPreparedSpells: [],
+    classSpellcasting: {},
     spellSlots,
     pactMagicSlots: null,
   };
@@ -483,7 +485,7 @@ function gatherAllFeatures(classes: CharacterClass[], data: DataLoader): Feature
   return features;
 }
 
-/** Build spells for multiclass characters */
+/** Build spells for multiclass characters (per-class tracking) */
 function buildMulticlassSpells(
   classes: CharacterClass[],
   abilityScores: AbilityScores,
@@ -499,34 +501,65 @@ function buildMulticlassSpells(
     return emptyCharacterSpells();
   }
 
-  // Calculate multiclass spell slots
-  const totalSpellcastingLevel = getMulticlassSpellcasterLevel(classes, data);
+  const totalLevel = classes.reduce((sum, c) => sum + c.level, 0);
+  const pb = getProficiencyBonus(totalLevel);
+  const classSpellcasting: Record<string, ClassSpellData> = {};
 
-  if (totalSpellcastingLevel > 0) {
-    // Use multiclass spell slot table
-    const spellSlots = calculateMulticlassSpellSlots(totalSpellcastingLevel, data);
-    const primaryClassId = classes.find(c => data.getClass(c.classId)?.spellcasting)?.classId;
-    if (!primaryClassId) {
-      return emptyCharacterSpells();
-    }
-    const primaryClass = data.getClass(primaryClassId);
-    if (!primaryClass) {
-      return emptyCharacterSpells();
-    }
-    const ability = primaryClass.spellcasting?.ability ?? 'Intelligence';
-    const pb = getProficiencyBonus(classes.reduce((sum, c) => sum + c.level, 0));
+  // Build per-class spell data
+  for (const charClass of classes) {
+    const classData = data.getClass(charClass.classId);
+    if (!classData?.spellcasting) continue;
+
+    const ability = classData.spellcasting.ability;
     const abilityMod = getModifier(getTotalScore(abilityScores, ability));
+    const spellSaveDC = 8 + pb + abilityMod;
+    const spellAttackBonus = pb + abilityMod;
 
-    return {
+    classSpellcasting[charClass.classId] = {
+      classId: charClass.classId,
       spellcastingAbility: ability,
-      spellSaveDC: 8 + pb + abilityMod,
-      spellAttackBonus: pb + abilityMod,
+      spellSaveDC,
+      spellAttackBonus,
       knownSpells: [],
       preparedSpells: [],
-      spellSlots,
-      pactMagicSlots: null,
+      alwaysPreparedSpells: [],
+      maxPrepared: charClass.level + abilityMod,
     };
   }
 
-  return emptyCharacterSpells();
+  // Calculate multiclass spell slots (unified pool)
+  const totalSpellcastingLevel = getMulticlassSpellcasterLevel(classes, data);
+  const spellSlots = totalSpellcastingLevel > 0
+    ? calculateMulticlassSpellSlots(totalSpellcastingLevel, data)
+    : createEmptySpellSlots();
+
+  // Handle Warlock Pact Magic
+  let pactMagicSlots: PactMagicSlots | null = null;
+  const warlockClass = classes.find(c => c.classId === 'Warlock');
+  if (warlockClass) {
+    const pact = calculatePactMagic(warlockClass.level, data);
+    if (pact) {
+      pactMagicSlots = {
+        level: pact.slotLevel,
+        total: pact.slots,
+        used: 0,
+        resetOn: 'Short Rest',
+      };
+    }
+  }
+
+  return {
+    classSpellcasting,
+    spellSlots,
+    pactMagicSlots,
+  };
+}
+
+/** Create empty spell slots record */
+function createEmptySpellSlots(): Record<SpellLevel, SpellSlotEntry> {
+  const slots: Record<SpellLevel, SpellSlotEntry> = {} as Record<SpellLevel, SpellSlotEntry>;
+  for (let level = 0; level <= 9; level++) {
+    slots[level as SpellLevel] = { total: 0, used: 0 };
+  }
+  return slots;
 }

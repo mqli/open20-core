@@ -15,7 +15,10 @@ Character
 ├── Skills
 ├── Feats[]
 ├── Equipment[] (Weapon | Armor | Gear)
-├── Spells (known, prepared, slots)
+├── Spells (per-class tracking)
+│   ├── classSpellcasting[] (per-class data)
+│   ├── spellSlots (unified pool)
+│   └── pactMagicSlots (Warlock only)
 ├── Resources[] (consumable counters)
 ├── HitPoints
 ├── CombatStats
@@ -50,6 +53,41 @@ interface Character {
 ```
 
 **JSON example**: See `static/` files for actual data.
+
+---
+
+## Character Spells (Per-Class Tracking)
+
+In D&D 5e multiclassing, different classes use different spellcasting abilities and track spells separately. The new model supports this:
+
+```typescript
+interface CharacterSpells {
+  // Per-class spell tracking (keyed by classId)
+  readonly classSpellcasting: Record<string, ClassSpellData>;
+
+  // Unified spell slots (multiclass combination)
+  readonly spellSlots: Record<SpellLevel, SpellSlotEntry>;
+
+  // Warlock Pact Magic (separate from regular slots)
+  readonly pactMagicSlots: PactMagicSlots | null;
+}
+
+interface ClassSpellData {
+  readonly classId: string;
+  readonly spellcastingAbility: AbilityName;
+  readonly spellSaveDC: number;  // 8 + PB + ability mod
+  readonly spellAttackBonus: number;
+  readonly knownSpells: readonly string[];
+  readonly preparedSpells: readonly string[];
+  readonly alwaysPreparedSpells?: readonly string[];
+  readonly maxPrepared: number;  // class level + ability mod
+}
+```
+
+**Key changes from previous version**:
+- `spellcastingAbility`, `spellSaveDC`, `spellAttackBonus` are now PER CLASS
+- `knownSpells` and `preparedSpells` are tracked per class
+- `spellSlots` is still a unified pool (correct for D&D 5e multiclassing)
 
 ---
 

@@ -32,11 +32,18 @@ function createMockDataLoaderWithSpells(spells: Spell[] = MOCK_SPELLS): DataLoad
 
 const MOCK_CHARACTER = {
   spells: {
-    knownSpells: ['fireball', 'shield', 'fire-bolt'],
-    preparedSpells: ['shield', 'fireball'],
-    spellcastingAbility: 'Intelligence' as const,
-    spellSaveDC: 15,
-    spellAttackBonus: 7,
+    classSpellcasting: {
+      Wizard: {
+        classId: 'Wizard',
+        spellcastingAbility: 'Intelligence' as const,
+        spellSaveDC: 15,
+        spellAttackBonus: 7,
+        knownSpells: ['fireball', 'shield', 'fire-bolt'],
+        preparedSpells: ['shield', 'fireball'],
+        alwaysPreparedSpells: [],
+        maxPrepared: 5,
+      },
+    },
     spellSlots: {},
     pactMagicSlots: null,
   },
@@ -123,11 +130,18 @@ describe('getSpellsForCharacter', () => {
   it('should skip unknown spell ids', () => {
     const char = {
       spells: {
-        knownSpells: ['fireball', 'non-existent'],
-        preparedSpells: [],
-        spellcastingAbility: 'Intelligence' as const,
-        spellSaveDC: 15,
-        spellAttackBonus: 7,
+        classSpellcasting: {
+          Wizard: {
+            classId: 'Wizard',
+            spellcastingAbility: 'Intelligence' as const,
+            spellSaveDC: 15,
+            spellAttackBonus: 7,
+            knownSpells: ['fireball', 'non-existent'],
+            preparedSpells: [],
+            alwaysPreparedSpells: [],
+            maxPrepared: 5,
+          },
+        },
         spellSlots: {},
         pactMagicSlots: null,
       },

@@ -135,7 +135,9 @@ describe('D&D Player Behavior - Survival Mechanics', () => {
         dataLoader
       );
 
-      expect(warlock.spells.spellcastingAbility).toBe('Charisma');
+      // Warlock uses Charisma for spellcasting
+      expect(warlock.spells.classSpellcasting['Warlock']).toBeDefined();
+      expect(warlock.spells.classSpellcasting['Warlock']!.spellcastingAbility).toBe('Charisma');
     });
   });
 });

@@ -114,12 +114,18 @@ const mockWizardChar = {
   feats: [],
   equipment: [],
   spells: {
-    spellcastingAbility: 'Intelligence',
-    spellSaveDC: 13,
-    spellAttackBonus: 5,
-    knownSpells: ['detect-magic', 'fire-bolt', 'fireball'],
-    preparedSpells: ['detect-magic', 'fireball'],
-    alwaysPreparedSpells: [],
+    classSpellcasting: {
+      Wizard: {
+        classId: 'Wizard',
+        spellcastingAbility: 'Intelligence',
+        spellSaveDC: 13,
+        spellAttackBonus: 5,
+        knownSpells: ['detect-magic', 'fire-bolt', 'fireball'],
+        preparedSpells: ['detect-magic', 'fireball'],
+        alwaysPreparedSpells: [],
+        maxPrepared: 5,
+      },
+    },
     spellSlots: {
       0: { total: 0, used: 0 },
       1: { total: 4, used: 0 },

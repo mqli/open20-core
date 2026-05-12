@@ -20,15 +20,35 @@ export interface PactMagicSlots {
   readonly resetOn: 'Short Rest'; // Warlock法术位短休恢复
 }
 
-// 角色法术数据（Character.spells）
-export interface CharacterSpells {
-  readonly spellcastingAbility: import('./ability').AbilityName;
-  readonly spellSaveDC: number;
+// 每职业法术追踪（多维职业支持）
+export interface ClassSpellData {
+  readonly classId: string;
+  readonly spellcastingAbility: AbilityName;
+  readonly spellSaveDC: number;  // 8 + proficiency + ability mod
   readonly spellAttackBonus: number;
-  readonly knownSpells: readonly string[]; // Spell.id 列表
-  readonly preparedSpells: readonly string[]; // 已准备法术（施法者用）
-  readonly alwaysPreparedSpells?: readonly string[]; // 始终准备的法术（不计入准备数量）
+  
+  // 该职业已知的法术
+  readonly knownSpells: readonly string[];
+  
+  // 已准备的法术（准备施法者用）
+  readonly preparedSpells: readonly string[];
+  
+  // 始终准备的法术（领域法术等）- 不计入准备数量
+  readonly alwaysPreparedSpells?: readonly string[];
+  
+  // 最大准备法术数量（准备施法者）: 职业等级 + 能力调整值
+  readonly maxPrepared: number;
+}
+
+// 角色法术数据（Character.spells）- 支持多维职业
+export interface CharacterSpells {
+  // 每职业法术追踪（以 classId 为键）
+  readonly classSpellcasting: Record<string, ClassSpellData>;
+  
+  // 统一法术位（多维职业合并池）
   readonly spellSlots: Record<SpellLevel, SpellSlotEntry>;
+  
+  // Warlock Pact Magic（独立于常规法术位）
   readonly pactMagicSlots: PactMagicSlots | null;
 }
 

@@ -217,7 +217,7 @@ export function searchSpells(filter: SpellFilter, data: DataLoader): Spell[] {
 }
 
 /**
- * Get spells for a character (known or prepared)
+ * Get spells for a character (known by any class)
  *
  * @param char - Character object
  * @param data - DataLoader
@@ -227,52 +227,132 @@ export function searchSpells(filter: SpellFilter, data: DataLoader): Spell[] {
  * getSpellsForCharacter(char, data) // Character's known spells with full data
  */
 export function getSpellsForCharacter(char: Character, data: DataLoader): Spell[] {
-  const knownSpellIds = char.spells.knownSpells;
-  return knownSpellIds.map(id => data.getSpell(id)).filter((s): s is Spell => s !== undefined);
+  // Collect known spells from all classes
+  const knownSpellIds = new Set<string>();
+  for (const classSpellData of Object.values(char.spells.classSpellcasting)) {
+    for (const spellId of classSpellData.knownSpells) {
+      knownSpellIds.add(spellId);
+    }
+  }
+  return Array.from(knownSpellIds)
+    .map(id => data.getSpell(id))
+    .filter((s): s is Spell => s !== undefined);
 }
 
 /**
  * Get prepared spells for a character
- * Includes both regularly prepared and always-prepared spells
+ * Includes both regularly prepared and always-prepared spells from all classes
  *
  * @param char - Character object
  * @param data - DataLoader
  * @returns Array of prepared spells
  */
 export function getPreparedSpells(char: Character, data: DataLoader): Spell[] {
-  const allPreparedIds = [
-    ...char.spells.preparedSpells,
-    ...(char.spells.alwaysPreparedSpells ?? []),
-  ];
-  // Deduplicate
-  const uniqueIds = [...new Set(allPreparedIds)];
-  return uniqueIds.map(id => data.getSpell(id)).filter((s): s is Spell => s !== undefined);
+  const allPreparedIds = new Set<string>();
+
+  for (const classSpellData of Object.values(char.spells.classSpellcasting)) {
+    // Add regularly prepared spells
+    for (const spellId of classSpellData.preparedSpells) {
+      allPreparedIds.add(spellId);
+    }
+    // Add always-prepared spells
+    for (const spellId of (classSpellData.alwaysPreparedSpells ?? [])) {
+      allPreparedIds.add(spellId);
+    }
+  }
+
+  return Array.from(allPreparedIds)
+    .map(id => data.getSpell(id))
+    .filter((s): s is Spell => s !== undefined);
 }
 
 /**
  * Check if a spell is prepared by the character
- * Includes always-prepared spells
+ * Checks all classes for prepared or always-prepared spells
  *
  * @param char - Character object
  * @param spellId - Spell ID
- * @returns True if the spell is prepared or always prepared
+ * @returns True if the spell is prepared or always prepared in any class
  */
 export function isSpellPrepared(char: Character, spellId: string): boolean {
-  return (
-    char.spells.preparedSpells.includes(spellId) ||
-    (char.spells.alwaysPreparedSpells ?? []).includes(spellId)
-  );
+  for (const classSpellData of Object.values(char.spells.classSpellcasting)) {
+    if (
+      classSpellData.preparedSpells.includes(spellId) ||
+      (classSpellData.alwaysPreparedSpells ?? []).includes(spellId)
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**
- * Check if a character knows a spell
+ * Check if a character knows a spell (in any class)
  *
  * @param char - Character object
  * @param spellId - Spell ID
- * @returns True if the character knows the spell
+ * @returns True if the character knows the spell in any class
  */
 export function knowsSpell(char: Character, spellId: string): boolean {
-  return char.spells.knownSpells.includes(spellId);
+  for (const classSpellData of Object.values(char.spells.classSpellcasting)) {
+    if (classSpellData.knownSpells.includes(spellId)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Get the class spell data for a specific class
+ *
+ * @param char - Character object
+ * @param classId - Class ID
+ * @returns ClassSpellData or undefined
+ */
+export function getClassSpellData(
+  char: Character,
+  classId: string
+): import('../types/spell').ClassSpellData | undefined {
+  return char.spells.classSpellcasting[classId];
+}
+
+/**
+ * Check if a spell is known for a specific class
+ *
+ * @param char - Character object
+ * @param classId - Class ID
+ * @param spellId - Spell ID
+ * @returns True if the spell is known for that class
+ */
+export function knowsSpellForClass(
+  char: Character,
+  classId: string,
+  spellId: string
+): boolean {
+  const classSpellData = char.spells.classSpellcasting[classId];
+  if (!classSpellData) return false;
+  return classSpellData.knownSpells.includes(spellId);
+}
+
+/**
+ * Check if a spell is prepared for a specific class
+ *
+ * @param char - Character object
+ * @param classId - Class ID
+ * @param spellId - Spell ID
+ * @returns True if the spell is prepared for that class
+ */
+export function isSpellPreparedForClass(
+  char: Character,
+  classId: string,
+  spellId: string
+): boolean {
+  const classSpellData = char.spells.classSpellcasting[classId];
+  if (!classSpellData) return false;
+  return (
+    classSpellData.preparedSpells.includes(spellId) ||
+    (classSpellData.alwaysPreparedSpells ?? []).includes(spellId)
+  );
 }
 
 /**
