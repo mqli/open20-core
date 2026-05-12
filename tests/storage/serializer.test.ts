@@ -45,11 +45,7 @@ function createMinimalCharacter(overrides?: Partial<Character>): Character {
     feats: [],
     equipment: [],
     spells: {
-      spellcastingAbility: 'Intelligence',
-      spellSaveDC: 0,
-      spellAttackBonus: 0,
-      knownSpells: [],
-      preparedSpells: [],
+      classSpellcasting: {},
       spellSlots: {} as Record<import('../../src/types/spell').SpellLevel, import('../../src/types/spell').SpellSlotEntry>,
       pactMagicSlots: null,
     },

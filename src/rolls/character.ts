@@ -291,15 +291,27 @@ export function rollSpellDamage(
   // Add spellcasting ability modifier if it's a spell attack
   const modifiers = [];
   if (spell.attack) {
-    const abilityMod = getModifier(
-      getTotalScore(character.abilityScores, character.spells.spellcastingAbility)
-    );
-    if (abilityMod !== 0) {
-      modifiers.push({
-        value: abilityMod,
-        type: 'ability' as const,
-        description: `${character.spells.spellcastingAbility} modifier`,
-      });
+    // Find the class that can cast this spell
+    let spellcastingAbility: AbilityName | undefined;
+    for (const [classId, classSpellData] of Object.entries(character.spells.classSpellcasting)) {
+      const classIdLower = classId.toLowerCase();
+      if (spell.classes?.some(c => c.toLowerCase() === classIdLower)) {
+        spellcastingAbility = classSpellData.spellcastingAbility;
+        break;
+      }
+    }
+
+    if (spellcastingAbility) {
+      const abilityMod = getModifier(
+        getTotalScore(character.abilityScores, spellcastingAbility)
+      );
+      if (abilityMod !== 0) {
+        modifiers.push({
+          value: abilityMod,
+          type: 'ability' as const,
+          description: `${spellcastingAbility} modifier`,
+        });
+      }
     }
   }
 

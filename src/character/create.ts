@@ -12,7 +12,7 @@ import type {
   Currency,
   DamageDefenses,
 } from '../types/character';
-import type { CharacterSpells, SpellLevel, SpellSlotEntry, PactMagicSlots } from '../types/spell';
+import type { CharacterSpells, ClassSpellData, SpellLevel, SpellSlotEntry, PactMagicSlots } from '../types/spell';
 import type { Feature, Class } from '../types/class';
 import type { Resource } from '../types/resource';
 import { ResetType } from '../types/resource';

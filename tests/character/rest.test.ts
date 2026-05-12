@@ -6,6 +6,8 @@ import type { Character } from '../../src/types/character';
 import type { DieType } from '../../src/types/dice';
 import type { Resource } from '../../src/types/resource';
 import type {
+  ClassSpellData,
+  CharacterSpells,
   SpellSlotEntry,
   PactMagicSlots,
   SpellLevel,
@@ -16,6 +18,32 @@ import type { Class, Feature } from '../../src/types/class';
 
 import { shortRest, longRest } from '../../src/character/rest';
 import type { RandomProvider } from '../../src/character/rest';
+
+// ── Helper ─────────────────────────────────────────
+
+/** Create CharacterSpells with per-class tracking (new structure) */
+function makeCharSpells(
+  classId: string,
+  overrides?: Partial<ClassSpellData>
+): CharacterSpells {
+  return {
+    classSpellcasting: {
+      [classId]: {
+        classId,
+        spellcastingAbility: 'Intelligence' as const,
+        spellSaveDC: 0,
+        spellAttackBonus: 0,
+        knownSpells: [],
+        preparedSpells: [],
+        alwaysPreparedSpells: [],
+        maxPrepared: 0,
+        ...overrides,
+      },
+    },
+    spellSlots: {} as Record<SpellLevel, SpellSlotEntry>,
+    pactMagicSlots: null,
+  };
+}
 
 // ── Mock Data ──────────────────────────────────────────────────
 
@@ -119,11 +147,7 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
     feats: [],
     equipment: [],
     spells: {
-      spellcastingAbility: 'Intelligence',
-      spellSaveDC: 0,
-      spellAttackBonus: 0,
-      knownSpells: [],
-      preparedSpells: [],
+      classSpellcasting: {},
       spellSlots: {} as Record<SpellLevel, SpellSlotEntry>,
       pactMagicSlots: null,
     },
@@ -227,11 +251,18 @@ function makeWarlock(): Character {
       },
     ],
     spells: {
-      spellcastingAbility: 'Charisma',
-      spellSaveDC: 14,
-      spellAttackBonus: 6,
-      knownSpells: [],
-      preparedSpells: [],
+      classSpellcasting: {
+        warlock: {
+          classId: 'warlock',
+          spellcastingAbility: 'Charisma',
+          spellSaveDC: 14,
+          spellAttackBonus: 6,
+          knownSpells: [],
+          preparedSpells: [],
+          alwaysPreparedSpells: [],
+          maxPrepared: 0,
+        },
+      },
       spellSlots,
       pactMagicSlots: pactMagic,
     },
@@ -397,11 +428,18 @@ describe('longRest', () => {
         },
       ],
       spells: {
-        spellcastingAbility: 'Intelligence',
-        spellSaveDC: 15,
-        spellAttackBonus: 7,
-        knownSpells: [],
-        preparedSpells: [],
+        classSpellcasting: {
+          wizard: {
+            classId: 'wizard',
+            spellcastingAbility: 'Intelligence',
+            spellSaveDC: 15,
+            spellAttackBonus: 7,
+            knownSpells: [],
+            preparedSpells: [],
+            alwaysPreparedSpells: [],
+            maxPrepared: 0,
+          },
+        },
         spellSlots,
         pactMagicSlots: null,
       },

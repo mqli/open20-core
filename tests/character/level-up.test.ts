@@ -8,6 +8,34 @@ import type { Character } from '../../src/types/character';
 import type { Class, Feature } from '../../src/types/class';
 import type { DataLoader } from '../../src/data/loader';
 
+// ── Helpers ──────────────────────────────────────────────
+
+import type { ClassSpellData, CharacterSpells, SpellLevel, SpellSlotEntry } from '../../src/types/spell';
+
+/** Create CharacterSpells with per-class tracking (new structure) */
+function makeCharSpells(
+  classId: string,
+  overrides?: Partial<ClassSpellData>
+): CharacterSpells {
+  return {
+    classSpellcasting: {
+      [classId]: {
+        classId,
+        spellcastingAbility: 'Intelligence' as const,
+        spellSaveDC: 0,
+        spellAttackBonus: 0,
+        knownSpells: [],
+        preparedSpells: [],
+        alwaysPreparedSpells: [],
+        maxPrepared: 0,
+        ...overrides,
+      },
+    },
+    spellSlots: {} as Record<SpellLevel, SpellSlotEntry>,
+    pactMagicSlots: null,
+  };
+}
+
 // ── Mock Helpers ────────────────────────────────────────────────
 
 function makeFighterClass(): Class {
@@ -211,11 +239,18 @@ function makeLevel1Wizard(): Character {
     feats: [],
     equipment: [],
     spells: {
-      spellcastingAbility: 'Intelligence',
-      spellSaveDC: 13,
-      spellAttackBonus: 5,
-      knownSpells: ['Fire Bolt', 'Magic Missile'],
-      preparedSpells: ['Magic Missile'],
+      classSpellcasting: {
+        Wizard: {
+          classId: 'Wizard',
+          spellcastingAbility: 'Intelligence',
+          spellSaveDC: 13,
+          spellAttackBonus: 5,
+          knownSpells: ['Fire Bolt', 'Magic Missile'],
+          preparedSpells: ['Magic Missile'],
+          alwaysPreparedSpells: [],
+          maxPrepared: 0,
+        },
+      },
       spellSlots: {},
       pactMagicSlots: null,
     },
@@ -361,11 +396,11 @@ describe('levelUp', () => {
     );
 
     expect(result.classes[0]!.level).toBe(2);
-    expect(result.spells.knownSpells).toContain('Shield');
-    expect(result.spells.knownSpells).toContain('Misty Step');
+    expect(result.spells.classSpellcasting['Wizard']!.knownSpells).toContain('Shield');
+    expect(result.spells.classSpellcasting['Wizard']!.knownSpells).toContain('Misty Step');
     // Original spells still present
-    expect(result.spells.knownSpells).toContain('Fire Bolt');
-    expect(result.spells.knownSpells).toContain('Magic Missile');
+    expect(result.spells.classSpellcasting['Wizard']!.knownSpells).toContain('Fire Bolt');
+    expect(result.spells.classSpellcasting['Wizard']!.knownSpells).toContain('Magic Missile');
   });
 
   it('7. new resources: Fighter 1 → 2 (Action Surge)', () => {

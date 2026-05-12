@@ -108,12 +108,29 @@ export function levelUp(
     }
   }
 
-  // 4. New spells
+  // 4. New spells (per-class tracking)
   let newSpells = { ...char.spells };
   if (options.newSpells && options.newSpells.length > 0) {
+    const classId = options.classId;
+    const existing = newSpells.classSpellcasting[classId] ?? {
+      classId,
+      spellcastingAbility: 'Intelligence' as const,
+      spellSaveDC: 0,
+      spellAttackBonus: 0,
+      knownSpells: [],
+      preparedSpells: [],
+      alwaysPreparedSpells: [],
+      maxPrepared: 0,
+    };
     newSpells = {
       ...newSpells,
-      knownSpells: [...newSpells.knownSpells, ...options.newSpells],
+      classSpellcasting: {
+        ...newSpells.classSpellcasting,
+        [classId]: {
+          ...existing,
+          knownSpells: [...existing.knownSpells, ...options.newSpells],
+        },
+      },
     };
   }
 
@@ -209,7 +226,7 @@ function addNewClass(
     }
   }
 
-  // Handle spellcasting for multiclass
+  // Handle spellcasting for multiclass (per-class tracking)
   let newSpells = { ...char.spells };
   const hasSpellcasting = classData.spellcasting;
 
@@ -222,11 +239,30 @@ function addNewClass(
       const ability = classData.spellcasting?.ability ?? 'Intelligence';
       const abilityMod = getModifier(getTotalScore(char.abilityScores, ability));
 
+      // Update or create class spell data
+      const classId = options.classId;
+      const existing = newSpells.classSpellcasting[classId] ?? {
+        classId,
+        spellcastingAbility: 'Intelligence' as const,
+        spellSaveDC: 0,
+        spellAttackBonus: 0,
+        knownSpells: [],
+        preparedSpells: [],
+        alwaysPreparedSpells: [],
+        maxPrepared: 0,
+      };
+
       newSpells = {
         ...newSpells,
-        spellcastingAbility: ability,
-        spellSaveDC: 8 + newProficiencyBonus + abilityMod,
-        spellAttackBonus: newProficiencyBonus + abilityMod,
+        classSpellcasting: {
+          ...newSpells.classSpellcasting,
+          [classId]: {
+            ...existing,
+            spellcastingAbility: ability,
+            spellSaveDC: 8 + newProficiencyBonus + abilityMod,
+            spellAttackBonus: newProficiencyBonus + abilityMod,
+          },
+        },
         spellSlots,
       };
     }

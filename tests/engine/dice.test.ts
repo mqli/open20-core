@@ -66,11 +66,18 @@ function createMockCharacter(): Character {
     feats: [],
     equipment: [],
     spells: {
-      spellcastingAbility: 'Intelligence',
-      spellSaveDC: 14,
-      spellAttackBonus: 5,
-      knownSpells: [],
-      preparedSpells: [],
+      classSpellcasting: {
+        fighter: {
+          classId: 'fighter',
+          spellcastingAbility: 'Intelligence',
+          spellSaveDC: 14,
+          spellAttackBonus: 5,
+          knownSpells: [],
+          preparedSpells: [],
+          alwaysPreparedSpells: [],
+          maxPrepared: 0,
+        },
+      },
       spellSlots: {} as Record<
         0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
         { total: number; used: number }
