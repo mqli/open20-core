@@ -23,6 +23,8 @@ import {
   unprepareSpell,
   prepareSpellForClass,
   unprepareSpellForClass,
+  addKnownSpell,
+  removeKnownSpell,
   addEquipment,
   removeEquipment,
   modifyCurrency,
@@ -509,5 +511,57 @@ describe('modifyCurrency', () => {
     const originalGp = char.currency.gp;
     modifyCurrency(char, { gp: 100 });
     expect(char.currency.gp).toBe(originalGp);
+  });
+});
+
+// ── addKnownSpell / removeKnownSpell ────────────────────────
+
+describe('addKnownSpell / removeKnownSpell', () => {
+  it('adds known spell: added to knownSpells for class', () => {
+    const char = makeWizard();
+    const result = addKnownSpell(char, 'Wizard', 'magic-missile');
+    expect(result.spells.classSpellcasting['Wizard'].knownSpells).toContain('magic-missile');
+  });
+
+  it('adds known spell to non-existent class: no change', () => {
+    const char = makeWizard();
+    const result = addKnownSpell(char, 'Cleric', 'cure-wounds');
+    expect(result.spells.classSpellcasting['Cleric']).toBeUndefined();
+  });
+
+  it('adds already known spell: no duplicate', () => {
+    const char = makeWizard();
+    const once = addKnownSpell(char, 'Wizard', 'magic-missile');
+    const twice = addKnownSpell(once, 'Wizard', 'magic-missile');
+    expect(twice.spells.classSpellcasting['Wizard'].knownSpells.filter(id => id === 'magic-missile')).toHaveLength(1);
+  });
+
+  it('removes known spell: removed from knownSpells', () => {
+    const char = makeWizard();
+    const withSpell = addKnownSpell(char, 'Wizard', 'magic-missile');
+    const result = removeKnownSpell(withSpell, 'Wizard', 'magic-missile');
+    expect(result.spells.classSpellcasting['Wizard'].knownSpells).not.toContain('magic-missile');
+  });
+
+  it('removes known spell: also removed from preparedSpells', () => {
+    const char = makeWizard();
+    const withSpell = addKnownSpell(char, 'Wizard', 'magic-missile');
+    const prepared = prepareSpellForClass(withSpell, 'Wizard', 'magic-missile');
+    expect(prepared.spells.classSpellcasting['Wizard'].preparedSpells).toContain('magic-missile');
+
+    const result = removeKnownSpell(prepared, 'Wizard', 'magic-missile');
+    expect(result.spells.classSpellcasting['Wizard'].preparedSpells).not.toContain('magic-missile');
+  });
+
+  it('removes non-existent known spell: no change', () => {
+    const char = makeWizard();
+    const result = removeKnownSpell(char, 'Wizard', 'non-existent-spell');
+    expect(result).toBe(char);
+  });
+
+  it('removes known spell for non-existent class: no change', () => {
+    const char = makeWizard();
+    const result = removeKnownSpell(char, 'Cleric', 'cure-wounds');
+    expect(result).toBe(char);
   });
 });

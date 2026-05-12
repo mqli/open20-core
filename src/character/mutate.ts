@@ -444,6 +444,7 @@ export function removeKnownSpell(char: Character, classId: string, spellId: stri
   classSpellcasting[classId] = {
     ...classData,
     knownSpells: classData.knownSpells.filter(id => id !== spellId),
+    preparedSpells: classData.preparedSpells.filter(id => id !== spellId),
   };
 
   return withUpdate(char, {
