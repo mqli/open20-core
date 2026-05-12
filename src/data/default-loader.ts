@@ -1,13 +1,7 @@
 // data/default-loader.ts
-// 默认 DataLoader 实现 — 从静态 JSON 数据加载
-// 实现 HLD §5.3 + §7.3 + R26 内容包管理
-//
-// 修复：
-// - require() → createRequire（ESM 兼容）
-// - featuresByLevel 数组→ReadonlyMap 转换（JSON 无法直接存 Map）
-// - R26: 支持内容包注册/注销
+// Unified DataLoader implementation — works in both Node.js and Browser
+// Uses import with assert { type: 'json' } (Node.js 21+ / all bundlers)
 
-import { createRequire } from 'node:module';
 import type { DataLoader, LookupTables, SpellLevel } from './loader';
 import type { ContentPack, ContentPackMeta } from '../content/types';
 import type { Species, SpeciesSubtype } from '../types/species';
@@ -19,36 +13,22 @@ import type { Weapon, Armor, GearItem } from '../types/equipment';
 import type { Spell } from '../types/spell';
 import type { DieType } from '../types/dice';
 import type { Monster } from '../monster/types';
-import { loadContentPack } from '../content/io';
 
-// ── ESM 兼容的 JSON 加载 ────────────────────────────────────
-const require = createRequire(import.meta.url);
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const rawSpecies: unknown[] = require('../../static/srd/species.json');
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const rawBackgrounds: unknown[] = require('../../static/srd/backgrounds.json');
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const rawClasses: unknown[] = require('../../static/srd/classes.json');
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const rawSubclasses: unknown[] = require('../../static/srd/subclasses.json');
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const rawFeats: unknown[] = require('../../static/srd/feats.json');
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const rawWeapons: unknown[] = require('../../static/srd/weapons.json');
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const rawArmor: unknown[] = require('../../static/srd/armor.json');
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const rawGear: unknown[] = require('../../static/srd/gear.json');
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const rawSpells: unknown[] = require('../../static/srd/spells.json');
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const rawMonsters: unknown[] = require('../../static/srd/monsters.json');
+// ── JSON 导入（Node.js 21+ / 所有 bundlers 支持）────────────────────
+import speciesDataJson from '../../static/srd/species.json' assert { type: 'json' };
+import backgroundsDataJson from '../../static/srd/backgrounds.json' assert { type: 'json' };
+import classesDataJson from '../../static/srd/classes.json' assert { type: 'json' };
+import subclassesDataJson from '../../static/srd/subclasses.json' assert { type: 'json' };
+import featsDataJson from '../../static/srd/feats.json' assert { type: 'json' };
+import weaponsDataJson from '../../static/srd/weapons.json' assert { type: 'json' };
+import armorDataJson from '../../static/srd/armor.json' assert { type: 'json' };
+import gearDataJson from '../../static/srd/gear.json' assert { type: 'json' };
+import spellsDataJson from '../../static/srd/spells.json' assert { type: 'json' };
+import monstersDataJson from '../../static/srd/monsters.json' assert { type: 'json' };
+import srdMetaJson from '../../static/srd/meta.json' assert { type: 'json' };
 
 // ── JSON → 类型转换工具 ──────────────────────────────────────
 
-/** 将 JSON 中的 featuresByLevel 数组转为 ReadonlyMap<number, Feature[]> */
 function parseFeaturesByLevel(
   raw: Array<{ level: number; features: readonly Feature[] }>
 ): ReadonlyMap<number, readonly Feature[]> {
@@ -59,7 +39,6 @@ function parseFeaturesByLevel(
   return map;
 }
 
-/** 将原始 JSON 对象转为 Class 类型（含 featuresByLevel 转换） */
 function parseClass(raw: unknown): Class {
   const c = raw as Record<string, unknown>;
   return {
@@ -78,7 +57,6 @@ function parseClass(raw: unknown): Class {
   };
 }
 
-/** 将原始 JSON 对象转为 Subclass 类型（含 featuresByLevel 转换） */
 function parseSubclass(raw: unknown): Subclass {
   const s = raw as Record<string, unknown>;
   return {
@@ -91,30 +69,38 @@ function parseSubclass(raw: unknown): Subclass {
   };
 }
 
+// ── 类型安全的 JSON 数据 ──────────────────────────────────────
+
+const speciesDataTyped: Species[] = speciesDataJson as unknown as Species[];
+const backgroundsDataTyped: Background[] = backgroundsDataJson as unknown as Background[];
+const classesDataTyped: Class[] = (classesDataJson as unknown[]).map(parseClass);
+const subclassesDataTyped: Subclass[] = (subclassesDataJson as unknown[]).map(parseSubclass);
+const featsDataTyped: Feat[] = featsDataJson as unknown as Feat[];
+const weaponsDataTyped: Weapon[] = weaponsDataJson as unknown as Weapon[];
+const armorDataTyped: Armor[] = armorDataJson as unknown as Armor[];
+const gearDataTyped: GearItem[] = gearDataJson as unknown as GearItem[];
+const spellsDataTyped: Spell[] = spellsDataJson as unknown as Spell[];
+const monstersDataTyped: Monster[] = monstersDataJson as unknown as Monster[];
+const srdMetaCached: ContentPackMeta = srdMetaJson as unknown as ContentPackMeta;
+
 // ── 可变的数据存储（支持内容包注册）─────────────────────
 
-// 使用 let 而不是 const，以便支持 register/unregister
-let speciesData: Species[] = rawSpecies as Species[];
-let backgroundsData: Background[] = rawBackgrounds as Background[];
-let classesData: Class[] = rawClasses.map(parseClass);
-let subclassesData: Subclass[] = rawSubclasses.map(parseSubclass);
-let featsData: Feat[] = rawFeats as Feat[];
-let weaponsData: Weapon[] = rawWeapons as Weapon[];
-let armorData: Armor[] = rawArmor as Armor[];
-let gearData: GearItem[] = rawGear as GearItem[];
-let spellsData: Spell[] = rawSpells as Spell[];
-let monstersData: Monster[] = rawMonsters as Monster[];
+let speciesData: Species[] = [...speciesDataTyped];
+let backgroundsData: Background[] = [...backgroundsDataTyped];
+let classesData: Class[] = [...classesDataTyped];
+let subclassesData: Subclass[] = [...subclassesDataTyped];
+let featsData: Feat[] = [...featsDataTyped];
+let weaponsData: Weapon[] = [...weaponsDataTyped];
+let armorData: Armor[] = [...armorDataTyped];
+let gearData: GearItem[] = [...gearDataTyped];
+let spellsData: Spell[] = [...spellsDataTyped];
+let monstersData: Monster[] = [...monstersDataTyped];
 
 // 已注册的内容包元数据
 const registeredPacks: Map<string, ContentPackMeta> = new Map();
 
-// 注册 SRD 内容包
-try {
-  const srdMeta = require('../../static/srd/meta.json') as ContentPackMeta;
-  registeredPacks.set(srdMeta.id, srdMeta);
-} catch {
-  // meta.json 可能不存在，忽略
-}
+// 初始化时注册 SRD
+registeredPacks.set(srdMetaCached.id, srdMetaCached);
 
 // ── 内容包管理辅助函数 ──────────────────────────────────────
 
@@ -155,25 +141,20 @@ function unregisterData(source: string): void {
 
 export function createDataLoader(tables: LookupTables): DataLoader {
   // 重置数据（用于测试隔离）
-  speciesData = rawSpecies as Species[];
-  backgroundsData = rawBackgrounds as Background[];
-  classesData = rawClasses.map(parseClass);
-  subclassesData = rawSubclasses.map(parseSubclass);
-  featsData = rawFeats as Feat[];
-  weaponsData = rawWeapons as Weapon[];
-  armorData = rawArmor as Armor[];
-  gearData = rawGear as GearItem[];
-  spellsData = rawSpells as Spell[];
-  monstersData = rawMonsters as Monster[];
+  speciesData = [...speciesDataTyped];
+  backgroundsData = [...backgroundsDataTyped];
+  classesData = [...classesDataTyped];
+  subclassesData = [...subclassesDataTyped];
+  featsData = [...featsDataTyped];
+  weaponsData = [...weaponsDataTyped];
+  armorData = [...armorDataTyped];
+  gearData = [...gearDataTyped];
+  spellsData = [...spellsDataTyped];
+  monstersData = [...monstersDataTyped];
   registeredPacks.clear();
 
   // 重新注册 SRD
-  try {
-    const srdMeta = require('../../static/srd/meta.json') as ContentPackMeta;
-    registeredPacks.set(srdMeta.id, srdMeta);
-  } catch {
-    // ignore
-  }
+  registeredPacks.set(srdMetaCached.id, srdMetaCached);
 
   return {
     // ── 物种（Species）───
@@ -226,7 +207,6 @@ export function createDataLoader(tables: LookupTables): DataLoader {
     },
 
     getSubclassesBySource(_source: string): Subclass[] {
-      // Subclass 没有 source 字段，暂时返回空数组
       return [];
     },
 
@@ -323,8 +303,8 @@ export function createDataLoader(tables: LookupTables): DataLoader {
     },
 
     // ── 内容包管理（R26）─────────────────────
-    registerContentPack(source: string | ContentPack): void {
-      const pack = loadContentPack(source);
+    // 接受 ContentPack 对象（Browser 和 Node.js 通用）
+    registerContentPack(pack: ContentPack): void {
       registeredPacks.set(pack.meta.id, pack.meta);
       registerData(pack);
     },
@@ -368,10 +348,9 @@ export function createDataLoader(tables: LookupTables): DataLoader {
       const slotsArray = classSlots[classLevel];
       if (!slotsArray) return emptySlotRecord();
 
-      // slotsArray 是数组，index 0 = 1级法术位，index 1 = 2级法术位...
       const result: Record<number, number> = {};
       for (let i = 0; i < slotsArray.length; i++) {
-        result[i + 1] = slotsArray[i] ?? 0; // 修正：index 0 → 法术位等级 1
+        result[i + 1] = slotsArray[i] ?? 0;
       }
       return result;
     },
@@ -380,7 +359,6 @@ export function createDataLoader(tables: LookupTables): DataLoader {
       const slotsObj = tables.multiclassSpellSlots[totalSpellcastingLevel];
       if (!slotsObj) return emptySlotRecord();
 
-      // JSON uses string keys like "1", "2", convert to numeric
       const result: Record<number, number> = {};
       const slotsRecord = slotsObj as Record<string, number>;
       for (const key of Object.keys(slotsRecord)) {

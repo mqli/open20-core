@@ -4,7 +4,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createDataLoader } from '../../src/data';
 import type { ContentPack } from '../../src/content';
-import { loadContentPack } from '../../src/content';
+import { loadContentPack } from '../../src/content/io';
 
 // Mock lookup tables (minimal for testing)
 const mockLookupTables = {

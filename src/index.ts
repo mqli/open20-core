@@ -1,5 +1,6 @@
 // src/index.ts
 // Top-level barrel export — public API per HLD §12.1
+// Single entry point for both Node.js and browser environments
 
 // ── Types ─────────────────────────────────────────────────
 export type { Character, CharacterClass, HitPoints, DeathSaves, Currency } from './types';
@@ -13,15 +14,15 @@ export type { Spell, CharacterSpells, SpellSlotEntry, PactMagicSlots } from './t
 export type { Resource, ResetType } from './types';
 export type { CombatStats, CharacterAttack, ActiveCondition, ConditionName } from './types';
 export type { BaseAttack } from './types';
-// DieType is now exported from './engine' (dice-core)
 
-// ── Data ──────────────────────────────────────────────────
+// ── Data Loaders ────────────────────────────────────────
 export type { DataLoader, LookupTables } from './data';
 export { createDataLoader } from './data';
 
 // ── Content (R26: Content Pack Management) ─────────
 export type { ContentPack, ContentPackMeta } from './content';
-export { exportContentPack, importContentPack, loadContentPack } from './content';
+// Note: exportContentPack, importContentPack, loadContentPack are Node.js-only
+// Import directly from 'open20-core/content/io' when needed in Node.js environment
 
 // ── Engine (pure functions) ─────────────────────────────
 export { getModifier, getTotalScore } from './engine';
@@ -46,6 +47,48 @@ export type { SpellSlotEntry as SpellSlotEntryEngine, PactMagicResult } from './
 export { calculateInitiative } from './engine';
 export { calculatePassivePerception } from './engine';
 export { calculateAttacks } from './engine';
+
+// ── Engine: Critical Hit/Fail Helpers ────────────────
+export { isCriticalHit, isCriticalFail } from './engine';
+
+// ── Engine: Concentration Management ─────────────────
+export type { ConcentrationCheckResult } from './engine';
+export {
+  isConcentrating,
+  getConcentratingSpellId,
+  calculateConcentrationDC,
+} from './engine';
+
+// ── Engine: Combat Helpers ───────────────────────────
+export {
+  applyHPChange,
+  applyTypedDamageToHP,
+  setTemporaryHPShared,
+  isDefeatedShared,
+  getCharacterCurrentHP,
+  getCharacterMaxHP,
+  getCharacterTemporaryHP,
+  getMonsterCurrentHP,
+  getMonsterMaxHP,
+  getMonsterTemporaryHP,
+  addDamageResistance,
+  addDamageImmunity,
+  addDamageVulnerability,
+  emptyDefenses,
+  mergeDefenses,
+} from './engine';
+
+// ── Engine: Spell Casting ────────────────────────────
+export {
+  canCastAsRitual,
+  castAsRitual,
+  getRitualCastingTime,
+  isCantrip,
+  canCastCantrip,
+  canUpcast,
+  getUpcastDescription,
+  castSpell,
+} from './engine';
 
 // ── Character (state management) ────────────────────────
 export { createCharacter } from './character';
@@ -187,48 +230,6 @@ export {
   rollInitiative,
 } from './engine';
 
-// ── Engine: Critical Hit/Fail Helpers ────────────────
-export { isCriticalHit, isCriticalFail } from './engine';
-
-// ── Engine: Concentration Management ─────────────────
-export type { ConcentrationCheckResult } from './engine';
-export {
-  isConcentrating,
-  getConcentratingSpellId,
-  calculateConcentrationDC,
-} from './engine';
-
-// ── Engine: Combat Helpers ───────────────────────────
-export {
-  applyHPChange,
-  applyTypedDamageToHP,
-  setTemporaryHPShared,
-  isDefeatedShared,
-  getCharacterCurrentHP,
-  getCharacterMaxHP,
-  getCharacterTemporaryHP,
-  getMonsterCurrentHP,
-  getMonsterMaxHP,
-  getMonsterTemporaryHP,
-  addDamageResistance,
-  addDamageImmunity,
-  addDamageVulnerability,
-  emptyDefenses,
-  mergeDefenses,
-} from './engine';
-
-// ── Engine: Spell Casting ────────────────────────────
-export {
-  canCastAsRitual,
-  castAsRitual,
-  getRitualCastingTime,
-  isCantrip,
-  canCastCantrip,
-  canUpcast,
-  getUpcastDescription,
-  castSpell,
-} from './engine';
-
 // Layer 4: Application (rolls module)
 export type {
   CharacterSkillCheckParams,
@@ -261,5 +262,4 @@ export {
 // ── Storage ──────────────────────────────────────────────
 export type { ICharacterStorage, CharacterSummary } from './storage';
 export { InMemoryStorage } from './storage';
-export { JsonFileStorage } from './storage';
 export { serialize, deserialize, sanitizeFilename } from './storage';

@@ -16,8 +16,7 @@
     "./content": "./dist/content/index.js",
     "./rolls": "./dist/rolls/index.js",
     "./dice": "./dist/dice/index.js",
-    "./storage": "./dist/storage/index.js",
-    "./browser": "./dist/browser-index.js"
+    "./storage": "./dist/storage/index.js"
   },
   "scripts": {
     "prepare": "npm run build",

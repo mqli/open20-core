@@ -28,7 +28,6 @@ describe('Node.js Artifact Tests (dist/index.js)', () => {
 
   test('should export storage classes', () => {
     expect(Open20Core.InMemoryStorage).toBeDefined();
-    expect(Open20Core.JsonFileStorage).toBeDefined();
   });
 
   test('getModifier should work correctly', () => {

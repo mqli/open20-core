@@ -118,10 +118,6 @@ export interface LookupTables {
 
 // ── createDataLoader — 默认工厂函数 ───────────────────────
 // 接收静态 JSON 数据，返回 DataLoader 实例
-// 这是唯一会在运行时被调用的地方（除非测试注入 mock）
+// 统一实现，同时支持 Node.js 和 Browser
 
-import { createDataLoader as createDefaultLoader } from './default-loader';
-
-export function createDataLoader(tables: LookupTables): DataLoader {
-  return createDefaultLoader(tables);
-}
+export { createDataLoader } from './default-loader';
