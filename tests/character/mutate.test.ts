@@ -21,6 +21,8 @@ import {
   unequipItem,
   prepareSpell,
   unprepareSpell,
+  prepareSpellForClass,
+  unprepareSpellForClass,
   addEquipment,
   removeEquipment,
   modifyCurrency,
@@ -384,6 +386,75 @@ describe('prepareSpell / unprepareSpell', () => {
     const char = makeWizard();
     const result = unprepareSpell(char, 'fireball');
     expect(result.spells.classSpellcasting['Wizard']!.preparedSpells).toEqual(char.spells.classSpellcasting['Wizard']!.preparedSpells);
+  });
+});
+
+describe('prepareSpellForClass / unprepareSpellForClass', () => {
+  it('prepares new spell for class: added to class preparedSpells', () => {
+    const char = makeWizard();
+    const result = prepareSpellForClass(char, 'Wizard', 'fireball');
+    expect(result.spells.classSpellcasting['Wizard']!.preparedSpells).toContain('fireball');
+  });
+
+  it('prepares for non-existent class: no change', () => {
+    const char = makeWizard();
+    const result = prepareSpellForClass(char, 'Fighter', 'fireball');
+    expect(result).toEqual(char);
+  });
+
+  it('prepares already prepared spell: no duplicate', () => {
+    const char = makeWizard();
+    const prepared = prepareSpellForClass(char, 'Wizard', 'fireball');
+    const result = prepareSpellForClass(prepared, 'Wizard', 'fireball');
+    expect(result.spells.classSpellcasting['Wizard']!.preparedSpells.filter(id => id === 'fireball')).toHaveLength(1);
+  });
+
+  it('unprepares prepared spell for class: removed from class preparedSpells', () => {
+    const char = makeWizard();
+    const prepared = prepareSpellForClass(char, 'Wizard', 'fireball');
+    const result = unprepareSpellForClass(prepared, 'Wizard', 'fireball');
+    expect(result.spells.classSpellcasting['Wizard']!.preparedSpells).not.toContain('fireball');
+  });
+
+  it('unprepares for non-existent class: no change', () => {
+    const char = makeWizard();
+    const result = unprepareSpellForClass(char, 'Fighter', 'fireball');
+    expect(result).toEqual(char);
+  });
+
+  it('unprepares non-prepared spell: no change', () => {
+    const char = makeWizard();
+    const result = unprepareSpellForClass(char, 'Wizard', 'fireball');
+    expect(result.spells.classSpellcasting['Wizard']!.preparedSpells).toEqual(char.spells.classSpellcasting['Wizard']!.preparedSpells);
+  });
+
+  it('multiclass: prepares spell for correct class only', () => {
+    // Create a Wizard with two classes
+    const char = makeWizard();
+    // Manually add a second class's spell data
+    const withMulticlass = {
+      ...char,
+      spells: {
+        ...char.spells,
+        classSpellcasting: {
+          ...char.spells.classSpellcasting,
+          Cleric: {
+            classId: 'Cleric',
+            spellcastingAbility: 'Wisdom' as const,
+            spellSaveDC: 13,
+            spellAttackBonus: 5,
+            knownSpells: ['cure-wounds'],
+            preparedSpells: ['cure-wounds'],
+            alwaysPreparedSpells: [],
+            maxPrepared: 4,
+          },
+        },
+      },
+    };
+    const result = prepareSpellForClass(withMulticlass, 'Cleric', 'guiding-bolt');
+    expect(result.spells.classSpellcasting['Cleric']!.preparedSpells).toContain('guiding-bolt');
+    // Wizard spells unchanged
+    expect(result.spells.classSpellcasting['Wizard']!.preparedSpells).not.toContain('guiding-bolt');
   });
 });
 
