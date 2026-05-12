@@ -28,13 +28,34 @@ Spell slot tracking is used by casters every round in combat. Need to display us
 See `../../spec/data-model.md` → `Spells`
 
 ```typescript
-// Character.spells.spellSlots
+// Character.spells (per-class tracking)
+interface CharacterSpells {
+  // Per-class spell tracking (keyed by classId)
+  classSpellcasting: Record<string, ClassSpellData>;
+
+  // Unified spell slots (multiclass combination)
+  spellSlots: Record<SpellLevel, SpellSlotEntry>;
+
+  // Warlock Pact Magic (separate from regular slots)
+  pactMagicSlots: PactMagicSlots | null;
+}
+
+interface ClassSpellData {
+  classId: string;
+  spellcastingAbility: AbilityName;
+  spellSaveDC: number;      // 8 + PB + ability mod
+  spellAttackBonus: number;
+  knownSpells: readonly string[];
+  preparedSpells: readonly string[];
+  alwaysPreparedSpells?: readonly string[];
+  maxPrepared: number;       // class level + ability mod
+}
+
 interface SpellSlotEntry {
   total: number;
   used: number;
 }
 
-// Character.spells.pactMagicSlots (Warlock only)
 interface PactMagicSlots {
   level: number;    // Pact Magic spell level
   total: number;
@@ -42,6 +63,11 @@ interface PactMagicSlots {
   resetOn: "Short Rest" | "Long Rest";
 }
 ```
+
+**Key changes from previous version**:
+- `spellcastingAbility`, `spellSaveDC`, `spellAttackBonus` are now PER CLASS
+- `knownSpells` and `preparedSpells` are tracked per class
+- `spellSlots` is still a unified pool (correct for D&D 5e multiclassing)
 
 Spell slot totals calculated per PRD §10 Appendix C rules, depends on:
 - Class (Wizard/Cleric/etc.)

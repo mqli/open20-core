@@ -318,6 +318,37 @@ spellSlots: Record<string, Record<number, readonly number[]>>;
 // Inner value is `readonly number[]`, not `Record<number, number>`
 ```
 
+### 5.5 Per-Class Spell Tracking (New in v0.x)
+**Context**: Spell data is now tracked PER CLASS, not on the character directly.
+
+**Old way (WRONG)**:
+```typescript
+// ❌ WRONG - These fields no longer exist on CharacterSpells
+const dc = char.spells.spellSaveDC;
+const known = char.spells.knownSpells;
+```
+
+**New way (CORRECT)**:
+```typescript
+// ✅ RIGHT - Access per-class data
+const classSpellData = char.spells.classSpellcasting[classId];
+if (classSpellData) {
+  const dc = classSpellData.spellSaveDC;
+  const known = classSpellData.knownSpells;
+  const prepared = classSpellData.preparedSpells;
+}
+
+// Or use query functions
+const classData = getClassSpellData(char, 'wizard');
+const knows = knowsSpellForClass(char, 'wizard', 'fireball');
+```
+
+**Key changes**:
+- `classSpellcasting: Record<string, ClassSpellData>` - keyed by classId
+- `spellSlots` is still a unified pool (correct for D&D 5e multiclassing)
+- Use `getClassSpellData()`, `knowsSpellForClass()`, `isSpellPreparedForClass()` for queries
+- Use `prepareSpellForClass()`, `unprepareSpellForClass()` for mutations
+
 ---
 
 ## 6. How to Run Tests & Build

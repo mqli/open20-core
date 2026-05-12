@@ -66,7 +66,7 @@
 | S13-S17 | Character state management | ✅ |
 | S18-S20 | Spells, Storage, Integration | ✅ |
 
-**Current test status**: **560+ tests passing**, `tsc --noEmit` ✅
+**Current test status**: **753+ tests passing**, `tsc --noEmit` ✅
 
 ---
 

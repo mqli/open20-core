@@ -215,6 +215,8 @@ open20-core/
 | `unequipItem` | `(char, itemId) => Character` | Unequip an item |
 | `prepareSpell` | `(char, spellId) => Character` | Mark spell as prepared |
 | `unprepareSpell` | `(char, spellId) => Character` | Unmark spell as prepared |
+| `prepareSpellForClass` | `(char, classId, spellId) => Character` | Mark spell as prepared for specific class |
+| `unprepareSpellForClass` | `(char, classId, spellId) => Character` | Unmark spell as prepared for specific class |
 
 ### 4.3 Spells Module (`src/spells/`) — L2: Mechanics
 
@@ -237,6 +239,12 @@ open20-core/
 | `getPreparedSpells` | `(char) => string[]` | Get list of prepared spell IDs |
 | `isSpellPrepared` | `(char, spellId) => boolean` | Check if spell is prepared |
 | `knowsSpell` | `(char, spellId) => boolean` | Check if character knows spell |
+| `getClassSpellData` | `(char, classId) => ClassSpellData \| undefined` | Get per-class spell data |
+| `knowsSpellForClass` | `(char, classId, spellId) => boolean` | Check if class knows spell |
+| `isSpellPreparedForClass` | `(char, classId, spellId) => boolean` | Check if class has spell prepared |
+| `getPreparationRule` | `(classId) => PreparationRule` | Get class's spell preparation rule |
+| `canChangePreparedSpells` | `(char, classId) => boolean` | Check if can change prepared spells |
+| `getMaxPreparedSpellChanges` | `(char, classId) => number` | Max spell changes at long rest |
 
 **SpellFilter Interface**:
 ```typescript
@@ -321,7 +329,7 @@ interface SpellFilter {
 | S20 | Integration tests | ✅ | `tests/integration/` |
 | S21 | Layered architecture refactoring | 📋 | Planned - reorganize into L1/L2/L3/L4 |
 
-**Current Test Status**: **699+ tests passing**, `tsc --noEmit` ✅
+**Current Test Status**: **753+ tests passing**, `tsc --noEmit` ✅
 
 ---
 

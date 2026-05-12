@@ -12,7 +12,7 @@ A headless TypeScript game engine for D&D 5e 2024 — rule calculations, spell m
 - **ESM**: Modern JavaScript module system
 - **TypeScript**: Full type safety with strict mode
 - **Zod Schemas**: Runtime validation for all data structures
-- **Testable**: 550+ tests with 100% coverage for engine/character modules
+- **Testable**: 750+ tests with 100% coverage for engine/character modules
 
 ## Installation
 
