@@ -3,9 +3,8 @@ import { createDataLoader } from '../../../src/data/loader';
 import { createCharacter } from '../../../src/character/create';
 import { modifyHP } from '../../../src/character/mutate';
 import { shortRest, longRest } from '../../../src/character/rest';
-import lookupTables from '../../../static/srd/lookup-tables.json';
 
-const dataLoader = createDataLoader(lookupTables);
+const dataLoader = createDataLoader();
 
 describe('D&D SRD 5.2 - Fighter Class: Level 1-4 Features', () => {
   // ============================================================

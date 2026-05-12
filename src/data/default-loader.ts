@@ -26,6 +26,7 @@ import gearDataJson from '../../static/srd/gear.json' assert { type: 'json' };
 import spellsDataJson from '../../static/srd/spells.json' assert { type: 'json' };
 import monstersDataJson from '../../static/srd/monsters.json' assert { type: 'json' };
 import srdMetaJson from '../../static/srd/meta.json' assert { type: 'json' };
+import lookupTablesJson from '../../static/srd/lookup-tables.json' assert { type: 'json' };
 
 // ── JSON → 类型转换工具 ──────────────────────────────────────
 
@@ -82,6 +83,7 @@ const gearDataTyped: GearItem[] = gearDataJson as unknown as GearItem[];
 const spellsDataTyped: Spell[] = spellsDataJson as unknown as Spell[];
 const monstersDataTyped: Monster[] = monstersDataJson as unknown as Monster[];
 const srdMetaCached: ContentPackMeta = srdMetaJson as unknown as ContentPackMeta;
+const lookupTablesTyped: LookupTables = lookupTablesJson as unknown as LookupTables;
 
 // ── 可变的数据存储（支持内容包注册）─────────────────────
 
@@ -139,7 +141,7 @@ function unregisterData(source: string): void {
 
 // ── createDataLoader 工厂函数 ───────────────────────────────
 
-export function createDataLoader(tables: LookupTables): DataLoader {
+export function createDataLoader(): DataLoader {
   // 重置数据（用于测试隔离）
   speciesData = [...speciesDataTyped];
   backgroundsData = [...backgroundsDataTyped];
@@ -322,14 +324,14 @@ export function createDataLoader(tables: LookupTables): DataLoader {
 
     // ── 查表数据（Lookup Tables）────────────────────
     getProficiencyBonus(level: number): number {
-      const keys = Object.keys(tables.proficiencyBonus)
+      const keys = Object.keys(lookupTablesTyped.proficiencyBonus)
         .map(Number)
         .sort((a, b) => a - b);
 
-      let result = tables.proficiencyBonus[keys[0] ?? 1] ?? 2;
+      let result = lookupTablesTyped.proficiencyBonus[keys[0] ?? 1] ?? 2;
       for (const key of keys) {
         if (level >= key) {
-          result = tables.proficiencyBonus[key] ?? 2;
+          result = lookupTablesTyped.proficiencyBonus[key] ?? 2;
         } else {
           break;
         }
@@ -338,11 +340,11 @@ export function createDataLoader(tables: LookupTables): DataLoader {
     },
 
     getHitDieFixedValue(die: DieType): number {
-      return tables.hitDieFixedValue[die] ?? 0;
+      return lookupTablesTyped.hitDieFixedValue[die] ?? 0;
     },
 
     getSpellSlots(classId: string, classLevel: number): Record<number, number> {
-      const classSlots = tables.spellSlots[classId];
+      const classSlots = lookupTablesTyped.spellSlots[classId];
       if (!classSlots) return emptySlotRecord();
 
       const slotsArray = classSlots[classLevel];
@@ -356,7 +358,7 @@ export function createDataLoader(tables: LookupTables): DataLoader {
     },
 
     getMulticlassSpellSlots(totalSpellcastingLevel: number): Record<number, number> {
-      const slotsObj = tables.multiclassSpellSlots[totalSpellcastingLevel];
+      const slotsObj = lookupTablesTyped.multiclassSpellSlots[totalSpellcastingLevel];
       if (!slotsObj) return emptySlotRecord();
 
       const result: Record<number, number> = {};
@@ -369,15 +371,15 @@ export function createDataLoader(tables: LookupTables): DataLoader {
     },
 
     getPactMagicSlots(warlockLevel: number): { slots: number; slotLevel: number } {
-      return tables.pactMagicSlots[warlockLevel] ?? { slots: 0, slotLevel: 0 };
+      return lookupTablesTyped.pactMagicSlots[warlockLevel] ?? { slots: 0, slotLevel: 0 };
     },
 
     getWeaponMasteryProperties(): readonly string[] {
-      return tables.weaponMasteryProperties;
+      return lookupTablesTyped.weaponMasteryProperties;
     },
 
     getConditionNames(): readonly string[] {
-      return tables.conditionNames;
+      return lookupTablesTyped.conditionNames;
     },
   };
 }

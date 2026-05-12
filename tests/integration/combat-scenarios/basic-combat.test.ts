@@ -27,12 +27,11 @@ import {
 } from '../../../src/engine/combat';
 import { defaultRandom } from '../../../src/dice/core';
 import { calculateMonsterAttackBonus } from '../../../src/monster/calculator';
-import lookupTables from '../../../static/srd/lookup-tables.json';
 import monstersArray from '../../../static/srd/monsters.json';
 
 // ── Test Helpers ─────────────────────────────────────────────
 
-const dataLoader = createDataLoader(lookupTables);
+const dataLoader = createDataLoader();
 
 function createTestFighter(name: string = 'Fighter') {
   const char = createCharacter(

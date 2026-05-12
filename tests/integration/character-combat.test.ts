@@ -6,9 +6,8 @@ import { longRest } from '../../src/character/rest';
 import { calculateTypedDamage } from '../../src/engine/damage-calculator';
 import { applyTypedDamage } from '../../src/character/mutate';
 import type { DamageDefenses } from '../../src/types/damage';
-import lookupTables from '../../static/srd/lookup-tables.json';
 
-const dataLoader = createDataLoader(lookupTables);
+const dataLoader = createDataLoader();
 
 describe('D&D Player Behavior - Combat and Damage', () => {
   describe('Session 9: Death and Death Saves', () => {

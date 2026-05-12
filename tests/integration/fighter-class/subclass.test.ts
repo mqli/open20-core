@@ -1,9 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { createDataLoader } from '../../../src/data/loader';
 import { createCharacter } from '../../../src/character/create';
-import lookupTables from '../../../static/srd/lookup-tables.json';
 
-const dataLoader = createDataLoader(lookupTables);
+const dataLoader = createDataLoader();
 
 describe('D&D SRD 5.2 - Fighter Class: Subclasses', () => {
   // ============================================================

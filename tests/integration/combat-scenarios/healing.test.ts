@@ -13,12 +13,11 @@ import {
   getMonsterCurrentHP,
   getMonsterMaxHP,
 } from '../../../src/engine/combat';
-import lookupTables from '../../../static/srd/lookup-tables.json';
 import monstersArray from '../../../static/srd/monsters.json';
 
 // ── Test Helpers ─────────────────────────────────────────────
 
-const dataLoader = createDataLoader(lookupTables);
+const dataLoader = createDataLoader();
 
 function createTestFighter(name: string = 'Fighter') {
   const char = createCharacter(

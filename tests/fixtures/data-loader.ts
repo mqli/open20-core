@@ -5,7 +5,6 @@
 import type { DataLoader } from '../../src/data/loader';
 import type { ContentPack } from '../../src/content/types';
 import { createDataLoader } from '../../src/data/loader';
-import lookupTables from '../../static/srd/lookup-tables.json';
 
 /**
  * Creates a mock DataLoader with sensible defaults.
@@ -95,5 +94,5 @@ export function createMockDataLoader(overrides: Partial<DataLoader> = {}): DataL
  * @returns A DataLoader backed by real SRD data
  */
 export function createSRDDataLoader(): DataLoader {
-  return createDataLoader(lookupTables);
+  return createDataLoader();
 }

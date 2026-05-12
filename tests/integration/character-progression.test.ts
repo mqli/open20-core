@@ -7,9 +7,8 @@ import { levelUp } from '../../src/character/level-up';
 import { validateCharacter } from '../../src/character/validate';
 import { recomputeDerivedStats } from '../../src/character/recompute';
 import { serialize, deserialize } from '../../src/storage/serializer';
-import lookupTables from '../../static/srd/lookup-tables.json';
 
-const dataLoader = createDataLoader(lookupTables);
+const dataLoader = createDataLoader();
 
 describe('D&D Player Behavior - Character Progression', () => {
   describe('Session 3: Long Rest and Level Up', () => {

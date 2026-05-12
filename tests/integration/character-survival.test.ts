@@ -3,9 +3,8 @@ import { createDataLoader } from '../../src/data/loader';
 import { createCharacter } from '../../src/character/create';
 import { modifyHP } from '../../src/character/mutate';
 import { longRest } from '../../src/character/rest';
-import lookupTables from '../../static/srd/lookup-tables.json';
 
-const dataLoader = createDataLoader(lookupTables);
+const dataLoader = createDataLoader();
 
 describe('D&D Player Behavior - Survival Mechanics', () => {
   describe('Session 15: Death Save Roller Coaster', () => {

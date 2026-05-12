@@ -8,9 +8,8 @@ import { recomputeDerivedStats } from '../../src/character/recompute';
 import { serialize, deserialize } from '../../src/storage/serializer';
 import { applyTypedDamage } from '../../src/character/mutate';
 import type { DamageDefenses } from '../../src/types/damage';
-import lookupTables from '../../static/srd/lookup-tables.json';
 
-const dataLoader = createDataLoader(lookupTables);
+const dataLoader = createDataLoader();
 
 describe('D&D Player Behavior - Adventure Arc', () => {
   describe('Session 17: Barbarian Rage and Reckless Attack', () => {

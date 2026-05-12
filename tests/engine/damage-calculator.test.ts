@@ -16,8 +16,7 @@ import type { DamageDefenses } from '../../src/types/damage';
 import { createDataLoader } from '../../src/data/loader';
 import { createCharacter } from '../../src/character/create';
 import { modifyHP } from '../../src/character/mutate';
-import lookupTables from '../../static/srd/lookup-tables.json';
-const dataLoader = createDataLoader(lookupTables);
+const dataLoader = createDataLoader();
 
 describe('DamageType parsing', () => {
   it('parses standard damage types case-sensitively', () => {

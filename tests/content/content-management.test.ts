@@ -6,22 +6,11 @@ import { createDataLoader } from '../../src/data';
 import type { ContentPack } from '../../src/content';
 import { loadContentPack } from '../../src/content/io';
 
-// Mock lookup tables (minimal for testing)
-const mockLookupTables = {
-  proficiencyBonus: { 1: 2, 5: 3, 9: 4, 13: 5, 17: 6 },
-  hitDieFixedValue: { d6: 4, d8: 5, d10: 6, d12: 7 } as Record<string, number>,
-  spellSlots: {},
-  multiclassSpellSlots: {},
-  pactMagicSlots: {},
-  weaponMasteryProperties: ['Cleave', 'Graze', 'Nick', 'Push', 'Sap', 'Slow', 'Topple', 'Vex'],
-  conditionNames: ['Blinded', 'Charmed', 'Deafened', 'Exhausted', 'Frightened', 'Grappled', 'Incapacitated', 'Invisible', 'Paralyzed', 'Petrified', 'Poisoned', 'Prone', 'Restrained', 'Stunned', 'Unconscious'],
-};
-
 describe('Content Management (R26)', () => {
   let dataLoader: ReturnType<typeof createDataLoader>;
 
   beforeEach(() => {
-    dataLoader = createDataLoader(mockLookupTables as any);
+    dataLoader = createDataLoader();
   });
 
   describe('Content Pack Registration', () => {
