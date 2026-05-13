@@ -125,7 +125,7 @@ export { validateCharacter } from './character';
 export { recomputeDerivedStats } from './character';
 
 // ── Spells (query + preparation rules) ─────────────────
-export type { SpellFilter, PreparationRule, PreparationChangeLimit } from './spells';
+export type { SpellFilter } from './spells';
 export {
   getSpell as getSpellData,
   searchSpells,
@@ -137,9 +137,8 @@ export {
   getClassSpellData,
   knowsSpellForClass,
   isSpellPreparedForClass,
-  getPreparationRule,
-  canChangePreparedSpells,
-  getMaxPreparedSpellChanges,
+  isPreparationCaster,
+  isKnownCaster,
 } from './spells';
 
 // ── Monsters (query + combat) ─────────────────────────

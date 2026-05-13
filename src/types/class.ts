@@ -2,11 +2,43 @@
 // 职业与子职业相关类型（零依赖）
 
 import type { ResetType } from './resource';
+import type { AbilityName } from './ability';
 
-// 法术施法方式
-export interface Spellcasting {
-  readonly ability: import('./ability').AbilityName; // 施法关键属性
-  readonly prepares: boolean; // 是否需要准备法术
+// 法术施法方式（判别联合）
+// 对应 SRD 5.2 Spell Preparation by Class 表
+export type Spellcasting =
+  | PreparationSpellcasting
+  | KnownSpellcasting;
+
+// 准备施法者：Cleric, Druid, Wizard, Paladin, Ranger
+interface PreparationSpellcasting {
+  readonly type: 'preparation';
+  readonly ability: AbilityName;
+
+  // 如何"知道"法术：
+  // - 'class_list'  → Cleric, Druid: 自动知道该职业法术列表中的所有法术
+  // - 'spellbook'   → Wizard: 必须学习/抄写才能知道
+  // - 'limited'     → Paladin, Ranger: 知道的法术数量有限（等级 + 调整值）
+  readonly knownSource: 'class_list' | 'spellbook' | 'limited';
+
+  // 每次长休可以更换多少个准备的法术：
+  // - 'all'   → Cleric, Druid, Wizard: 可以更换任意数量
+  // - number  → Paladin, Ranger: 每次长休只能更换1个（SRD: "One"）
+  // 注意：此为参考字段，代码不强制执行限制
+  readonly changesPerRest: 'all' | number;
+}
+
+// 已知施法者（无需准备）：Bard, Sorcerer, Warlock
+interface KnownSpellcasting {
+  readonly type: 'known';
+  readonly ability: AbilityName;
+
+  // 每升一级可以更换多少个已知法术（SRD: 总是1）
+  // 注意：此为参考字段，代码不强制执行限制
+  readonly changesPerLevel: number;
+
+  // Warlock 专用：使用 Pact Magic 而非常规法术位
+  readonly pactMagic?: true;
 }
 
 // 职业特性条目

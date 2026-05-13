@@ -272,8 +272,9 @@
       }
     ],
     "spellcasting": {
+      "type": "known",
       "ability": "Charisma",
-      "prepares": false
+      "changesPerLevel": 1
     }
   },
   {
@@ -382,8 +383,10 @@
       }
     ],
     "spellcasting": {
+      "type": "preparation",
       "ability": "Wisdom",
-      "prepares": true
+      "knownSource": "class_list",
+      "changesPerRest": "all"
     }
   },
   {
@@ -500,8 +503,10 @@
       }
     ],
     "spellcasting": {
+      "type": "preparation",
       "ability": "Wisdom",
-      "prepares": true
+      "knownSource": "class_list",
+      "changesPerRest": "all"
     }
   },
   {
@@ -952,8 +957,10 @@
       }
     ],
     "spellcasting": {
+      "type": "preparation",
       "ability": "Charisma",
-      "prepares": true
+      "knownSource": "limited",
+      "changesPerRest": 1
     }
   },
   {
@@ -1105,8 +1112,10 @@
       }
     ],
     "spellcasting": {
+      "type": "preparation",
       "ability": "Wisdom",
-      "prepares": false
+      "knownSource": "limited",
+      "changesPerRest": 1
     }
   },
   {
@@ -1347,8 +1356,9 @@
       }
     ],
     "spellcasting": {
+      "type": "known",
       "ability": "Charisma",
-      "prepares": false
+      "changesPerLevel": 1
     }
   },
   {
@@ -1439,8 +1449,10 @@
       }
     ],
     "spellcasting": {
+      "type": "known",
       "ability": "Charisma",
-      "prepares": false
+      "changesPerLevel": 1,
+      "pactMagic": true
     }
   },
   {
@@ -1535,8 +1547,10 @@
       }
     ],
     "spellcasting": {
+      "type": "preparation",
       "ability": "Intelligence",
-      "prepares": true
+      "knownSource": "spellbook",
+      "changesPerRest": "all"
     }
   }
 ]

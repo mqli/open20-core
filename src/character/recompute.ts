@@ -106,11 +106,21 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     const charClass = char.classes.find(c => c.classId === classId);
     const classLevel = charClass?.level ?? 1;
 
+    // Auto-populate knownSpells for class_list casters (Cleric, Druid)
+    // They automatically know ALL spells on their class list
+    let knownSpells = classSpellData.knownSpells;
+    if (classData.spellcasting.type === 'preparation' && classData.spellcasting.knownSource === 'class_list') {
+      knownSpells = data.getAllSpells()
+        .filter(s => s.classes?.includes(classId))
+        .map(s => s.id);
+    }
+
     classSpellcasting[classId] = {
       ...classSpellData,
       spellcastingAbility: ability,
       spellSaveDC: 8 + pb + abilityMod,
       spellAttackBonus: pb + abilityMod,
+      knownSpells,
       maxPrepared: classLevel + abilityMod,
     };
   }
@@ -124,12 +134,21 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     const ability = classData.spellcasting.ability;
     const abilityMod = getModifier(getTotalScore(char.abilityScores, ability));
 
+    // Auto-populate knownSpells for class_list casters (Cleric, Druid)
+    // They automatically know ALL spells on their class list
+    let knownSpells: readonly string[] = [];
+    if (classData.spellcasting.type === 'preparation' && classData.spellcasting.knownSource === 'class_list') {
+      knownSpells = data.getAllSpells()
+        .filter(s => s.classes?.includes(charClass.classId))
+        .map(s => s.id);
+    }
+
     classSpellcasting[charClass.classId] = {
       classId: charClass.classId,
       spellcastingAbility: ability,
       spellSaveDC: 8 + pb + abilityMod,
       spellAttackBonus: pb + abilityMod,
-      knownSpells: [],
+      knownSpells,
       preparedSpells: [],
       alwaysPreparedSpells: [],
       maxPrepared: charClass.level + abilityMod,

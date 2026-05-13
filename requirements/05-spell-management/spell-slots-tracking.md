@@ -45,11 +45,27 @@ interface ClassSpellData {
   spellcastingAbility: AbilityName;
   spellSaveDC: number;      // 8 + PB + ability mod
   spellAttackBonus: number;
+
+  // Interpretation depends on class's Spellcasting.knownSource:
+  // - 'class_list' (Cleric/Druid): ALL spells on class list (auto-populated)
+  // - 'spellbook' (Wizard): spells in spellbook
+  // - 'limited' (Paladin/Ranger): chosen known spells
+  // - 'known' (Sorcerer/Bard/Warlock): chosen known spells
   knownSpells: readonly string[];
+
+  // For preparation casters: currently prepared
+  // For known casters: same as knownSpells
   preparedSpells: readonly string[];
+
+  // Always prepared (Domain spells, etc.) — doesn't count against max
   alwaysPreparedSpells?: readonly string[];
-  maxPrepared: number;       // class level + ability mod
+
+  // Max prepared = class level + ability mod (for preparation casters)
+  maxPrepared: number;
 }
+```
+
+> **Note**: `changesPerRest` and `changesPerLevel` in the `Spellcasting` type are **reference fields** (documenting SRD rules). The code does **NOT** enforce these limits — players can manage their own characters freely.
 
 interface SpellSlotEntry {
   total: number;
@@ -60,7 +76,7 @@ interface PactMagicSlots {
   level: number;    // Pact Magic spell level
   total: number;
   used: number;
-  resetOn: "Short Rest" | "Long Rest";
+  resetOn: "Short Rest"; // Warlock slots always reset on short rest
 }
 ```
 
@@ -68,6 +84,7 @@ interface PactMagicSlots {
 - `spellcastingAbility`, `spellSaveDC`, `spellAttackBonus` are now PER CLASS
 - `knownSpells` and `preparedSpells` are tracked per class
 - `spellSlots` is still a unified pool (correct for D&D 5e multiclassing)
+- Added `preparedChangedThisRest` and `knownChangedThisLevel` to enforce SRD change limits
 
 Spell slot totals calculated per PRD §10 Appendix C rules, depends on:
 - Class (Wizard/Cleric/etc.)
@@ -107,10 +124,13 @@ Sum Spellcasting class levels → look up `multiclassSpellSlots[totalSpellcastin
 |---|---|
 | Non-spellcaster | Don't display spell slot tracker |
 | Only cantrips (level 0) | Don't display spell slot tracker (cantrips don't consume slots) |
-| Warlock multiclass | Pact Magic slots displayed separately |
+| Warlock multiclass | Pact Magic slots displayed separately (reset on short rest) |
 | Click when used == total | Don't increase, show "Spell slots depleted" |
 | Long rest (Warlock) | Pact Magic not reset (needs short rest) |
 | Short rest (non-Warlock) | Spell slots not reset |
+| Cleric/Druid (`knownSource: 'class_list'`) | `knownSpells` auto-populated from class list on creation/recompute |
+| Paladin/Ranger (`changesPerRest: 1`) | Enforce max 1 prepared spell change per long rest |
+| Bard/Sorcerer/Warlock (`changesPerLevel: 1`) | Enforce max 1 known spell change per level gain |
 
 ---
 

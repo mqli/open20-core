@@ -27,16 +27,90 @@ Spell management is core functionality for spellcasting characters. Casters need
 
 See `../../spec/data-model.md` → `Spell`
 
+### Class Spellcasting Type (Discriminated Union)
+
+Defined in `src/types/class.ts`. Replaces the old `Spellcasting` interface with a discriminated union that accurately models D&D 5e SRD rules:
+
 ```typescript
-// Character.spells
-interface CharacterSpells {
-  knownSpells: string[];        // ["fire-bolt", "mage-hand", "shield"]
-  preparedSpells: string[];     // ["shield", "magic-missile"]
-  spellcastingAbility: string;   // "Intelligence" | "Wisdom" | "Charisma"
-  spellSlots: Record<number, SpellSlotEntry>;
-  pactMagicSlots: PactMagicSlots | null;
+// Discriminated union for class spellcasting rules
+type Spellcasting =
+  | PreparationSpellcasting   // Cleric, Druid, Wizard, Paladin, Ranger
+  | KnownSpellcasting;         // Bard, Sorcerer, Warlock
+
+interface PreparationSpellcasting {
+  type: 'preparation';
+  ability: AbilityName;
+  
+  // How the caster "knows" spells:
+  // - 'class_list'  → Cleric, Druid: automatically knows ALL spells on class list
+  // - 'spellbook'   → Wizard: must learn/copy spells into spellbook
+  // - 'limited'     → Paladin, Ranger: knows limited number (level + ability mod)
+  knownSource: 'class_list' | 'spellbook' | 'limited';
+  
+  // How many prepared spells can be changed per long rest:
+  // - 'all'   → Cleric, Druid, Wizard: can change any number
+  // - number  → Paladin, Ranger: can only change 1 per long rest (SRD: "One")
+  changesPerRest: 'all' | number;
+}
+
+interface KnownSpellcasting {
+  type: 'known';
+  ability: AbilityName;
+  
+  // How many known spells can be changed per level (SRD: always 1)
+  changesPerLevel: number;
+  
+  // Warlock-specific: Pact Magic instead of regular slots
+  pactMagic?: true;
 }
 ```
+
+**SRD Reference** (Spell Preparation by Class table):
+- Cleric/Druid/Wizard: Change when = "Finish a Long Rest", Number = "Any"
+- Paladin/Ranger: Change when = "Finish a Long Rest", Number = "One"
+- Bard/Sorcerer/Warlock: Change when = "Gain a level", Number = "One"
+
+### Character Spells Data
+
+```typescript
+// Character.spells (per-class tracking)
+interface CharacterSpells {
+  // Per-class spell tracking (keyed by classId)
+  classSpellcasting: Record<string, ClassSpellData>;
+  
+  // Unified spell slots (multiclass combination)
+  spellSlots: Record<SpellLevel, SpellSlotEntry>;
+  
+  // Warlock Pact Magic (separate from regular slots)
+  pactMagicSlots: PactMagicSlots | null;
+}
+
+interface ClassSpellData {
+  classId: string;
+  spellcastingAbility: AbilityName;
+  spellSaveDC: number;      // 8 + PB + ability mod
+  spellAttackBonus: number;
+
+  // Interpretation depends on knownSource:
+  // - 'class_list' (Cleric/Druid): ALL spells on class list (auto-populated)
+  // - 'spellbook' (Wizard): spells in spellbook
+  // - 'limited' (Paladin/Ranger): chosen known spells
+  // - 'known' (Sorcerer/Bard/Warlock): chosen known spells
+  knownSpells: readonly string[];
+
+  // For preparation casters: currently prepared
+  // For known casters: same as knownSpells (not used separately)
+  preparedSpells: readonly string[];
+
+  // Always prepared (Domain spells, etc.) — doesn't count against max
+  alwaysPreparedSpells?: readonly string[];
+
+  // Max prepared = class level + ability mod (for preparation casters)
+  maxPrepared: number;
+}
+```
+
+> **Note**: `changesPerRest` and `changesPerLevel` in the `Spellcasting` type are **reference fields** (documenting SRD rules). The code does **NOT** enforce these limits — players can manage their own characters freely.
 
 Spell details loaded from static data (`static/spells.json`):
 
@@ -113,8 +187,11 @@ interface SpellFilter {
 | Scenario | Handling |
 |---|---|
 | Non-spellcasting class | Completely hide spell area, don't render any spell-related UI |
-| Wizard (preparation caster) | Show "Prepared" checkbox, preparedSpells cleared after long rest |
-| Sorcerer/Warlock (known caster) | Don't show "Prepared" checkbox, knownSpells = all available |
+| Cleric/Druid (`knownSource: 'class_list'`) | `knownSpells` auto-populated from class list; can prepare any after long rest |
+| Wizard (`knownSource: 'spellbook'`) | `knownSpells` = spellbook only; must learn spells; can prepare any after long rest |
+| Paladin/Ranger (`changesPerRest: 1`) | Can only change 1 prepared spell per long rest |
+| Bard/Sorcerer/Warlock (`type: 'known'`) | Don't show "Prepared" checkbox; `knownSpells` = all available; can only change 1 known spell per level |
+| Warlock (`pactMagic: true`) | Uses Pact Magic slots (short rest recovery), not regular slots |
 | Spell description not in SRD | Show "Description not available", don't block UI |
 | No spells match filter | Show "No matching spells", not blank |
 | Cantrips (level 0) | Grouped under level 0, don't consume spell slots |

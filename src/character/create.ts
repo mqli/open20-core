@@ -321,13 +321,22 @@ export function buildInitialSpells(
   const spellSaveDC = 8 + pb + abilityMod;
   const spellAttackBonus = pb + abilityMod;
 
+  // Auto-populate knownSpells for class_list casters (Cleric, Druid)
+  // They automatically know ALL spells on their class list
+  let knownSpells: readonly string[] = [];
+  if (spellcasting.type === 'preparation' && spellcasting.knownSource === 'class_list') {
+    knownSpells = data.getAllSpells()
+      .filter(s => s.classes?.includes(classData.id))
+      .map(s => s.id);
+  }
+
   // 构建该职业的法术数据
   const classSpellData: ClassSpellData = {
     classId: classData.id,
     spellcastingAbility: ability,
     spellSaveDC,
     spellAttackBonus,
-    knownSpells: [],
+    knownSpells,
     preparedSpells: [],
     alwaysPreparedSpells: [],
     maxPrepared: 1 + abilityMod, // 1级 + 调整值
@@ -515,12 +524,21 @@ function buildMulticlassSpells(
     const spellSaveDC = 8 + pb + abilityMod;
     const spellAttackBonus = pb + abilityMod;
 
+    // Auto-populate knownSpells for class_list casters (Cleric, Druid)
+    // They automatically know ALL spells on their class list
+    let knownSpells: readonly string[] = [];
+    if (classData.spellcasting.type === 'preparation' && classData.spellcasting.knownSource === 'class_list') {
+      knownSpells = data.getAllSpells()
+        .filter(s => s.classes?.includes(charClass.classId))
+        .map(s => s.id);
+    }
+
     classSpellcasting[charClass.classId] = {
       classId: charClass.classId,
       spellcastingAbility: ability,
       spellSaveDC,
       spellAttackBonus,
-      knownSpells: [],
+      knownSpells,
       preparedSpells: [],
       alwaysPreparedSpells: [],
       maxPrepared: charClass.level + abilityMod,

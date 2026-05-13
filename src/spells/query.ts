@@ -5,118 +5,22 @@
 import type { Spell, SpellLevel, SpellSchool, CastingTime } from '../types/spell';
 import type { DamageType } from '../types/damage';
 import type { Character } from '../types/character';
+import type { Class } from '../types/class';
 import type { DataLoader } from '../data/loader';
 
-// ── Preparation Rules ──────────────────────────────────────
+// ── Spellcasting Type Helpers ──────────────────────────────
 
-/**
- * SRD 5.2 Spell Preparation Rules by class:
- *
- * - Cleric, Druid, Wizard: Change any number after Long Rest
- * - Paladin, Ranger: Change 1 spell after Long Rest
- * - Bard, Sorcerer, Warlock: Change only when gaining a level (1 spell)
- */
-export type PreparationChangeLimit = 'any' | 'one-per-long-rest' | 'level-up-only';
-
-export interface PreparationRule {
-  /** Whether the class prepares spells (vs knowing them) */
-  preparesSpells: boolean;
-  /** When spells can be changed */
-  changeTiming: 'long-rest' | 'level-up';
-  /** Limit on number of changes */
-  changeLimit: PreparationChangeLimit;
+/** Check if a class is a preparation caster (Cleric, Druid, Wizard, Paladin, Ranger) */
+export function isPreparationCaster(classData: Class): boolean {
+  return classData.spellcasting?.type === 'preparation';
 }
 
-/** Preparation rules by class */
-const PREPARATION_RULES: Record<string, PreparationRule> = {
-  cleric: { preparesSpells: true, changeTiming: 'long-rest', changeLimit: 'any' },
-  druid: { preparesSpells: true, changeTiming: 'long-rest', changeLimit: 'any' },
-  wizard: { preparesSpells: true, changeTiming: 'long-rest', changeLimit: 'any' },
-  paladin: { preparesSpells: true, changeTiming: 'long-rest', changeLimit: 'one-per-long-rest' },
-  ranger: { preparesSpells: true, changeTiming: 'long-rest', changeLimit: 'one-per-long-rest' },
-  bard: { preparesSpells: false, changeTiming: 'level-up', changeLimit: 'level-up-only' },
-  sorcerer: { preparesSpells: false, changeTiming: 'level-up', changeLimit: 'level-up-only' },
-  warlock: { preparesSpells: false, changeTiming: 'level-up', changeLimit: 'level-up-only' },
-};
-
-/**
- * Get the preparation rule for a character based on their classes.
- * For multiclass, returns the most restrictive rule.
- *
- * @param char - Character object
- * @returns Preparation rule for the character
- */
-export function getPreparationRule(char: Character): PreparationRule {
-  const classes = char.classes.map(c => c.classId);
-
-  // If any class prepares spells, treat as prepared caster
-  const hasPreparedCaster = classes.some(c => PREPARATION_RULES[c]?.preparesSpells);
-  const hasLevelUpOnly = classes.some(c => PREPARATION_RULES[c]?.changeLimit === 'level-up-only');
-
-  if (hasPreparedCaster) {
-    // Check if any prepared caster class has 'any' limit
-    const hasAnyLimit = classes.some(c => PREPARATION_RULES[c]?.changeLimit === 'any');
-    if (hasAnyLimit) {
-      return { preparesSpells: true, changeTiming: 'long-rest', changeLimit: 'any' };
-    }
-    return { preparesSpells: true, changeTiming: 'long-rest', changeLimit: 'one-per-long-rest' };
-  }
-
-  if (hasLevelUpOnly) {
-    return { preparesSpells: false, changeTiming: 'level-up', changeLimit: 'level-up-only' };
-  }
-
-  // Default: can't prepare spells (non-caster)
-  return { preparesSpells: false, changeTiming: 'level-up', changeLimit: 'level-up-only' };
+/** Check if a class is a known caster (Bard, Sorcerer, Warlock) */
+export function isKnownCaster(classData: Class): boolean {
+  return classData.spellcasting?.type === 'known';
 }
 
-/**
- * Check if a character can currently change prepared spells.
- * SRD: Prepared casters can change after Long Rest; known casters only at level up.
- *
- * @param char - Character object
- * @returns Whether the character can change prepared spells now
- *
- * @example
- * canChangePreparedSpells(char) // true if after long rest for prepared casters
- */
-export function canChangePreparedSpells(char: Character): boolean {
-  const rule = getPreparationRule(char);
-
-  if (rule.changeTiming === 'level-up') {
-    // Can only change when gaining a level
-    // This would need to be checked by the caller (e.g., during level up flow)
-    return false;
-  }
-
-  // For 'long-rest' timing, check if character has taken a long rest
-  // We track this via the presence of used spell slots (reset after long rest)
-  // A simpler approach: just return true and let the UI handle the timing
-  return true;
-}
-
-/**
- * Get the maximum number of spell changes allowed.
- *
- * @param char - Character object
- * @returns Maximum number of changes (Infinity for 'any', 1 for 'one-per-long-rest', 0 for 'level-up-only')
- */
-export function getMaxPreparedSpellChanges(char: Character): number {
-  const rule = getPreparationRule(char);
-
-  switch (rule.changeLimit) {
-    case 'any':
-      return Infinity;
-    case 'one-per-long-rest':
-      return 1;
-    case 'level-up-only':
-      return 0;
-    default:
-      return 0;
-  }
-}
-
-// ── SpellFilter Interface ──────────────────────────────────────
+// ── SpellFilter Interface ────────────────────────────────────
 
 export interface SpellFilter {
   name?: string;

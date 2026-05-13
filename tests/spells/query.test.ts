@@ -12,19 +12,19 @@ import {
   getClassSpellData,
   knowsSpellForClass,
   isSpellPreparedForClass,
-  getPreparationRule,
-  canChangePreparedSpells,
-  getMaxPreparedSpellChanges,
+  isPreparationCaster,
+  isKnownCaster,
 } from '../../src/spells/query';
 import type { DataLoader } from '../../src/data/loader';
 import type { Spell, SpellLevel, SpellSchool } from '../../src/types/spell';
+import type { Class } from '../../src/types/class';
 
-// ── Shared Fixtures ───────────────────────────────────────────
+// ── Shared Fixtures ───────────────────────────────────
 
 import { createMockDataLoader } from '../fixtures/data-loader';
 import { MOCK_SPELLS } from '../fixtures/spells';
 
-// ── Mock DataLoader ────────────────────────────────────────────
+// ── Mock DataLoader ────────────────────────────────────
 
 function createMockDataLoaderWithSpells(spells: Spell[] = MOCK_SPELLS): DataLoader {
   return createMockDataLoader({
@@ -34,7 +34,7 @@ function createMockDataLoaderWithSpells(spells: Spell[] = MOCK_SPELLS): DataLoad
   });
 }
 
-// ── Mock Character ─────────────────────────────────────────────
+// ── Mock Character ─────────────────────────────────────
 
 const MOCK_CHARACTER = {
   spells: {
@@ -55,7 +55,75 @@ const MOCK_CHARACTER = {
   },
 };
 
-// ── Tests ─────────────────────────────────────────────────────
+// ── Mock Class Data ────────────────────────────────────
+
+const MOCK_WIZARD_CLASS: Class = {
+  id: 'Wizard',
+  name: 'Wizard',
+  source: '2024 PHB',
+  hitDie: 'd6' as any,
+  savingThrowProficiencies: ['Intelligence', 'Wisdom'] as any,
+  armorTraining: [],
+  weaponProficiencies: [],
+  weaponMastery: false,
+  featuresByLevel: new Map(),
+  spellcasting: {
+    type: 'preparation',
+    ability: 'Intelligence' as any,
+    knownSource: 'spellbook',
+    changesPerRest: 'all',
+  },
+};
+
+const MOCK_CLERIC_CLASS: Class = {
+  id: 'Cleric',
+  name: 'Cleric',
+  source: '2024 PHB',
+  hitDie: 'd8' as any,
+  savingThrowProficiencies: ['Wisdom', 'Charisma'] as any,
+  armorTraining: ['Light', 'Medium', 'Heavy', 'Shields'],
+  weaponProficiencies: ['Simple'],
+  weaponMastery: false,
+  featuresByLevel: new Map(),
+  spellcasting: {
+    type: 'preparation',
+    ability: 'Wisdom' as any,
+    knownSource: 'class_list',
+    changesPerRest: 'all',
+  },
+};
+
+const MOCK_BARD_CLASS: Class = {
+  id: 'Bard',
+  name: 'Bard',
+  source: '2024 PHB',
+  hitDie: 'd8' as any,
+  savingThrowProficiencies: ['Dexterity', 'Charisma'] as any,
+  armorTraining: ['Light'],
+  weaponProficiencies: ['Simple', 'Hand Crossbow', 'Longsword', 'Rapier', 'Shortsword'],
+  weaponMastery: false,
+  featuresByLevel: new Map(),
+  spellcasting: {
+    type: 'known',
+    ability: 'Charisma' as any,
+    changesPerLevel: 1,
+  },
+};
+
+const MOCK_FIGHTER_CLASS: Class = {
+  id: 'Fighter',
+  name: 'Fighter',
+  source: '2024 PHB',
+  hitDie: 'd10' as any,
+  savingThrowProficiencies: ['Strength', 'Constitution'] as any,
+  armorTraining: ['Light', 'Medium', 'Heavy', 'Shields'],
+  weaponProficiencies: ['Simple', 'Martial'],
+  weaponMastery: true,
+  featuresByLevel: new Map(),
+  spellcasting: null,
+};
+
+// ── Tests ─────────────────────────────────────────────
 
 describe('getSpell', () => {
   const data = createMockDataLoaderWithSpells();
@@ -257,95 +325,34 @@ describe('isSpellPreparedForClass', () => {
   });
 });
 
-describe('getPreparationRule', () => {
-  it('should return correct rule for Wizard (prepares, any changes)', () => {
-    const char = {
-      classes: [{ classId: 'wizard', level: 3 }],
-    };
-    const rule = getPreparationRule(char as any);
-    expect(rule.preparesSpells).toBe(true);
-    expect(rule.changeTiming).toBe('long-rest');
-    expect(rule.changeLimit).toBe('any');
+describe('isPreparationCaster', () => {
+  it('should return true for Wizard (preparation caster)', () => {
+    expect(isPreparationCaster(MOCK_WIZARD_CLASS)).toBe(true);
   });
 
-  it('should return correct rule for Sorcerer (knows, level-up only)', () => {
-    const char = {
-      classes: [{ classId: 'sorcerer', level: 3 }],
-    };
-    const rule = getPreparationRule(char as any);
-    expect(rule.preparesSpells).toBe(false);
-    expect(rule.changeTiming).toBe('level-up');
-    expect(rule.changeLimit).toBe('level-up-only');
+  it('should return true for Cleric (preparation caster)', () => {
+    expect(isPreparationCaster(MOCK_CLERIC_CLASS)).toBe(true);
   });
 
-  it('should return correct rule for Paladin (prepares, one per long rest)', () => {
-    const char = {
-      classes: [{ classId: 'paladin', level: 3 }],
-    };
-    const rule = getPreparationRule(char as any);
-    expect(rule.preparesSpells).toBe(true);
-    expect(rule.changeTiming).toBe('long-rest');
-    expect(rule.changeLimit).toBe('one-per-long-rest');
+  it('should return false for Bard (known caster)', () => {
+    expect(isPreparationCaster(MOCK_BARD_CLASS)).toBe(false);
   });
 
-  it('should handle multiclass (Wizard + Sorcerer = prepared with any limit)', () => {
-    const char = {
-      classes: [
-        { classId: 'wizard', level: 3 },
-        { classId: 'sorcerer', level: 2 },
-      ],
-    };
-    const rule = getPreparationRule(char as any);
-    // Wizard is a prepared caster with 'any' limit
-    expect(rule.preparesSpells).toBe(true);
-    expect(rule.changeLimit).toBe('any');
-  });
-
-  it('should return default for non-caster', () => {
-    const char = {
-      classes: [{ classId: 'fighter', level: 3 }],
-    };
-    const rule = getPreparationRule(char as any);
-    expect(rule.preparesSpells).toBe(false);
-    expect(rule.changeLimit).toBe('level-up-only');
+  it('should return false for Fighter (non-caster)', () => {
+    expect(isPreparationCaster(MOCK_FIGHTER_CLASS)).toBe(false);
   });
 });
 
-describe('canChangePreparedSpells', () => {
-  it('should return true for prepared casters (long-rest timing)', () => {
-    const char = {
-      classes: [{ classId: 'wizard', level: 3 }],
-    };
-    expect(canChangePreparedSpells(char as any)).toBe(true);
+describe('isKnownCaster', () => {
+  it('should return true for Bard (known caster)', () => {
+    expect(isKnownCaster(MOCK_BARD_CLASS)).toBe(true);
   });
 
-  it('should return false for known casters (level-up timing)', () => {
-    const char = {
-      classes: [{ classId: 'sorcerer', level: 3 }],
-    };
-    expect(canChangePreparedSpells(char as any)).toBe(false);
-  });
-});
-
-describe('getMaxPreparedSpellChanges', () => {
-  it('should return Infinity for prepared casters with any limit', () => {
-    const char = {
-      classes: [{ classId: 'wizard', level: 3 }],
-    };
-    expect(getMaxPreparedSpellChanges(char as any)).toBe(Infinity);
+  it('should return false for Wizard (preparation caster)', () => {
+    expect(isKnownCaster(MOCK_WIZARD_CLASS)).toBe(false);
   });
 
-  it('should return 1 for Paladin (one-per-long-rest)', () => {
-    const char = {
-      classes: [{ classId: 'paladin', level: 3 }],
-    };
-    expect(getMaxPreparedSpellChanges(char as any)).toBe(1);
-  });
-
-  it('should return 0 for known casters (level-up-only)', () => {
-    const char = {
-      classes: [{ classId: 'sorcerer', level: 3 }],
-    };
-    expect(getMaxPreparedSpellChanges(char as any)).toBe(0);
+  it('should return false for Fighter (non-caster)', () => {
+    expect(isKnownCaster(MOCK_FIGHTER_CLASS)).toBe(false);
   });
 });
