@@ -166,10 +166,13 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
   // 7. Build Spells (handle multiclass spell slots)
   let spells: CharacterSpells;
 
+  // Get subclass data if applicable
+  const subclass = params.subclassId ? data.getSubclass(params.subclassId) : undefined;
+
   if (primaryLevel === 1 && !additionalClasses.length) {
     // Single class level 1
     spells = classData.spellcasting
-      ? buildInitialSpells(classData, abilityScores, data)
+      ? buildInitialSpells(classData, abilityScores, data, subclass ?? undefined)
       : emptyCharacterSpells();
   } else {
     // Multiclassing - calculate spell slots using multiclass rules
@@ -249,6 +252,26 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
 // ── Helper Functions ──────────────────────────────────────────
 
 /**
+ * 从子职业数据中获取始终准备的法术
+ * 根据职业等级，返回所有已获得的领域/誓言法术
+ */
+export function getAlwaysPreparedSpellsFromSubclass(
+  subclass: import('../types/class').Subclass,
+  classLevel: number
+): string[] {
+  if (!subclass.alwaysPreparedSpells) return [];
+  const spells: string[] = [];
+  for (const [level, spellList] of subclass.alwaysPreparedSpells) {
+    if (classLevel >= level) {
+      spells.push(...spellList);
+    }
+  }
+  return spells;
+}
+
+/**
+
+/**
  * 提取指定等级的特性列表
  */
 export function getFeaturesAtLevel(classData: Class, level: number): readonly Feature[] {
@@ -311,7 +334,8 @@ function buildSkills(
 export function buildInitialSpells(
   classData: Class,
   abilityScores: AbilityScores,
-  data: DataLoader
+  data: DataLoader,
+  subclass?: import('../types/class').Subclass
 ): CharacterSpells {
   const spellcasting = classData.spellcasting!;
   const ability = spellcasting.ability;
@@ -330,6 +354,12 @@ export function buildInitialSpells(
       .map(s => s.id);
   }
 
+  // Auto-populate alwaysPreparedSpells from subclass (domain/oath spells)
+  let alwaysPreparedSpells: readonly string[] = [];
+  if (subclass) {
+    alwaysPreparedSpells = getAlwaysPreparedSpellsFromSubclass(subclass, 1);
+  }
+
   // 构建该职业的法术数据
   const classSpellData: ClassSpellData = {
     classId: classData.id,
@@ -338,7 +368,7 @@ export function buildInitialSpells(
     spellAttackBonus,
     knownSpells,
     preparedSpells: [],
-    alwaysPreparedSpells: [],
+    alwaysPreparedSpells,
     maxPrepared: 1 + abilityMod, // 1级 + 调整值
   };
 
@@ -533,6 +563,15 @@ function buildMulticlassSpells(
         .map(s => s.id);
     }
 
+    // Auto-populate alwaysPreparedSpells from subclass (domain/oath spells)
+    let alwaysPreparedSpells: readonly string[] = [];
+    if (charClass.subclassId) {
+      const subclass = data.getSubclass(charClass.subclassId);
+      if (subclass) {
+        alwaysPreparedSpells = getAlwaysPreparedSpellsFromSubclass(subclass, charClass.level);
+      }
+    }
+
     classSpellcasting[charClass.classId] = {
       classId: charClass.classId,
       spellcastingAbility: ability,
@@ -540,7 +579,7 @@ function buildMulticlassSpells(
       spellAttackBonus,
       knownSpells,
       preparedSpells: [],
-      alwaysPreparedSpells: [],
+      alwaysPreparedSpells,
       maxPrepared: charClass.level + abilityMod,
     };
   }

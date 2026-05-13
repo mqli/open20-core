@@ -389,7 +389,7 @@
           },
           {
             "name": "Life Domain Spells",
-            "description": "You gain domain spells at the appropriate cleric levels. These spells count as cleric spells for you."
+            "description": "You gain domain spells at the appropriate cleric levels. These spells count as cleric spells for you and are always prepared."
           }
         ]
       },
@@ -429,6 +429,13 @@
           }
         ]
       }
+    ],
+    "alwaysPreparedSpells": [
+      {"level": 1, "spells": ["bless", "cure-wounds"]},
+      {"level": 3, "spells": ["lesser-restoration", "spiritual-weapon"]},
+      {"level": 5, "spells": ["beacon-of-hope", "revivify"]},
+      {"level": 7, "spells": ["death-ward", "guardian-of-faith"]},
+      {"level": 9, "spells": ["mass-cure-wounds", "raise-dead"]}
     ],
     "source": "SRD 5.2"
   },
@@ -482,6 +489,13 @@
           }
         ]
       }
+    ],
+    "alwaysPreparedSpells": [
+      {"level": 1, "spells": ["burning-hands", "faerie-fire"]},
+      {"level": 3, "spells": ["flaming-sphere", "scorching-ray"]},
+      {"level": 5, "spells": ["daylight", "fireball"]},
+      {"level": 7, "spells": ["arcane-eye", "wall-of-fire"]},
+      {"level": 9, "spells": ["scrying", "sunburst"]}
     ],
     "source": "SRD 5.2"
   },

@@ -67,7 +67,20 @@ function parseSubclass(raw: unknown): Subclass {
     featuresByLevel: parseFeaturesByLevel(
       s.featuresByLevel as Array<{ level: number; features: readonly Feature[] }>
     ),
+    alwaysPreparedSpells: s.alwaysPreparedSpells
+      ? parseAlwaysPreparedSpells(s.alwaysPreparedSpells as Array<{ level: number; spells: readonly string[] }>)
+      : undefined,
   };
+}
+
+function parseAlwaysPreparedSpells(
+  raw: Array<{ level: number; spells: readonly string[] }>
+): ReadonlyMap<number, readonly string[]> {
+  const map = new Map<number, readonly string[]>();
+  for (const entry of raw) {
+    map.set(entry.level, entry.spells);
+  }
+  return map;
 }
 
 // ── 类型安全的 JSON 数据 ──────────────────────────────────────

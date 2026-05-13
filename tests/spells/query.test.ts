@@ -235,6 +235,31 @@ describe('getPreparedSpells', () => {
     expect(results.map(s => s.id)).toContain('shield');
     expect(results.map(s => s.id)).toContain('fireball');
   });
+
+  it('should include always-prepared spells', () => {
+    const char = {
+      spells: {
+        classSpellcasting: {
+          Wizard: {
+            classId: 'Wizard',
+            spellcastingAbility: 'Intelligence' as const,
+            spellSaveDC: 15,
+            spellAttackBonus: 7,
+            knownSpells: ['fireball', 'shield'],
+            preparedSpells: ['shield'],
+            alwaysPreparedSpells: ['guidance', 'healing-word'],
+            maxPrepared: 5,
+          },
+        },
+        spellSlots: {},
+        pactMagicSlots: null,
+      },
+    };
+    const results = getPreparedSpells(char as any, data);
+    expect(results.map(s => s.id)).toContain('shield'); // regularly prepared
+    expect(results.map(s => s.id)).toContain('guidance'); // always-prepared
+    expect(results.map(s => s.id)).toContain('healing-word'); // always-prepared
+  });
 });
 
 describe('isSpellPrepared', () => {

@@ -183,3 +183,38 @@ export const CHAMPION_SUBCLASS: Subclass = {
     [7, [{ name: 'Remarkable Athlete', description: 'Add half proficiency to Str/Dex/Con checks', level: 7 }]],
   ]),
 };
+
+// ── Cleric Class (for spell testing) ─────────────────────────
+
+export const CLERIC_FEATURES_L1: Feature[] = [
+  { name: 'Spellcasting', description: 'Cast cleric spells', level: 1 },
+  { name: 'Blessing of the Trickster', description: 'Grant Stealth advantage', level: 1 },
+];
+
+export const CLERIC_CLASS: Class = {
+  id: 'Cleric',
+  name: 'Cleric',
+  source: '2024 PHB',
+  hitDie: 'd8',
+  savingThrowProficiencies: ['Wisdom', 'Charisma'],
+  armorTraining: ['Light', 'Medium', 'Shield'],
+  weaponProficiencies: ['Simple'],
+  weaponMastery: false,
+  featuresByLevel: new Map([[1, CLERIC_FEATURES_L1]]),
+  spellcasting: { type: 'preparation', ability: 'Wisdom', knownSource: 'class_list', changesPerRest: 'all' },
+};
+
+export const LIFE_DOMAIN_SUBCLASS: Subclass = {
+  id: 'Life Domain',
+  parentClass: 'Cleric',
+  grantedAtLevel: 1,
+  featuresByLevel: new Map([
+    [1, [{ name: 'Disciple of Life', description: 'Healing spells are more effective', level: 1 }]],
+    [2, [{ name: 'Channel Divinity: Preserve Life', description: 'Heal nearby creatures', level: 2 }]],
+  ]),
+  alwaysPreparedSpells: new Map([
+    [1, ['bless', 'cure-wounds']],
+    [3, ['lesser-restoration', 'spiritual-weapon']],
+    [5, ['beacon-of-hope', 'revivify']],
+  ]),
+};

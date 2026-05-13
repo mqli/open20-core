@@ -14,7 +14,7 @@ import { calculateMaxHP } from '../engine/hp-calculator';
 import type { Feature } from '../types/class';
 import { calculatePactMagic, calculateSpellSlotsFromClasses } from '../engine/spell-slots';
 import type { SpellLevel } from '../types/spell';
-import { getFeaturesAtLevel } from './create';
+import { getFeaturesAtLevel, getAlwaysPreparedSpellsFromSubclass } from './create';
 
 /**
  * Recalculates all derived/computed stats on a Character.
@@ -115,12 +115,22 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
         .map(s => s.id);
     }
 
+    // Auto-populate alwaysPreparedSpells from subclass (domain/oath spells)
+    let alwaysPreparedSpells = classSpellData.alwaysPreparedSpells ?? [];
+    if (charClass?.subclassId) {
+      const subclass = data.getSubclass(charClass.subclassId);
+      if (subclass) {
+        alwaysPreparedSpells = getAlwaysPreparedSpellsFromSubclass(subclass, classLevel);
+      }
+    }
+
     classSpellcasting[classId] = {
       ...classSpellData,
       spellcastingAbility: ability,
       spellSaveDC: 8 + pb + abilityMod,
       spellAttackBonus: pb + abilityMod,
       knownSpells,
+      alwaysPreparedSpells,
       maxPrepared: classLevel + abilityMod,
     };
   }
@@ -143,6 +153,15 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
         .map(s => s.id);
     }
 
+    // Auto-populate alwaysPreparedSpells from subclass (domain/oath spells)
+    let alwaysPreparedSpells: readonly string[] = [];
+    if (charClass.subclassId) {
+      const subclass = data.getSubclass(charClass.subclassId);
+      if (subclass) {
+        alwaysPreparedSpells = getAlwaysPreparedSpellsFromSubclass(subclass, charClass.level);
+      }
+    }
+
     classSpellcasting[charClass.classId] = {
       classId: charClass.classId,
       spellcastingAbility: ability,
@@ -150,7 +169,7 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
       spellAttackBonus: pb + abilityMod,
       knownSpells,
       preparedSpells: [],
-      alwaysPreparedSpells: [],
+      alwaysPreparedSpells,
       maxPrepared: charClass.level + abilityMod,
     };
   }

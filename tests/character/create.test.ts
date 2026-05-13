@@ -9,6 +9,7 @@ import {
   buildInitialSpells,
   emptyCharacterSpells,
   extractResources,
+  getAlwaysPreparedSpellsFromSubclass,
 } from '../../src/character/create';
 import type { CreateCharacterParams } from '../../src/character/create';
 import type { DataLoader } from '../../src/data/loader';
@@ -33,6 +34,8 @@ import {
   WIZARD_CLASS,
   ROGUE_CLASS,
   CHAMPION_SUBCLASS,
+  CLERIC_CLASS,
+  LIFE_DOMAIN_SUBCLASS,
 } from '../fixtures/characters';
 
 // ── Additional Test Data ──────────────────────────────────────
@@ -83,9 +86,15 @@ function createMockDataLoaderExtended(): DataLoader {
       if (id === 'Barbarian') return BARBARIAN_CLASS;
       if (id === 'Wizard') return WIZARD_CLASS;
       if (id === 'Rogue') return ROGUE_CLASS;
+      if (id === 'Cleric') return CLERIC_CLASS;
       return undefined;
     },
-    getAllClasses: () => [FIGHTER_CLASS, BARBARIAN_CLASS, WIZARD_CLASS, ROGUE_CLASS],
+    getSubclass: (id: string) => {
+      if (id === 'Champion') return CHAMPION_SUBCLASS;
+      if (id === 'Life Domain') return LIFE_DOMAIN_SUBCLASS;
+      return undefined;
+    },
+    getAllClasses: () => [FIGHTER_CLASS, BARBARIAN_CLASS, WIZARD_CLASS, ROGUE_CLASS, CLERIC_CLASS],
     getProficiencyBonus: (level: number) => {
       if (level <= 4) return 2;
       if (level <= 8) return 3;
@@ -799,5 +808,70 @@ describe('extractResources', () => {
     // 2024 PHB: Resources scale with Proficiency Bonus (PB at level 2 = 2)
     const actionSurge = resources.find(r => r.id === 'Action Surge');
     expect(actionSurge!.max).toBe(2);
+  });
+});
+
+describe('getAlwaysPreparedSpellsFromSubclass', () => {
+  it('returns spells for levels up to class level', () => {
+    const result = getAlwaysPreparedSpellsFromSubclass(LIFE_DOMAIN_SUBCLASS, 1);
+    expect(result).toContain('bless');
+    expect(result).toContain('cure-wounds');
+    // Level 3 spells should NOT be included at class level 1
+    expect(result).not.toContain('lesser-restoration');
+  });
+
+  it('returns all spells for higher class levels', () => {
+    const result = getAlwaysPreparedSpellsFromSubclass(LIFE_DOMAIN_SUBCLASS, 5);
+    expect(result).toContain('bless');
+    expect(result).toContain('cure-wounds');
+    expect(result).toContain('lesser-restoration');
+    expect(result).toContain('spiritual-weapon');
+    expect(result).toContain('beacon-of-hope');
+    expect(result).toContain('revivify');
+  });
+
+  it('returns empty array for subclass without alwaysPreparedSpells', () => {
+    const result = getAlwaysPreparedSpellsFromSubclass(CHAMPION_SUBCLASS, 3);
+    expect(result).toHaveLength(0);
+  });
+});
+
+describe('createCharacter with alwaysPreparedSpells', () => {
+  const data = createMockDataLoaderExtended();
+
+  it('populates alwaysPreparedSpells for Cleric with Life Domain', () => {
+    const params: CreateCharacterParams = {
+      name: 'Cleric Test',
+      speciesId: 'Human',
+      backgroundId: 'Soldier',
+      classId: 'Cleric',
+      subclassId: 'Life Domain',
+      abilityScores: STANDARD_SCORES,
+    };
+
+    const char = createCharacter(params, data);
+    const clericSpells = char.spells.classSpellcasting['Cleric'];
+    expect(clericSpells).toBeDefined();
+    expect(clericSpells!.alwaysPreparedSpells).toContain('bless');
+    expect(clericSpells!.alwaysPreparedSpells).toContain('cure-wounds');
+  });
+
+  it('does not count alwaysPreparedSpells against maxPrepared', () => {
+    // Wisdom 14 → +2, level 1 → maxPrepared = 1 + 2 = 3
+    const params: CreateCharacterParams = {
+      name: 'Cleric Test',
+      speciesId: 'Human',
+      backgroundId: 'Soldier',
+      classId: 'Cleric',
+      subclassId: 'Life Domain',
+      abilityScores: STANDARD_SCORES,
+    };
+
+    const char = createCharacter(params, data);
+    const clericSpells = char.spells.classSpellcasting['Cleric'];
+    // maxPrepared = level + abilityMod = 1 + 2 = 3
+    expect(clericSpells!.maxPrepared).toBe(2);
+    // alwaysPreparedSpells don't count against this limit
+    expect(clericSpells!.alwaysPreparedSpells).toHaveLength(2);
   });
 });

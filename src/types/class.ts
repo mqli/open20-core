@@ -73,6 +73,9 @@ export interface Subclass {
   readonly parentClass: string; // 父职业ID
   readonly grantedAtLevel: number;
   readonly featuresByLevel: ReadonlyMap<number, readonly Feature[]>;
+  // 始终准备的法术（领域法术、誓言法术等），按获得等级分组
+  // 这些法术不计入准备法术数量上限
+  readonly alwaysPreparedSpells?: ReadonlyMap<number, readonly string[]>;
 }
 
 // 多维职业法术位查询表条目
