@@ -12,7 +12,7 @@ import { calculatePassivePerception } from '../engine/passive-perception';
 import { calculateAttacks } from '../engine/attack-calculator';
 import { calculateMaxHP } from '../engine/hp-calculator';
 import type { Feature } from '../types/class';
-import { calculatePactMagic, calculateSpellSlotsFromClasses } from '../engine/spell-slots';
+import { calculatePactMagic, calculateSpellSlots, calculateSpellSlotsFromClasses } from '../engine/spell-slots';
 import type { SpellLevel } from '../types/spell';
 import { getFeaturesAtLevel, getAlwaysPreparedSpellsFromSubclass } from './create';
 
@@ -93,17 +93,6 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
   let newSpells = { ...char.spells };
   const classSpellcasting = { ...newSpells.classSpellcasting };
 
-  // Calculate combined spell slots first to determine max spell level for filtering known spells
-  const combinedSlots = calculateSpellSlotsFromClasses(char.classes, data);
-  const maxSpellLevel = (() => {
-    let max = 0;
-    for (let level = 1; level <= 9; level++) {
-      const entry = combinedSlots[level];
-      if (entry && entry.total > 0) max = level;
-    }
-    return max;
-  })();
-
   // Recalculate each class's spell data
   for (const [classId, classSpellData] of Object.entries(classSpellcasting)) {
     const classData = data.getClass(classId);
@@ -118,20 +107,33 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     const charClass = char.classes.find(c => c.classId === classId);
     const classLevel = charClass?.level ?? 1;
 
+    // Calculate per-class max spell level for filtering known spells
+    const classSlots = calculateSpellSlots(classId, classLevel, data);
+    const classMaxSpellLevel = (() => {
+      let max = 0;
+      for (let level = 1; level <= 9; level++) {
+        const entry = classSlots[level];
+        if (entry && entry.total > 0) max = level;
+      }
+      return max;
+    })();
+
     // Auto-populate knownSpells for class_list casters (Cleric, Druid)
-    // For other casters, filter existing knownSpells by max castable level
+    // For known casters (Bard, Sorcerer), filter existing knownSpells by max castable level
+    // For spellbook casters (Wizard), keep all known spells (spellbook can contain higher-level spells)
     let knownSpells = classSpellData.knownSpells;
     if (classData.spellcasting.type === 'preparation' && classData.spellcasting.knownSource === 'class_list') {
       knownSpells = data.getAllSpells()
-        .filter(s => s.classes?.includes(classId) && (s.level === 0 || s.level <= maxSpellLevel))
+        .filter(s => s.classes?.includes(classId) && (s.level === 0 || s.level <= classMaxSpellLevel))
         .map(s => s.id);
-    } else {
-      // Filter known spells by max spell level (cantrips always included)
+    } else if (classData.spellcasting.type === 'known') {
+      // Known casters can only know spells they can cast (cantrips + up to max spell level)
       knownSpells = knownSpells.filter(spellId => {
         const spell = data.getSpell(spellId);
-        return spell && (spell.level === 0 || spell.level <= maxSpellLevel);
+        return spell && (spell.level === 0 || spell.level <= classMaxSpellLevel);
       });
     }
+    // else: preparation/spellbook casters keep all knownSpells unchanged
 
     // Auto-populate alwaysPreparedSpells from subclass (domain/oath spells)
     let alwaysPreparedSpells = classSpellData.alwaysPreparedSpells ?? [];
@@ -162,12 +164,23 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     const ability = classData.spellcasting.ability;
     const abilityMod = getModifier(getTotalScore(char.abilityScores, ability));
 
+    // Calculate per-class max spell level for filtering known spells
+    const classSlots = calculateSpellSlots(charClass.classId, charClass.level, data);
+    const classMaxSpellLevel = (() => {
+      let max = 0;
+      for (let level = 1; level <= 9; level++) {
+        const entry = classSlots[level];
+        if (entry && entry.total > 0) max = level;
+      }
+      return max;
+    })();
+
     // Auto-populate knownSpells for class_list casters (Cleric, Druid)
     // Only include spells they can actually cast (cantrips + up to max spell level)
     let knownSpells: readonly string[] = [];
     if (classData.spellcasting.type === 'preparation' && classData.spellcasting.knownSource === 'class_list') {
       knownSpells = data.getAllSpells()
-        .filter(s => s.classes?.includes(charClass.classId) && (s.level === 0 || s.level <= maxSpellLevel))
+        .filter(s => s.classes?.includes(charClass.classId) && (s.level === 0 || s.level <= classMaxSpellLevel))
         .map(s => s.id);
     }
 

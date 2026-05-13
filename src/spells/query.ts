@@ -7,6 +7,7 @@ import type { DamageType } from '../types/damage';
 import type { Character } from '../types/character';
 import type { Class } from '../types/class';
 import type { DataLoader } from '../data/loader';
+import { calculateSpellSlots } from '../engine/spell-slots';
 
 // ── Spellcasting Type Helpers ──────────────────────────────
 
@@ -293,18 +294,21 @@ export function getKnownSpellsForClass(
   const classSpellData = char.spells.classSpellcasting[classId];
   if (!classSpellData) return [];
 
-  // Determine max spell level the character can cast
-  let maxSpellLevel = 0;
+  // Calculate per-class max spell level (not combined multiclass level)
+  const charClass = char.classes.find(c => c.classId === classId);
+  const classLevel = charClass?.level ?? 1;
+  const classSlots = calculateSpellSlots(classId, classLevel, data);
+  let classMaxSpellLevel = 0;
   for (let level = 1; level <= 9; level++) {
-    const entry = char.spells.spellSlots[level as SpellLevel];
+    const entry = classSlots[level];
     if (entry && entry.total > 0) {
-      maxSpellLevel = level;
+      classMaxSpellLevel = level;
     }
   }
 
   return classSpellData.knownSpells
     .map(id => data.getSpell(id))
-    .filter((s): s is Spell => s !== undefined && (s.level === 0 || s.level <= maxSpellLevel));
+    .filter((s): s is Spell => s !== undefined && (s.level === 0 || s.level <= classMaxSpellLevel));
 }
 
 /**

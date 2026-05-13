@@ -567,12 +567,16 @@ function buildMulticlassSpells(
     const spellSaveDC = 8 + pb + abilityMod;
     const spellAttackBonus = pb + abilityMod;
 
+    // Calculate per-class max spell level for filtering known spells
+    const classSlots = calculateSpellSlots(charClass.classId, charClass.level, data);
+    const classMaxSpellLevel = getMaxSpellLevel(classSlots);
+
     // Auto-populate knownSpells for class_list casters (Cleric, Druid)
-    // Only include spells they can actually cast (cantrips + up to max spell level)
+    // Only include spells they can actually cast (cantrips + up to per-class max spell level)
     let knownSpells: readonly string[] = [];
     if (classData.spellcasting.type === 'preparation' && classData.spellcasting.knownSource === 'class_list') {
       knownSpells = data.getAllSpells()
-        .filter(s => s.classes?.includes(charClass.classId) && (s.level === 0 || s.level <= maxSpellLevel))
+        .filter(s => s.classes?.includes(charClass.classId) && (s.level === 0 || s.level <= classMaxSpellLevel))
         .map(s => s.id);
     }
 
