@@ -122,22 +122,36 @@ export function searchSpells(filter: SpellFilter, data: DataLoader): Spell[] {
 
 /**
  * Get spells for a character (known by any class)
+ * Only returns spells the character can actually cast (cantrips + up to max spell level)
  *
  * @param char - Character object
  * @param data - DataLoader
- * @returns Array of known/prepared spells
+ * @returns Array of known spells within casting level
  *
  * @example
- * getSpellsForCharacter(char, data) // Character's known spells with full data
+ * getSpellsForCharacter(char, data) // Character's known spells within casting level
  */
 export function getSpellsForCharacter(char: Character, data: DataLoader): Spell[] {
-  // Collect known spells from all classes
+  // Determine max spell level the character can cast
+  let maxSpellLevel = 0;
+  for (let level = 1; level <= 9; level++) {
+    const entry = char.spells.spellSlots[level as SpellLevel];
+    if (entry && entry.total > 0) {
+      maxSpellLevel = level;
+    }
+  }
+
+  // Collect known spells from all classes, filtered by castable level
   const knownSpellIds = new Set<string>();
   for (const classSpellData of Object.values(char.spells.classSpellcasting)) {
     for (const spellId of classSpellData.knownSpells) {
-      knownSpellIds.add(spellId);
+      const spell = data.getSpell(spellId);
+      if (spell && (spell.level === 0 || spell.level <= maxSpellLevel)) {
+        knownSpellIds.add(spellId);
+      }
     }
   }
+
   return Array.from(knownSpellIds)
     .map(id => data.getSpell(id))
     .filter((s): s is Spell => s !== undefined);
@@ -257,6 +271,40 @@ export function isSpellPreparedForClass(
     classSpellData.preparedSpells.includes(spellId) ||
     (classSpellData.alwaysPreparedSpells ?? []).includes(spellId)
   );
+}
+
+/**
+ * Get known spells for a specific class, filtered by character level
+ * Only returns spells the character can actually cast (cantrips + up to max spell level)
+ *
+ * @param char - Character object
+ * @param classId - Class ID
+ * @param data - DataLoader
+ * @returns Array of known spells within casting level for that class
+ *
+ * @example
+ * getKnownSpellsForClass(char, 'sorcerer', data) // Sorcerer's known spells filtered by level
+ */
+export function getKnownSpellsForClass(
+  char: Character,
+  classId: string,
+  data: DataLoader
+): Spell[] {
+  const classSpellData = char.spells.classSpellcasting[classId];
+  if (!classSpellData) return [];
+
+  // Determine max spell level the character can cast
+  let maxSpellLevel = 0;
+  for (let level = 1; level <= 9; level++) {
+    const entry = char.spells.spellSlots[level as SpellLevel];
+    if (entry && entry.total > 0) {
+      maxSpellLevel = level;
+    }
+  }
+
+  return classSpellData.knownSpells
+    .map(id => data.getSpell(id))
+    .filter((s): s is Spell => s !== undefined && (s.level === 0 || s.level <= maxSpellLevel));
 }
 
 /**

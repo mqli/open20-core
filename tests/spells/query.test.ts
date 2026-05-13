@@ -50,7 +50,11 @@ const MOCK_CHARACTER = {
         maxPrepared: 5,
       },
     },
-    spellSlots: {},
+    spellSlots: {
+      1: { total: 4, used: 0 },
+      2: { total: 3, used: 0 },
+      3: { total: 3, used: 0 },
+    } as any,
     pactMagicSlots: null,
   },
 };
@@ -216,7 +220,11 @@ describe('getSpellsForCharacter', () => {
             maxPrepared: 5,
           },
         },
-        spellSlots: {},
+        spellSlots: {
+          1: { total: 4, used: 0 },
+          2: { total: 3, used: 0 },
+          3: { total: 3, used: 0 },
+        } as any,
         pactMagicSlots: null,
       },
     };

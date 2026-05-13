@@ -7,6 +7,7 @@ export {
   getSpell as getSpellData,
   searchSpells,
   getSpellsByClass,
+  getKnownSpellsForClass,
   getSpellsForCharacter,
   getPreparedSpells,
   isSpellPrepared,

@@ -119,12 +119,18 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     const classLevel = charClass?.level ?? 1;
 
     // Auto-populate knownSpells for class_list casters (Cleric, Druid)
-    // Only include spells they can actually cast (cantrips + up to max spell level)
+    // For other casters, filter existing knownSpells by max castable level
     let knownSpells = classSpellData.knownSpells;
     if (classData.spellcasting.type === 'preparation' && classData.spellcasting.knownSource === 'class_list') {
       knownSpells = data.getAllSpells()
         .filter(s => s.classes?.includes(classId) && (s.level === 0 || s.level <= maxSpellLevel))
         .map(s => s.id);
+    } else {
+      // Filter known spells by max spell level (cantrips always included)
+      knownSpells = knownSpells.filter(spellId => {
+        const spell = data.getSpell(spellId);
+        return spell && (spell.level === 0 || spell.level <= maxSpellLevel);
+      });
     }
 
     // Auto-populate alwaysPreparedSpells from subclass (domain/oath spells)
