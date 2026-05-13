@@ -498,17 +498,15 @@ describe('getKnownSpellsForClass', () => {
   ];
 
   function createTestDataLoader(spells: Spell[] = allSpells): DataLoader {
-    // Spell slot table for different class levels
-    // calculateSpellSlots expects getSpellSlots to return Record<number, { total: number; used: number }>
-    const createSlotRecord = (slots: Record<number, number>): Record<number, { total: number; used: number }> => {
-      const record: Record<number, { total: number; used: number }> = {};
+    const createSlotRecord = (slots: Record<number, number>): Record<number, number> => {
+      const record: Record<number, number> = {};
       for (let i = 1; i <= 9; i++) {
-        record[i] = { total: slots[i] || 0, used: 0 };
+        record[i] = slots[i] || 0;
       }
       return record;
     };
 
-    const sorcererSlots: Record<number, Record<number, { total: number; used: number }>> = {
+    const sorcererSlots: Record<number, Record<number, number>> = {
       1: createSlotRecord({ 1: 2 }),
       2: createSlotRecord({ 1: 3 }),
       3: createSlotRecord({ 1: 4, 2: 2 }),
@@ -526,9 +524,9 @@ describe('getKnownSpellsForClass', () => {
         if (id === 'Cleric') return MOCK_CLERIC_CLASS;
         return undefined;
       },
-      getSpellSlots: (classId: string, level: number) => {
+      getSpellSlots: (classId: string, classLevel: number) => {
         if (classId === 'Sorcerer') {
-          return sorcererSlots[level] || createSlotRecord({});
+          return sorcererSlots[classLevel] || createSlotRecord({});
         }
         return createSlotRecord({});
       },

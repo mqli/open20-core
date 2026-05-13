@@ -17,10 +17,9 @@ interface PreparationSpellcasting {
   readonly ability: AbilityName;
 
   // 如何"知道"法术：
-  // - 'class_list'  → Cleric, Druid: 自动知道该职业法术列表中的所有法术
+  // - 'class_list'  → Cleric, Druid, Paladin, Ranger: 自动知道该职业法术列表中的所有法术
   // - 'spellbook'   → Wizard: 必须学习/抄写才能知道
-  // - 'limited'     → Paladin, Ranger: 知道的法术数量有限（等级 + 调整值）
-  readonly knownSource: 'class_list' | 'spellbook' | 'limited';
+  readonly knownSource: 'class_list' | 'spellbook';
 
   // 每次长休可以更换多少个准备的法术：
   // - 'all'   → Cleric, Druid, Wizard: 可以更换任意数量

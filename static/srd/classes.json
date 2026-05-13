@@ -959,7 +959,7 @@
     "spellcasting": {
       "type": "preparation",
       "ability": "Charisma",
-      "knownSource": "limited",
+      "knownSource": "class_list",
       "changesPerRest": 1
     }
   },
@@ -1114,7 +1114,7 @@
     "spellcasting": {
       "type": "preparation",
       "ability": "Wisdom",
-      "knownSource": "limited",
+      "knownSource": "class_list",
       "changesPerRest": 1
     }
   },

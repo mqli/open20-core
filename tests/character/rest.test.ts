@@ -56,8 +56,8 @@ function makeMockClass(id: string, hitDie: DieType): Class {
     savingThrowProficiencies: [],
     armorTraining: [],
     weaponMastery: false,
-    featuresByLevel: new Map<number, readonly Feature[]>(),
-    spellcasting: id === 'Warlock' ? { ability: 'Charisma', prepares: false } : null,
+    featuresByLevel: [],
+    spellcasting: id === 'Warlock' ? { type: 'known', ability: 'Charisma', changesPerLevel: 1, pactMagic: true } : null,
   };
 }
 

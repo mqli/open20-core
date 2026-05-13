@@ -32,7 +32,7 @@ const MOCK_CLASSES: Record<string, Class> = {
     armorTraining: [],
     weaponMastery: false,
     featuresByLevel: [],
-    spellcasting: { ability: 'Intelligence', prepares: true },
+    spellcasting: { type: 'preparation', ability: 'Intelligence', knownSource: 'spellbook', changesPerRest: 'all' },
   },
   Barbarian: {
     id: 'Barbarian',
@@ -54,7 +54,7 @@ const MOCK_CLASSES: Record<string, Class> = {
     armorTraining: [],
     weaponMastery: false,
     featuresByLevel: [],
-    spellcasting: { ability: 'Charisma', prepares: false },
+    spellcasting: { type: 'known', ability: 'Charisma', changesPerLevel: 1 },
   },
   Rogue: {
     id: 'Rogue',

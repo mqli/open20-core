@@ -76,10 +76,10 @@ const CHAMPION_SUBCLASS_EXTENDED: Subclass = {
   id: 'Champion',
   parentClass: 'fighter',
   grantedAtLevel: 3,
-  featuresByLevel: new Map([
-    [3, CHAMPION_FEATURES_L3],
-    [7, CHAMPION_FEATURES_L7],
-  ]),
+  featuresByLevel: [
+    { level: 3, features: CHAMPION_FEATURES_L3 },
+    { level: 7, features: CHAMPION_FEATURES_L7 },
+  ],
 };
 
 const WARLOCK_FEATURES_L1: Feature[] = [
@@ -94,8 +94,8 @@ const WARLOCK_CLASS: Class = {
   savingThrowProficiencies: ['Wisdom', 'Charisma'],
   armorTraining: ['Light'],
   weaponMastery: false,
-  featuresByLevel: new Map([[1, WARLOCK_FEATURES_L1]]),
-  spellcasting: { ability: 'Charisma', prepares: false },
+  featuresByLevel: [{ level: 1, features: WARLOCK_FEATURES_L1 }],
+  spellcasting: { type: 'known', ability: 'Charisma', changesPerLevel: 1 },
 };
 
 // ── Mock DataLoader ─────────────────────────────
@@ -860,8 +860,8 @@ describe('recomputeDerivedStats', () => {
       // Mutate to Sorcerer 3 / Wizard 2
       const mutated = mutate(char);
       mutated.classes = [
-        { classId: 'Sorcerer', level: 3 },
-        { classId: 'Wizard', level: 2 },
+        { classId: 'Sorcerer', level: 3, subclassId: null, subclassLevel: 0, hitDice: { die: 'd6', used: 0 } },
+        { classId: 'Wizard', level: 2, subclassId: null, subclassLevel: 0, hitDice: { die: 'd6', used: 0 } },
       ];
 
       // Manually set up Sorcerer knownSpells with some higher level spells
@@ -908,8 +908,8 @@ describe('recomputeDerivedStats', () => {
       // Mutate to Sorcerer 3 / Wizard 2
       const mutated = mutate(char);
       mutated.classes = [
-        { classId: 'Sorcerer', level: 3 },
-        { classId: 'Wizard', level: 2 },
+        { classId: 'Sorcerer', level: 3, subclassId: null, subclassLevel: 0, hitDice: { die: 'd6', used: 0 } },
+        { classId: 'Wizard', level: 2, subclassId: null, subclassLevel: 0, hitDice: { die: 'd6', used: 0 } },
       ];
 
       // Add high level spells to Wizard spellbook
