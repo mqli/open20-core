@@ -10,7 +10,7 @@ export type { Background } from './types';
 export type { Class, Subclass, Feature, Spellcasting } from './types';
 export type { Feat, FeatCategory } from './types';
 export type { Weapon, Armor, GearItem, EquipmentItem } from './types';
-export type { Spell, CharacterSpells, SpellSlotEntry, PactMagicSlots } from './types';
+export type { Spell, CharacterSpells, ClassSpellData, AlwaysPreparedSpells, SpellSlotEntry, PactMagicSlots } from './types';
 export type { Resource, ResetType } from './types';
 export type { CombatStats, CharacterAttack, ActiveCondition, ConditionName } from './types';
 export type { BaseAttack } from './types';
@@ -91,7 +91,7 @@ export {
 } from './engine';
 
 // ── Character (state management) ────────────────────────
-export { createCharacter } from './character';
+export { createCharacter, getAlwaysPreparedSpellsFromSubclass } from './character';
 export { levelUp } from './character';
 export { shortRest, longRest } from './character';
 export {

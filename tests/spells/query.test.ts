@@ -66,7 +66,7 @@ const MOCK_WIZARD_CLASS: Class = {
   armorTraining: [],
   weaponProficiencies: [],
   weaponMastery: false,
-  featuresByLevel: new Map(),
+  featuresByLevel: [],
   spellcasting: {
     type: 'preparation',
     ability: 'Intelligence' as any,
@@ -84,7 +84,7 @@ const MOCK_CLERIC_CLASS: Class = {
   armorTraining: ['Light', 'Medium', 'Heavy', 'Shields'],
   weaponProficiencies: ['Simple'],
   weaponMastery: false,
-  featuresByLevel: new Map(),
+  featuresByLevel: [],
   spellcasting: {
     type: 'preparation',
     ability: 'Wisdom' as any,
@@ -102,7 +102,7 @@ const MOCK_BARD_CLASS: Class = {
   armorTraining: ['Light'],
   weaponProficiencies: ['Simple', 'Hand Crossbow', 'Longsword', 'Rapier', 'Shortsword'],
   weaponMastery: false,
-  featuresByLevel: new Map(),
+  featuresByLevel: [],
   spellcasting: {
     type: 'known',
     ability: 'Charisma' as any,
@@ -119,7 +119,7 @@ const MOCK_FIGHTER_CLASS: Class = {
   armorTraining: ['Light', 'Medium', 'Heavy', 'Shields'],
   weaponProficiencies: ['Simple', 'Martial'],
   weaponMastery: true,
-  featuresByLevel: new Map(),
+  featuresByLevel: [],
   spellcasting: null,
 };
 

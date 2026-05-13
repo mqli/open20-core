@@ -261,9 +261,9 @@ export function getAlwaysPreparedSpellsFromSubclass(
 ): string[] {
   if (!subclass.alwaysPreparedSpells) return [];
   const spells: string[] = [];
-  for (const [level, spellList] of subclass.alwaysPreparedSpells) {
-    if (classLevel >= level) {
-      spells.push(...spellList);
+  for (const entry of subclass.alwaysPreparedSpells) {
+    if (classLevel >= entry.level) {
+      spells.push(...entry.spells);
     }
   }
   return spells;
@@ -275,7 +275,8 @@ export function getAlwaysPreparedSpellsFromSubclass(
  * 提取指定等级的特性列表
  */
 export function getFeaturesAtLevel(classData: Class, level: number): readonly Feature[] {
-  return classData.featuresByLevel.get(level) ?? [];
+  const entry = classData.featuresByLevel.find(f => f.level === level);
+  return entry?.features ?? [];
 }
 
 /**
@@ -514,9 +515,10 @@ function gatherAllFeatures(classes: CharacterClass[], data: DataLoader): Feature
     if (charClass.subclassId) {
       const subclass = data.getSubclass(charClass.subclassId);
       if (subclass) {
-        for (let lv = 1; lv <= charClass.level; lv++) {
-          const subFeatures = subclass.featuresByLevel.get(lv);
-          if (subFeatures) features.push(...subFeatures);
+        for (const entry of subclass.featuresByLevel) {
+          if (entry.level <= charClass.level) {
+            features.push(...entry.features);
+          }
         }
       }
     }

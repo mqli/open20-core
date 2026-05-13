@@ -1,7 +1,7 @@
 // character/index.ts
 // Barrel export — character module public API
 
-export { createCharacter } from './create';
+export { createCharacter, getAlwaysPreparedSpellsFromSubclass } from './create';
 export type { CreateCharacterParams } from './create';
 
 export { levelUp } from './level-up';

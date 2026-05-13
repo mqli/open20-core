@@ -52,7 +52,7 @@ const FIGHTER_CLASS: Class = {
   savingThrowProficiencies: ['Strength', 'Constitution'],
   armorTraining: ['Light', 'Medium', 'Heavy', 'Shield'],
   weaponMastery: true,
-  featuresByLevel: new Map([[1, FIGHTER_FEATURES_L1]]),
+  featuresByLevel: [{ level: 1, features: FIGHTER_FEATURES_L1 }],
   spellcasting: null,
 };
 
@@ -74,7 +74,7 @@ const WIZARD_CLASS: Class = {
   savingThrowProficiencies: ['Intelligence', 'Wisdom'],
   armorTraining: [],
   weaponMastery: false,
-  featuresByLevel: new Map([[1, WIZARD_FEATURES_L1]]),
+  featuresByLevel: [{ level: 1, features: WIZARD_FEATURES_L1 }],
   spellcasting: { ability: 'Intelligence', prepares: true },
 };
 
@@ -90,9 +90,7 @@ const CHAMPION_SUBCLASS: Subclass = {
   id: 'Champion',
   parentClass: 'Fighter',
   grantedAtLevel: 3,
-  featuresByLevel: new Map([
-    [3, [{ name: 'Improved Critical', description: 'Crit on 19-20', level: 3 }]],
-  ]),
+  featuresByLevel: [{ level: 3, features: [{ name: 'Improved Critical', description: 'Crit on 19-20', level: 3 }] }],
 };
 
 // ── Mock DataLoader ────────────────────────────────────────────

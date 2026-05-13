@@ -121,10 +121,10 @@ export const FIGHTER_CLASS: Class = {
   savingThrowProficiencies: ['Strength', 'Constitution'],
   armorTraining: ['Light', 'Medium', 'Heavy', 'Shield'],
   weaponMastery: true,
-  featuresByLevel: new Map([
-    [1, FIGHTER_FEATURES_L1],
-    [2, FIGHTER_FEATURES_L2],
-  ]),
+  featuresByLevel: [
+    { level: 1, features: FIGHTER_FEATURES_L1 },
+    { level: 2, features: FIGHTER_FEATURES_L2 },
+  ],
   spellcasting: null,
 };
 
@@ -136,7 +136,7 @@ export const BARBARIAN_CLASS: Class = {
   savingThrowProficiencies: ['Strength', 'Constitution'],
   armorTraining: ['Light', 'Medium', 'Shield'],
   weaponMastery: true,
-  featuresByLevel: new Map([[1, BARBARIAN_FEATURES_L1]]),
+  featuresByLevel: [{ level: 1, features: BARBARIAN_FEATURES_L1 }],
   spellcasting: null,
 };
 
@@ -148,7 +148,7 @@ export const WIZARD_CLASS: Class = {
   savingThrowProficiencies: ['Intelligence', 'Wisdom'],
   armorTraining: [],
   weaponMastery: false,
-  featuresByLevel: new Map([[1, WIZARD_FEATURES_L1]]),
+  featuresByLevel: [{ level: 1, features: WIZARD_FEATURES_L1 }],
   spellcasting: { ability: 'Intelligence', prepares: true },
 };
 
@@ -160,15 +160,15 @@ export const ROGUE_CLASS: Class = {
   savingThrowProficiencies: ['Dexterity', 'Intelligence'],
   armorTraining: ['Light'],
   weaponMastery: true,
-  featuresByLevel: new Map([
-    [
-      1,
-      [
+  featuresByLevel: [
+    {
+      level: 1,
+      features: [
         { name: 'Sneak Attack', description: 'Extra damage', level: 1 },
         { name: 'Cunning Action', description: 'Bonus action dash/disengage/hide', level: 1 },
       ],
-    ],
-  ]),
+    },
+  ],
   spellcasting: null,
 };
 
@@ -178,10 +178,10 @@ export const CHAMPION_SUBCLASS: Subclass = {
   id: 'Champion',
   parentClass: 'Fighter',
   grantedAtLevel: 3,
-  featuresByLevel: new Map([
-    [3, [{ name: 'Improved Critical', description: 'Crit on 19-20', level: 3 }]],
-    [7, [{ name: 'Remarkable Athlete', description: 'Add half proficiency to Str/Dex/Con checks', level: 7 }]],
-  ]),
+  featuresByLevel: [
+    { level: 3, features: [{ name: 'Improved Critical', description: 'Crit on 19-20', level: 3 }] },
+    { level: 7, features: [{ name: 'Remarkable Athlete', description: 'Add half proficiency to Str/Dex/Con checks', level: 7 }] },
+  ],
 };
 
 // ── Cleric Class (for spell testing) ─────────────────────────
@@ -200,7 +200,7 @@ export const CLERIC_CLASS: Class = {
   armorTraining: ['Light', 'Medium', 'Shield'],
   weaponProficiencies: ['Simple'],
   weaponMastery: false,
-  featuresByLevel: new Map([[1, CLERIC_FEATURES_L1]]),
+  featuresByLevel: [{ level: 1, features: CLERIC_FEATURES_L1 }],
   spellcasting: { type: 'preparation', ability: 'Wisdom', knownSource: 'class_list', changesPerRest: 'all' },
 };
 
@@ -208,13 +208,13 @@ export const LIFE_DOMAIN_SUBCLASS: Subclass = {
   id: 'Life Domain',
   parentClass: 'Cleric',
   grantedAtLevel: 1,
-  featuresByLevel: new Map([
-    [1, [{ name: 'Disciple of Life', description: 'Healing spells are more effective', level: 1 }]],
-    [2, [{ name: 'Channel Divinity: Preserve Life', description: 'Heal nearby creatures', level: 2 }]],
-  ]),
-  alwaysPreparedSpells: new Map([
-    [1, ['bless', 'cure-wounds']],
-    [3, ['lesser-restoration', 'spiritual-weapon']],
-    [5, ['beacon-of-hope', 'revivify']],
-  ]),
+  featuresByLevel: [
+    { level: 1, features: [{ name: 'Disciple of Life', description: 'Healing spells are more effective', level: 1 }] },
+    { level: 2, features: [{ name: 'Channel Divinity: Preserve Life', description: 'Heal nearby creatures', level: 2 }] },
+  ],
+  alwaysPreparedSpells: [
+    { level: 1, spells: ['bless', 'cure-wounds'] },
+    { level: 3, spells: ['lesser-restoration', 'spiritual-weapon'] },
+    { level: 5, spells: ['beacon-of-hope', 'revivify'] },
+  ],
 };

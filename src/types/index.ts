@@ -50,6 +50,7 @@ export type { WeaponMasteryProperty } from './equipment';
 
 // 法术
 export type { Spell, SpellSlotEntry, PactMagicSlots, CharacterSpells } from './spell';
+export type { AlwaysPreparedSpells, ClassSpellData } from './spell';
 export type { SpellLevel, SpellSchool, CastingTime, SpellComponent } from './spell';
 
 // 资源

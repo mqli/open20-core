@@ -20,6 +20,10 @@ export interface PactMagicSlots {
   readonly resetOn: 'Short Rest'; // Warlock法术位短休恢复
 }
 
+// 始终准备的法术列表（领域法术、誓言法术等）
+// 这些法术不计入准备法术数量上限
+export type AlwaysPreparedSpells = readonly string[];
+
 // 每职业法术追踪（多维职业支持）
 export interface ClassSpellData {
   readonly classId: string;
@@ -34,7 +38,7 @@ export interface ClassSpellData {
   readonly preparedSpells: readonly string[];
   
   // 始终准备的法术（领域法术等）- 不计入准备数量
-  readonly alwaysPreparedSpells?: readonly string[];
+  readonly alwaysPreparedSpells?: AlwaysPreparedSpells;
   
   // 最大准备法术数量（准备施法者）: 职业等级 + 能力调整值
   readonly maxPrepared: number;

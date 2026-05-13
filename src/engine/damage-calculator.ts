@@ -288,10 +288,10 @@ function getClassDefenses(char: Character, dataLoader: DataLoader): DamageDefens
     if (!classData) continue;
 
     // Check all features for damage resistances
-    for (const [level, features] of classData.featuresByLevel) {
-      if (level > charClass.level) continue;
+    for (const entry of classData.featuresByLevel) {
+      if (entry.level > charClass.level) continue;
 
-      for (const feature of features) {
+      for (const feature of entry.features) {
         const found = parseDefenseFromDescription(feature.description);
 
         // Special case: Barbarian Rage - only active while raging

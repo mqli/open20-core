@@ -3,6 +3,7 @@
 
 import type { ResetType } from './resource';
 import type { AbilityName } from './ability';
+import type { AlwaysPreparedSpells } from './spell';
 
 // 法术施法方式（判别联合）
 // 对应 SRD 5.2 Spell Preparation by Class 表
@@ -63,7 +64,11 @@ export interface Class {
   readonly armorTraining: readonly string[]; // 许可的护甲类型
   readonly weaponProficiencies?: readonly string[]; // 武器熟练项（如 "Simple", "Martial", "Longsword"）
   readonly weaponMastery: boolean; // 是否有Weapon Mastery
-  readonly featuresByLevel: ReadonlyMap<number, readonly Feature[]>;
+  // JSON 原生格式：按等级分组的特性列表
+  readonly featuresByLevel: readonly {
+    readonly level: number;
+    readonly features: readonly Feature[];
+  }[];
   readonly spellcasting: Spellcasting | null;
 }
 
@@ -72,10 +77,19 @@ export interface Subclass {
   readonly id: string;
   readonly parentClass: string; // 父职业ID
   readonly grantedAtLevel: number;
-  readonly featuresByLevel: ReadonlyMap<number, readonly Feature[]>;
-  // 始终准备的法术（领域法术、誓言法术等），按获得等级分组
-  // 这些法术不计入准备法术数量上限
-  readonly alwaysPreparedSpells?: ReadonlyMap<number, readonly string[]>;
+  // JSON 原生格式：按等级分组的特性列表
+  readonly featuresByLevel: readonly {
+    readonly level: number;
+    readonly features: readonly Feature[];
+  }[];
+  // 始终准备的法术（领域法术、誓言法术等）
+  // JSON 原生格式：按获得等级分组，这些法术不计入准备法术数量上限
+  readonly alwaysPreparedSpells?: readonly {
+    readonly level: number;
+    readonly spells: AlwaysPreparedSpells;
+  }[];
+  // 来源（如 'SRD 5.2', '2024 PHB' 等）
+  readonly source?: string;
 }
 
 // 多维职业法术位查询表条目

@@ -46,9 +46,10 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
       if (charClass.subclassId) {
         const subclass = data.getSubclass(charClass.subclassId);
         if (subclass) {
-          for (let lv = 1; lv <= charClass.level; lv++) {
-            const subFeatures = subclass.featuresByLevel.get(lv);
-            if (subFeatures) features.push(...subFeatures);
+          for (const entry of subclass.featuresByLevel) {
+            if (entry.level <= charClass.level) {
+              features.push(...entry.features);
+            }
           }
         }
       }

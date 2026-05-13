@@ -39,19 +39,6 @@ function makeCharSpells(
 // ── Mock Helpers ────────────────────────────────────────────────
 
 function makeFighterClass(): Class {
-  const featuresByLevel = new Map<number, Feature[]>();
-  featuresByLevel.set(1, [
-    { name: 'Fighting Style', description: 'Choose a Fighting Style', resourceId: 'Second Wind' },
-  ]);
-  featuresByLevel.set(2, [
-    { name: 'Action Surge', description: 'Push beyond normal limits', resourceId: 'Action Surge' },
-  ]);
-  featuresByLevel.set(3, [
-    { name: 'Martial Archetype', description: 'Choose a Martial Archetype' },
-  ]);
-  featuresByLevel.set(4, [
-    { name: 'Ability Score Improvement', description: 'Increase ability scores or take a feat' },
-  ]);
   return {
     id: 'Fighter',
     name: 'Fighter',
@@ -60,17 +47,17 @@ function makeFighterClass(): Class {
     savingThrowProficiencies: ['Strength', 'Constitution'],
     armorTraining: ['Light', 'Medium', 'Heavy', 'Shield'],
     weaponMastery: true,
-    featuresByLevel,
+    featuresByLevel: [
+      { level: 1, features: [{ name: 'Fighting Style', description: 'Choose a Fighting Style', resourceId: 'Second Wind' }] },
+      { level: 2, features: [{ name: 'Action Surge', description: 'Push beyond normal limits', resourceId: 'Action Surge' }] },
+      { level: 3, features: [{ name: 'Martial Archetype', description: 'Choose a Martial Archetype' }] },
+      { level: 4, features: [{ name: 'Ability Score Improvement', description: 'Increase ability scores or take a feat' }] },
+    ],
     spellcasting: null,
   };
 }
 
 function makeWizardClass(): Class {
-  const featuresByLevel = new Map<number, Feature[]>();
-  featuresByLevel.set(1, [
-    { name: 'Spellcasting', description: 'Cast wizard spells', resourceId: 'Arcane Recovery' },
-  ]);
-  featuresByLevel.set(2, [{ name: 'Scholar', description: 'Gain expertise in a skill' }]);
   return {
     id: 'Wizard',
     name: 'Wizard',
@@ -79,7 +66,10 @@ function makeWizardClass(): Class {
     savingThrowProficiencies: ['Intelligence', 'Wisdom'],
     armorTraining: [],
     weaponMastery: false,
-    featuresByLevel,
+    featuresByLevel: [
+      { level: 1, features: [{ name: 'Spellcasting', description: 'Cast wizard spells', resourceId: 'Arcane Recovery' }] },
+      { level: 2, features: [{ name: 'Scholar', description: 'Gain expertise in a skill' }] },
+    ],
     spellcasting: { ability: 'Intelligence', prepares: true },
   };
 }

@@ -1,6 +1,6 @@
 // data/default-loader.ts
 // Unified DataLoader implementation — works in both Node.js and Browser
-// Uses import with assert { type: 'json' } (Node.js 21+ / all bundlers)
+// JSON imports are cast directly to types (no parsing needed)
 
 import type { DataLoader, LookupTables, SpellLevel } from './loader';
 import type { ContentPack, ContentPackMeta } from '../content/types';
@@ -15,80 +15,25 @@ import type { DieType } from '../types/dice';
 import type { Monster } from '../monster/types';
 
 // ── JSON 导入（Node.js 21+ / 所有 bundlers 支持）────────────────────
-import speciesDataJson from '../../static/srd/species.json' assert { type: 'json' };
-import backgroundsDataJson from '../../static/srd/backgrounds.json' assert { type: 'json' };
-import classesDataJson from '../../static/srd/classes.json' assert { type: 'json' };
-import subclassesDataJson from '../../static/srd/subclasses.json' assert { type: 'json' };
-import featsDataJson from '../../static/srd/feats.json' assert { type: 'json' };
-import weaponsDataJson from '../../static/srd/weapons.json' assert { type: 'json' };
-import armorDataJson from '../../static/srd/armor.json' assert { type: 'json' };
-import gearDataJson from '../../static/srd/gear.json' assert { type: 'json' };
-import spellsDataJson from '../../static/srd/spells.json' assert { type: 'json' };
-import monstersDataJson from '../../static/srd/monsters.json' assert { type: 'json' };
-import srdMetaJson from '../../static/srd/meta.json' assert { type: 'json' };
-import lookupTablesJson from '../../static/srd/lookup-tables.json' assert { type: 'json' };
+import speciesDataJson from '../../static/srd/species.json' with { type: 'json' };
+import backgroundsDataJson from '../../static/srd/backgrounds.json' with { type: 'json' };
+import classesDataJson from '../../static/srd/classes.json' with { type: 'json' };
+import subclassesDataJson from '../../static/srd/subclasses.json' with { type: 'json' };
+import featsDataJson from '../../static/srd/feats.json' with { type: 'json' };
+import weaponsDataJson from '../../static/srd/weapons.json' with { type: 'json' };
+import armorDataJson from '../../static/srd/armor.json' with { type: 'json' };
+import gearDataJson from '../../static/srd/gear.json' with { type: 'json' };
+import spellsDataJson from '../../static/srd/spells.json' with { type: 'json' };
+import monstersDataJson from '../../static/srd/monsters.json' with { type: 'json' };
+import srdMetaJson from '../../static/srd/meta.json' with { type: 'json' };
+import lookupTablesJson from '../../static/srd/lookup-tables.json' with { type: 'json' };
 
-// ── JSON → 类型转换工具 ──────────────────────────────────────
-
-function parseFeaturesByLevel(
-  raw: Array<{ level: number; features: readonly Feature[] }>
-): ReadonlyMap<number, readonly Feature[]> {
-  const map = new Map<number, readonly Feature[]>();
-  for (const entry of raw) {
-    map.set(entry.level, entry.features);
-  }
-  return map;
-}
-
-function parseClass(raw: unknown): Class {
-  const c = raw as Record<string, unknown>;
-  return {
-    id: c.id as string,
-    name: (c.name as string) ?? (c.id as string),
-    source: c.source as Class['source'],
-    hitDie: c.hitDie as DieType,
-    savingThrowProficiencies: c.savingThrowProficiencies as readonly AbilityName[],
-    armorTraining: c.armorTraining as readonly string[],
-    weaponProficiencies: c.weaponProficiencies as readonly string[],
-    weaponMastery: c.weaponMastery as boolean,
-    featuresByLevel: parseFeaturesByLevel(
-      c.featuresByLevel as Array<{ level: number; features: readonly Feature[] }>
-    ),
-    spellcasting: c.spellcasting as Class['spellcasting'],
-  };
-}
-
-function parseSubclass(raw: unknown): Subclass {
-  const s = raw as Record<string, unknown>;
-  return {
-    id: s.id as string,
-    parentClass: s.parentClass as string,
-    grantedAtLevel: s.grantedAtLevel as number,
-    featuresByLevel: parseFeaturesByLevel(
-      s.featuresByLevel as Array<{ level: number; features: readonly Feature[] }>
-    ),
-    alwaysPreparedSpells: s.alwaysPreparedSpells
-      ? parseAlwaysPreparedSpells(s.alwaysPreparedSpells as Array<{ level: number; spells: readonly string[] }>)
-      : undefined,
-  };
-}
-
-function parseAlwaysPreparedSpells(
-  raw: Array<{ level: number; spells: readonly string[] }>
-): ReadonlyMap<number, readonly string[]> {
-  const map = new Map<number, readonly string[]>();
-  for (const entry of raw) {
-    map.set(entry.level, entry.spells);
-  }
-  return map;
-}
-
-// ── 类型安全的 JSON 数据 ──────────────────────────────────────
+// ── 类型安全的 JSON 数据（直接转换，无需解析）─────────────────────
 
 const speciesDataTyped: Species[] = speciesDataJson as unknown as Species[];
 const backgroundsDataTyped: Background[] = backgroundsDataJson as unknown as Background[];
-const classesDataTyped: Class[] = (classesDataJson as unknown[]).map(parseClass);
-const subclassesDataTyped: Subclass[] = (subclassesDataJson as unknown[]).map(parseSubclass);
+const classesDataTyped: Class[] = classesDataJson as unknown as Class[];
+const subclassesDataTyped: Subclass[] = subclassesDataJson as unknown as Subclass[];
 const featsDataTyped: Feat[] = featsDataJson as unknown as Feat[];
 const weaponsDataTyped: Weapon[] = weaponsDataJson as unknown as Weapon[];
 const armorDataTyped: Armor[] = armorDataJson as unknown as Armor[];
@@ -123,10 +68,10 @@ function registerData(pack: ContentPack): void {
   if (pack.species) speciesData = [...speciesData, ...pack.species];
   if (pack.backgrounds) backgroundsData = [...backgroundsData, ...pack.backgrounds];
   if (pack.classes) {
-    classesData = [...classesData, ...pack.classes.map(parseClass)];
+    classesData = [...classesData, ...pack.classes as unknown as Class[]];
   }
   if (pack.subclasses) {
-    subclassesData = [...subclassesData, ...pack.subclasses.map(parseSubclass)];
+    subclassesData = [...subclassesData, ...pack.subclasses as unknown as Subclass[]];
   }
   if (pack.feats) featsData = [...featsData, ...pack.feats];
   if (pack.weapons) weaponsData = [...weaponsData, ...pack.weapons];
@@ -221,8 +166,8 @@ export function createDataLoader(): DataLoader {
       return subclassesData.find(s => s.id === id);
     },
 
-    getSubclassesBySource(_source: string): Subclass[] {
-      return [];
+    getSubclassesBySource(source: string): Subclass[] {
+      return subclassesData.filter(s => s.source === source);
     },
 
     getSubclassesForClass(classId: string): Subclass[] {

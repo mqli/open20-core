@@ -20,7 +20,7 @@ const MOCK_CLASSES: Record<string, Class> = {
     savingThrowProficiencies: ['Strength', 'Constitution'],
     armorTraining: ['Light', 'Medium', 'Heavy', 'Shield'],
     weaponMastery: true,
-    featuresByLevel: new Map(),
+    featuresByLevel: [],
     spellcasting: null,
   },
   Wizard: {
@@ -31,7 +31,7 @@ const MOCK_CLASSES: Record<string, Class> = {
     savingThrowProficiencies: ['Intelligence', 'Wisdom'],
     armorTraining: [],
     weaponMastery: false,
-    featuresByLevel: new Map(),
+    featuresByLevel: [],
     spellcasting: { ability: 'Intelligence', prepares: true },
   },
   Barbarian: {
@@ -42,7 +42,7 @@ const MOCK_CLASSES: Record<string, Class> = {
     savingThrowProficiencies: ['Strength', 'Constitution'],
     armorTraining: ['Light', 'Medium', 'Shield'],
     weaponMastery: true,
-    featuresByLevel: new Map(),
+    featuresByLevel: [],
     spellcasting: null,
   },
   Sorcerer: {
@@ -53,7 +53,7 @@ const MOCK_CLASSES: Record<string, Class> = {
     savingThrowProficiencies: ['Constitution', 'Charisma'],
     armorTraining: [],
     weaponMastery: false,
-    featuresByLevel: new Map(),
+    featuresByLevel: [],
     spellcasting: { ability: 'Charisma', prepares: false },
   },
   Rogue: {
@@ -64,7 +64,7 @@ const MOCK_CLASSES: Record<string, Class> = {
     savingThrowProficiencies: ['Dexterity', 'Intelligence'],
     armorTraining: ['Light'],
     weaponMastery: true,
-    featuresByLevel: new Map(),
+    featuresByLevel: [],
     spellcasting: null,
   },
 };
