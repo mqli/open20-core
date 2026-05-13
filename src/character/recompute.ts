@@ -93,6 +93,17 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
   let newSpells = { ...char.spells };
   const classSpellcasting = { ...newSpells.classSpellcasting };
 
+  // Calculate combined spell slots first to determine max spell level for filtering known spells
+  const combinedSlots = calculateSpellSlotsFromClasses(char.classes, data);
+  const maxSpellLevel = (() => {
+    let max = 0;
+    for (let level = 1; level <= 9; level++) {
+      const entry = combinedSlots[level];
+      if (entry && entry.total > 0) max = level;
+    }
+    return max;
+  })();
+
   // Recalculate each class's spell data
   for (const [classId, classSpellData] of Object.entries(classSpellcasting)) {
     const classData = data.getClass(classId);
@@ -108,11 +119,11 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     const classLevel = charClass?.level ?? 1;
 
     // Auto-populate knownSpells for class_list casters (Cleric, Druid)
-    // They automatically know ALL spells on their class list
+    // Only include spells they can actually cast (cantrips + up to max spell level)
     let knownSpells = classSpellData.knownSpells;
     if (classData.spellcasting.type === 'preparation' && classData.spellcasting.knownSource === 'class_list') {
       knownSpells = data.getAllSpells()
-        .filter(s => s.classes?.includes(classId))
+        .filter(s => s.classes?.includes(classId) && (s.level === 0 || s.level <= maxSpellLevel))
         .map(s => s.id);
     }
 
@@ -146,11 +157,11 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     const abilityMod = getModifier(getTotalScore(char.abilityScores, ability));
 
     // Auto-populate knownSpells for class_list casters (Cleric, Druid)
-    // They automatically know ALL spells on their class list
+    // Only include spells they can actually cast (cantrips + up to max spell level)
     let knownSpells: readonly string[] = [];
     if (classData.spellcasting.type === 'preparation' && classData.spellcasting.knownSource === 'class_list') {
       knownSpells = data.getAllSpells()
-        .filter(s => s.classes?.includes(charClass.classId))
+        .filter(s => s.classes?.includes(charClass.classId) && (s.level === 0 || s.level <= maxSpellLevel))
         .map(s => s.id);
     }
 

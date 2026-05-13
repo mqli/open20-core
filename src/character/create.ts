@@ -346,12 +346,16 @@ export function buildInitialSpells(
   const spellSaveDC = 8 + pb + abilityMod;
   const spellAttackBonus = pb + abilityMod;
 
+  // Calculate spell slots first to determine max spell level character can cast
+  const slots = calculateSpellSlots(classData.id, 1, data);
+  const maxSpellLevel = getMaxSpellLevel(slots);
+
   // Auto-populate knownSpells for class_list casters (Cleric, Druid)
-  // They automatically know ALL spells on their class list
+  // Only include spells they can actually cast (cantrips + up to max spell level)
   let knownSpells: readonly string[] = [];
   if (spellcasting.type === 'preparation' && spellcasting.knownSource === 'class_list') {
     knownSpells = data.getAllSpells()
-      .filter(s => s.classes?.includes(classData.id))
+      .filter(s => s.classes?.includes(classData.id) && (s.level === 0 || s.level <= maxSpellLevel))
       .map(s => s.id);
   }
 
@@ -374,7 +378,6 @@ export function buildInitialSpells(
   };
 
   // 计算法术位
-  const slots = calculateSpellSlots(classData.id, 1, data);
   const spellSlots: Record<SpellLevel, SpellSlotEntry> = {} as Record<SpellLevel, SpellSlotEntry>;
   spellSlots[0] = { total: 0, used: 0 }; // cantrips
   for (let level = 1; level <= 9; level++) {
@@ -544,6 +547,14 @@ function buildMulticlassSpells(
 
   const totalLevel = classes.reduce((sum, c) => sum + c.level, 0);
   const pb = getProficiencyBonus(totalLevel);
+
+  // Calculate multiclass spell slots first to determine max spell level
+  const totalSpellcastingLevel = getMulticlassSpellcasterLevel(classes, data);
+  const spellSlots = totalSpellcastingLevel > 0
+    ? calculateMulticlassSpellSlots(totalSpellcastingLevel, data)
+    : createEmptySpellSlots();
+  const maxSpellLevel = getMaxSpellLevel(spellSlots);
+
   const classSpellcasting: Record<string, ClassSpellData> = {};
 
   // Build per-class spell data
@@ -557,11 +568,11 @@ function buildMulticlassSpells(
     const spellAttackBonus = pb + abilityMod;
 
     // Auto-populate knownSpells for class_list casters (Cleric, Druid)
-    // They automatically know ALL spells on their class list
+    // Only include spells they can actually cast (cantrips + up to max spell level)
     let knownSpells: readonly string[] = [];
     if (classData.spellcasting.type === 'preparation' && classData.spellcasting.knownSource === 'class_list') {
       knownSpells = data.getAllSpells()
-        .filter(s => s.classes?.includes(charClass.classId))
+        .filter(s => s.classes?.includes(charClass.classId) && (s.level === 0 || s.level <= maxSpellLevel))
         .map(s => s.id);
     }
 
@@ -586,12 +597,6 @@ function buildMulticlassSpells(
     };
   }
 
-  // Calculate multiclass spell slots (unified pool)
-  const totalSpellcastingLevel = getMulticlassSpellcasterLevel(classes, data);
-  const spellSlots = totalSpellcastingLevel > 0
-    ? calculateMulticlassSpellSlots(totalSpellcastingLevel, data)
-    : createEmptySpellSlots();
-
   // Handle Warlock Pact Magic
   let pactMagicSlots: PactMagicSlots | null = null;
   const warlockClass = classes.find(c => c.classId === 'Warlock');
@@ -612,6 +617,18 @@ function buildMulticlassSpells(
     spellSlots,
     pactMagicSlots,
   };
+}
+
+/** Get the maximum spell level the character can cast based on spell slots */
+function getMaxSpellLevel(slots: Record<number, SpellSlotEntry>): number {
+  let maxLevel = 0;
+  for (let level = 1; level <= 9; level++) {
+    const entry = slots[level];
+    if (entry && entry.total > 0) {
+      maxLevel = level;
+    }
+  }
+  return maxLevel;
 }
 
 /** Create empty spell slots record */
