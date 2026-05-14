@@ -1,222 +1,59 @@
 [
   {
     "id": "alert",
-    "source": "2024 PHB",
+    "source": "SRD 5.2",
     "name": "Alert",
-    "description": "You gain the following benefits: Initiative Proficiency. You add your Proficiency Bonus to your Initiative rolls. Initiative Swap. Immediately after you roll Initiative, you can swap your Initiative with the Initiative of one willing ally within 30 feet of yourself. You can't use this benefit if you have the Incapacitated condition.",
-    "category": "Origin",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "crafter",
-    "source": "2024 PHB",
-    "name": "Crafter",
-    "description": "You gain the following benefits: Crafting Flexibility. You gain Tool Proficiency in one set of Artisan's Tools of your choice. You can create items using that set of tools even if the recipe requires other Artisan's Tools. Tool Expertise. Choose one set of Artisan's Tools in which you have Proficiency. Your Proficiency Bonus is doubled for any check you make with that set of tools.",
-    "category": "Origin",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "healer",
-    "source": "2024 PHB",
-    "name": "Healer",
-    "description": "You gain the following benefits: Battle Medic. When you use a Healer's Kit to stabilize a creature that has 0 Hit Points, that creature also regains 1 Hit Point. Healing Rerolls. Whenever you roll a die to determine the number of Hit Points you restore with a spell or with this feat's Heroic Healer benefit, you can reroll the die if it rolls a 1, and you must use the new roll. Heroic Healer. As a Magic action, you can expend one use of a Healer's Kit to tend to a creature within 5 feet of yourself. The creature regains 2d4 + 2 Hit Points.",
-    "category": "Origin",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "lucky",
-    "source": "2024 PHB",
-    "name": "Lucky",
-    "description": "You gain the following benefits: Luck Points. You have Luck Points equal to your Proficiency Bonus. You can expend Luck Points to gain Advantage on attack rolls, Ability Checks, or saving throws. You can also cause Attacking to have Disadvantage. Reroll 1s. When you roll a 1 on a d20 for an attack roll, Ability Check, or saving throw, you can reroll the die. You can choose to do this before or after making the roll.",
+    "description": "You gain the following benefits: Initiative Proficiency. When you roll Initiative, you can add your Proficiency Bonus to the roll. Initiative Swap. Immediately after you roll Initiative, you can swap your Initiative with the Initiative of one willing ally in the same combat. You can't make this swap if you or the ally has the Incapacitated condition.",
     "category": "Origin",
     "prerequisites": null,
     "grants": null
   },
   {
     "id": "magic-initiate",
-    "source": "2024 PHB",
+    "source": "SRD 5.2",
     "name": "Magic Initiate",
-    "description": "You gain the following benefits: Cantrip. Choose a class with a Spell List: Bard, Cleric, Druid, Sorcerer, Warlock, or Wizard. Choose two cantrips from that list. Spell. Learn one level 1 spell from the same list. Using the Spell. Intelligence, Wisdom, or Charisma is your spellcasting Ability for the spells you cast with this feat (choose when you select the feat).",
-    "category": "Origin",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "musician",
-    "source": "2024 PHB",
-    "name": "Musician",
-    "description": "You gain the following benefits: Inspiring Song. As a Magic action, you can play a Tiny instrument and give yourself and one ally within 5 feet of yourself a Heroic Inspiration. The ally must be able to hear you. Number of Uses. You can use this benefit a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
+    "description": "You gain the following benefits: Two Cantrips. You learn two cantrips of your choice from the Cleric, Druid, or Wizard spell list. Intelligence, Wisdom, or Charisma is your spellcasting ability for this feat's spells (choose when you select this feat). Level 1 Spell. Choose a level 1 spell from the same list you selected for this feat's cantrips. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have. Spell Change. Whenever you gain a new level, you can replace one of the spells you chose for this feat with a different spell of the same level from the chosen spell list. Repeatable. You can take this feat more than once, but you must choose a different spell list each time.",
     "category": "Origin",
     "prerequisites": null,
     "grants": null
   },
   {
     "id": "savage-attacker",
-    "source": "2024 PHB",
+    "source": "SRD 5.2",
     "name": "Savage Attacker",
-    "description": "You gain the following benefits: Savage Attack. Once per turn, you can reroll a damage die used in a weapon attack. You must use the new roll. Heavy Weapon Training. You gain Proficiency with the following weapons: Battleaxe, Flail, Greataxe, Greatsword, Halberd, Lance, Longsword, Maul, Morningstar, Pike, Rapier, Scimitar, Shortsword, Trident, War Pick, Warhammer, Whip.",
+    "description": "You've trained to deal particularly damaging strikes. Once per turn when you hit a target with a weapon, you can roll the weapon's damage dice twice and use either roll against the target.",
     "category": "Origin",
     "prerequisites": null,
     "grants": null
   },
   {
     "id": "skilled",
-    "source": "2024 PHB",
+    "source": "SRD 5.2",
     "name": "Skilled",
-    "description": "You gain the following benefits: Skill Proficiencies. You gain Proficiency in any combination of three skills or tools of your choice.",
-    "category": "Origin",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "tavern-brawler",
-    "source": "2024 PHB",
-    "name": "Tavern Brawler",
-    "description": "You gain the following benefits: Tavern Brawler. You gain Proficiency with Improvised Weapons and with your choice of one of the following weapons: Club, Handaxe, Quarterstaff, or Unarmed Strike. Pugilist. Your Unarmed Strike deals 1d6 Bludgeoning damage instead of the usual 1.",
-    "category": "Origin",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "tough",
-    "source": "2024 PHB",
-    "name": "Tough",
-    "description": "You gain the following benefits: Tough Constitution. Your Hit Point maximum increases by 2 times your character level. Whenever you gain a character level, your Hit Point maximum increases by an additional 2 Hit Points. Diehard. You have Advantage on Death Saving Throws.",
+    "description": "You gain the following benefits: Skill Proficiencies. You gain Proficiency in any combination of three skills or tools of your choice. Repeatable. You can take this feat more than once.",
     "category": "Origin",
     "prerequisites": null,
     "grants": null
   },
   {
     "id": "ability-score-improvement",
-    "source": "2024 PHB",
+    "source": "SRD 5.2",
     "name": "Ability Score Improvement",
-    "description": "You gain the following benefits: Increase the score of one Ability by 2, or increase the score of two Abilities by 1. Neither of these increases can raise an Ability Score above 20. If this feat is your starting feat, you can't increase an Ability Score above 20. At certain character levels, you can select this feat to increase your Ability Scores further. See the Character Advancement table in the Player's Handbook for more information.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "actor",
-    "source": "2024 PHB",
-    "name": "Actor",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Charisma score by 1, to a maximum of 20. Bardic Inspiration. You can use a Bonus Action to give one creature within 60 feet of yourself a Bardic Inspiration die (a d6). A creature can use the die after witnessing a performance by you. Deception and Performance Proficiency. You gain Proficiency with Deception and Performance. If you're already Proficient, you instead double your Proficiency Bonus for any check you make with Deception or Performance.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "athlete",
-    "source": "2024 PHB",
-    "name": "Athlete",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 20. Climb Speed. You gain a Climb Speed equal to the Speed of your current form. Hop. At the start of your turn, if you have noMovement remaining, you can use your Bonus Action to move up to half your Speed.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "charger",
-    "source": "2024 PHB",
-    "name": "Charger",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Constitution score by 1, to a maximum of 20. Charge. If you move at least 10 feet in a straight line toward a target immediately before hitting it with a melee attack, you can attempt to shove it as part of the same action.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "chef",
-    "source": "2024 PHB",
-    "name": "Chef",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Constitution or Intelligence score by 1, to a maximum of 20. Cook. You can create Cooked Meals using your Artisan's Tools. A Cooked Meal provides Temporary Hit Points. Heroic Inspiration. As part of a Short Rest, you can cook a special meal for a number of creatures equal to your Proficiency Bonus. Each creature that eats the meal regains 1d4 + your Proficiency Bonus Hit Points and gains Heroic Inspiration.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "crossbow-expert",
-    "source": "2024 PHB",
-    "name": "Crossbow Expert",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Dexterity score by 1, to a maximum of 20. Crossbow Adept. You gain Proficiency with Crossbows. Neutralize Load. You can ignore the Load property of Crossbows. Fighterly. When you use the Hand Crossbow to make an attack, you can use a Bonus Action to attack with a Hand Crossbow you are holding.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "crusher",
-    "source": "2024 PHB",
-    "name": "Crusher",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Constitution score by 1, to a maximum of 20. Crusher's Resilience. Whenever you are hit by an attack, you can use your Reaction to reduce the damage by 1d6 + your Proficiency Bonus. Push. Once per turn, when you hit a creature with a Bludgeoning damage attack, you can move it 5 feet. You can do this only if the target is a creature no more than one size larger than you.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "defensive-duelist",
-    "source": "2024 PHB",
-    "name": "Defensive Duelist",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Dexterity score by 1, to a maximum of 20. Parry. If you are wielding a Finesse weapon in one hand and no other weapon, you can use your Reaction to add your Proficiency Bonus to your AC against one melee attack that would hit you. To do so, you must see the attacker and be wielding a Finesse weapon.",
+    "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. This feat can't increase an ability score above 20. Repeatable. You can take this feat more than once.",
     "category": "General",
     "prerequisites": {
-      "ability": {
-        "Dexterity": 13
-      }
+      "level": 4
     },
     "grants": null
   },
   {
-    "id": "dual-wielder",
-    "source": "2024 PHB",
-    "name": "Dual Wielder",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength, Dexterity, or Constitution score by 1, to a maximum of 20. Enhanced Dual Wielding. When you're wielding a weapon in each hand and you attack with that weapon as part of the Two-Weapon Fighting rule, you can use Two-Weapon Fighting even if the weapons aren't Light. Damage Resistance. While wielding a weapon in each hand, you gain a +1 bonus to AC.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "durable",
-    "source": "2024 PHB",
-    "name": "Durable",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Constitution score by 1, to a maximum of 20. Diehard. You have Advantage on Death Saving Throws. Natural Healing. When you roll a Hit Die to regain Hit Points, the minimum number of Hit Points you regain equals twice your Constitution modifier (minimum of 2).",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "elemental-adept",
-    "source": "2024 PHB",
-    "name": "Elemental Adept",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. Energy Adept. Choose one of the following damage types: Acid, Cold, Fire, Thunder, or Lightning. Spells you cast ignore Resistance to that damage type. Each time you cast a spell, you can change the damage type to the chosen type.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "fey-touched",
-    "source": "2024 PHB",
-    "name": "Fey-Touched",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. Fey Magic. You learn one level 1 spell of your choice from the Bard, Cleric, or Druid spell list. You can cast this spell with this feat using Intelligence, Wisdom, or Charisma (your choice when you gain this feat).",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
     "id": "grappler",
-    "source": "2024 PHB",
+    "source": "SRD 5.2",
     "name": "Grappler",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 20. Grappler's Techniques. You gain the following benefits: - You have Advantage on attack rolls to grapple. - Creatures you are grappling have Disadvantage on attack rolls against you. - When you hit a creature with an Unarmed Strike, you can grapple it as part of the same action.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "great-weapon-master",
-    "source": "2024 PHB",
-    "name": "Great Weapon Master",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength score by 1, to a maximum of 20. Power Attack. Before making a melee attack with a Heavy weapon that you are Proficient with, you can choose to take a -5 penalty to the attack roll. If the attack hits, you deal an extra 10 damage. Cleave. Immediately after you score a Critical Hit or reduce a creature to 0 Hit Points with a melee attack, you can make one additional melee attack as a Bonus Action.",
+    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 20. Punch and Grab. When you hit a creature with an Unarmed Strike as part of the Attack action on your turn, you can use both the Damage and the Grapple option. You can use this benefit only once per turn. Attack Advantage. You have Advantage on attack rolls against a creature Grappled by you. Fast Wrestler. You don't have to spend extra movement to move a creature Grappled by you if the creature is your size or smaller.",
     "category": "General",
     "prerequisites": {
+      "level": 4,
       "ability": {
         "Strength": 13
       }
@@ -224,501 +61,54 @@
     "grants": null
   },
   {
-    "id": "heavily-armored",
-    "source": "2024 PHB",
-    "name": "Heavily Armored",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength score by 1, to a maximum of 20. Heavy Armor Proficiency. You gain Proficiency with Heavy Armor.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "heavy-armor-master",
-    "source": "2024 PHB",
-    "name": "Heavy Armor Master",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength score by 1, to a maximum of 20. Damage Reduction. While you are wearing Heavy Armor, any Bludgeoning, Piercing, or Slashing damage that you take from a non-magical attack is reduced by 3.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "inspiring-leader",
-    "source": "2024 PHB",
-    "name": "Inspiring Leader",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Charisma score by 1, to a maximum of 20. Rally. As a Magic action, you can bolster the morale of your allies. Choose up to six willing creatures within 30 feet of yourself. Each creature gains Temporary Hit Points equal to your level + your Charisma modifier.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "keen-mind",
-    "source": "2024 PHB",
-    "name": "Keen Mind",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Intelligence score by 1, to a maximum of 20. Eidetic Memory. You can accurately recall anything you have seen or heard within the past 30 days. Direction Sense. You always know which way is north, and you can easily find your way back to a location you have visited previously.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "lightly-armored",
-    "source": "2024 PHB",
-    "name": "Lightly Armored",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 20. Light Armor Proficiency. You gain Proficiency with Light Armor.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "mage-slayer",
-    "source": "2024 PHB",
-    "name": "Mage Slayer",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength, Dexterity, or Constitution score by 1, to a maximum of 20. Mage Hunter. When a creature within 5 feet of you casts a spell, you can use your Reaction to make one melee weapon attack against that creature. Disruptive. When you hit a creature with an attack, that creature has Disadvantage on the next saving throw it makes before the start of your next turn.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "martial-weapon-training",
-    "source": "2024 PHB",
-    "name": "Martial Weapon Training",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 20. Martial Weapon Proficiency. You gain Proficiency with Martial Weapons.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "medium-armor-master",
-    "source": "2024 PHB",
-    "name": "Medium Armor Master",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 20. Medium Armor Proficiency. You gain Proficiency with Medium Armor. Improved Medium Armor. When you wear Medium Armor, you can add your full Dexterity modifier to your AC (normally, you can add only up to +2).",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "moderately-armored",
-    "source": "2024 PHB",
-    "name": "Moderately Armored",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 20. Medium Armor and Shield Proficiency. You gain Proficiency with Medium Armor and Shields.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "mounted-combatant",
-    "source": "2024 PHB",
-    "name": "Mounted Combatant",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength, Dexterity, or Wisdom score by 1, to a maximum of 20. Mounted Advantage. While mounted, you have Advantage on attack rolls against unmounted creatures that are smaller than your mount. Defensive Rider. While mounted, you can use your Reaction to impose Disadvantage on an attack roll that targets you or your mount.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "observant",
-    "source": "2024 PHB",
-    "name": "Observant",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Intelligence or Wisdom score by 1, to a maximum of 20. Keen Observer. If you can see a creature's mouth while it is speaking a language you understand, you can read its lips. Quick Search. You can take the Search action as a Bonus Action.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "piercer",
-    "source": "2024 PHB",
-    "name": "Piercer",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 20. Piercer's Precision. Once per turn, when you hit a creature with an attack that deals Piercing damage, you can reroll one damage die, and you must use the new roll. Armor Penetration. When you score a Critical Hit with a Piercing damage attack, you can roll one additional damage die.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "poisoner",
-    "source": "2024 PHB",
-    "name": "Poisoner",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Constitution or Intelligence score by 1, to a maximum of 20. Poisoner's Proficiency. You gain Proficiency with the Poisoner's Kit. Poisons you create with this kit are nonmagical and deal Poison damage. Apply Poison. As a Bonus Action, you can apply a Poison to a weapon or piece of ammunition.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "polearm-master",
-    "source": "2024 PHB",
-    "name": "Polearm Master",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 20. Polearm Proficiency. You gain Proficiency with the following weapons: Halberd, Pike, and Quarterstaff. Reactive Strike. While wielding a Quarterstaff, Halberd, or Pike, you can use your Reaction to make an attack with the weapon against a creature that enters your reach.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "resilient",
-    "source": "2024 PHB",
-    "name": "Resilient",
-    "description": "You gain the following benefits: Ability Score Increase. Increase one Ability score of your choice by 1, to a maximum of 20. Proficiency. You gain Proficiency in saving throws using the chosen Ability.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "ritual-caster",
-    "source": "2024 PHB",
-    "name": "Ritual Caster",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Intelligence or Wisdom score by 1, to a maximum of 20. Ritual Spells. You can cast a Spell as a Ritual if it is on the Bard, Cleric, or Druid spell list and has the Ritual tag. You can also cast any Spell as a Ritual if it is on your class's Spell List and has the Ritual tag.",
-    "category": "General",
-    "prerequisites": {
-      "ability": {
-        "Intelligence": 13
-      }
-    },
-    "grants": null
-  },
-  {
-    "id": "sentinel",
-    "source": "2024 PHB",
-    "name": "Sentinel",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 20. Sentinel's Reaction. When a creature within 5 feet of you hits you with an attack, you can use your Reaction to make one melee weapon attack against that creature. If the attack hits, the creature's speed becomes 0 until the start of its next turn.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "shadow-touched",
-    "source": "2024 PHB",
-    "name": "Shadow-Touched",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. Shadow Magic. You learn one level 1 spell of your choice from the Bard, Cleric, or Wizard spell list that deals Cold damage or Necrotic damage. You can cast this spell with this feat using Intelligence, Wisdom, or Charisma (your choice when you gain this feat).",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "sharpshooter",
-    "source": "2024 PHB",
-    "name": "Sharpshooter",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Dexterity score by 1, to a maximum of 20. Sharpshooter's Range. You can ignore Half Cover and Three-Quarters Cover when making ranged attacks. Powerful Shot. Before making a ranged attack with a weapon that you are Proficient with, you can choose to take a -5 penalty to the attack roll. If the attack hits, you deal an extra 10 damage.",
-    "category": "General",
-    "prerequisites": {
-      "ability": {
-        "Dexterity": 13
-      }
-    },
-    "grants": null
-  },
-  {
-    "id": "shield-master",
-    "source": "2024 PHB",
-    "name": "Shield Master",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength score by 1, to a maximum of 20. Shield Bash. If you are holding a Shield, you can use it to make a Shove attempt as a Bonus Action. Protection. You can use your Reaction to impose Disadvantage on an attack roll made against a creature other than yourself that is within 5 feet of you.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "skill-expert",
-    "source": "2024 PHB",
-    "name": "Skill Expert",
-    "description": "You gain the following benefits: Ability Score Increase. Increase one Ability score of your choice by 1, to a maximum of 20. Proficiency. You gain Proficiency in one skill of your choice. Expertise. Choose one skill in which you have Proficiency. Your Proficiency Bonus is doubled for any check you make with that skill.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "skulker",
-    "source": "2024 PHB",
-    "name": "Skulker",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Dexterity score by 1, to a maximum of 20. Steady Aim. As a Bonus Action, you can take the Aim action. If you do, you have Advantage on your next attack roll this turn. Foursight. You can attempt to hide when you are lightly obscured from the creature from which you are hiding.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "slasher",
-    "source": "2024 PHB",
-    "name": "Slasher",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 20. Slasher's Technique. Once per turn, when you hit a creature with an attack that deals Slashing damage, you can reduce that creature's Speed by 10 feet until the start of your next turn. Hamstring. When you score a Critical Hit with a Slashing damage attack, the target has Disadvantage on attack rolls until the start of your next turn.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "speedy",
-    "source": "2024 PHB",
-    "name": "Speedy",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 20. Fleet of Foot. Your Speed increases by 10 feet. Dash. When you take the Dash action, you can use a Bonus Action to move up to your Speed again.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "spell-sniper",
-    "source": "2024 PHB",
-    "name": "Spell Sniper",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. Spell Range. The range of your spells that require an attack roll increases by 30 feet. Double Range. When you cast a spell that has a range of 5 feet or greater, you can ignore Half Cover and Three-Quarters Cover.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "telekinetic",
-    "source": "2024 PHB",
-    "name": "Telekinetic",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. Minor Telekinesis. You can use your telekinesis to move one creature within 30 feet of you. The creature must be willing or have the Incapacitated condition. You can also use your telekinesis to manipulate objects.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "telepathic",
-    "source": "2024 PHB",
-    "name": "Telepathic",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. Telepathic Communication. You can speak telepathically to any creature within 60 feet of you. You can't use this ability if you are Incapacitated. Telepathic Casting. You can cast spells as if you were in the space of a willing creature within 30 feet of you that can hear you.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "war-caster",
-    "source": "2024 PHB",
-    "name": "War Caster",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 20. War Caster's Advantage. You have Advantage on Constitution saving throws that you make to maintain Concentration on a spell. Opportunity Casting. When a creature provokes an Opportunity Attack from you, you can use your Reaction to cast a spell at the creature rather than making an Opportunity Attack.",
-    "category": "General",
-    "prerequisites": {
-      "ability": {
-        "Concentration": 13
-      }
-    },
-    "grants": null
-  },
-  {
-    "id": "weapon-master",
-    "source": "2024 PHB",
-    "name": "Weapon Master",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 20. Weapon Proficiency. You gain Proficiency with any four weapons of your choice.",
-    "category": "General",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
     "id": "archery",
-    "source": "2024 PHB",
+    "source": "SRD 5.2",
     "name": "Archery",
-    "description": "You gain a +2 bonus to attack rolls made with Ranged weapons.",
+    "description": "You gain a +2 bonus to attack rolls you make with Ranged weapons.",
     "category": "Fighting Style",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "blind-fighting",
-    "source": "2024 PHB",
-    "name": "Blind Fighting",
-    "description": "You have Blindsight with a range of 10 feet. Within that range, you can effectively see anything that isn't behind Total Cover, even if you're Blinded or in Darkness. Moreover, you can see an Invisible creature within that range, unless the creature has managed to hide from you.",
-    "category": "Fighting Style",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "blessed-warrior",
-    "source": "2024 PHB",
-    "name": "Blessed Warrior",
-    "description": "You learn two Cleric cantrips of your choice. Your spellcasting Ability for these spells is Charisma (Paladin) or Wisdom (others).",
-    "category": "Fighting Style",
-    "prerequisites": null,
+    "prerequisites": {
+      "feature": "Fighting Style Feature"
+    },
     "grants": null
   },
   {
     "id": "defense",
-    "source": "2024 PHB",
+    "source": "SRD 5.2",
     "name": "Defense",
-    "description": "While you are wearing Armor, you gain a +1 bonus to AC.",
+    "description": "While you're wearing Light, Medium, or Heavy armor, you gain a +1 bonus to Armor Class.",
     "category": "Fighting Style",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "dueling",
-    "source": "2024 PHB",
-    "name": "Dueling",
-    "description": "When you are wielding a Melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls with that weapon.",
-    "category": "Fighting Style",
-    "prerequisites": null,
+    "prerequisites": {
+      "feature": "Fighting Style Feature"
+    },
     "grants": null
   },
   {
     "id": "great-weapon-fighting",
-    "source": "2024 PHB",
+    "source": "SRD 5.2",
     "name": "Great Weapon Fighting",
-    "description": "When you roll a 1 or 2 on a damage die for an attack you make with a Melee weapon that you are wielding with two hands, you can reroll the die, and you must use the new roll.",
+    "description": "When you roll damage for an attack you make with a Melee weapon that you are holding with two hands, you can treat any 1 or 2 on a damage die as a 3. The weapon must have the Two-Handed or Versatile property to gain this benefit.",
     "category": "Fighting Style",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "interception",
-    "source": "2024 PHB",
-    "name": "Interception",
-    "description": "When a creature you can see hits a target other than you that is within 5 feet of you, you can use your Reaction to reduce the damage the target takes by 1d10 + your Proficiency Bonus.",
-    "category": "Fighting Style",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "protection",
-    "source": "2024 PHB",
-    "name": "Protection",
-    "description": "When a creature you can see attacks a target other than you that is within 5 feet of you, you can use your Reaction to impose Disadvantage on the attack roll, provided you are wielding a Shield.",
-    "category": "Fighting Style",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "thrown-weapon-fighting",
-    "source": "2024 PHB",
-    "name": "Thrown Weapon Fighting",
-    "description": "When you make a ranged attack with a Thrown weapon, you gain a +2 bonus to the damage roll.",
-    "category": "Fighting Style",
-    "prerequisites": null,
+    "prerequisites": {
+      "feature": "Fighting Style Feature"
+    },
     "grants": null
   },
   {
     "id": "two-weapon-fighting",
-    "source": "2024 PHB",
+    "source": "SRD 5.2",
     "name": "Two-Weapon Fighting",
-    "description": "When you engage in Two-Weapon Fighting, you can add your Ability Bonus to the damage of the second attack.",
+    "description": "When you make an extra attack as a result of using a weapon that has the Light property, you can add your ability modifier to the damage of that attack if you aren't already adding it to the damage.",
     "category": "Fighting Style",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "unarmed-fighting",
-    "source": "2024 PHB",
-    "name": "Unarmed Fighting",
-    "description": "Your Unarmed Strikes can deal 1d6 Bludgeoning damage. If you are not holding any weapons or a Shield, your Unarmed Strikes deal 1d8 Bludgeoning damage, and your reach with them increases by 5 feet.",
-    "category": "Fighting Style",
-    "prerequisites": null,
-    "grants": null
-  },
-  {
-    "id": "druidic-warrior",
-    "source": "2024 PHB",
-    "name": "Druidic Warrior",
-    "description": "You learn two Druid cantrips of your choice. Your spellcasting Ability for these spells is Wisdom.",
-    "category": "Fighting Style",
-    "prerequisites": null,
+    "prerequisites": {
+      "feature": "Fighting Style Feature"
+    },
     "grants": null
   },
   {
     "id": "boon-of-combat-prowess",
-    "source": "2024 PHB",
+    "source": "SRD 5.2",
     "name": "Boon of Combat Prowess",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength, Dexterity, Constitution, Intelligence, Wisdom, or Charisma score by 1, to a maximum of 30. Combat Prowess. You gain a +1 bonus to attack rolls and to Armor Class.",
-    "category": "Epic Boon",
-    "prerequisites": {
-      "level": 19
-    },
-    "grants": null
-  },
-  {
-    "id": "boon-of-energy-resistance",
-    "source": "2024 PHB",
-    "name": "Boon of Energy Resistance",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Constitution score by 1, to a maximum of 30. Energy Resistance. You gain Resistance to Acid, Cold, Fire, Lightning, and Thunder damage.",
-    "category": "Epic Boon",
-    "prerequisites": {
-      "level": 19
-    },
-    "grants": null
-  },
-  {
-    "id": "boon-of-fate",
-    "source": "2024 PHB",
-    "name": "Boon of Fate",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 30. Divine Intervention. You can call on the forces of fate to alter reality. As a Magic action, you can roll 1d4 and apply the number rolled as a bonus or penalty to one attack roll, Ability Check, or saving throw that you can see. Once you use this benefit, you can't use it again until you finish a Short or Long Rest.",
-    "category": "Epic Boon",
-    "prerequisites": {
-      "level": 19
-    },
-    "grants": null
-  },
-  {
-    "id": "boon-of-fortitude",
-    "source": "2024 PHB",
-    "name": "Boon of Fortitude",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Constitution score by 2, to a maximum of 30. Fortitude. Your Hit Point maximum increases by 40.",
-    "category": "Epic Boon",
-    "prerequisites": {
-      "level": 19
-    },
-    "grants": null
-  },
-  {
-    "id": "boon-of-irresistible-offense",
-    "source": "2024 PHB",
-    "name": "Boon of Irresistible Offense",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength, Dexterity, Intelligence, Wisdom, or Charisma score by 1, to a maximum of 30. Irresistible Offense. Your attacks deal an extra 1d10 Force damage.",
-    "category": "Epic Boon",
-    "prerequisites": {
-      "level": 19
-    },
-    "grants": null
-  },
-  {
-    "id": "boon-of-recovery",
-    "source": "2024 PHB",
-    "name": "Boon of Recovery",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Constitution score by 1, to a maximum of 30. Recovery. You regain all of your Hit Points when you finish a Short or Long Rest. Additionally, if you have 0 Hit Points and are making Death Saving Throws, you can use your Reaction to succeed on one of them.",
-    "category": "Epic Boon",
-    "prerequisites": {
-      "level": 19
-    },
-    "grants": null
-  },
-  {
-    "id": "boon-of-skill",
-    "source": "2024 PHB",
-    "name": "Boon of Skill",
-    "description": "You gain the following benefits: Ability Score Increase. Increase any Ability score by 2, to a maximum of 30. Skill Proficiency. You gain Proficiency in all skills.",
-    "category": "Epic Boon",
-    "prerequisites": {
-      "level": 19
-    },
-    "grants": null
-  },
-  {
-    "id": "boon-of-speed",
-    "source": "2024 PHB",
-    "name": "Boon of Speed",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 30. Speed. Your Speed increases by 30 feet. Fly. You gain a Fly Speed equal to your Speed.",
-    "category": "Epic Boon",
-    "prerequisites": {
-      "level": 19
-    },
-    "grants": null
-  },
-  {
-    "id": "boon-of-spell-recall",
-    "source": "2024 PHB",
-    "name": "Boon of Spell Recall",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 30. Spell Recall. You can cast any spell you know or have prepared without expending a spell slot, though you can use this benefit only once per spell per Long Rest.",
-    "category": "Epic Boon",
-    "prerequisites": {
-      "level": 19
-    },
-    "grants": null
-  },
-  {
-    "id": "boon-of-the-night-spirit",
-    "source": "2024 PHB",
-    "name": "Boon of the Night Spirit",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Dexterity, Intelligence, Wisdom, or Charisma score by 1, to a maximum of 30. Night Spirit. You can cast Invisibility at will, without expending a spell slot. You can also see in Darkness as if it were Dim Light.",
-    "category": "Epic Boon",
-    "prerequisites": {
-      "level": 19
-    },
-    "grants": null
-  },
-  {
-    "id": "boon-of-truesight",
-    "source": "2024 PHB",
-    "name": "Boon of Truesight",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength, Dexterity, Constitution, Intelligence, Wisdom, or Charisma score by 1, to a maximum of 30. Truesight. You gain Truesight with a range of 120 feet.",
+    "description": "You gain the following benefits: Ability Score Increase. Increase one ability score of your choice by 1, to a maximum of 30. Peerless Aim. When you miss with an attack roll, you can hit instead. Once you use this benefit, you can't use it again until the start of your next turn.",
     "category": "Epic Boon",
     "prerequisites": {
       "level": 19
@@ -727,9 +117,65 @@
   },
   {
     "id": "boon-of-dimensional-travel",
-    "source": "2024 PHB",
+    "source": "SRD 5.2",
     "name": "Boon of Dimensional Travel",
-    "description": "You gain the following benefits: Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 30. Dimensional Travel. You can cast Misty Step at will, without expending a spell slot.",
+    "description": "You gain the following benefits: Ability Score Increase. Increase one ability score of your choice by 1, to a maximum of 30. Blink Steps. Immediately after you take the Attack action or the Magic action, you can teleport up to 30 feet to an unoccupied space you can see.",
+    "category": "Epic Boon",
+    "prerequisites": {
+      "level": 19
+    },
+    "grants": null
+  },
+  {
+    "id": "boon-of-fate",
+    "source": "SRD 5.2",
+    "name": "Boon of Fate",
+    "description": "You gain the following benefits: Ability Score Increase. Increase one ability score of your choice by 1, to a maximum of 30. Improve Fate. When you or another creature within 60 feet of you succeeds on or fails a D20 Test, you can roll 2d4 and apply the total rolled as a bonus or penalty to the d20 roll. Once you use this benefit, you can't use it again until you roll Initiative or finish a Short or Long Rest.",
+    "category": "Epic Boon",
+    "prerequisites": {
+      "level": 19
+    },
+    "grants": null
+  },
+  {
+    "id": "boon-of-irresistible-offense",
+    "source": "SRD 5.2",
+    "name": "Boon of Irresistible Offense",
+    "description": "You gain the following benefits: Ability Score Increase. Increase your Strength or Dexterity score by 1, to a maximum of 30. Overcome Defenses. The Bludgeoning, Piercing, and Slashing damage you deal always ignores Resistance. Overwhelming Strike. When you roll a 20 on the d20 for an attack roll, you can deal extra damage to the target equal to the ability score increased by this feat. The extra damage's type is the same as the attack's type.",
+    "category": "Epic Boon",
+    "prerequisites": {
+      "level": 19
+    },
+    "grants": null
+  },
+  {
+    "id": "boon-of-spell-recall",
+    "source": "SRD 5.2",
+    "name": "Boon of Spell Recall",
+    "description": "You gain the following benefits: Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 30. Free Casting. Whenever you cast a spell with a level 1–4 spell slot, roll 1d4. If the number you roll is the same as the slot's level, the slot isn't expended.",
+    "category": "Epic Boon",
+    "prerequisites": {
+      "level": 19,
+      "feature": "Spellcasting Feature"
+    },
+    "grants": null
+  },
+  {
+    "id": "boon-of-the-night-spirit",
+    "source": "SRD 5.2",
+    "name": "Boon of the Night Spirit",
+    "description": "You gain the following benefits: Ability Score Increase. Increase one ability score of your choice by 1, to a maximum of 30. Merge with Shadows. While within Dim Light or Darkness, you can give yourself the Invisible condition as a Bonus Action. The condition ends on you immediately after you take an action, a Bonus Action, or a Reaction. Shadowy Form. While within Dim Light or Darkness, you have Resistance to all damage except Psychic and Radiant.",
+    "category": "Epic Boon",
+    "prerequisites": {
+      "level": 19
+    },
+    "grants": null
+  },
+  {
+    "id": "boon-of-truesight",
+    "source": "SRD 5.2",
+    "name": "Boon of Truesight",
+    "description": "You gain the following benefits: Ability Score Increase. Increase one ability score of your choice by 1, to a maximum of 30. Truesight. You have Truesight with a range of 60 feet.",
     "category": "Epic Boon",
     "prerequisites": {
       "level": 19
