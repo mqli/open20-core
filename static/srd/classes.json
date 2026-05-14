@@ -288,10 +288,11 @@
     "featuresByLevel": [
       {
         "level": 1,
+        "preparedSpells": 4,
         "features": [
           {
             "name": "Spellcasting",
-            "description": "You can cast Cleric spells using Wisdom as your spellcasting ability. You prepare the list of Cleric spells that are available for you to cast, choosing from the Cleric spell list. The number of spells you can prepare is equal to your Wisdom modifier + your Cleric level (minimum of one spell)."
+            "description": "You can cast Cleric spells using Wisdom as your spellcasting ability. You prepare the list of Cleric spells that are available for you to cast, choosing from the Cleric spell list. The number of spells you can prepare is shown in the Prepared Spells column of the Cleric Features table."
           },
           {
             "name": "Divine Order",
@@ -301,6 +302,7 @@
       },
       {
         "level": 2,
+        "preparedSpells": 5,
         "features": [
           {
             "name": "Channel Divinity",
@@ -311,6 +313,7 @@
       },
       {
         "level": 3,
+        "preparedSpells": 6,
         "features": [
           {
             "name": "Cleric Subclass",
@@ -320,6 +323,7 @@
       },
       {
         "level": 4,
+        "preparedSpells": 7,
         "features": [
           {
             "name": "Ability Score Improvement",
@@ -329,6 +333,7 @@
       },
       {
         "level": 5,
+        "preparedSpells": 9,
         "features": [
           {
             "name": "Sear Undead",
@@ -337,7 +342,13 @@
         ]
       },
       {
+        "level": 6,
+        "preparedSpells": 10,
+        "features": []
+      },
+      {
         "level": 7,
+        "preparedSpells": 11,
         "features": [
           {
             "name": "Blessed Strikes",
@@ -346,7 +357,23 @@
         ]
       },
       {
+        "level": 8,
+        "preparedSpells": 12,
+        "features": [
+          {
+            "name": "Ability Score Improvement",
+            "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. You can't increase an ability score above 20 using this feature."
+          }
+        ]
+      },
+      {
+        "level": 9,
+        "preparedSpells": 14,
+        "features": []
+      },
+      {
         "level": 10,
+        "preparedSpells": 15,
         "features": [
           {
             "name": "Divine Intervention",
@@ -355,7 +382,28 @@
         ]
       },
       {
+        "level": 11,
+        "preparedSpells": 16,
+        "features": []
+      },
+      {
+        "level": 12,
+        "preparedSpells": 16,
+        "features": [
+          {
+            "name": "Ability Score Improvement",
+            "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. You can't increase an ability score above 20 using this feature."
+          }
+        ]
+      },
+      {
+        "level": 13,
+        "preparedSpells": 17,
+        "features": []
+      },
+      {
         "level": 14,
+        "preparedSpells": 17,
         "features": [
           {
             "name": "Improved Blessed Strikes",
@@ -364,7 +412,33 @@
         ]
       },
       {
+        "level": 15,
+        "preparedSpells": 18,
+        "features": []
+      },
+      {
+        "level": 16,
+        "preparedSpells": 18,
+        "features": [
+          {
+            "name": "Ability Score Improvement",
+            "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. You can't increase an ability score above 20 using this feature."
+          }
+        ]
+      },
+      {
+        "level": 17,
+        "preparedSpells": 19,
+        "features": []
+      },
+      {
+        "level": 18,
+        "preparedSpells": 20,
+        "features": []
+      },
+      {
         "level": 19,
+        "preparedSpells": 21,
         "features": [
           {
             "name": "Epic Boon",
@@ -374,6 +448,7 @@
       },
       {
         "level": 20,
+        "preparedSpells": 22,
         "features": [
           {
             "name": "Greater Divine Intervention",
@@ -400,10 +475,11 @@
     "featuresByLevel": [
       {
         "level": 1,
+        "preparedSpells": 4,
         "features": [
           {
             "name": "Spellcasting",
-            "description": "You can cast Druid spells using Wisdom as your spellcasting ability. You prepare the list of Druid spells that are available for you to cast, choosing from the Druid spell list. The number of spells you can prepare is equal to your Wisdom modifier + your Druid level (minimum of one spell)."
+            "description": "You can cast Druid spells using Wisdom as your spellcasting ability. You prepare the list of Druid spells that are available for you to cast, choosing from the Druid spell list. The number of spells you can prepare is shown in the Prepared Spells column of the Druid Features table."
           },
           {
             "name": "Druidic",
@@ -417,6 +493,7 @@
       },
       {
         "level": 2,
+        "preparedSpells": 5,
         "features": [
           {
             "name": "Wild Shape",
@@ -431,6 +508,7 @@
       },
       {
         "level": 3,
+        "preparedSpells": 6,
         "features": [
           {
             "name": "Druid Subclass",
@@ -440,6 +518,7 @@
       },
       {
         "level": 4,
+        "preparedSpells": 7,
         "features": [
           {
             "name": "Ability Score Improvement",
@@ -449,6 +528,7 @@
       },
       {
         "level": 5,
+        "preparedSpells": 9,
         "features": [
           {
             "name": "Wild Resurgence",
@@ -457,7 +537,13 @@
         ]
       },
       {
+        "level": 6,
+        "preparedSpells": 10,
+        "features": []
+      },
+      {
         "level": 7,
+        "preparedSpells": 11,
         "features": [
           {
             "name": "Elemental Fury",
@@ -466,7 +552,53 @@
         ]
       },
       {
+        "level": 8,
+        "preparedSpells": 12,
+        "features": [
+          {
+            "name": "Ability Score Improvement",
+            "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. You can't increase an ability score above 20 using this feature."
+          }
+        ]
+      },
+      {
+        "level": 9,
+        "preparedSpells": 14,
+        "features": []
+      },
+      {
+        "level": 10,
+        "preparedSpells": 15,
+        "features": []
+      },
+      {
+        "level": 11,
+        "preparedSpells": 16,
+        "features": []
+      },
+      {
+        "level": 12,
+        "preparedSpells": 16,
+        "features": [
+          {
+            "name": "Ability Score Improvement",
+            "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. You can't increase an ability score above 20 using this feature."
+          }
+        ]
+      },
+      {
+        "level": 13,
+        "preparedSpells": 17,
+        "features": []
+      },
+      {
+        "level": 14,
+        "preparedSpells": 17,
+        "features": []
+      },
+      {
         "level": 15,
+        "preparedSpells": 18,
         "features": [
           {
             "name": "Improved Elemental Fury",
@@ -475,7 +607,23 @@
         ]
       },
       {
+        "level": 16,
+        "preparedSpells": 18,
+        "features": [
+          {
+            "name": "Ability Score Improvement",
+            "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. You can't increase an ability score above 20 using this feature."
+          }
+        ]
+      },
+      {
+        "level": 17,
+        "preparedSpells": 19,
+        "features": []
+      },
+      {
         "level": 18,
+        "preparedSpells": 20,
         "features": [
           {
             "name": "Beast Spells",
@@ -485,6 +633,7 @@
       },
       {
         "level": 19,
+        "preparedSpells": 21,
         "features": [
           {
             "name": "Epic Boon",
@@ -494,6 +643,7 @@
       },
       {
         "level": 20,
+        "preparedSpells": 22,
         "features": [
           {
             "name": "Archdruid",
@@ -827,6 +977,7 @@
     "featuresByLevel": [
       {
         "level": 1,
+        "preparedSpells": 2,
         "features": [
           {
             "name": "Lay On Hands",
@@ -835,7 +986,7 @@
           },
           {
             "name": "Spellcasting",
-            "description": "You can cast Paladin spells using Charisma as your spellcasting ability. You prepare the list of Paladin spells that are available for you to cast, choosing from the Paladin spell list. The number of spells you can prepare is equal to your Charisma modifier + your Paladin level (minimum of one spell)."
+            "description": "You can cast Paladin spells using Charisma as your spellcasting ability. You prepare the list of Paladin spells that are available for you to cast, choosing from the Paladin spell list. The number of spells you can prepare is shown in the Prepared Spells column of the Paladin Features table."
           },
           {
             "name": "Weapon Mastery",
@@ -845,6 +996,7 @@
       },
       {
         "level": 2,
+        "preparedSpells": 3,
         "features": [
           {
             "name": "Fighting Style",
@@ -858,6 +1010,7 @@
       },
       {
         "level": 3,
+        "preparedSpells": 4,
         "features": [
           {
             "name": "Channel Divinity",
@@ -872,6 +1025,7 @@
       },
       {
         "level": 4,
+        "preparedSpells": 5,
         "features": [
           {
             "name": "Ability Score Improvement",
@@ -881,6 +1035,7 @@
       },
       {
         "level": 5,
+        "preparedSpells": 6,
         "features": [
           {
             "name": "Extra Attack",
@@ -894,6 +1049,7 @@
       },
       {
         "level": 6,
+        "preparedSpells": 6,
         "features": [
           {
             "name": "Aura of Protection",
@@ -902,7 +1058,23 @@
         ]
       },
       {
+        "level": 7,
+        "preparedSpells": 7,
+        "features": []
+      },
+      {
+        "level": 8,
+        "preparedSpells": 7,
+        "features": [
+          {
+            "name": "Ability Score Improvement",
+            "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. You can't increase an ability score above 20 using this feature."
+          }
+        ]
+      },
+      {
         "level": 9,
+        "preparedSpells": 9,
         "features": [
           {
             "name": "Abjure Foes",
@@ -912,6 +1084,7 @@
       },
       {
         "level": 10,
+        "preparedSpells": 9,
         "features": [
           {
             "name": "Aura of Courage",
@@ -921,6 +1094,7 @@
       },
       {
         "level": 11,
+        "preparedSpells": 10,
         "features": [
           {
             "name": "Radiant Strikes",
@@ -929,7 +1103,23 @@
         ]
       },
       {
+        "level": 12,
+        "preparedSpells": 10,
+        "features": [
+          {
+            "name": "Ability Score Improvement",
+            "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. You can't increase an ability score above 20 using this feature."
+          }
+        ]
+      },
+      {
+        "level": 13,
+        "preparedSpells": 11,
+        "features": []
+      },
+      {
         "level": 14,
+        "preparedSpells": 11,
         "features": [
           {
             "name": "Restoring Touch",
@@ -938,7 +1128,28 @@
         ]
       },
       {
+        "level": 15,
+        "preparedSpells": 12,
+        "features": []
+      },
+      {
+        "level": 16,
+        "preparedSpells": 12,
+        "features": [
+          {
+            "name": "Ability Score Improvement",
+            "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. You can't increase an ability score above 20 using this feature."
+          }
+        ]
+      },
+      {
+        "level": 17,
+        "preparedSpells": 14,
+        "features": []
+      },
+      {
         "level": 18,
+        "preparedSpells": 14,
         "features": [
           {
             "name": "Aura Expansion",
@@ -948,6 +1159,7 @@
       },
       {
         "level": 19,
+        "preparedSpells": 15,
         "features": [
           {
             "name": "Epic Boon",
@@ -974,14 +1186,15 @@
     "featuresByLevel": [
       {
         "level": 1,
+        "preparedSpells": 2,
         "features": [
           {
             "name": "Spellcasting",
-            "description": "You can cast Ranger spells using Wisdom as your spellcasting ability. You prepare the list of Ranger spells that are available for you to cast, choosing from the Ranger spell list. The number of spells you can prepare is equal to your Wisdom modifier + your Ranger level (minimum of one spell)."
+            "description": "You can cast Ranger spells using Wisdom as your spellcasting ability. You prepare the list of Ranger spells that are available for you to cast, choosing from the Ranger spell list. The number of spells you can prepare is shown in the Prepared Spells column of the Ranger Features table."
           },
           {
             "name": "Favored Enemy",
-            "description": "You choose a type of creature to be your Favored Enemy. You have Advantage on Wisdom (Perception) checks to find your Favored Enemy, as well as on saving throws against their abilities. You also learn one language of your choice that is spoken by your Favored Enemy."
+            "description": "You always have the *Hunter's Mark* spell prepared. You can cast it twice without expending a spell slot, and you regain all expended uses of this ability when you finish a Long Rest."
           },
           {
             "name": "Weapon Mastery",
@@ -991,10 +1204,11 @@
       },
       {
         "level": 2,
+        "preparedSpells": 3,
         "features": [
           {
             "name": "Deft Explorer",
-            "description": "You are an unparalleled explorer. You gain proficiency in one of the following skills: Nature, Perception, Stealth, or Survival. Your proficiency bonus is doubled for any ability check you make that uses the chosen skill."
+            "description": "Thanks to your travels, you gain the following benefits: Expertise - Choose one of your skill proficiencies with which you lack Expertise. You gain Expertise in that skill; Languages - You know two languages of your choice from the language tables in \"Character Creation.\""
           },
           {
             "name": "Fighting Style",
@@ -1004,6 +1218,7 @@
       },
       {
         "level": 3,
+        "preparedSpells": 4,
         "features": [
           {
             "name": "Ranger Subclass",
@@ -1013,6 +1228,7 @@
       },
       {
         "level": 4,
+        "preparedSpells": 5,
         "features": [
           {
             "name": "Ability Score Improvement",
@@ -1022,6 +1238,7 @@
       },
       {
         "level": 5,
+        "preparedSpells": 6,
         "features": [
           {
             "name": "Extra Attack",
@@ -1031,82 +1248,126 @@
       },
       {
         "level": 6,
+        "preparedSpells": 6,
         "features": [
           {
             "name": "Roving",
-            "description": "While you are traveling for an hour or more, you gain the following benefits: Difficult terrain doesn't slow your group's travel; Your group can't become lost except by magical means; You can move stealthily at a normal pace; When you finish a Short Rest, you gain one of the following benefits of your choice: +10 temporary Hit Points, regain one expended use of Spellcasting, or regain one expended use of Natural Explorer."
+            "description": "Your Speed increases by 10 feet while you aren't wearing Heavy armor. You also have a Climb Speed and a Swim Speed equal to your Speed."
+          }
+        ]
+      },
+      {
+        "level": 7,
+        "preparedSpells": 7,
+        "features": []
+      },
+      {
+        "level": 8,
+        "preparedSpells": 7,
+        "features": [
+          {
+            "name": "Ability Score Improvement",
+            "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. You can't increase an ability score above 20 using this feature."
           }
         ]
       },
       {
         "level": 9,
+        "preparedSpells": 9,
         "features": [
           {
             "name": "Expertise",
-            "description": "Choose two of your skill proficiencies. Your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies."
+            "description": "Choose two of your skill proficiencies with which you lack Expertise. You gain Expertise in those skills."
           }
         ]
       },
       {
         "level": 10,
+        "preparedSpells": 9,
         "features": [
           {
             "name": "Tireless",
-            "description": "You can use the Help action as a Bonus Action. Additionally, when you use the Help action to aid an ally's attack, the ally can roll a d4 and add it to the attack roll."
+            "description": "Primal forces now help fuel you on your journeys, granting you the following benefits: Temporary Hit Points - As a Magic action, you can give yourself a number of Temporary Hit Points equal to 1d8 plus your Wisdom modifier (minimum of 1). You can use this action a number of times equal to your Wisdom modifier (minimum of once), and you regain all expended uses when you finish a Long Rest.; Decrease Exhaustion - Whenever you finish a Short Rest, your Exhaustion level, if any, decreases by 1."
+          }
+        ]
+      },
+      {
+        "level": 11,
+        "preparedSpells": 10,
+        "features": []
+      },
+      {
+        "level": 12,
+        "preparedSpells": 10,
+        "features": [
+          {
+            "name": "Ability Score Improvement",
+            "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. You can't increase an ability score above 20 using this feature."
           }
         ]
       },
       {
         "level": 13,
+        "preparedSpells": 11,
         "features": [
           {
             "name": "Relentless Hunter",
-            "description": "Your Favored Enemy now grants you the following benefits: Your weapon attacks deal an extra 1d4 damage against your Favored Enemy; If your Favored Enemy is a Humanoid, you have Advantage on attack rolls against it."
+            "description": "Taking damage can't break your Concentration on *Hunter's Mark*."
           }
         ]
       },
       {
         "level": 14,
+        "preparedSpells": 11,
         "features": [
           {
             "name": "Nature's Veil",
-            "description": "You can cast the *Greater Invisibility* spell on yourself as a Bonus Action. You can use this feature a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest."
+            "description": "You invoke spirits of nature to magically hide yourself. As a Bonus Action, you can give yourself the Invisible condition until the end of your next turn. You can use this feature a number of times equal to your Wisdom modifier (minimum of once), and you regain all expended uses when you finish a Long Rest."
+          }
+        ]
+      },
+      {
+        "level": 15,
+        "preparedSpells": 12,
+        "features": []
+      },
+      {
+        "level": 16,
+        "preparedSpells": 12,
+        "features": [
+          {
+            "name": "Ability Score Improvement",
+            "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. You can't increase an ability score above 20 using this feature."
           }
         ]
       },
       {
         "level": 17,
+        "preparedSpells": 14,
         "features": [
           {
             "name": "Precise Hunter",
-            "description": "When you hit your Favored Enemy with a weapon attack, the attack deals an extra 2d4 damage."
+            "description": "You have Advantage on attack rolls against the creature currently marked by your *Hunter's Mark*."
           }
         ]
       },
       {
         "level": 18,
+        "preparedSpells": 14,
         "features": [
           {
             "name": "Feral Senses",
-            "description": "You can sense the location of invisible creatures within 30 feet of you, as long as the creature isn't behind total cover."
+            "description": "Your connection to the forces of nature grants you Blindsight with a range of 30 feet."
           }
         ]
       },
       {
         "level": 19,
+        "preparedSpells": 15,
         "features": [
           {
             "name": "Epic Boon",
             "description": "You gain an Epic Boon feat of your choice."
-          }
-        ]
-      },
-      {
-        "level": 20,
-        "features": [
-          {
-            "name": "Foe Slayer",
-            "description": "You can use your Favored Enemy feature to gain the following benefits: When you miss an attack against your Favored Enemy, you can roll one additional attack roll and use the better of the two rolls; When your Favored Enemy forces you to make a saving throw, you can roll a d4 and add it to the save."
           }
         ]
       }
@@ -1466,10 +1727,11 @@
     "featuresByLevel": [
       {
         "level": 1,
+        "preparedSpells": 4,
         "features": [
           {
             "name": "Spellcasting",
-            "description": "You can cast Wizard spells using Intelligence as your spellcasting ability. You have a Spellbook that contains your known Wizard spells. You prepare the list of Wizard spells that are available for you to cast, choosing from the Wizard spell list. The number of spells you can prepare is equal to your Intelligence modifier + your Wizard level (minimum of one spell)."
+            "description": "You can cast Wizard spells using Intelligence as your spellcasting ability. You have a Spellbook that contains your known Wizard spells. You prepare the list of Wizard spells that are available for you to cast, choosing from the Wizard spell list. The number of spells you can prepare is shown in the Prepared Spells column of the Wizard Features table."
           },
           {
             "name": "Ritual Adept",
@@ -1484,6 +1746,7 @@
       },
       {
         "level": 2,
+        "preparedSpells": 5,
         "features": [
           {
             "name": "Scholar",
@@ -1493,6 +1756,7 @@
       },
       {
         "level": 3,
+        "preparedSpells": 6,
         "features": [
           {
             "name": "Wizard Subclass",
@@ -1502,6 +1766,7 @@
       },
       {
         "level": 4,
+        "preparedSpells": 7,
         "features": [
           {
             "name": "Ability Score Improvement",
@@ -1511,6 +1776,7 @@
       },
       {
         "level": 5,
+        "preparedSpells": 9,
         "features": [
           {
             "name": "Memorize Spell",
@@ -1519,7 +1785,78 @@
         ]
       },
       {
+        "level": 6,
+        "preparedSpells": 10,
+        "features": []
+      },
+      {
+        "level": 7,
+        "preparedSpells": 11,
+        "features": []
+      },
+      {
+        "level": 8,
+        "preparedSpells": 12,
+        "features": []
+      },
+      {
+        "level": 9,
+        "preparedSpells": 14,
+        "features": []
+      },
+      {
+        "level": 10,
+        "preparedSpells": 15,
+        "features": []
+      },
+      {
+        "level": 11,
+        "preparedSpells": 16,
+        "features": []
+      },
+      {
+        "level": 12,
+        "preparedSpells": 16,
+        "features": [
+          {
+            "name": "Ability Score Improvement",
+            "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. You can't increase an ability score above 20 using this feature."
+          }
+        ]
+      },
+      {
+        "level": 13,
+        "preparedSpells": 17,
+        "features": []
+      },
+      {
+        "level": 14,
+        "preparedSpells": 18,
+        "features": []
+      },
+      {
+        "level": 15,
+        "preparedSpells": 19,
+        "features": []
+      },
+      {
+        "level": 16,
+        "preparedSpells": 21,
+        "features": [
+          {
+            "name": "Ability Score Improvement",
+            "description": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. You can't increase an ability score above 20 using this feature."
+          }
+        ]
+      },
+      {
+        "level": 17,
+        "preparedSpells": 22,
+        "features": []
+      },
+      {
         "level": 18,
+        "preparedSpells": 23,
         "features": [
           {
             "name": "Spell Mastery",
@@ -1529,6 +1866,7 @@
       },
       {
         "level": 19,
+        "preparedSpells": 24,
         "features": [
           {
             "name": "Epic Boon",
@@ -1538,6 +1876,7 @@
       },
       {
         "level": 20,
+        "preparedSpells": 25,
         "features": [
           {
             "name": "Signature Spells",

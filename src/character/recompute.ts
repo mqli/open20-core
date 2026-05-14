@@ -144,6 +144,10 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
       }
     }
 
+    // 从职业特性表中读取可准备法术数量（SRD 5.2 使用表格数值，非常规公式）
+    const levelEntry = classData.featuresByLevel.find(f => f.level === classLevel);
+    const maxPrepared = levelEntry?.preparedSpells ?? 0;
+
     classSpellcasting[classId] = {
       ...classSpellData,
       spellcastingAbility: ability,
@@ -151,7 +155,7 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
       spellAttackBonus: pb + abilityMod,
       knownSpells,
       alwaysPreparedSpells,
-      maxPrepared: classLevel + abilityMod,
+      maxPrepared,
     };
   }
 
@@ -193,6 +197,10 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
       }
     }
 
+    // 从职业特性表中读取可准备法术数量（SRD 5.2 使用表格数值，非常规公式）
+    const levelEntry = classData.featuresByLevel.find(f => f.level === charClass.level);
+    const maxPrepared = levelEntry?.preparedSpells ?? 0;
+
     classSpellcasting[charClass.classId] = {
       classId: charClass.classId,
       spellcastingAbility: ability,
@@ -201,7 +209,7 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
       knownSpells,
       preparedSpells: [],
       alwaysPreparedSpells,
-      maxPrepared: charClass.level + abilityMod,
+      maxPrepared,
     };
   }
 

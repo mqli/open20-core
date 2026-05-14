@@ -148,7 +148,7 @@ export const WIZARD_CLASS: Class = {
   savingThrowProficiencies: ['Intelligence', 'Wisdom'],
   armorTraining: [],
   weaponMastery: false,
-  featuresByLevel: [{ level: 1, features: WIZARD_FEATURES_L1 }],
+  featuresByLevel: [{ level: 1, preparedSpells: 4, features: WIZARD_FEATURES_L1 }],
   spellcasting: { type: 'preparation', ability: 'Intelligence', knownSource: 'spellbook', changesPerRest: 'all' },
 };
 
@@ -200,7 +200,7 @@ export const CLERIC_CLASS: Class = {
   armorTraining: ['Light', 'Medium', 'Shield'],
   weaponProficiencies: ['Simple'],
   weaponMastery: false,
-  featuresByLevel: [{ level: 1, features: CLERIC_FEATURES_L1 }],
+  featuresByLevel: [{ level: 1, preparedSpells: 4, features: CLERIC_FEATURES_L1 }],
   spellcasting: { type: 'preparation', ability: 'Wisdom', knownSource: 'class_list', changesPerRest: 'all' },
 };
 

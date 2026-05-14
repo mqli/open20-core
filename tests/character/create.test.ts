@@ -857,7 +857,7 @@ describe('createCharacter with alwaysPreparedSpells', () => {
   });
 
   it('does not count alwaysPreparedSpells against maxPrepared', () => {
-    // Wisdom 14 → +2, level 1 → maxPrepared = 1 + 2 = 3
+    // SRD 5.2: Cleric level 1 has preparedSpells = 4 in the table
     const params: CreateCharacterParams = {
       name: 'Cleric Test',
       speciesId: 'Human',
@@ -869,8 +869,8 @@ describe('createCharacter with alwaysPreparedSpells', () => {
 
     const char = createCharacter(params, data);
     const clericSpells = char.spells.classSpellcasting['Cleric'];
-    // maxPrepared = level + abilityMod = 1 + 2 = 3
-    expect(clericSpells!.maxPrepared).toBe(2);
+    // maxPrepared = 4 (from SRD 5.2 table for Cleric level 1)
+    expect(clericSpells!.maxPrepared).toBe(4);
     // alwaysPreparedSpells don't count against this limit
     expect(clericSpells!.alwaysPreparedSpells).toHaveLength(2);
   });

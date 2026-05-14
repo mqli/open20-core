@@ -366,6 +366,10 @@ export function buildInitialSpells(
   }
 
   // 构建该职业的法术数据
+  // 从职业特性表中读取可准备法术数量（SRD 5.2 使用表格数值，非常规公式）
+  const level1Entry = classData.featuresByLevel.find(f => f.level === 1);
+  const maxPrepared = level1Entry?.preparedSpells ?? 0;
+  
   const classSpellData: ClassSpellData = {
     classId: classData.id,
     spellcastingAbility: ability,
@@ -374,7 +378,7 @@ export function buildInitialSpells(
     knownSpells,
     preparedSpells: [],
     alwaysPreparedSpells,
-    maxPrepared: 1 + abilityMod, // 1级 + 调整值
+    maxPrepared,
   };
 
   // 计算法术位

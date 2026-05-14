@@ -66,6 +66,9 @@ export interface Class {
   // JSON 原生格式：按等级分组的特性列表
   readonly featuresByLevel: readonly {
     readonly level: number;
+    // 准备施法者每级可准备的法术数量（从职业特性表中读取）
+    // 仅准备施法职业（Cleric, Druid, Wizard, Paladin, Ranger）有此字段
+    readonly preparedSpells?: number;
     readonly features: readonly Feature[];
   }[];
   readonly spellcasting: Spellcasting | null;
@@ -79,6 +82,9 @@ export interface Subclass {
   // JSON 原生格式：按等级分组的特性列表
   readonly featuresByLevel: readonly {
     readonly level: number;
+    // 准备施法者每级可准备的法术数量（从职业特性表中读取）
+    // 仅准备施法职业（Cleric, Druid, Wizard, Paladin, Ranger）有此字段
+    readonly preparedSpells?: number;
     readonly features: readonly Feature[];
   }[];
   // 始终准备的法术（领域法术、誓言法术等）
