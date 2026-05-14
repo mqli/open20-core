@@ -22,16 +22,13 @@ import { getModifier, getTotalScore } from '../engine/ability-modifier';
 import { SKILL_NAMES } from '../types/skill';
 import { getProficiencyBonus } from '../engine/proficiency-bonus';
 import { calculateHPAtLevel1, calculateHPIncrement } from '../engine/hp-calculator';
-import { calculateAC } from '../engine/ac-calculator';
-import { calculateInitiative } from '../engine/initiative';
-import { calculatePassivePerception } from '../engine/passive-perception';
 import {
   calculateSpellSlots,
   calculatePactMagic,
   getMulticlassSpellcasterLevel,
   calculateMulticlassSpellSlots,
 } from '../engine/spell-slots';
-import { calculateAttacks } from '../engine/attack-calculator';
+import { recomputeDerivedStats } from './recompute';
 
 // ── 公共接口 ────────────────────────────────────────────
 
@@ -88,7 +85,9 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
   const abilityScores: AbilityScores = {
     base: params.abilityScores,
     racialBonuses: species.abilityBonuses,
+    backgroundBonuses: {},
     featBonuses: {},
+    featGrants: {},
     temporaryBonuses: {},
   };
 
@@ -179,37 +178,7 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
     spells = buildMulticlassSpells(charClasses, abilityScores, data);
   }
 
-  // 8. Calculate CombatStats (pb already calculated above for resources)
-  const allFeatures = gatherAllFeatures(charClasses, data);
-
-  // Compute weapon proficiencies from classes
-  const weaponProficiencies = new Set<string>();
-  for (const c of charClasses) {
-    const classData = data.getClass(c.classId);
-    if (classData && classData.weaponProficiencies) {
-      for (const wp of classData.weaponProficiencies) {
-        weaponProficiencies.add(wp);
-      }
-    }
-  }
-
-  const combatStats: CombatStats = {
-    AC: calculateAC(abilityScores, [], allFeatures, data, []),
-    initiative: calculateInitiative(abilityScores, params.featIds ?? [], allFeatures),
-    speed: species.speed,
-    passivePerception: calculatePassivePerception(abilityScores, skills, pb, []),
-    proficiencyBonus: pb,
-    attacks: calculateAttacks(
-      abilityScores,
-      [],
-      pb,
-      allFeatures,
-      data,
-      Array.from(weaponProficiencies)
-    ),
-  };
-
-  // 9. Build Currency
+  // 8. Build Currency
   const currency: Currency = {
     cp: 0,
     sp: 0,
@@ -218,14 +187,16 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
     pp: 0,
   };
 
-  // 10. Return complete Character
+  // 10. Return complete Character (recompute will calculate combatStats and grants)
   const now = new Date().toISOString();
   const emptyDamageDefenses: DamageDefenses = {
     resistances: [],
     immunities: [],
     vulnerabilities: [],
   };
-  return {
+  
+  // Build partial character without combatStats
+  const partialChar: Character = {
     schemaVersion: '2024.1',
     name: params.name,
     species: params.speciesId,
@@ -239,7 +210,14 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
     spells,
     resources,
     hitPoints,
-    combatStats,
+    combatStats: {
+      AC: 10,
+      initiative: 0,
+      speed: species.speed,
+      passivePerception: 10,
+      proficiencyBonus: pb,
+      attacks: [],
+    },
     currency,
     conditions: [],
     damageDefenses: emptyDamageDefenses,
@@ -247,6 +225,9 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
     createdAt: now,
     updatedAt: now,
   };
+  
+  // Use recomputeDerivedStats as single source of truth for derived stats and grants
+  return recomputeDerivedStats(partialChar, data);
 }
 
 // ── Helper Functions ──────────────────────────────────────────

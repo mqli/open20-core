@@ -51,7 +51,7 @@ describe('D&D Player Behavior - Survival Mechanics', () => {
         {
           name: 'Lucky',
           speciesId: 'Human',
-          backgroundId: 'sailor',
+          backgroundId: 'soldier',  // SRD 5.2 only: Acolyte, Criminal, Sage, soldier
           classId: 'Fighter',
           abilityScores: {
             Strength: 12,
@@ -120,7 +120,7 @@ describe('D&D Player Behavior - Survival Mechanics', () => {
         {
           name: 'Shadow',
           speciesId: 'Tiefling',
-          backgroundId: 'sailor',
+          backgroundId: 'soldier',  // SRD 5.2 only: Acolyte, Criminal, Sage, soldier
           classId: 'Warlock',
           abilityScores: {
             Strength: 10,

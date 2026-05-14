@@ -44,7 +44,16 @@
     "prerequisites": {
       "level": 4
     },
-    "grants": null
+    "grants": {
+      "abilityBonus": {
+        "Strength": 2,
+        "Dexterity": 2,
+        "Constitution": 2,
+        "Intelligence": 2,
+        "Wisdom": 2,
+        "Charisma": 2
+      }
+    }
   },
   {
     "id": "grappler",
@@ -58,7 +67,12 @@
         "Strength": 13
       }
     },
-    "grants": null
+    "grants": {
+      "abilityBonus": {
+        "Strength": 1,
+        "Dexterity": 1
+      }
+    }
   },
   {
     "id": "archery",
@@ -113,7 +127,16 @@
     "prerequisites": {
       "level": 19
     },
-    "grants": null
+    "grants": {
+      "abilityBonus": {
+        "Strength": 1,
+        "Dexterity": 1,
+        "Constitution": 1,
+        "Intelligence": 1,
+        "Wisdom": 1,
+        "Charisma": 1
+      }
+    }
   },
   {
     "id": "boon-of-dimensional-travel",
@@ -124,7 +147,16 @@
     "prerequisites": {
       "level": 19
     },
-    "grants": null
+    "grants": {
+      "abilityBonus": {
+        "Strength": 1,
+        "Dexterity": 1,
+        "Constitution": 1,
+        "Intelligence": 1,
+        "Wisdom": 1,
+        "Charisma": 1
+      }
+    }
   },
   {
     "id": "boon-of-fate",
@@ -135,7 +167,16 @@
     "prerequisites": {
       "level": 19
     },
-    "grants": null
+    "grants": {
+      "abilityBonus": {
+        "Strength": 1,
+        "Dexterity": 1,
+        "Constitution": 1,
+        "Intelligence": 1,
+        "Wisdom": 1,
+        "Charisma": 1
+      }
+    }
   },
   {
     "id": "boon-of-irresistible-offense",
@@ -146,7 +187,12 @@
     "prerequisites": {
       "level": 19
     },
-    "grants": null
+    "grants": {
+      "abilityBonus": {
+        "Strength": 1,
+        "Dexterity": 1
+      }
+    }
   },
   {
     "id": "boon-of-spell-recall",
@@ -158,7 +204,13 @@
       "level": 19,
       "feature": "Spellcasting Feature"
     },
-    "grants": null
+    "grants": {
+      "abilityBonus": {
+        "Intelligence": 1,
+        "Wisdom": 1,
+        "Charisma": 1
+      }
+    }
   },
   {
     "id": "boon-of-the-night-spirit",
@@ -169,7 +221,16 @@
     "prerequisites": {
       "level": 19
     },
-    "grants": null
+    "grants": {
+      "abilityBonus": {
+        "Strength": 1,
+        "Dexterity": 1,
+        "Constitution": 1,
+        "Intelligence": 1,
+        "Wisdom": 1,
+        "Charisma": 1
+      }
+    }
   },
   {
     "id": "boon-of-truesight",
@@ -180,6 +241,15 @@
     "prerequisites": {
       "level": 19
     },
-    "grants": null
+    "grants": {
+      "abilityBonus": {
+        "Strength": 1,
+        "Dexterity": 1,
+        "Constitution": 1,
+        "Intelligence": 1,
+        "Wisdom": 1,
+        "Charisma": 1
+      }
+    }
   }
 ]

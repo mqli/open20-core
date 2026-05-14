@@ -23,7 +23,9 @@ const CharacterSchema = z.object({
   abilityScores: z.object({
     base: z.record(z.string(), z.number()),
     racialBonuses: z.record(z.string(), z.number()).optional(),
+    backgroundBonuses: z.record(z.string(), z.number()).optional(),
     featBonuses: z.record(z.string(), z.number()).optional(),
+    featGrants: z.record(z.string(), z.number()).optional(),
     temporaryBonuses: z.record(z.string(), z.number()).optional(),
   }),
   skills: z.record(z.string(), z.any()),

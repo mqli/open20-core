@@ -1,9 +1,11 @@
 // character/recompute.ts
 // Recalculates all derived/computed stats on a Character
 // Pure function — returns a new Character with updated combat stats
+// Single source of truth for applying background and feat grants
 
 import type { Character } from '../types/character';
 import type { DataLoader } from '../data/loader';
+import type { AbilityName, AbilityScores } from '../types/ability';
 import { getModifier, getTotalScore } from '../engine/ability-modifier';
 import { getProficiencyBonus } from '../engine/proficiency-bonus';
 import { calculateAC } from '../engine/ac-calculator';
@@ -11,10 +13,56 @@ import { calculateInitiative } from '../engine/initiative';
 import { calculatePassivePerception } from '../engine/passive-perception';
 import { calculateAttacks } from '../engine/attack-calculator';
 import { calculateMaxHP } from '../engine/hp-calculator';
-import type { Feature } from '../types/class';
 import { calculatePactMagic, calculateSpellSlots, calculateSpellSlotsFromClasses } from '../engine/spell-slots';
-import type { SpellLevel } from '../types/spell';
-import { getFeaturesAtLevel, getAlwaysPreparedSpellsFromSubclass } from './create';
+import type { SpellLevel, SpellSlotEntry } from '../types/spell';
+import type { Class, Feature, Subclass } from '../types/class';
+
+// ── Helper Functions (moved from create.ts to break circular dependency) ──
+
+/** Extract features at a specific level */
+function getFeaturesAtLevel(classData: Class, level: number): readonly Feature[] {
+  const entry = classData.featuresByLevel.find(f => f.level === level);
+  return entry?.features ?? [];
+}
+
+/** Get always-prepared spells from subclass */
+function getAlwaysPreparedSpellsFromSubclass(
+  subclass: Subclass,
+  classLevel: number
+): string[] {
+  if (!subclass.alwaysPreparedSpells) return [];
+  const spells: string[] = [];
+  for (const entry of subclass.alwaysPreparedSpells) {
+    if (classLevel >= entry.level) {
+      spells.push(...entry.spells);
+    }
+  }
+  return spells;
+}
+
+// ── Grant Computation (Single Source of Truth) ─────────────────
+
+/**
+ * Compute ability score grants from feats.
+ * Background ability score choices are stored in abilityScores.backgroundBonuses
+ * and applied directly (set by player during character creation/level-up).
+ */
+function computeFeatGrants(char: Character, data: DataLoader): Partial<Record<AbilityName, number>> {
+  const featGrants: Partial<Record<AbilityName, number>> = {};
+  for (const featId of char.feats) {
+    const feat = data.getFeat(featId);
+    if (feat?.grants?.abilityBonus) {
+      for (const [ability, bonus] of Object.entries(feat.grants.abilityBonus)) {
+        const numBonus = bonus as number;
+        if (numBonus !== 0) {
+          featGrants[ability as AbilityName] =
+            (featGrants[ability as AbilityName] ?? 0) + numBonus;
+        }
+      }
+    }
+  }
+  return featGrants;
+}
 
 /**
  * Recalculates all derived/computed stats on a Character.
@@ -30,9 +78,18 @@ import { getFeaturesAtLevel, getAlwaysPreparedSpellsFromSubclass } from './creat
  * 8. Spell slot totals (preserving used counts where possible)
  */
 export function recomputeDerivedStats(char: Character, data: DataLoader): Character {
+  // Compute feat grants (single source of truth)
+  const featGrants = computeFeatGrants(char, data);
+
+  // Update abilityScores with computed grants
+  const updatedAbilityScores: AbilityScores = {
+    ...char.abilityScores,
+    featGrants,
+  };
+  
   const totalLevel = char.classes.reduce((sum, c) => sum + c.level, 0);
   const pb = getProficiencyBonus(totalLevel);
-  const conMod = getModifier(getTotalScore(char.abilityScores, 'Constitution'));
+  const conMod = getModifier(getTotalScore(updatedAbilityScores, 'Constitution'));
 
   // Gather all features across all classes and subclasses
   const features: Feature[] = [];
@@ -71,17 +128,17 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     }
   }
 
-  // Recalculate combat stats
-  const newAC = calculateAC(char.abilityScores, char.equipment, features, data, char.conditions);
-  const newInitiative = calculateInitiative(char.abilityScores, char.feats, features);
+  // Recalculate combat stats (using updated ability scores with grants)
+  const newAC = calculateAC(updatedAbilityScores, char.equipment, features, data, char.conditions);
+  const newInitiative = calculateInitiative(updatedAbilityScores, char.feats, features);
   const newPassivePerception = calculatePassivePerception(
-    char.abilityScores,
+    updatedAbilityScores,
     char.skills,
     pb,
     char.conditions
   );
   const newAttacks = calculateAttacks(
-    char.abilityScores,
+    updatedAbilityScores,
     char.equipment,
     pb,
     features,
@@ -103,7 +160,7 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     }
 
     const ability = classData.spellcasting.ability;
-    const abilityMod = getModifier(getTotalScore(char.abilityScores, ability));
+    const abilityMod = getModifier(getTotalScore(updatedAbilityScores, ability));
     const charClass = char.classes.find(c => c.classId === classId);
     const classLevel = charClass?.level ?? 1;
 
@@ -166,7 +223,7 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     if (classSpellcasting[charClass.classId]) continue; // already tracked
 
     const ability = classData.spellcasting.ability;
-    const abilityMod = getModifier(getTotalScore(char.abilityScores, ability));
+    const abilityMod = getModifier(getTotalScore(updatedAbilityScores, ability));
 
     // Calculate per-class max spell level for filtering known spells
     const classSlots = calculateSpellSlots(charClass.classId, charClass.level, data);
@@ -246,18 +303,27 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
 
   // Recalculate regular spell slots (using multiclass rules)
   const newSlots = calculateSpellSlotsFromClasses(char.classes, data);
-  // Preserve used counts, update totals
-  const updatedSlots = { ...newSpells.spellSlots };
-  for (let level = 1; level <= 9; level++) {
-    const newEntry = newSlots[level];
-    if (newEntry) {
-      const oldUsed = updatedSlots[level as SpellLevel]?.used ?? 0;
-      updatedSlots[level as SpellLevel] = {
-        total: newEntry.total,
-        used: Math.min(oldUsed, newEntry.total),
-      };
-    }
-  }
+  
+  // Check if newSlots has any non-zero entries
+  const hasNonZero = Object.values(newSlots).some(entry => entry.total > 0);
+  
+  // Preserve used counts, update totals (only if newSlots has non-zero entries)
+  const updatedSlots = hasNonZero
+    ? (() => {
+        const slots: Record<SpellLevel, SpellSlotEntry> = {} as Record<SpellLevel, SpellSlotEntry>;
+        for (let level = 1; level <= 9; level++) {
+          const newEntry = newSlots[level];
+          if (newEntry) {
+            const oldUsed = newSpells.spellSlots[level as SpellLevel]?.used ?? 0;
+            slots[level as SpellLevel] = {
+              total: newEntry.total,
+              used: Math.min(oldUsed, newEntry.total),
+            };
+          }
+        }
+        return slots;
+      })()
+    : newSpells.spellSlots; // Preserve existing slots if recalculation returns all zeros
   newSpells = {
     ...newSpells,
     spellSlots: updatedSlots as typeof char.spells.spellSlots,
@@ -265,6 +331,7 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
 
   return {
     ...char,
+    abilityScores: updatedAbilityScores,
     hitPoints: {
       ...char.hitPoints,
       max: newMaxHP,

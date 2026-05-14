@@ -55,9 +55,9 @@ const EXPECTED_CONDITIONS = [
 
 const EXPECTED_COUNTS = {
   species: 12,
-  backgrounds: 16,
+  backgrounds: 4,  // SRD 5.2 only: Acolyte, Criminal, Sage, Soldier
   classes: 12,
-  feats: 75,
+  feats: 14,  // SRD 5.2 only
   weapons: 30,
   armors: 15,
   spells: 50,

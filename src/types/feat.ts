@@ -34,5 +34,3 @@ export interface FeatGrant {
   readonly weaponMastery?: readonly string[]; // 武器精通属性
 }
 
-// 2024 专长总数：75个
-// 37个新专长 + 35个修订专长 + 3个未变专长

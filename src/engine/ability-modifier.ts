@@ -22,7 +22,7 @@ export function getModifier(score: number): number {
 }
 
 /**
- * 计算属性总值（base + racial + feat + temporary）
+ * 计算属性总值（base + racial + background + feat + featGrants + temporary）
  * 所有加值来源求和
  *
  * @param scores - 属性值对象
@@ -30,13 +30,15 @@ export function getModifier(score: number): number {
  * @returns 该属性的总值
  *
  * @example
- * getTotalScore({ base: { Strength: 15 }, racialBonuses: { Strength: 2 }, featBonuses: {}, temporaryBonuses: {} }, 'Strength')
+ * getTotalScore({ base: { Strength: 15 }, racialBonuses: { Strength: 2 }, backgroundBonuses: {}, featBonuses: {}, featGrants: {}, temporaryBonuses: {} }, 'Strength')
  * // 17
  */
 export function getTotalScore(scores: AbilityScores, ability: AbilityName): number {
-  const base = scores.base[ability] ?? 10;
-  const racial = scores.racialBonuses[ability] ?? 0;
-  const feat = scores.featBonuses[ability] ?? 0;
-  const temp = scores.temporaryBonuses[ability] ?? 0;
-  return base + racial + feat + temp;
+  const base = scores.base?.[ability] ?? 10;
+  const racial = scores.racialBonuses?.[ability] ?? 0;
+  const background = scores.backgroundBonuses?.[ability] ?? 0;
+  const feat = scores.featBonuses?.[ability] ?? 0;
+  const featGrants = scores.featGrants?.[ability] ?? 0;
+  const temp = scores.temporaryBonuses?.[ability] ?? 0;
+  return base + racial + background + feat + featGrants + temp;
 }

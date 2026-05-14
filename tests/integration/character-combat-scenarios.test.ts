@@ -8,7 +8,6 @@ import { validateCharacter } from '../../src/character/validate';
 import { serialize, deserialize } from '../../src/storage/serializer';
 import { applyTypedDamage } from '../../src/character/mutate';
 import type { DamageDefenses } from '../../src/types/damage';
-import lookupTables from '../../static/srd/lookup-tables.json';
 
 const dataLoader = createDataLoader();
 
@@ -186,7 +185,7 @@ describe('D&D Player Behavior - Full Lifecycle & Combat Scenarios', () => {
         {
           name: 'Sylara',
           speciesId: 'Elf',
-          backgroundId: 'guide',
+          backgroundId: 'sage',  // SRD 5.2: acolyte, criminal, sage, soldier
           classId: 'Ranger',
           abilityScores: {
             Strength: 14,
