@@ -26,8 +26,8 @@
         "level": 10,
         "features": [
           {
-            "name": "Intimidating Rage",
-            "description": "When you enter your rage, you can choose to reduce your rage bonus by 1 to gain the ability to force enemies to make a Wisdom saving throw or be frightened of you until the end of your next turn."
+            "name": "Retaliation",
+            "description": "When you take damage from a creature that is within 5 feet of you, you can take a Reaction to make one melee attack against that creature, using a weapon or an Unarmed Strike."
           }
         ]
       },
@@ -35,8 +35,8 @@
         "level": 14,
         "features": [
           {
-            "name": "Retaliation",
-            "description": "When you take damage from a creature that is within 5 feet of you, you can use your reaction to make a melee weapon attack against that creature."
+            "name": "Intimidating Presence",
+            "description": "As a Bonus Action, you can strike terror into others with your menacing presence and primal power. When you do so, each creature of your choice in a 30-foot Emanation originating from you must make a Wisdom saving throw (DC 8 plus your Strength modifier and Proficiency Bonus). On a failed save, a creature has the Frightened condition for 1 minute. At the end of each of the Frightened creature's turns, the creature repeats the save, ending the effect on itself on a success. Once you use this feature, you can't use it again until you finish a Long Rest unless you expend a use of your rage (no action required) to restore your use of it."
           }
         ]
       }
@@ -301,8 +301,8 @@
         "level": 6,
         "features": [
           {
-            "name": "Additional Magical Secrets",
-            "description": "You learn two additional spells of your choice from any class. These spells must be of a level you can cast."
+            "name": "Magical Discoveries",
+            "description": "You learn two spells of your choice. These spells can come from the Cleric, Druid, or Wizard spell list or any combination thereof. A spell you choose must be a cantrip or a spell for which you have spell slots. You always have the chosen spells prepared, and whenever you gain a Bard level, you can replace one of the spells with another spell that meets these requirements."
           }
         ]
       },
@@ -311,7 +311,7 @@
         "features": [
           {
             "name": "Magical Secrets",
-            "description": "You learn two additional spells of your choice from any class. These spells must be of a level you can cast."
+            "description": "You learn two additional spells of your choice from the Bard, Cleric, Druid, and Wizard spell lists. The chosen spells count as Bard spells for you."
           }
         ]
       },
@@ -320,7 +320,7 @@
         "features": [
           {
             "name": "Peerless Skill",
-            "description": "When you make an ability check, you can expend one use of your Bardic Inspiration to roll a Bardic Inspiration die and add the result to the ability check."
+            "description": "When you make an ability check or attack roll and fail, you can expend one use of Bardic Inspiration; roll the Bardic Inspiration die, and add the number rolled to the d20, potentially turning a failure into a success. On a failure, the Bardic Inspiration isn't expended."
           }
         ]
       }
@@ -407,7 +407,7 @@
         "features": [
           {
             "name": "Blessed Healer",
-            "description": "When you cast a healing spell on another creature, you also regain hit points equal to your Wisdom modifier (minimum of 1)."
+            "description": "The healing spells you cast on others heal you as well. Immediately after you cast a spell with a spell slot that restores Hit Points to one or more creatures other than yourself, you regain Hit Points equal to 2 plus the spell slot's level."
           }
         ]
       },
@@ -425,18 +425,17 @@
         "features": [
           {
             "name": "Supreme Healing",
-            "description": "When you cast a spell that restores hit points, the healing increases by an amount equal to your cleric level. No creature can regain hit points from your healing spells more than once per turn."
+            "description": "When you would normally roll one or more dice to restore Hit Points to a creature with a spell or Channel Divinity, don't roll those dice for the healing; instead use the highest number possible for each die. For example, instead of restoring 2d6 Hit Points to a creature with a spell, you restore 12."
           }
         ]
       }
     ],
-    "alwaysPreparedSpells": [
-      {"level": 1, "spells": ["bless", "cure-wounds"]},
-      {"level": 3, "spells": ["lesser-restoration", "spiritual-weapon"]},
-      {"level": 5, "spells": ["beacon-of-hope", "revivify"]},
-      {"level": 7, "spells": ["death-ward", "guardian-of-faith"]},
-      {"level": 9, "spells": ["mass-cure-wounds", "raise-dead"]}
-    ],
+  "alwaysPreparedSpells": [
+    {"level": 3, "spells": ["aid", "bless", "cure-wounds", "lesser-restoration"]},
+    {"level": 5, "spells": ["mass-healing-word", "revivify"]},
+    {"level": 7, "spells": ["aura-of-life", "death-ward"]},
+    {"level": 9, "spells": ["greater-restoration", "mass-cure-wounds"]}
+  ],
     "source": "SRD 5.2"
   },
   {
@@ -2175,11 +2174,15 @@
     "grantedAtLevel": 2,
     "featuresByLevel": [
       {
-        "level": 2,
+        "level": 3,
         "features": [
           {
-            "name": "Sculpt Spells",
-            "description": "You can create pockets of relative safety within the effects of your evocation spells. When you cast an evocation spell that affects other creatures that you can see, you can choose a number of them equal to 1 + the spell's level. The chosen creatures automatically succeed on their saving throws against the spell, and they take no damage if they would normally take half damage on a successful save."
+            "name": "Evocation Savant",
+            "description": "Choose two Wizard spells from the Evocation school, each of which must be no higher than level 2, and add them to your spellbook for free. In addition, whenever you gain access to a new level of spell slots in this class, you can add one Wizard spell from the Evocation school to your spellbook for free. The chosen spell must be of a level for which you have spell slots."
+          },
+          {
+            "name": "Potent Cantrip",
+            "description": "Your damaging cantrips affect even creatures that avoid the brunt of the effect. When you cast a cantrip at a creature and you miss with the attack roll or the target succeeds on a saving throw against the cantrip, the target takes half the cantrip's damage (if any) but suffers no additional effect from the cantrip."
           }
         ]
       },
@@ -2187,8 +2190,8 @@
         "level": 6,
         "features": [
           {
-            "name": "Potent Cantrip",
-            "description": "When a creature succeeds on a saving throw against your cantrip, the creature takes half the cantrip's damage (if any) but suffers no additional effect from the cantrip."
+            "name": "Sculpt Spells",
+            "description": "You can create pockets of relative safety within the effects of your evocation spells. When you cast an evocation spell that affects other creatures that you can see, you can choose a number of them equal to 1 + the spell's level. The chosen creatures automatically succeed on their saving throws against the spell, and they take no damage if they would normally take half damage on a successful save."
           }
         ]
       },
@@ -2206,7 +2209,7 @@
         "features": [
           {
             "name": "Overchannel",
-            "description": "When you cast a wizard spell of 1st through 5th level that deals damage, you can deal maximum damage with that spell. If the spell would force a creature to make a saving throw to take half damage, it takes half damage on a failed save. Once you use this feature, you can't use it again until you finish a short or long rest."
+            "description": "You can increase the power of your spells. When you cast a Wizard spell with a spell slot of levels 1–5 that deals damage, you can deal maximum damage with that spell on the turn you cast it. The first time you do so, you suffer no adverse effect. If you use this feature again before you finish a Long Rest, you take 2d12 Necrotic damage for each level of the spell slot immediately after you cast it. This damage ignores Resistance and Immunity. Each time you use this feature again before finishing a Long Rest, the Necrotic damage per spell level increases by 1d12."
           }
         ]
       }
