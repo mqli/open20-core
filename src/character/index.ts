@@ -48,6 +48,18 @@ export type { ValidationError, ValidationResult } from './validate';
 
 export { recomputeDerivedStats } from './recompute';
 
+// ── Spell Casting ──────────────────────────────
+export {
+  canCastAsRitual,
+  castAsRitual,
+  getRitualCastingTime,
+  isCantrip,
+  canCastCantrip,
+  canUpcast,
+  getUpcastDescription,
+  castSpell,
+} from './spell-casting';
+
 // HP Accessor Helpers (for API consistency with monster module)
 export {
   getCharacterCurrentHP,

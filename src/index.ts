@@ -78,7 +78,7 @@ export {
   mergeDefenses,
 } from './engine';
 
-// ── Engine: Spell Casting ────────────────────────────
+// ── Character: Spell Casting ────────────────────────
 export {
   canCastAsRitual,
   castAsRitual,
@@ -88,7 +88,7 @@ export {
   canUpcast,
   getUpcastDescription,
   castSpell,
-} from './engine';
+} from './character';
 
 // ── Character (state management) ────────────────────────
 export { createCharacter, getAlwaysPreparedSpellsFromSubclass } from './character';

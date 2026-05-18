@@ -4,7 +4,7 @@
 import type { Character } from '../../types/character';
 import type { DataLoader } from '../../data/loader';
 import type { SpellLevel } from '../../types/spell';
-import { isCantrip as isCantripSpell } from '../../engine/spell-casting';
+import { isCantrip as isCantripSpell } from '../spell-casting';
 import { withUpdate } from './hp';
 
 // ── Spell Slot Mutations ────────────────────────────────

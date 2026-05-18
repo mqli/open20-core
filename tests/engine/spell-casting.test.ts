@@ -11,7 +11,7 @@ import {
   canUpcast,
   getUpcastDescription,
   castSpell,
-} from '../../src/engine/spell-casting';
+} from '../../src/character/spell-casting';
 import type { Spell, Character } from '../../src/types';
 
 // Mock DataLoader

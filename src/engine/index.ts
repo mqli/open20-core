@@ -92,15 +92,3 @@ export {
   calculateConcentrationDC,
   type ConcentrationCheckResult,
 } from './concentration';
-
-// ── Spell Casting ──────────────────────────────────
-export {
-  canCastAsRitual,
-  castAsRitual,
-  getRitualCastingTime,
-  isCantrip,
-  canCastCantrip,
-  canUpcast,
-  getUpcastDescription,
-  castSpell,
-} from './spell-casting';
