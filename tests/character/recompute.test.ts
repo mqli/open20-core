@@ -36,9 +36,10 @@ const MOCK_SORCERER_CLASS: Class = {
   weaponMastery: false,
   featuresByLevel: [],
   spellcasting: {
-    type: 'known',
     ability: 'Charisma' as any,
-    changesPerLevel: 1,
+    knownSource: 'class_list',
+    preparationTiming: 'level_up',
+    changesPerPreparation: 'all',
   },
 };
 
@@ -53,10 +54,10 @@ const MOCK_CLERIC_CLASS: Class = {
   weaponMastery: false,
   featuresByLevel: [],
   spellcasting: {
-    type: 'preparation',
     ability: 'Wisdom' as any,
     knownSource: 'class_list',
-    changesPerRest: 'all',
+    preparationTiming: 'long_rest',
+    changesPerPreparation: 'all',
   },
 };
 
@@ -95,7 +96,13 @@ const WARLOCK_CLASS: Class = {
   armorTraining: ['Light'],
   weaponMastery: false,
   featuresByLevel: [{ level: 1, features: WARLOCK_FEATURES_L1 }],
-  spellcasting: { type: 'known', ability: 'Charisma', changesPerLevel: 1 },
+  spellcasting: { 
+    ability: 'Charisma' as any,
+    knownSource: 'class_list',
+    preparationTiming: 'level_up',
+    changesPerPreparation: 'all',
+    pactMagic: true 
+  },
 };
 
 // ── Mock DataLoader ─────────────────────────────

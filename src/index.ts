@@ -138,8 +138,10 @@ export {
   getClassSpellData,
   knowsSpellForClass,
   isSpellPreparedForClass,
-  isPreparationCaster,
-  isKnownCaster,
+  isClassListCaster,
+  isSpellbookCaster,
+  canChangeSpellsOnLongRest,
+  canChangeSpellsOnLevelUp,
 } from './spells';
 
 // ── Monsters (query + combat) ─────────────────────────

@@ -5,37 +5,27 @@ import type { ResetType } from './resource';
 import type { AbilityName } from './ability';
 import type { AlwaysPreparedSpells } from './spell';
 
-// 法术施法方式（判别联合）
-// 对应 SRD 5.2 Spell Preparation by Class 表
-export type Spellcasting =
-  | PreparationSpellcasting
-  | KnownSpellcasting;
-
-// 准备施法者：Cleric, Druid, Wizard, Paladin, Ranger
-interface PreparationSpellcasting {
-  readonly type: 'preparation';
+// 法术施法方式（SRD 5.2）
+// 所有施法者都有准备法术（Prepared Spells）
+// 区别仅在于：何时可以更换准备的法术 + 如何知道法术 + 法术位系统
+export interface Spellcasting {
   readonly ability: AbilityName;
 
   // 如何"知道"法术：
-  // - 'class_list'  → Cleric, Druid, Paladin, Ranger: 自动知道该职业法术列表中的所有法术
-  // - 'spellbook'   → Wizard: 必须学习/抄写才能知道
+  // - 'class_list'  → Cleric, Druid, Paladin, Ranger, Bard, Sorcerer: 自动知道该职业法术列表中的所有法术
+  // - 'spellbook'   → Wizard: 必须学习/抄写才能知道（有法师书）
   readonly knownSource: 'class_list' | 'spellbook';
 
-  // 每次长休可以更换多少个准备的法术：
-  // - 'all'   → Cleric, Druid, Wizard: 可以更换任意数量
-  // - number  → Paladin, Ranger: 每次长休只能更换1个（SRD: "One"）
-  // 注意：此为参考字段，代码不强制执行限制
-  readonly changesPerRest: 'all' | number;
-}
+  // 何时可以更换准备的法术：
+  // - 'long_rest'  → Cleric, Druid, Wizard: 每次长休可更换
+  // - 'level_up'   → Bard, Sorcerer, Warlock: 仅在升级时可更换
+  readonly preparationTiming: 'long_rest' | 'level_up';
 
-// 已知施法者（无需准备）：Bard, Sorcerer, Warlock
-interface KnownSpellcasting {
-  readonly type: 'known';
-  readonly ability: AbilityName;
-
-  // 每升一级可以更换多少个已知法术（SRD: 总是1）
+  // 每次准备时可以更换多少个法术：
+  // - 'all'   → Cleric, Druid, Wizard, Bard, Sorcerer: 可以更换任意数量
+  // - number  → Paladin, Ranger: 每次只能更换1个（SRD: "One"）
   // 注意：此为参考字段，代码不强制执行限制
-  readonly changesPerLevel: number;
+  readonly changesPerPreparation: 'all' | number;
 
   // Warlock 专用：使用 Pact Magic 而非常规法术位
   readonly pactMagic?: true;

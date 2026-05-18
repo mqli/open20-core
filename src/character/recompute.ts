@@ -175,22 +175,19 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
       return max;
     })();
 
-    // Auto-populate knownSpells for class_list casters (Cleric, Druid)
-    // For known casters (Bard, Sorcerer), filter existing knownSpells by max castable level
-    // For spellbook casters (Wizard), keep all known spells (spellbook can contain higher-level spells)
+    // Auto-populate knownSpells based on caster type
     let knownSpells = classSpellData.knownSpells;
-    if (classData.spellcasting.type === 'preparation' && classData.spellcasting.knownSource === 'class_list') {
+    if (classData.spellcasting.knownSource === 'class_list') {
+      // Class-list casters: auto-populate with spells they can cast
       knownSpells = data.getAllSpells()
         .filter(s => s.classes?.includes(classId) && (s.level === 0 || s.level <= classMaxSpellLevel))
         .map(s => s.id);
-    } else if (classData.spellcasting.type === 'known') {
-      // Known casters can only know spells they can cast (cantrips + up to max spell level)
-      knownSpells = knownSpells.filter(spellId => {
-        const spell = data.getSpell(spellId);
-        return spell && (spell.level === 0 || spell.level <= classMaxSpellLevel);
-      });
+    } else if (classData.spellcasting.knownSource === 'spellbook') {
+      // Wizard: auto-populate with ALL spells from spellbook (can contain higher-level spells)
+      knownSpells = data.getAllSpells()
+        .filter(s => s.classes?.includes(classId))
+        .map(s => s.id);
     }
-    // else: preparation/spellbook casters keep all knownSpells unchanged
 
     // Auto-populate alwaysPreparedSpells from subclass (domain/oath spells)
     let alwaysPreparedSpells = classSpellData.alwaysPreparedSpells ?? [];
@@ -236,10 +233,10 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
       return max;
     })();
 
-    // Auto-populate knownSpells for class_list casters (Cleric, Druid)
+    // Auto-populate knownSpells for class_list casters (Cleric, Druid, Bard, etc.)
     // Only include spells they can actually cast (cantrips + up to max spell level)
     let knownSpells: readonly string[] = [];
-    if (classData.spellcasting.type === 'preparation' && classData.spellcasting.knownSource === 'class_list') {
+    if (classData.spellcasting?.knownSource === 'class_list') {
       knownSpells = data.getAllSpells()
         .filter(s => s.classes?.includes(charClass.classId) && (s.level === 0 || s.level <= classMaxSpellLevel))
         .map(s => s.id);
