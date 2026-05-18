@@ -1,40 +1,30 @@
 // character/create.ts
 // 角色创建 — 根据参数和规则数据构建完整的角色（支持多维职业）
 // 对应 HLD §6.2
+//
+// 设计：只构建核心身份/来源数据，所有派生属性交给 recomputeDerivedStats 计算。
 
 import type { AbilityName, AbilityScores } from '../types/ability';
 import type { SkillEntry } from '../types/skill';
 import type {
   Character,
   CharacterClass,
-  HitPoints,
-  CombatStats,
   Currency,
   DamageDefenses,
 } from '../types/character';
-import type { CharacterSpells, ClassSpellData, SpellLevel, SpellSlotEntry, PactMagicSlots } from '../types/spell';
-import type { Feature, Class } from '../types/class';
+import type { Class } from '../types/class';
 import type { Resource } from '../types/resource';
-import { ResetType } from '../types/resource';
 import type { DataLoader } from '../data/loader';
 
-import { getModifier, getTotalScore } from '../engine/ability-modifier';
-import { SKILL_NAMES } from '../types/skill';
 import { getProficiencyBonus } from '../engine/proficiency-bonus';
-import { calculateHPAtLevel1, calculateHPIncrement } from '../engine/hp-calculator';
-import {
-  calculateSpellSlots,
-  calculatePactMagic,
-  getMulticlassSpellcasterLevel,
-  calculateMulticlassSpellSlots,
-} from '../engine/spell-slots';
+import { emptyCharacterSpells } from './spells-init';
 import { recomputeDerivedStats } from './recompute';
-import { getFeaturesAtLevel, getAlwaysPreparedSpellsFromSubclass } from './utils';
 import { extractResources } from './resource-builder';
 
 // Re-export for backward compatibility (tests import from create.ts)
 export { getFeaturesAtLevel, getAlwaysPreparedSpellsFromSubclass } from './utils';
 export { extractResources } from './resource-builder';
+export { emptyCharacterSpells, buildInitialSpells, buildMulticlassSpells } from './spells-init';
 
 // ── 公共接口 ────────────────────────────────────────────
 
@@ -64,30 +54,23 @@ export interface CreateCharacterParams {
 export function createCharacter(params: CreateCharacterParams, data: DataLoader): Character {
   // 1. Validate inputs
   const species = data.getSpecies(params.speciesId);
-  if (!species) {
-    throw new Error(`Invalid speciesId: "${params.speciesId}" not found in data`);
-  }
+  if (!species) throw new Error(`Invalid speciesId: "${params.speciesId}" not found in data`);
 
   const backgroundData = data.getBackground(params.backgroundId);
-  if (!backgroundData) {
-    throw new Error(`Invalid backgroundId: "${params.backgroundId}" not found in data`);
-  }
+  if (!backgroundData) throw new Error(`Invalid backgroundId: "${params.backgroundId}" not found in data`);
 
   const classData = data.getClass(params.classId);
-  if (!classData) {
-    throw new Error(`Invalid classId: "${params.classId}" not found in data`);
-  }
+  if (!classData) throw new Error(`Invalid classId: "${params.classId}" not found in data`);
 
   // Validate additional classes (multiclassing)
   const additionalClasses = params.additionalClasses ?? [];
   for (const additional of additionalClasses) {
-    const additionalClassData = data.getClass(additional.classId);
-    if (!additionalClassData) {
+    if (!data.getClass(additional.classId)) {
       throw new Error(`Invalid classId: "${additional.classId}" not found in data`);
     }
   }
 
-  // 2. Build AbilityScores
+  // 2. Build AbilityScores (featGrants computed by recomputeDerivedStats)
   const abilityScores: AbilityScores = {
     base: params.abilityScores,
     racialBonuses: species.abilityBonuses,
@@ -107,102 +90,49 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
       subclassLevel: params.subclassId ? primaryLevel : null,
       hitDice: { die: classData.hitDie, used: 0 },
     },
-    ...additionalClasses.map(ac => {
-      const acData = data.getClass(ac.classId)!;
-      return {
-        classId: ac.classId,
-        level: ac.level,
-        subclassId: ac.subclassId ?? null,
-        subclassLevel: ac.subclassId ? ac.level : null,
-        hitDice: { die: acData.hitDie, used: 0 },
-      };
-    }),
+    ...additionalClasses.map(ac => ({
+      classId: ac.classId,
+      level: ac.level,
+      subclassId: ac.subclassId ?? null,
+      subclassLevel: ac.subclassId ? ac.level : null,
+      hitDice: { die: data.getClass(ac.classId)!.hitDie, used: 0 },
+    })),
   ];
 
-  // Calculate total level
   const totalLevel = charClasses.reduce((sum, c) => sum + c.level, 0);
+  const pb = getProficiencyBonus(totalLevel);
 
-  // 4. Build Skills (use primary class for skill proficiencies)
+  // 4. Build Skills (not handled by recompute — set at creation/level-up)
   const skills = buildSkills(
     backgroundData.skillProficiencies,
     classData,
     params.skillChoices ?? []
   );
 
-  // 5. Calculate HP (sum from all classes)
-  const conMod = getModifier(getTotalScore(abilityScores, 'Constitution'));
-  let maxHP = calculateHPAtLevel1(classData.hitDie, conMod);
-
-  // Additional levels for primary class
-  for (let lv = 2; lv <= primaryLevel; lv++) {
-    maxHP += calculateHPIncrement(classData.hitDie, conMod);
-  }
-
-  // Add HP from additional classes
+  // 5. Build Resources (not handled by recompute — only added on creation/level-up)
+  const resources: Resource[] = extractResources(classData, primaryLevel, pb);
   for (const additional of additionalClasses) {
     const acData = data.getClass(additional.classId)!;
-    // First level of each additional class: max hit die + Con mod
-    maxHP += calculateHPAtLevel1(acData.hitDie, conMod);
-    // Additional levels: fixed value + Con mod for each level beyond 1
-    for (let lv = 2; lv <= additional.level; lv++) {
-      maxHP += calculateHPIncrement(acData.hitDie, conMod);
-    }
-  }
-
-  const hitPoints: HitPoints = {
-    max: maxHP,
-    current: maxHP,
-    temporary: 0,
-    deathSaves: { successes: 0, failures: 0, isStable: false },
-  };
-
-  // 6. Build Resources (extract from all classes)
-  // 计算熟练加值用于资源数量（某些资源如Action Surge随PB变化）
-  const pb = getProficiencyBonus(totalLevel);
-  let resources: Resource[] = extractResources(classData, primaryLevel, pb);
-  for (const additional of additionalClasses) {
-    const acData = data.getClass(additional.classId)!;
-    // 多职业时使用总等级计算PB
     const additionalPB = getProficiencyBonus(additional.level);
     const additionalResources = extractResources(acData, additional.level, additionalPB);
-    resources = [...resources, ...additionalResources];
+    resources.push(...additionalResources);
   }
 
-  // 7. Build Spells (handle multiclass spell slots)
-  let spells: CharacterSpells;
-
-  // Get subclass data if applicable
-  const subclass = params.subclassId ? data.getSubclass(params.subclassId) : undefined;
-
-  if (primaryLevel === 1 && !additionalClasses.length) {
-    // Single class level 1
-    spells = classData.spellcasting
-      ? buildInitialSpells(classData, abilityScores, data, subclass ?? undefined)
-      : emptyCharacterSpells();
-  } else {
-    // Multiclassing - calculate spell slots using multiclass rules
-    spells = buildMulticlassSpells(charClasses, abilityScores, data);
-  }
-
-  // 8. Build Currency
+  // 6. Build Currency
   const currency: Currency = {
-    cp: 0,
-    sp: 0,
-    ep: 0,
+    cp: 0, sp: 0, ep: 0,
     gp: backgroundData.startingGold,
     pp: 0,
   };
 
-  // 9. Build empty damage defenses
+  // 7. Empty defaults (recomputeDerivedStats will fill these)
   const emptyDamageDefenses: DamageDefenses = {
-    resistances: [],
-    immunities: [],
-    vulnerabilities: [],
+    resistances: [], immunities: [], vulnerabilities: [],
   };
 
   const now = new Date().toISOString();
-  
-  // Build partial character without combatStats
+
+  // Build character with minimal data — recompute fills all derived stats
   const partialChar: Character = {
     schemaVersion: '2024.1',
     name: params.name,
@@ -214,16 +144,15 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
     skills,
     feats: params.featIds ?? [],
     equipment: [],
-    spells,
+    spells: emptyCharacterSpells(),
     resources,
-    hitPoints,
+    hitPoints: {
+      max: 0, current: 0, temporary: 0,
+      deathSaves: { successes: 0, failures: 0, isStable: false },
+    },
     combatStats: {
-      AC: 10,
-      initiative: 0,
-      speed: species.speed,
-      passivePerception: 10,
-      proficiencyBonus: pb,
-      attacks: [],
+      AC: 10, initiative: 0, speed: species.speed,
+      passivePerception: 10, proficiencyBonus: pb, attacks: [],
     },
     currency,
     conditions: [],
@@ -232,9 +161,17 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
     createdAt: now,
     updatedAt: now,
   };
-  
-  // Use recomputeDerivedStats as single source of truth for derived stats and grants
-  return recomputeDerivedStats(partialChar, data);
+
+  // Single source of truth for all derived stats
+  const char = recomputeDerivedStats(partialChar, data);
+  // Set current HP to max on creation (recompute never heals)
+  return {
+    ...char,
+    hitPoints: {
+      ...char.hitPoints,
+      current: char.hitPoints.max,
+    },
+  };
 }
 
 // ── Helper Functions ──────────────────────────────────────────
@@ -249,305 +186,31 @@ export function isProficient(
   classData: Class,
   skillChoices: readonly string[]
 ): boolean {
-  // 背景授予的技能熟练
-  if (backgroundSkillProficiencies.includes(skillName)) {
-    return true;
-  }
+  if (backgroundSkillProficiencies.includes(skillName)) return true;
 
-  // 职业特性中1级授予的技能熟练
   // TODO: Parse feature.grantedSkills or similar field when Feature type supports it
-  // Currently, class features that grant fixed skill proficiencies (e.g., Rogue's Thieves' Tools)
-  // are not automatically detected. The caller must pass them via skillChoices.
+  // Currently, class features that grant fixed skill proficiencies are not auto-detected.
+  // The caller must pass them via skillChoices.
 
-  // 用户选择的职业技能
-  if (skillChoices.includes(skillName)) {
-    return true;
-  }
-
+  if (skillChoices.includes(skillName)) return true;
   return false;
 }
 
-/**
- * 构建所有18个技能的熟练状态
- */
+/** 构建所有18个技能的熟练状态 */
 function buildSkills(
   backgroundSkillProficiencies: readonly string[],
   classData: Class,
   skillChoices: readonly string[]
 ): Record<string, SkillEntry> {
   const skills: Record<string, SkillEntry> = {};
-  for (const skillName of SKILL_NAMES) {
+  for (const skillName of ['Athletics', 'Acrobatics', 'Animal Handling',
+    'Arcana', 'Deception', 'History', 'Insight', 'Intimidation',
+    'Investigation', 'Medicine', 'Nature', 'Perception', 'Performance',
+    'Persuasion', 'Religion', 'Sleight of Hand', 'Stealth', 'Survival']) {
     skills[skillName] = {
       proficient: isProficient(skillName, backgroundSkillProficiencies, classData, skillChoices),
       expertise: false,
     };
   }
   return skills;
-}
-
-/**
- * 构建施法职业的初始法术数据（每职业追踪）
- */
-export function buildInitialSpells(
-  classData: Class,
-  abilityScores: AbilityScores,
-  data: DataLoader,
-  subclass?: import('../types/class').Subclass
-): CharacterSpells {
-  const spellcasting = classData.spellcasting!;
-  const ability = spellcasting.ability;
-  const pb = getProficiencyBonus(1);
-  const abilityMod = getModifier(getTotalScore(abilityScores, ability));
-
-  const spellSaveDC = 8 + pb + abilityMod;
-  const spellAttackBonus = pb + abilityMod;
-
-  // Calculate spell slots first to determine max spell level character can cast
-  const slots = calculateSpellSlots(classData.id, 1, data);
-  const maxSpellLevel = getMaxSpellLevel(slots);
-
-  // Get max cantrips known from class table (SRD 5.2)
-  const level1Entry = classData.featuresByLevel.find(f => f.level === 1);
-  const maxCantripsKnown = level1Entry?.cantripsKnown ?? 0;
-
-  // For known casters (Sorcerer, Bard, Warlock):
-  // - knownSpells: chosen spells including cantrips (limited number)
-  // For class_list casters (Cleric, Druid):
-  // - knownCantrips: limited number (player must choose), starts empty
-  // - knownSpells: ALL level 1+ spells on class list (they "know" them all)
-  // For spellbook casters (Wizard):
-  // - knownCantrips: limited number, starts empty
-  // - knownSpells: only spells in spellbook
-  let knownCantrips: readonly string[] = [];
-  let knownSpells: readonly string[] = [];
-
-  if (spellcasting.knownSource === 'class_list') {
-    // Class list casters: auto-populate level 1+ spells from class list
-    knownSpells = data.getAllSpells()
-      .filter(s => s.classes?.includes(classData.id) && s.level >= 1 && s.level <= maxSpellLevel)
-      .map(s => s.id);
-  } else if (spellcasting.knownSource === 'spellbook') {
-    // Wizard: starts with empty spellbook (cantrips and spells added separately)
-    knownCantrips = [];
-    knownSpells = [];
-  }
-
-  // Auto-populate alwaysPreparedSpells from subclass (domain/oath spells)
-  let alwaysPreparedSpells: readonly string[] = [];
-  if (subclass) {
-    alwaysPreparedSpells = getAlwaysPreparedSpellsFromSubclass(subclass, 1);
-  }
-
-  // 从职业特性表中读取可准备法术数量（SRD 5.2 使用表格数值，非常规公式）
-  const maxPrepared = level1Entry?.preparedSpells ?? 0;
-
-  const classSpellData: ClassSpellData = {
-    classId: classData.id,
-    spellcastingAbility: ability,
-    spellSaveDC,
-    spellAttackBonus,
-    knownCantrips,
-    maxCantripsKnown,
-    knownSpells,
-    preparedSpells: [],
-    alwaysPreparedSpells,
-    maxPrepared,
-  };
-
-  // 计算法术位
-  const spellSlots: Record<SpellLevel, SpellSlotEntry> = {} as Record<SpellLevel, SpellSlotEntry>;
-  spellSlots[0] = { total: 0, used: 0 }; // cantrips
-  for (let level = 1; level <= 9; level++) {
-    spellSlots[level as SpellLevel] = slots[level] ?? { total: 0, used: 0 };
-  }
-
-  // Pact Magic (Warlock)
-  let pactMagicSlots: PactMagicSlots | null = null;
-  if (classData.id === 'Warlock') {
-    const pact = calculatePactMagic(1, data);
-    if (pact) {
-      pactMagicSlots = {
-        level: pact.slotLevel,
-        total: pact.slots,
-        used: 0,
-        resetOn: 'Short Rest',
-      };
-    }
-  }
-
-  return {
-    classSpellcasting: { [classData.id]: classSpellData },
-    spellSlots,
-    pactMagicSlots,
-  };
-}
-
-/**
- * 创建空法术数据（非施法职业）
- */
-export function emptyCharacterSpells(): CharacterSpells {
-  const spellSlots: Record<SpellLevel, SpellSlotEntry> = {} as Record<SpellLevel, SpellSlotEntry>;
-  for (let level = 0; level <= 9; level++) {
-    spellSlots[level as SpellLevel] = { total: 0, used: 0 };
-  }
-  return {
-    classSpellcasting: {},
-    spellSlots,
-    pactMagicSlots: null,
-  };
-}
-
-// ── Helper Functions for Multiclassing ─────────────────────────
-
-/** Gather all features from all classes */
-function gatherAllFeatures(classes: CharacterClass[], data: DataLoader): Feature[] {
-  const features: Feature[] = [];
-  for (const charClass of classes) {
-    const classData = data.getClass(charClass.classId);
-    if (!classData) continue;
-
-    for (let lv = 1; lv <= charClass.level; lv++) {
-      features.push(...getFeaturesAtLevel(classData, lv));
-    }
-
-    // Add subclass features
-    if (charClass.subclassId) {
-      const subclass = data.getSubclass(charClass.subclassId);
-      if (subclass) {
-        for (const entry of subclass.featuresByLevel) {
-          if (entry.level <= charClass.level) {
-            features.push(...entry.features);
-          }
-        }
-      }
-    }
-  }
-  return features;
-}
-
-/** Build spells for multiclass characters (per-class tracking) */
-function buildMulticlassSpells(
-  classes: CharacterClass[],
-  abilityScores: AbilityScores,
-  data: DataLoader
-): CharacterSpells {
-  // Check if any class is a spellcaster
-  const hasSpellcaster = classes.some(c => {
-    const classData = data.getClass(c.classId);
-    return classData?.spellcasting;
-  });
-
-  if (!hasSpellcaster) {
-    return emptyCharacterSpells();
-  }
-
-  const totalLevel = classes.reduce((sum, c) => sum + c.level, 0);
-  const pb = getProficiencyBonus(totalLevel);
-
-  // Calculate multiclass spell slots first to determine max spell level
-  const totalSpellcastingLevel = getMulticlassSpellcasterLevel(classes, data);
-  const spellSlots = totalSpellcastingLevel > 0
-    ? calculateMulticlassSpellSlots(totalSpellcastingLevel, data)
-    : createEmptySpellSlots();
-  const maxSpellLevel = getMaxSpellLevel(spellSlots);
-
-  const classSpellcasting: Record<string, ClassSpellData> = {};
-
-  // Build per-class spell data
-  for (const charClass of classes) {
-    const classData = data.getClass(charClass.classId);
-    if (!classData?.spellcasting) continue;
-
-    const ability = classData.spellcasting.ability;
-    const abilityMod = getModifier(getTotalScore(abilityScores, ability));
-    const spellSaveDC = 8 + pb + abilityMod;
-    const spellAttackBonus = pb + abilityMod;
-
-    // Calculate per-class max spell level for filtering known spells
-    const classSlots = calculateSpellSlots(charClass.classId, charClass.level, data);
-    const classMaxSpellLevel = getMaxSpellLevel(classSlots);
-
-    // Get max cantrips known from class table (SRD 5.2)
-    const levelEntry = classData.featuresByLevel.find(f => f.level === charClass.level);
-    const maxCantripsKnown = levelEntry?.cantripsKnown ?? 0;
-
-    // For new classes, knownCantrips starts empty (player must choose)
-    let knownCantrips: readonly string[] = [];
-    let knownSpells: readonly string[] = [];
-
-    // Auto-populate knownSpells for class_list casters (Cleric, Druid, etc.)
-    // Only include spells they can actually cast (level 1+ up to per-class max spell level)
-    if (classData.spellcasting?.knownSource === 'class_list') {
-      knownSpells = data.getAllSpells()
-        .filter(s => s.classes?.includes(charClass.classId) && s.level >= 1 && s.level <= classMaxSpellLevel)
-        .map(s => s.id);
-    }
-
-    // Auto-populate alwaysPreparedSpells from subclass (domain/oath spells)
-    let alwaysPreparedSpells: readonly string[] = [];
-    if (charClass.subclassId) {
-      const subclass = data.getSubclass(charClass.subclassId);
-      if (subclass) {
-        alwaysPreparedSpells = getAlwaysPreparedSpellsFromSubclass(subclass, charClass.level);
-      }
-    }
-
-    // 从职业特性表中读取可准备法术数量（SRD 5.2 使用表格数值，非常规公式）
-    const maxPrepared = levelEntry?.preparedSpells ?? 0;
-
-    classSpellcasting[charClass.classId] = {
-      classId: charClass.classId,
-      spellcastingAbility: ability,
-      spellSaveDC,
-      spellAttackBonus,
-      knownCantrips,
-      maxCantripsKnown,
-      knownSpells,
-      preparedSpells: [],
-      alwaysPreparedSpells,
-      maxPrepared,
-    };
-  }
-
-  // Handle Warlock Pact Magic
-  let pactMagicSlots: PactMagicSlots | null = null;
-  const warlockClass = classes.find(c => c.classId === 'Warlock');
-  if (warlockClass) {
-    const pact = calculatePactMagic(warlockClass.level, data);
-    if (pact) {
-      pactMagicSlots = {
-        level: pact.slotLevel,
-        total: pact.slots,
-        used: 0,
-        resetOn: 'Short Rest',
-      };
-    }
-  }
-
-  return {
-    classSpellcasting,
-    spellSlots,
-    pactMagicSlots,
-  };
-}
-
-/** Get the maximum spell level the character can cast based on spell slots */
-function getMaxSpellLevel(slots: Record<number, SpellSlotEntry>): number {
-  let maxLevel = 0;
-  for (let level = 1; level <= 9; level++) {
-    const entry = slots[level];
-    if (entry && entry.total > 0) {
-      maxLevel = level;
-    }
-  }
-  return maxLevel;
-}
-
-/** Create empty spell slots record */
-function createEmptySpellSlots(): Record<SpellLevel, SpellSlotEntry> {
-  const slots: Record<SpellLevel, SpellSlotEntry> = {} as Record<SpellLevel, SpellSlotEntry>;
-  for (let level = 0; level <= 9; level++) {
-    slots[level as SpellLevel] = { total: 0, used: 0 };
-  }
-  return slots;
 }

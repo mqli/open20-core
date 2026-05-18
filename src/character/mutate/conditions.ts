@@ -5,8 +5,7 @@ import type { Character, ConditionName, ActiveCondition } from '../../types/char
 import type { DataLoader } from '../../data/loader';
 import type { RandomProvider } from '../../dice/core';
 import type { ConcentrationCheckResult } from '../../engine/concentration';
-import { isConcentrating, getConcentratingSpellId, calculateConcentrationDC } from '../../engine/concentration';
-import { isCantrip as isCantripSpell } from '../spell-casting';
+import { isConcentrating, calculateConcentrationDC } from '../../engine/concentration';
 import { getModifier, getTotalScore } from '../../engine/ability-modifier';
 import { rollSavingThrow } from '../../dice/mechanics';
 import { withUpdate } from './hp';

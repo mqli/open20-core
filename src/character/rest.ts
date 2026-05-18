@@ -3,7 +3,6 @@
 // Corresponds to HLD §6.2
 
 import type { Character, CharacterClass } from '../types/character';
-import type { DieType } from '../types/dice';
 import type { Resource } from '../types/resource';
 import { ResetType } from '../types/resource';
 import type { DataLoader } from '../data/loader';
