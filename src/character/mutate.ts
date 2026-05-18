@@ -20,6 +20,7 @@ import {
   calculateConcentrationDC,
   type ConcentrationCheckResult,
 } from '../engine/concentration';
+import { isCantrip as isCantripSpell } from '../engine/spell-casting';
 // calculateTypedDamage is used in applyTypedDamage function
 import { applyHPChange, applyTypedDamageToHP, setTemporaryHPShared } from '../engine/combat';
 import { recomputeDerivedStats } from './recompute';
@@ -544,13 +545,23 @@ export function removeEquipment(char: Character, itemId: string): Character {
 export function prepareSpellForClass(
   char: Character,
   classId: string,
-  spellId: string
+  spellId: string,
+  data?: DataLoader
 ): Character {
   const classSpellcasting = { ...char.spells.classSpellcasting };
   const classData = classSpellcasting[classId];
 
   if (!classData) return char;
   if (classData.preparedSpells.includes(spellId)) return char;
+
+  // Validate: cannot prepare cantrips (level 0)
+  // Cantrips are always known and castable at will
+  if (data) {
+    const spell = data.getSpell(spellId);
+    if (spell && isCantripSpell(spell)) {
+      return char;
+    }
+  }
 
   // Check if we've hit the max prepared limit
   const alwaysPrepared = classData.alwaysPreparedSpells ?? [];

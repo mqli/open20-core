@@ -142,6 +142,7 @@ export {
   isSpellbookCaster,
   canChangeSpellsOnLongRest,
   canChangeSpellsOnLevelUp,
+  canCastSpell,
 } from './spells';
 
 // ── Monsters (query + combat) ─────────────────────────

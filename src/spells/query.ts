@@ -232,6 +232,28 @@ export function knowsSpell(char: Character, spellId: string): boolean {
 }
 
 /**
+ * Check if a character can cast a spell (cantrip or level 1+)
+ * - Cantrips: check if known (can cast at will)
+ * - Level 1+ spells: check if prepared
+ *
+ * @param char - Character object
+ * @param spell - Spell to check
+ * @param data - DataLoader
+ * @returns True if the character can cast the spell
+ *
+ * @example
+ * canCastSpell(char, spell, data) // true if cantrip (known) or level 1+ (prepared)
+ */
+export function canCastSpell(char: Character, spell: Spell, data: DataLoader): boolean {
+  if (spell.level === 0) {
+    // Cantrip - check if known
+    return knowsSpell(char, spell.id);
+  }
+  // Level 1+ - check if prepared
+  return isSpellPrepared(char, spell.id);
+}
+
+/**
  * Get the class spell data for a specific class
  *
  * @param char - Character object

@@ -19,4 +19,5 @@ export {
   isSpellbookCaster,
   canChangeSpellsOnLongRest,
   canChangeSpellsOnLevelUp,
+  canCastSpell,
 } from './query';
