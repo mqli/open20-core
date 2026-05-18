@@ -11,14 +11,24 @@ import { calculateSpellSlots } from '../engine/spell-slots';
 
 // ── Spellcasting Type Helpers ──────────────────────────────
 
-/** Check if a class is a preparation caster (Cleric, Druid, Wizard, Paladin, Ranger) */
-export function isPreparationCaster(classData: Class): boolean {
-  return classData.spellcasting?.type === 'preparation';
+/** Check if a class knows spells from class list (Cleric, Druid, Paladin, Ranger, Bard, Sorcerer) */
+export function isClassListCaster(classData: Class): boolean {
+  return classData.spellcasting?.knownSource === 'class_list';
 }
 
-/** Check if a class is a known caster (Bard, Sorcerer, Warlock) */
-export function isKnownCaster(classData: Class): boolean {
-  return classData.spellcasting?.type === 'known';
+/** Check if a class uses spellbook (Wizard) */
+export function isSpellbookCaster(classData: Class): boolean {
+  return classData.spellcasting?.knownSource === 'spellbook';
+}
+
+/** Check if a class can change prepared spells after Long Rest */
+export function canChangeSpellsOnLongRest(classData: Class): boolean {
+  return classData.spellcasting?.preparationTiming === 'long_rest';
+}
+
+/** Check if a class can only change prepared spells on level up */
+export function canChangeSpellsOnLevelUp(classData: Class): boolean {
+  return classData.spellcasting?.preparationTiming === 'level_up';
 }
 
 // ── SpellFilter Interface ────────────────────────────────────

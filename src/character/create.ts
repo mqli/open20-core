@@ -331,10 +331,10 @@ export function buildInitialSpells(
   const slots = calculateSpellSlots(classData.id, 1, data);
   const maxSpellLevel = getMaxSpellLevel(slots);
 
-  // Auto-populate knownSpells for class_list casters (Cleric, Druid)
+  // Auto-populate knownSpells for class_list casters (Cleric, Druid, etc.)
   // Only include spells they can actually cast (cantrips + up to max spell level)
   let knownSpells: readonly string[] = [];
-  if (spellcasting.type === 'preparation' && spellcasting.knownSource === 'class_list') {
+  if (spellcasting.knownSource === 'class_list') {
     knownSpells = data.getAllSpells()
       .filter(s => s.classes?.includes(classData.id) && (s.level === 0 || s.level <= maxSpellLevel))
       .map(s => s.id);
@@ -556,10 +556,10 @@ function buildMulticlassSpells(
     const classSlots = calculateSpellSlots(charClass.classId, charClass.level, data);
     const classMaxSpellLevel = getMaxSpellLevel(classSlots);
 
-    // Auto-populate knownSpells for class_list casters (Cleric, Druid)
+    // Auto-populate knownSpells for class_list casters (Cleric, Druid, etc.)
     // Only include spells they can actually cast (cantrips + up to per-class max spell level)
     let knownSpells: readonly string[] = [];
-    if (classData.spellcasting.type === 'preparation' && classData.spellcasting.knownSource === 'class_list') {
+    if (classData.spellcasting?.knownSource === 'class_list') {
       knownSpells = data.getAllSpells()
         .filter(s => s.classes?.includes(charClass.classId) && (s.level === 0 || s.level <= classMaxSpellLevel))
         .map(s => s.id);

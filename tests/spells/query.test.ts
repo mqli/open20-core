@@ -12,8 +12,10 @@ import {
   getClassSpellData,
   knowsSpellForClass,
   isSpellPreparedForClass,
-  isPreparationCaster,
-  isKnownCaster,
+  isClassListCaster,
+  isSpellbookCaster,
+  canChangeSpellsOnLongRest,
+  canChangeSpellsOnLevelUp,
   getKnownSpellsForClass,
 } from '../../src/spells/query';
 import type { DataLoader } from '../../src/data/loader';
@@ -109,10 +111,10 @@ const MOCK_WIZARD_CLASS: Class = {
   weaponMastery: false,
   featuresByLevel: [],
   spellcasting: {
-    type: 'preparation',
     ability: 'Intelligence' as any,
     knownSource: 'spellbook',
-    changesPerRest: 'all',
+    preparationTiming: 'long_rest',
+    changesPerPreparation: 'all',
   },
 };
 
@@ -127,10 +129,10 @@ const MOCK_CLERIC_CLASS: Class = {
   weaponMastery: false,
   featuresByLevel: [],
   spellcasting: {
-    type: 'preparation',
     ability: 'Wisdom' as any,
     knownSource: 'class_list',
-    changesPerRest: 'all',
+    preparationTiming: 'long_rest',
+    changesPerPreparation: 'all',
   },
 };
 
@@ -145,9 +147,10 @@ const MOCK_BARD_CLASS: Class = {
   weaponMastery: false,
   featuresByLevel: [],
   spellcasting: {
-    type: 'known',
     ability: 'Charisma' as any,
-    changesPerLevel: 1,
+    knownSource: 'class_list',
+    preparationTiming: 'level_up',
+    changesPerPreparation: 'all',
   },
 };
 
@@ -395,35 +398,67 @@ describe('isSpellPreparedForClass', () => {
   });
 });
 
-describe('isPreparationCaster', () => {
-  it('should return true for Wizard (preparation caster)', () => {
-    expect(isPreparationCaster(MOCK_WIZARD_CLASS)).toBe(true);
+describe('isClassListCaster', () => {
+  it('should return true for Cleric (class_list caster)', () => {
+    expect(isClassListCaster(MOCK_CLERIC_CLASS)).toBe(true);
   });
 
-  it('should return true for Cleric (preparation caster)', () => {
-    expect(isPreparationCaster(MOCK_CLERIC_CLASS)).toBe(true);
+  it('should return true for Bard (class_list caster)', () => {
+    expect(isClassListCaster(MOCK_BARD_CLASS)).toBe(true);
   });
 
-  it('should return false for Bard (known caster)', () => {
-    expect(isPreparationCaster(MOCK_BARD_CLASS)).toBe(false);
+  it('should return false for Wizard (spellbook caster)', () => {
+    expect(isClassListCaster(MOCK_WIZARD_CLASS)).toBe(false);
   });
 
   it('should return false for Fighter (non-caster)', () => {
-    expect(isPreparationCaster(MOCK_FIGHTER_CLASS)).toBe(false);
+    expect(isClassListCaster(MOCK_FIGHTER_CLASS)).toBe(false);
   });
 });
 
-describe('isKnownCaster', () => {
-  it('should return true for Bard (known caster)', () => {
-    expect(isKnownCaster(MOCK_BARD_CLASS)).toBe(true);
+describe('isSpellbookCaster', () => {
+  it('should return true for Wizard (spellbook caster)', () => {
+    expect(isSpellbookCaster(MOCK_WIZARD_CLASS)).toBe(true);
   });
 
-  it('should return false for Wizard (preparation caster)', () => {
-    expect(isKnownCaster(MOCK_WIZARD_CLASS)).toBe(false);
+  it('should return false for Cleric (class_list caster)', () => {
+    expect(isSpellbookCaster(MOCK_CLERIC_CLASS)).toBe(false);
   });
 
   it('should return false for Fighter (non-caster)', () => {
-    expect(isKnownCaster(MOCK_FIGHTER_CLASS)).toBe(false);
+    expect(isSpellbookCaster(MOCK_FIGHTER_CLASS)).toBe(false);
+  });
+});
+
+describe('canChangeSpellsOnLongRest', () => {
+  it('should return true for Wizard (long_rest timing)', () => {
+    expect(canChangeSpellsOnLongRest(MOCK_WIZARD_CLASS)).toBe(true);
+  });
+
+  it('should return true for Cleric (long_rest timing)', () => {
+    expect(canChangeSpellsOnLongRest(MOCK_CLERIC_CLASS)).toBe(true);
+  });
+
+  it('should return false for Bard (level_up timing)', () => {
+    expect(canChangeSpellsOnLongRest(MOCK_BARD_CLASS)).toBe(false);
+  });
+
+  it('should return false for Fighter (non-caster)', () => {
+    expect(canChangeSpellsOnLongRest(MOCK_FIGHTER_CLASS)).toBe(false);
+  });
+});
+
+describe('canChangeSpellsOnLevelUp', () => {
+  it('should return true for Bard (level_up timing)', () => {
+    expect(canChangeSpellsOnLevelUp(MOCK_BARD_CLASS)).toBe(true);
+  });
+
+  it('should return false for Wizard (long_rest timing)', () => {
+    expect(canChangeSpellsOnLevelUp(MOCK_WIZARD_CLASS)).toBe(false);
+  });
+
+  it('should return false for Fighter (non-caster)', () => {
+    expect(canChangeSpellsOnLevelUp(MOCK_FIGHTER_CLASS)).toBe(false);
   });
 });
 
