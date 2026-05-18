@@ -214,6 +214,19 @@ function parseMarkdown(content: string): ParsedSpell[] {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
+    // Skip section headers like "### H Spells" or "## Spells"
+    if (line.startsWith('#') && !line.startsWith('####')) {
+      // Save previous spell before starting new section
+      if (currentSpell && currentSpell.name) {
+        currentSpell.descriptionLines = descriptionLines;
+        spells.push(currentSpell as ParsedSpell);
+      }
+      currentSpell = null;
+      inDescription = false;
+      descriptionLines = [];
+      continue;
+    }
+
     // New spell starts with ####
     if (line.startsWith('####')) {
       // Save previous spell
@@ -303,9 +316,9 @@ function parseMarkdown(content: string): ParsedSpell[] {
       continue;
     }
 
-    // Skip empty lines
+    // Skip empty lines when not in description
     if (!line.trim()) {
-      if (descriptionLines.length > 0 && inDescription) {
+      if (inDescription) {
         descriptionLines.push('');
       }
       continue;

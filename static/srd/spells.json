@@ -175,9 +175,7 @@
       "",
       "**_Sensory Effect._** You create a harmless sensory effect, such as falling leaves, spectral dancing fairies, a gentle breeze, the sound of an animal, or the faint odor of skunk. The effect must fit in a 5-foot Cube.",
       "",
-      "**_Fire Play._** You light or snuff out a candle, a torch, or a campfire.",
-      "",
-      "### E Spells"
+      "**_Fire Play._** You light or snuff out a candle, a torch, or a campfire."
     ],
     "source": "SRD 5.2",
     "classes": [
@@ -1286,9 +1284,7 @@
     "description": [
       "A thin sheet of flames shoots forth from you. Each creature in a 15-foot Cone makes a Dexterity saving throw, taking 3d6 Fire damage on a failed save or half as much damage on a successful one.",
       "",
-      "Flammable objects in the Cone that aren't being worn or carried start burning.",
-      "",
-      "### C Spells"
+      "Flammable objects in the Cone that aren't being worn or carried start burning."
     ],
     "source": "SRD 5.2",
     "classes": [
@@ -1509,9 +1505,7 @@
     "concentration": false,
     "ritual": false,
     "description": [
-      "A creature you touch regains a number of Hit Points equal to 2d8 plus your spellcasting ability modifier.",
-      "",
-      "### D Spells"
+      "A creature you touch regains a number of Hit Points equal to 2d8 plus your spellcasting ability modifier."
     ],
     "source": "SRD 5.2",
     "classes": [
@@ -2452,9 +2446,7 @@
     "concentration": false,
     "ritual": false,
     "description": [
-      "You touch a creature. The target's Speed increases by 10 feet until the spell ends.",
-      "",
-      "### M and N Spells"
+      "You touch a creature. The target's Speed increases by 10 feet until the spell ends."
     ],
     "source": "SRD 5.2",
     "classes": [
@@ -2568,9 +2560,7 @@
     "concentration": false,
     "ritual": true,
     "description": [
-      "You remove poison and rot from nonmagical food and drink in a 5-foot-radius Sphere centered on a point within range.",
-      "",
-      "### R Spells"
+      "You remove poison and rot from nonmagical food and drink in a 5-foot-radius Sphere centered on a point within range."
     ],
     "source": "SRD 5.2",
     "classes": [
@@ -3672,9 +3662,7 @@
       "",
       "The gust disperses gas or vapor, and it extinguishes candles and similar unprotected flames in the area. It causes protected flames, such as those of lanterns, to dance wildly and has a 50 percent chance to extinguish them.",
       "",
-      "As a Bonus Action on your later turns, you can change the direction in which the Line blasts from you.",
-      "",
-      "### H Spells"
+      "As a Bonus Action on your later turns, you can change the direction in which the Line blasts from you."
     ],
     "source": "SRD 5.2",
     "classes": [
@@ -3777,9 +3765,7 @@
     "concentration": true,
     "ritual": false,
     "description": [
-      "A creature you touch has the Invisible condition until the spell ends. The spell ends early immediately after the target makes an attack roll, deals damage, or casts a spell.",
-      "",
-      "### J,K and L Spells"
+      "A creature you touch has the Invisible condition until the spell ends. The spell ends early immediately after the target makes an attack roll, deals damage, or casts a spell."
     ],
     "source": "SRD 5.2",
     "classes": [
@@ -4262,9 +4248,7 @@
     "description": [
       "You touch a rope. One end of it hovers upward until the rope hangs perpendicular to the ground or the rope reaches a ceiling. At the rope's upper end, an Invisible 3-foot-by-5-foot portal opens to an extradimensional space that lasts until the spell ends. That space can be reached by climbing the rope, which can be pulled into or dropped out of it.",
       "",
-      "The space can hold up to eight Medium or smaller creatures. Attacks, spells, and other effects can't pass into or out of the space, but creatures inside it can see through the portal. Anything inside the space drops out when the spell ends.",
-      "",
-      "### S Spells"
+      "The space can hold up to eight Medium or smaller creatures. Attacks, spells, and other effects can't pass into or out of the space, but creatures inside it can see through the portal. Anything inside the space drops out when the spell ends."
     ],
     "source": "SRD 5.2",
     "classes": [
@@ -5212,9 +5196,7 @@
     "description": [
       "You create a twisting pattern of colors in a 30-foot Cube within range. The pattern appears for a moment and vanishes. Each creature in the area who can see the pattern must succeed on a Wisdom saving throw or have the Charmed condition for the duration. While Charmed, the creature has the Incapacitated condition and a Speed of 0.",
       "",
-      "The spell ends for an affected creature if it takes any damage or if someone else uses an action to shake the creature out of its stupor.",
-      "",
-      "### I Spells"
+      "The spell ends for an affected creature if it takes any damage or if someone else uses an action to shake the creature out of its stupor."
     ],
     "source": "SRD 5.2",
     "classes": [
@@ -5420,9 +5402,7 @@
     "concentration": false,
     "ritual": false,
     "description": [
-      "For the duration, you hide a target that you touch from Divination spells. The target can be a willing creature, or it can be a place or an object no larger than 10 feet in any dimension. The target can't be targeted by any Divination spell or perceived through magical scrying sensors.",
-      "",
-      "### P Spells"
+      "For the duration, you hide a target that you touch from Divination spells. The target can be a willing creature, or it can be a place or an object no larger than 10 feet in any dimension. The target can't be targeted by any Divination spell or perceived through magical scrying sensors."
     ],
     "source": "SRD 5.2",
     "classes": [
@@ -6553,6 +6533,37 @@
     }
   },
   {
+    "id": "freedom-of-movement",
+    "name": "Freedom of Movement",
+    "level": 4,
+    "school": "Abjuration",
+    "castingTime": "Action",
+    "range": "Touch",
+    "components": [
+      "V",
+      "S",
+      "M"
+    ],
+    "duration": "kj 1 hour",
+    "concentration": false,
+    "ritual": false,
+    "description": [
+      "You touch a willing creature. For the duration, the target's movement is unaffected by Difficult Terrain, and spells and other magical effects can neither reduce the target's Speed nor cause the target to have the Paralyzed or Restrained conditions. The target also has a Swim Speed equal to its Speed.",
+      "",
+      "In addition, the target can spend 5 feet of movement to automatically escape from nonmagical restraints, such as manacles or a creature imposing the Grappled condition on it."
+    ],
+    "source": "SRD 5.2",
+    "classes": [
+      "Bard",
+      "Cleric",
+      "Druid",
+      "Ranger"
+    ],
+    "usingAHigherLevelSpellSlot": [
+      "You can target one additional creature for each spell slot level above 4."
+    ]
+  },
+  {
     "id": "giant-insect",
     "name": "Giant Insect",
     "level": 4,
@@ -7255,9 +7266,7 @@
     "description": [
       "You spend the casting time tracing magical pathways within a precious gemstone, and then touch the target. The target must be either a Beast or Plant creature with an Intelligence of 3 or less or a natural plant that isn't a creature. The target gains an Intelligence of 10 and the ability to speak one language you know. If the target is a natural plant, it becomes a Plant creature and gains the ability to move its limbs, roots, vines, creepers, and so forth, and it gains senses similar to a human's. The GM chooses statistics appropriate for the awakened Plant, such as the statistics for the **Awakened Shrub** or **Awakened Tree** in \"Monsters.\"",
       "",
-      "The awakened target has the Charmed condition for 30 days or until you or your allies deal damage to it. When that condition ends, the awakened creature chooses its attitude toward you.",
-      "",
-      "### B Spells"
+      "The awakened target has the Charmed condition for 30 days or until you or your allies deal damage to it. When that condition ends, the awakened creature chooses its attitude toward you."
     ],
     "source": "SRD 5.2",
     "classes": [
@@ -8701,9 +8710,7 @@
       "",
       "**_Panicked._** The target has the Frightened condition. On each of its turns, the Frightened target must take the Dash action and move away from you by the safest and shortest route available. If the target moves to a space at least 60 feet away from you where it can't see you, this effect ends.",
       "",
-      "**_Sickened._** The target has the Poisoned condition.",
-      "",
-      "### F Spells"
+      "**_Sickened._** The target has the Poisoned condition."
     ],
     "source": "SRD 5.2",
     "classes": [
@@ -8807,60 +8814,6 @@
         }
       ]
     }
-  },
-  {
-    "id": "freedom-of-movement",
-    "name": "Freedom of Movement",
-    "level": 6,
-    "school": "Evocation",
-    "castingTime": "Action",
-    "range": "300 feet",
-    "components": [
-      "V",
-      "S",
-      "M"
-    ],
-    "duration": "Instantaneous",
-    "concentration": false,
-    "ritual": false,
-    "description": [
-      "You touch a willing creature. For the duration, the target's movement is unaffected by Difficult Terrain, and spells and other magical effects can neither reduce the target's Speed nor cause the target to have the Paralyzed or Restrained conditions. The target also has a Swim Speed equal to its Speed.",
-      "",
-      "In addition, the target can spend 5 feet of movement to automatically escape from nonmagical restraints, such as manacles or a creature imposing the Grappled condition on it.",
-      "",
-      "### Freezing Sphere",
-      "",
-      "A frigid globe streaks from you to a point of your choice within range, where it explodes in a 60-foot-radius Sphere. Each creature in that area makes a Constitution saving throw, taking 10d6 Cold damage on failed save or half as much damage on a successful one.",
-      "",
-      "If the globe strikes a body of water, it freezes the water to a depth of 6 inches over an area 30 feet square. This ice lasts for 1 minute. Creatures that were swimming on the surface of frozen water are trapped in the ice and have the Restrained condition. A trapped creature can take an action to make a Strength (Athletics) check against your spell save DC to break free.",
-      "",
-      "You can refrain from firing the globe after completing the spell's casting. If you do so, a globe about the size of a sling bullet, cool to the touch, appears in your hand. At any time, you or a creature you give the globe to can throw the globe (to a range of 40 feet) or hurl it with a sling (to the sling's normal range). It shatters on impact, with the same effect as a normal casting of the spell. You can also set the globe down without shattering it. After 1 minute, if the globe hasn't already shattered, it explodes.",
-      "",
-      "### G Spells"
-    ],
-    "source": "SRD 5.2",
-    "classes": [
-      "Sorcerer",
-      "Wizard"
-    ],
-    "usingAHigherLevelSpellSlot": [
-      "*Using a Higher-Level Spell Slot.* The damage increases by 1d6 for each spell slot level above 6."
-    ],
-    "damage": {
-      "entries": [
-        {
-          "dice": "10d6",
-          "type": "Cold"
-        }
-      ],
-      "perSlot": [
-        {
-          "dice": "1d6",
-          "type": "Cold"
-        }
-      ]
-    },
-    "save": "Strength"
   },
   {
     "id": "globe-of-invulnerability",
@@ -10094,9 +10047,7 @@
       "",
       "**_Sleep._** Each target must succeed on a Wisdom saving throw or have the Unconscious condition for 10 minutes. A creature awakens if it takes damage or if someone takes an action to shake it awake.",
       "",
-      "**_Stunning._** Each target must succeed on a Wisdom saving throw or have the Stunned condition for 1 minute.",
-      "",
-      "### T Spells"
+      "**_Stunning._** Each target must succeed on a Wisdom saving throw or have the Stunned condition for 1 minute."
     ],
     "source": "SRD 5.2",
     "classes": [
@@ -10708,9 +10659,7 @@
       "",
       "At the start of each of your turns after the wall appears, the wall, along with any creatures in it, moves 50 feet away from you. Any Huge or smaller creature inside the wall or whose space the wall enters when it moves must succeed on a Strength saving throw or take 5d10 Bludgeoning damage. A creature can take this damage only once per round. At the end of the turn, the wall's height is reduced by 50 feet, and the damage the wall deals on later rounds is reduced by 1d10. When the wall reaches 0 feet in height, the spell ends.",
       "",
-      "A creature caught in the wall can move by swimming. Because of the wave's force, though, the creature must succeed on a Strength (Athletics) check against your spell save DC to move at all. If it fails the check, it can't move. A creature that moves out of the wall falls to the ground.",
-      "",
-      "### U-Z Spells"
+      "A creature caught in the wall can move by swimming. Because of the wave's force, though, the creature must succeed on a Strength (Athletics) check against your spell save DC to move at all. If it fails the check, it can't move. A creature that moves out of the wall falls to the ground."
     ],
     "source": "SRD 5.2",
     "classes": [
