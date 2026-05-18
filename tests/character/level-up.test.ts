@@ -24,6 +24,8 @@ function makeCharSpells(
         spellcastingAbility: 'Intelligence' as const,
         spellSaveDC: 0,
         spellAttackBonus: 0,
+        knownCantrips: [],
+        maxCantripsKnown: 0,
         knownSpells: [],
         preparedSpells: [],
         alwaysPreparedSpells: [],
@@ -70,7 +72,7 @@ function makeWizardClass(): Class {
       { level: 1, features: [{ name: 'Spellcasting', description: 'Cast wizard spells', resourceId: 'Arcane Recovery' }] },
       { level: 2, features: [{ name: 'Scholar', description: 'Gain expertise in a skill' }] },
     ],
-    spellcasting: { type: 'preparation', ability: 'Intelligence', knownSource: 'spellbook', changesPerRest: 'all' },
+    spellcasting: { type: 'preparation', ability: 'Intelligence', knownSource: 'spellbook', preparationTiming: 'long_rest', changesPerPreparation: 'all' },
   };
 }
 
@@ -324,7 +326,7 @@ describe('levelUp', () => {
 
     expect(result.classes[0]!.level).toBe(4);
     // featBonuses.Strength should increase by 2
-    expect(result.abilityScores.featBonuses.Strength).toBe(2);
+    expect(result.abilityScores.featBonuses?.Strength ?? 0).toBe(2);
   });
 
   it('4. level up with feat: Fighter 7 → 8', () => {

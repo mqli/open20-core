@@ -24,10 +24,10 @@ export const ABILITY_NAMES: readonly AbilityName[] = [
 export interface AbilityScores {
   readonly base: Record<AbilityName, number>; // 玩家分配的原始值（8-15）
   readonly racialBonuses: Partial<Record<AbilityName, number>>; // 来自物种的固定加值
-  readonly backgroundBonuses: Partial<Record<AbilityName, number>>; // 来自背景的加值（由 recompute 计算）
-  readonly featBonuses: Partial<Record<AbilityName, number>>; // 来自专长 ASI 选择的加值
-  readonly featGrants: Partial<Record<AbilityName, number>>; // 来自专长固有奖励的加值（由 recompute 计算）
-  readonly temporaryBonuses: Partial<Record<AbilityName, number>>; // 法术/特性临时加值
+  readonly backgroundBonuses?: Partial<Record<AbilityName, number>>; // 来自背景的加值（由 recompute 计算）
+  readonly featBonuses?: Partial<Record<AbilityName, number>>; // 来自专长 ASI 选择的加值
+  readonly featGrants?: Partial<Record<AbilityName, number>>; // 来自专长固有奖励的加值（由 recompute 计算）
+  readonly temporaryBonuses?: Partial<Record<AbilityName, number>>; // 法术/特性临时加值
 }
 
 // 属性调整值计算方式：

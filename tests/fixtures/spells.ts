@@ -29,10 +29,11 @@ export function createMockSpell(overrides: Partial<Spell> = {}): Spell {
     range: 'Self',
     components: ['V', 'S'],
     duration: 'Instantaneous',
-    description: 'A mock spell for testing.',
-    source: 'Test',
+    description: ['A mock spell for testing.'],
     concentration: false,
     ritual: false,
+    source: 'Test',
+    classes: [],
   };
 
   return { ...defaults, ...overrides } as Spell;
@@ -49,7 +50,7 @@ export const MOCK_FIREBALL: Spell = createMockSpell({
   range: '150 ft.',
   components: ['V', 'S', 'M'],
   duration: 'Instantaneous',
-  description: 'A bright streak flashes from your pointing finger...',
+  description: ['A bright streak flashes from your pointing finger...'],
   source: 'SRD',
 });
 
@@ -62,7 +63,7 @@ export const MOCK_SHIELD: Spell = createMockSpell({
   range: 'Self',
   components: ['V', 'S'],
   duration: '1 round',
-  description: 'An invisible barrier of magical force appears...',
+  description: ['An invisible barrier of magical force appears...'],
   source: 'SRD',
 });
 
@@ -75,7 +76,7 @@ export const MOCK_MAGE_ARMOR: Spell = createMockSpell({
   range: 'Touch',
   components: ['V', 'S', 'M'],
   duration: '8 hours',
-  description: 'You touch a willing creature...',
+  description: ['You touch a willing creature...'],
   source: 'SRD',
 });
 
@@ -88,7 +89,7 @@ export const MOCK_FIRE_BOLT: Spell = createMockSpell({
   range: '120 ft.',
   components: ['V', 'S'],
   duration: 'Instantaneous',
-  description: 'You hurl a mote of fire...',
+  description: ['You hurl a mote of fire...'],
   source: 'SRD',
 });
 
@@ -101,7 +102,7 @@ export const MOCK_HEALING_WORD: Spell = createMockSpell({
   range: '60 ft.',
   components: ['V'],
   duration: 'Instantaneous',
-  description: 'A creature of your choice that you can see...',
+  description: ['A creature of your choice that you can see...'],
   source: 'SRD',
 });
 
@@ -114,7 +115,7 @@ export const MOCK_GUIDANCE: Spell = createMockSpell({
   range: 'Touch',
   components: ['V', 'S'],
   duration: 'Concentration, up to 1 minute',
-  description: 'You touch one willing creature...',
+  description: ['You touch one willing creature...'],
   source: 'SRD',
   concentration: true,
 });

@@ -111,7 +111,7 @@ describe('Content Management (R26)', () => {
             duration: 'Instantaneous',
             concentration: false,
             ritual: false,
-            description: 'A homebrew version of fireball.',
+            description: ['A homebrew version of fireball.'],
             source: 'Homebrew',
           },
         ],

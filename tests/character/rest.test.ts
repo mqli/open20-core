@@ -33,6 +33,8 @@ function makeCharSpells(
         spellcastingAbility: 'Intelligence' as const,
         spellSaveDC: 0,
         spellAttackBonus: 0,
+        knownCantrips: [],
+        maxCantripsKnown: 0,
         knownSpells: [],
         preparedSpells: [],
         alwaysPreparedSpells: [],
@@ -57,7 +59,7 @@ function makeMockClass(id: string, hitDie: DieType): Class {
     armorTraining: [],
     weaponMastery: false,
     featuresByLevel: [],
-    spellcasting: id === 'Warlock' ? { type: 'known', ability: 'Charisma', changesPerLevel: 1, pactMagic: true } : null,
+    spellcasting: id === 'Warlock' ? { type: 'known', ability: 'Charisma', preparationTiming: 'level_up', changesPerPreparation: 1, pactMagic: true } : null,
   };
 }
 
@@ -257,6 +259,8 @@ function makeWarlock(): Character {
           spellcastingAbility: 'Charisma',
           spellSaveDC: 14,
           spellAttackBonus: 6,
+          knownCantrips: [],
+          maxCantripsKnown: 0,
           knownSpells: [],
           preparedSpells: [],
           alwaysPreparedSpells: [],
@@ -434,6 +438,8 @@ describe('longRest', () => {
             spellcastingAbility: 'Intelligence',
             spellSaveDC: 15,
             spellAttackBonus: 7,
+            knownCantrips: [],
+            maxCantripsKnown: 0,
             knownSpells: [],
             preparedSpells: [],
             alwaysPreparedSpells: [],

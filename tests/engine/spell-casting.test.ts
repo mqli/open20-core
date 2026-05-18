@@ -26,7 +26,7 @@ const mockSpell: Spell = {
   duration: 'Concentration, up to 10 minutes',
   concentration: true,
   ritual: true,
-  description: 'For the duration, you sense the presence of magic...',
+  description: ['For the duration, you sense the presence of magic...'],
   classes: ['bard', 'cleric', 'druid', 'sorcerer', 'wizard'],
   source: 'SRD 5.2',
 };
@@ -42,7 +42,7 @@ const mockCantrip: Spell = {
   duration: 'Instantaneous',
   concentration: false,
   ritual: false,
-  description: 'You hurl a mote of fire...',
+  description: ['You hurl a mote of fire...'],
   classes: ['wizard', 'sorcerer'],
   source: 'SRD 5.2',
 };
@@ -58,7 +58,7 @@ const mockUpcastSpell: Spell = {
   duration: 'Instantaneous',
   concentration: false,
   ritual: false,
-  description: 'A bright streak flashes from your pointing finger...',
+  description: ['A bright streak flashes from your pointing finger...'],
   usingAHigherLevelSpellSlot: ['When you cast this spell using a spell slot of 4th level or higher, the damage increases by 1d6 for each slot level above 3rd.'],
   classes: ['wizard', 'sorcerer'],
   source: 'SRD 5.2',

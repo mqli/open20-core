@@ -445,6 +445,8 @@ describe('prepareSpellForClass / unprepareSpellForClass', () => {
             spellcastingAbility: 'Wisdom' as const,
             spellSaveDC: 13,
             spellAttackBonus: 5,
+            knownCantrips: [],
+            maxCantripsKnown: 0,
             knownSpells: ['cure-wounds'],
             preparedSpells: ['cure-wounds'],
             alwaysPreparedSpells: [],

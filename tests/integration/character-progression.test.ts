@@ -59,11 +59,11 @@ describe('D&D Player Behavior - Character Progression', () => {
       );
 
       expect(levelUpResult.classes[0]!.level).toBe(2);
-      expect(levelUpResult.abilityScores.featBonuses['Intelligence']).toBe(1);
+      expect(levelUpResult.abilityScores.featBonuses?.['Intelligence'] ?? 0).toBe(1);
       const totalInt =
         levelUpResult.abilityScores.base['Intelligence'] +
         (levelUpResult.abilityScores.racialBonuses['Intelligence'] ?? 0) +
-        (levelUpResult.abilityScores.featBonuses['Intelligence'] ?? 0);
+        (levelUpResult.abilityScores.featBonuses?.['Intelligence'] ?? 0);
       expect(totalInt).toBe(16);
     });
   });
