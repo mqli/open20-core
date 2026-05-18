@@ -11,7 +11,7 @@ import type { DieType } from '../types/dice';
 import { getModifier, getTotalScore } from '../engine/ability-modifier';
 import { getHitDieFixedValue } from '../engine/hp-calculator';
 import { getProficiencyBonus } from '../engine/proficiency-bonus';
-import { extractResources } from './create';
+import { extractResources } from './resource-builder';
 import {
   getMulticlassSpellcasterLevel,
   calculateMulticlassSpellSlots,

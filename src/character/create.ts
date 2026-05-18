@@ -29,6 +29,12 @@ import {
   calculateMulticlassSpellSlots,
 } from '../engine/spell-slots';
 import { recomputeDerivedStats } from './recompute';
+import { getFeaturesAtLevel, getAlwaysPreparedSpellsFromSubclass } from './utils';
+import { extractResources } from './resource-builder';
+
+// Re-export for backward compatibility (tests import from create.ts)
+export { getFeaturesAtLevel, getAlwaysPreparedSpellsFromSubclass } from './utils';
+export { extractResources } from './resource-builder';
 
 // ── 公共接口 ────────────────────────────────────────────
 
@@ -187,13 +193,14 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
     pp: 0,
   };
 
-  // 10. Return complete Character (recompute will calculate combatStats and grants)
-  const now = new Date().toISOString();
+  // 9. Build empty damage defenses
   const emptyDamageDefenses: DamageDefenses = {
     resistances: [],
     immunities: [],
     vulnerabilities: [],
   };
+
+  const now = new Date().toISOString();
   
   // Build partial character without combatStats
   const partialChar: Character = {
@@ -231,34 +238,6 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
 }
 
 // ── Helper Functions ──────────────────────────────────────────
-
-/**
- * 从子职业数据中获取始终准备的法术
- * 根据职业等级，返回所有已获得的领域/誓言法术
- */
-export function getAlwaysPreparedSpellsFromSubclass(
-  subclass: import('../types/class').Subclass,
-  classLevel: number
-): string[] {
-  if (!subclass.alwaysPreparedSpells) return [];
-  const spells: string[] = [];
-  for (const entry of subclass.alwaysPreparedSpells) {
-    if (classLevel >= entry.level) {
-      spells.push(...entry.spells);
-    }
-  }
-  return spells;
-}
-
-/**
-
-/**
- * 提取指定等级的特性列表
- */
-export function getFeaturesAtLevel(classData: Class, level: number): readonly Feature[] {
-  const entry = classData.featuresByLevel.find(f => f.level === level);
-  return entry?.features ?? [];
-}
 
 /**
  * 判断某技能是否熟练
@@ -415,87 +394,6 @@ export function emptyCharacterSpells(): CharacterSpells {
     classSpellcasting: {},
     spellSlots,
     pactMagicSlots: null,
-  };
-}
-
-/**
- * 从职业特性中提取资源
- * @param classData - 职业数据
- * @param level - 职业等级（会提取1到该等级的所有资源特性）
- * @param proficiencyBonus - 熟练加值（用于计算资源数量）
- */
-export function extractResources(classData: Class, level: number, proficiencyBonus?: number): Resource[] {
-  const resources: Resource[] = [];
-
-  // 收集从1级到指定等级的所有资源特性
-  for (let lv = 1; lv <= level; lv++) {
-    const features = getFeaturesAtLevel(classData, lv);
-
-    for (const feature of features) {
-      if (!feature.resourceId) continue;
-
-      // 避免重复添加相同资源（如果低等级已有该资源）
-      if (resources.some(r => r.id === feature.resourceId)) continue;
-
-      // 根据特性定义构建资源（优先使用特性中的定义，否则使用RESOURCE_DEFS）
-      const resource = buildResource(feature, level, proficiencyBonus);
-      if (resource) {
-        resources.push(resource);
-      }
-    }
-  }
-
-  return resources;
-}
-
-/**
- * 根据特性中的资源定义构建Resource对象
- * 优先使用特性中定义的资源属性，否则回退到RESOURCE_DEFS
- */
-function buildResource(feature: Feature, level: number, proficiencyBonus?: number): Resource | null {
-  const resourceId = feature.resourceId!;
-
-  // 资源默认值表（当特性中未定义时使用）
-  // scaleWithPBByDefault: 某些资源即使特性中未标记，也默认随PB变化（如2024 PHB的Second Wind）
-  const RESOURCE_DEFS: Record<string, { max: number; resetOn: ResetType; scaleWithPBByDefault?: boolean }> = {
-    'Second Wind': { max: 1, resetOn: ResetType.ShortRest, scaleWithPBByDefault: true },
-    Rage: { max: 2, resetOn: ResetType.LongRest },
-    'Lay on Hands': { max: 5, resetOn: ResetType.LongRest },
-    'Bardic Inspiration': { max: 1, resetOn: ResetType.LongRest },
-    'Channel Divinity': { max: 1, resetOn: ResetType.ShortRest },
-    'Wild Shape': { max: 2, resetOn: ResetType.ShortRest },
-    'Sorcery Points': { max: 1, resetOn: ResetType.LongRest },
-    'Focus Points': { max: 1, resetOn: ResetType.ShortRest },
-    'Action Surge': { max: 1, resetOn: ResetType.ShortRest, scaleWithPBByDefault: true },
-    Indomitable: { max: 1, resetOn: ResetType.LongRest, scaleWithPBByDefault: true },
-  };
-
-  // 计算熟练加值
-  const pb = proficiencyBonus ?? (2 + Math.floor((level - 1) / 4));
-
-  // 查找资源默认值
-  const def = RESOURCE_DEFS[resourceId];
-  if (!def) {
-    // 未知资源，跳过
-    return null;
-  }
-
-  // 优先使用特性中定义的资源属性，否则使用默认值
-  const max = feature.resourceMax !== undefined ? feature.resourceMax : def.max;
-  const resetOn = feature.resourceResetOn ?? def.resetOn;
-
-  // 判断是否随PB变化：
-  // 1. 特性中显式定义 resourceScaleWithPB
-  // 2. 或者默认值标记 scaleWithPBByDefault
-  const scaleWithPB = feature.resourceScaleWithPB ?? def.scaleWithPBByDefault ?? false;
-  const finalMax = scaleWithPB ? pb : max;
-
-  return {
-    id: resourceId,
-    name: resourceId,
-    max: finalMax,
-    used: 0,
-    resetOn,
   };
 }
 

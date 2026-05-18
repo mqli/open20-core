@@ -15,30 +15,8 @@ import { calculateAttacks } from '../engine/attack-calculator';
 import { calculateMaxHP } from '../engine/hp-calculator';
 import { calculatePactMagic, calculateSpellSlots, calculateSpellSlotsFromClasses } from '../engine/spell-slots';
 import type { SpellLevel, SpellSlotEntry } from '../types/spell';
-import type { Class, Feature, Subclass } from '../types/class';
-
-// ── Helper Functions (moved from create.ts to break circular dependency) ──
-
-/** Extract features at a specific level */
-function getFeaturesAtLevel(classData: Class, level: number): readonly Feature[] {
-  const entry = classData.featuresByLevel.find(f => f.level === level);
-  return entry?.features ?? [];
-}
-
-/** Get always-prepared spells from subclass */
-function getAlwaysPreparedSpellsFromSubclass(
-  subclass: Subclass,
-  classLevel: number
-): string[] {
-  if (!subclass.alwaysPreparedSpells) return [];
-  const spells: string[] = [];
-  for (const entry of subclass.alwaysPreparedSpells) {
-    if (classLevel >= entry.level) {
-      spells.push(...entry.spells);
-    }
-  }
-  return spells;
-}
+import type { Feature } from '../types/class';
+import { getFeaturesAtLevel, getAlwaysPreparedSpellsFromSubclass } from './utils';
 
 // ── Grant Computation (Single Source of Truth) ─────────────────
 
