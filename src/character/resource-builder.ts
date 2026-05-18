@@ -2,7 +2,7 @@
 // Pure functions to extract Resource[] from class features.
 // Shared by create.ts and level-up.ts.
 
-import type { Feature } from '../types/class';
+import type { Feature, Class, Subclass } from '../types/class';
 import type { Resource } from '../types/resource';
 import { ResetType } from '../types/resource';
 import { getFeaturesAtLevel } from './utils';
@@ -11,7 +11,7 @@ import { getFeaturesAtLevel } from './utils';
  * Extract resources from class features up to a given level.
  * Collects all features from level 1 to `level` that have a `resourceId`.
  */
-export function extractResources(classData: { featuresByLevel: { level: number; features: readonly Feature[] }[] }, level: number, proficiencyBonus?: number): Resource[] {
+export function extractResources(classData: Class | Subclass, level: number, proficiencyBonus?: number): Resource[] {
   const resources: Resource[] = [];
 
   for (let lv = 1; lv <= level; lv++) {
