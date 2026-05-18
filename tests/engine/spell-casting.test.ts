@@ -59,7 +59,7 @@ const mockUpcastSpell: Spell = {
   concentration: false,
   ritual: false,
   description: 'A bright streak flashes from your pointing finger...',
-  upcast: 'When you cast this spell using a spell slot of 4th level or higher, the damage increases by 1d6 for each slot level above 3rd.',
+  usingAHigherLevelSpellSlot: ['When you cast this spell using a spell slot of 4th level or higher, the damage increases by 1d6 for each slot level above 3rd.'],
   classes: ['wizard', 'sorcerer'],
   source: 'SRD 5.2',
 };

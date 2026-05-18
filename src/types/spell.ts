@@ -6,7 +6,7 @@ import type { AbilityName } from './ability';
 // 法术等级
 export type SpellLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
-// 法术法术位条目（Character.spells）
+// 法术位条目（Character.spells）
 export interface SpellSlotEntry {
   readonly total: number;
   readonly used: number;
@@ -30,16 +30,16 @@ export interface ClassSpellData {
   readonly spellcastingAbility: AbilityName;
   readonly spellSaveDC: number;  // 8 + proficiency + ability mod
   readonly spellAttackBonus: number;
-  
+
   // 该职业已知的法术
   readonly knownSpells: readonly string[];
-  
+
   // 已准备的法术（准备施法者用）
   readonly preparedSpells: readonly string[];
-  
+
   // 始终准备的法术（领域法术等）- 不计入准备数量
   readonly alwaysPreparedSpells?: AlwaysPreparedSpells;
-  
+
   // 最大准备法术数量（准备施法者）: 职业等级 + 能力调整值
   readonly maxPrepared: number;
 }
@@ -48,10 +48,10 @@ export interface ClassSpellData {
 export interface CharacterSpells {
   // 每职业法术追踪（以 classId 为键）
   readonly classSpellcasting: Record<string, ClassSpellData>;
-  
+
   // 统一法术位（多维职业合并池）
   readonly spellSlots: Record<SpellLevel, SpellSlotEntry>;
-  
+
   // Warlock Pact Magic（独立于常规法术位）
   readonly pactMagicSlots: PactMagicSlots | null;
 }
@@ -68,16 +68,21 @@ export interface SpellDamageEntry {
   readonly type: string; // 伤害类型，如 "Fire", "Piercing", "Poison"
 }
 
-// Spell damage/effect data（统一使用 entries 数组）
+// 戏法升级条目（自动计算伤害）
+export interface CantripUpgradeEntry {
+  readonly atCharacterLevel: 5 | 11 | 17;
+  readonly damage?: readonly SpellDamageEntry[];
+}
+
+// Spell damage/effect data
 export interface SpellDamage {
-  readonly entries: readonly SpellDamageEntry[]; // 法术伤害条目（升环时第一条伤害骰增加）
-  readonly higherLevel?: readonly string[];       // 升环伤害（对应 entries[0]）
-  readonly additional?: readonly SpellDamageEntry[]; // 额外伤害（不随升环增加）
+  readonly entries: readonly SpellDamageEntry[];
+  readonly additional?: readonly SpellDamageEntry[]; // Extra damage (doesn't scale with upcast)
+  readonly perSlot?: readonly SpellDamageEntry[]; // Damage increase per slot level above base (for upcasting)
 }
 
 export interface SpellHeal {
   readonly dice: string;
-  readonly higherLevel?: readonly string[];
 }
 
 // Spell template (static data from JSON)
@@ -92,17 +97,18 @@ export interface Spell {
   readonly duration: string;
   readonly concentration: boolean;
   readonly ritual: boolean;
-  readonly description: string; // 来自SRD
+  readonly description: readonly string[]; // 多段落描述
+  readonly cantripUpgrade?: readonly CantripUpgradeEntry[]; // 戏法升级（0级法术）
+  readonly usingAHigherLevelSpellSlot?: readonly string[]; // 升环施法说明（1+级法术）
   readonly damage?: SpellDamage;
   readonly heal?: SpellHeal;
   readonly save?: AbilityName;
   readonly attack?: boolean;
-  readonly source: string; // '2024 PHB' | '2014 PHB' | 'SRD 5.2' | 'Player\'s Handbook (2024)'
-  readonly upcast?: string; // 升环施法说明
-  readonly classes?: readonly string[]; // Which classes have this spell
+  readonly source: string;
+  readonly classes?: readonly string[];
 }
 
-// 法术法术学校
+// 法术学校
 export type SpellSchool =
   | 'Abjuration'
   | 'Conjuration'

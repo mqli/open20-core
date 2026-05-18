@@ -547,7 +547,7 @@ describe('rollSpellDamage', () => {
       description: 'You create three rays...',
       damage: {
         entries: [{ dice: '4d6', type: 'Fire' }],
-        higherLevel: ['5d6', '6d6', '7d6', '8d6', '9d6', '10d6', '11d6', '12d6'],
+        perSlot: [{ dice: '1d6', type: 'Fire' }],
       },
       attack: true,
       source: '2024 PHB',
@@ -575,7 +575,7 @@ describe('rollSpellDamage', () => {
       description: 'A shimmering green arrow...',
       damage: {
         entries: [{ dice: '2d6', type: 'Piercing' }],
-        higherLevel: ['3d6', '4d6', '5d6', '6d6'],
+        perSlot: [{ dice: '1d6', type: 'Piercing' }],
         additional: [{ dice: '1d6', type: 'Poison' }],
       },
       attack: false,

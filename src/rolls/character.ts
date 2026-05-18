@@ -263,13 +263,19 @@ export function rollSpellDamage(
     const entry = entries[i]!;
     let diceStr = entry.dice;
 
-    // Handle upcasting
-    if (i === 0 && slotLevel > spell.level && spell.damage.higherLevel) {
-      const higherIndex = Math.min(
-        slotLevel - spell.level - 1,
-        spell.damage.higherLevel.length - 1
-      );
-      diceStr = spell.damage.higherLevel[higherIndex] ?? diceStr;
+    // Handle upcasting: add perSlot damage for each slot level above base
+    if (i === 0 && slotLevel > spell.level && spell.damage.perSlot && spell.damage.perSlot.length > 0) {
+      const perSlotDice = spell.damage.perSlot[0]!.dice; // e.g., "1d6"
+      const numLevels = slotLevel - spell.level;
+      const baseMatch = diceStr.match(/(\d+)d(\d+)/);
+      const slotMatch = perSlotDice.match(/(\d+)d(\d+)/);
+      // Only combine if same dice sides
+      if (baseMatch && slotMatch && baseMatch[2] === slotMatch[2]) {
+        const baseCount = parseInt(baseMatch[1]!);
+        const slotCount = parseInt(slotMatch[1]!);
+        const totalCount = baseCount + slotCount * numLevels;
+        diceStr = `${totalCount}d${baseMatch[2]}`;
+      }
     }
 
     damageEntries.push({

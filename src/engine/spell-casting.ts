@@ -149,13 +149,15 @@ export function canCastCantrip(char: Character, spell: Spell, data: DataLoader):
  * SRD: "When a spell is cast using a higher-level spell slot, it's called upcasting."
  *
  * @param spell - The spell to check
- * @returns True if the spell can be upcast (has upcast effects)
+ * @returns True if the spell can be upcast (has usingAHigherLevelSpellSlot)
  *
  * @example
- * canUpcast(spell) // true if spell.upcast is defined
+ * canUpcast(spell) // true if spell.usingAHigherLevelSpellSlot is defined
  */
 export function canUpcast(spell: Spell): boolean {
-  return spell.upcast !== undefined && spell.upcast !== null;
+  return spell.usingAHigherLevelSpellSlot !== undefined
+    && spell.usingAHigherLevelSpellSlot !== null
+    && spell.usingAHigherLevelSpellSlot.length > 0;
 }
 
 /**
@@ -166,13 +168,13 @@ export function canUpcast(spell: Spell): boolean {
  * @returns Upcast description or undefined
  *
  * @example
- * getUpcastDescription(spell, 3) // "At Higher Levels: ..."
+ * getUpcastDescription(spell, 3) // "The damage increases by 1d6 for each slot level above 3."
  */
 export function getUpcastDescription(spell: Spell, slotLevel: SpellLevel): string | undefined {
   if (!canUpcast(spell)) return undefined;
   if (slotLevel <= spell.level) return undefined;
 
-  return spell.upcast;
+  return spell.usingAHigherLevelSpellSlot![0];
 }
 
 /**

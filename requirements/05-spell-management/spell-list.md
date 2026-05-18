@@ -112,28 +112,40 @@ interface ClassSpellData {
 
 > **Note**: `changesPerRest` and `changesPerLevel` in the `Spellcasting` type are **reference fields** (documenting SRD rules). The code does **NOT** enforce these limits — players can manage their own characters freely.
 
-Spell details loaded from static data (`static/spells.json`):
+Spell details loaded from static data (`static/srd/spells.json`):
 
 ```typescript
 interface Spell {
   id: string;                    // kebab-case
   name: string;
-  level: number;                 // 0-9 (0 = cantrip)
+  level: SpellLevel;              // 0-9 (0 = cantrip)
   school: SpellSchool;
   castingTime: CastingTime;
   range: string;
-  components: SpellComponents;
+  components: readonly SpellComponent[];
   duration: string;
   concentration: boolean;
   ritual: boolean;
-  description: string;           // SRD description text
-  higherLevel?: string;
+  description: readonly string[]; // Multi-paragraph SRD description
+  cantripUpgrade?: readonly CantripUpgradeEntry[];    // Cantrip damage scaling (0-level only)
+  usingAHigherLevelSpellSlot?: readonly string[];      // Higher level casting info (1+ level)
   damage?: SpellDamage;
   heal?: SpellHeal;
-  save?: Ability;
+  save?: AbilityName;
   attack?: boolean;
   source: string;
-  classes: string[];             // Which classes have this in spell list
+  classes?: readonly string[];   // Which classes have this in spell list
+}
+
+interface CantripUpgradeEntry {
+  atCharacterLevel: 5 | 11 | 17;
+  damage?: readonly SpellDamageEntry[];
+}
+
+interface SpellDamage {
+  entries: readonly SpellDamageEntry[];
+  additional?: readonly SpellDamageEntry[]; // Extra damage (doesn't scale with upcast)
+  perSlot?: readonly SpellDamageEntry[];     // Damage increase per slot level above base
 }
 ```
 
