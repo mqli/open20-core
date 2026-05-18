@@ -31,7 +31,13 @@ export interface ClassSpellData {
   readonly spellSaveDC: number;  // 8 + proficiency + ability mod
   readonly spellAttackBonus: number;
 
-  // 该职业已知的法术
+  // 已知的戏法（有限数量，由职业表决定）
+  readonly knownCantrips: readonly string[];
+
+  // 最大已知戏法数量（从职业表读取）
+  readonly maxCantripsKnown: number;
+
+  // 该职业已知的法术（1+级）
   readonly knownSpells: readonly string[];
 
   // 已准备的法术（准备施法者用）
@@ -40,7 +46,7 @@ export interface ClassSpellData {
   // 始终准备的法术（领域法术等）- 不计入准备数量
   readonly alwaysPreparedSpells?: AlwaysPreparedSpells;
 
-  // 最大准备法术数量（准备施法者）: 职业等级 + 能力调整值
+  // 最大准备法术数量（从职业表读取，SRD 5.2 使用表格数值）
   readonly maxPrepared: number;
 }
 

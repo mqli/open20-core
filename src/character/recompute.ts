@@ -176,17 +176,25 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     })();
 
     // Auto-populate knownSpells based on caster type
-    let knownSpells = classSpellData.knownSpells;
+    let knownSpells: readonly string[] = [...classSpellData.knownSpells];
+    let knownCantrips: readonly string[] = [...(classSpellData.knownCantrips ?? [])];
+    
+    // Get max cantrips known from class table (SRD 5.2)
+    const levelEntry = classData.featuresByLevel.find(f => f.level === classLevel);
+    const maxCantripsKnown = levelEntry?.cantripsKnown ?? classSpellData.maxCantripsKnown;
+
     if (classData.spellcasting.knownSource === 'class_list') {
-      // Class-list casters: auto-populate with spells they can cast
+      // Class-list casters:
+      // - knownCantrips: limited number (player chooses), preserve existing
+      // - knownSpells: ALL level 1+ spells on class list
+      knownCantrips = classSpellData.knownCantrips;
       knownSpells = data.getAllSpells()
-        .filter(s => s.classes?.includes(classId) && (s.level === 0 || s.level <= classMaxSpellLevel))
+        .filter(s => s.classes?.includes(classId) && s.level >= 1 && s.level <= classMaxSpellLevel)
         .map(s => s.id);
     } else if (classData.spellcasting.knownSource === 'spellbook') {
-      // Wizard: auto-populate with ALL spells from spellbook (can contain higher-level spells)
-      knownSpells = data.getAllSpells()
-        .filter(s => s.classes?.includes(classId))
-        .map(s => s.id);
+      // Wizard: preserve existing knownCantrips and knownSpells (spellbook managed separately)
+      knownCantrips = classSpellData.knownCantrips;
+      knownSpells = classSpellData.knownSpells;
     }
 
     // Auto-populate alwaysPreparedSpells from subclass (domain/oath spells)
@@ -198,8 +206,6 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
       }
     }
 
-    // 从职业特性表中读取可准备法术数量（SRD 5.2 使用表格数值，非常规公式）
-    const levelEntry = classData.featuresByLevel.find(f => f.level === classLevel);
     const maxPrepared = levelEntry?.preparedSpells ?? 0;
 
     classSpellcasting[classId] = {
@@ -207,6 +213,8 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
       spellcastingAbility: ability,
       spellSaveDC: 8 + pb + abilityMod,
       spellAttackBonus: pb + abilityMod,
+      knownCantrips,
+      maxCantripsKnown,
       knownSpells,
       alwaysPreparedSpells,
       maxPrepared,
@@ -233,12 +241,19 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
       return max;
     })();
 
-    // Auto-populate knownSpells for class_list casters (Cleric, Druid, Bard, etc.)
-    // Only include spells they can actually cast (cantrips + up to max spell level)
+    // Get max cantrips known from class table (SRD 5.2)
+    const levelEntry = classData.featuresByLevel.find(f => f.level === charClass.level);
+    const maxCantripsKnown = levelEntry?.cantripsKnown ?? 0;
+
+    // For known casters (Sorcerer, Bard): cantrips are part of knownSpells
+    // For class_list casters (Cleric, Druid): separate knownCantrips
+    let knownCantrips: readonly string[] = [];
     let knownSpells: readonly string[] = [];
+
     if (classData.spellcasting?.knownSource === 'class_list') {
+      // Class-list casters: auto-populate level 1+ spells
       knownSpells = data.getAllSpells()
-        .filter(s => s.classes?.includes(charClass.classId) && (s.level === 0 || s.level <= classMaxSpellLevel))
+        .filter(s => s.classes?.includes(charClass.classId) && s.level >= 1 && s.level <= classMaxSpellLevel)
         .map(s => s.id);
     }
 
@@ -251,8 +266,6 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
       }
     }
 
-    // 从职业特性表中读取可准备法术数量（SRD 5.2 使用表格数值，非常规公式）
-    const levelEntry = classData.featuresByLevel.find(f => f.level === charClass.level);
     const maxPrepared = levelEntry?.preparedSpells ?? 0;
 
     classSpellcasting[charClass.classId] = {
@@ -260,6 +273,8 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
       spellcastingAbility: ability,
       spellSaveDC: 8 + pb + abilityMod,
       spellAttackBonus: pb + abilityMod,
+      knownCantrips,
+      maxCantripsKnown,
       knownSpells,
       preparedSpells: [],
       alwaysPreparedSpells,

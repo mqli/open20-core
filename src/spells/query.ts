@@ -155,9 +155,14 @@ export function getSpellsForCharacter(char: Character, data: DataLoader): Spell[
   // Collect known spells from all classes, filtered by castable level
   const knownSpellIds = new Set<string>();
   for (const classSpellData of Object.values(char.spells.classSpellcasting)) {
+    // Add cantrips (level 0) from knownCantrips
+    for (const spellId of (classSpellData.knownCantrips ?? [])) {
+      knownSpellIds.add(spellId);
+    }
+    // Add level 1+ spells from knownSpells (filtered by castable level)
     for (const spellId of classSpellData.knownSpells) {
       const spell = data.getSpell(spellId);
-      if (spell && (spell.level === 0 || spell.level <= maxSpellLevel)) {
+      if (spell && spell.level <= maxSpellLevel) {
         knownSpellIds.add(spellId);
       }
     }
@@ -217,6 +222,7 @@ export function isSpellPrepared(char: Character, spellId: string): boolean {
 
 /**
  * Check if a character knows a spell (in any class)
+ * Checks both knownCantrips (for cantrips) and knownSpells (for level 1+)
  *
  * @param char - Character object
  * @param spellId - Spell ID
@@ -224,7 +230,10 @@ export function isSpellPrepared(char: Character, spellId: string): boolean {
  */
 export function knowsSpell(char: Character, spellId: string): boolean {
   for (const classSpellData of Object.values(char.spells.classSpellcasting)) {
-    if (classSpellData.knownSpells.includes(spellId)) {
+    if (
+      (classSpellData.knownCantrips ?? []).includes(spellId) ||
+      classSpellData.knownSpells.includes(spellId)
+    ) {
       return true;
     }
   }
@@ -246,7 +255,7 @@ export function knowsSpell(char: Character, spellId: string): boolean {
  */
 export function canCastSpell(char: Character, spell: Spell, data: DataLoader): boolean {
   if (spell.level === 0) {
-    // Cantrip - check if known
+    // Cantrip - check if known (in knownCantrips)
     return knowsSpell(char, spell.id);
   }
   // Level 1+ - check if prepared
@@ -269,6 +278,7 @@ export function getClassSpellData(
 
 /**
  * Check if a spell is known for a specific class
+ * Checks both knownCantrips (for cantrips) and knownSpells (for level 1+)
  *
  * @param char - Character object
  * @param classId - Class ID
@@ -282,7 +292,10 @@ export function knowsSpellForClass(
 ): boolean {
   const classSpellData = char.spells.classSpellcasting[classId];
   if (!classSpellData) return false;
-  return classSpellData.knownSpells.includes(spellId);
+  return (
+    (classSpellData.knownCantrips ?? []).includes(spellId) ||
+    classSpellData.knownSpells.includes(spellId)
+  );
 }
 
 /**

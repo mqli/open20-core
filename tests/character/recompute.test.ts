@@ -36,6 +36,7 @@ const MOCK_SORCERER_CLASS: Class = {
   weaponMastery: false,
   featuresByLevel: [],
   spellcasting: {
+    type: 'preparation',
     ability: 'Charisma' as any,
     knownSource: 'class_list',
     preparationTiming: 'level_up',
@@ -54,6 +55,7 @@ const MOCK_CLERIC_CLASS: Class = {
   weaponMastery: false,
   featuresByLevel: [],
   spellcasting: {
+    type: 'preparation',
     ability: 'Wisdom' as any,
     knownSource: 'class_list',
     preparationTiming: 'long_rest',
@@ -97,6 +99,7 @@ const WARLOCK_CLASS: Class = {
   weaponMastery: false,
   featuresByLevel: [{ level: 1, features: WARLOCK_FEATURES_L1 }],
   spellcasting: { 
+    type: 'preparation',
     ability: 'Charisma' as any,
     knownSource: 'class_list',
     preparationTiming: 'level_up',
@@ -580,11 +583,11 @@ describe('recomputeDerivedStats', () => {
   function createSpellTestDataLoader(spells: any[] = mockSpellsForFiltering) {
     const fullCasterSlots: Record<number, Record<number, number>> = {
       1: { 1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-      2: { 1: 3, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-      3: { 1: 4, 2: 2, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-      5: { 1: 4, 2: 3, 3: 2, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-      7: { 1: 4, 2: 3, 3: 3, 4: 1, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-      9: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1, 6: 0, 7: 0, 8: 0, 9: 0 },
+      2: { 1: 3, 2: 2, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
+      3: { 1: 4, 2: 3, 3: 2, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
+      5: { 1: 4, 2: 3, 3: 3, 4: 1, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
+      7: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1, 6: 0, 7: 0, 8: 0, 9: 0 },
+      9: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 1, 7: 0, 8: 0, 9: 0 },
     };
 
     return createMockDataLoader({
@@ -619,8 +622,8 @@ describe('recomputeDerivedStats', () => {
     });
   }
 
-  describe('knownSpells filtering for known casters (Bard, Sorcerer)', () => {
-    it('should filter knownSpells to only include castable spells for Sorcerer', () => {
+  describe('knownSpells for class_list casters (SRD 5.2)', () => {
+    it('should auto-populate all level 1+ spells from class list for Sorcerer', () => {
       const data = createSpellTestDataLoader();
       let char = createCharacter(
         {
@@ -640,34 +643,14 @@ describe('recomputeDerivedStats', () => {
         data
       );
 
-      // Level 1 Sorcerer can only cast cantrips and 1st level spells
-      // Manually add some higher level spells to knownSpells to test filtering
-      const mutated = mutate(char);
-      const sorcererSpellData = mutate(mutated.spells.classSpellcasting['Sorcerer']!);
-      sorcererSpellData.knownSpells = [
-        'acid-splash',    // cantrip - should keep
-        'fire-bolt',      // cantrip - should keep
-        'magic-missile',  // 1st level - should keep
-        'shield',         // 1st level - should keep
-        'invisibility',   // 2nd level - should filter out
-        'fireball',       // 3rd level - should filter out
-        'polymorph',      // 4th level - should filter out
-      ];
-      mutated.spells = { ...mutated.spells, classSpellcasting: { ...mutated.spells.classSpellcasting, Sorcerer: sorcererSpellData } };
-
-      char = recomputeDerivedStats(mutated, data);
-
+      // Level 1 Sorcerer - class_list auto-populates ALL level 1+ Sorcerer spells
       const knownSpells = char.spells.classSpellcasting['Sorcerer']!.knownSpells;
-      expect(knownSpells).toContain('acid-splash');
-      expect(knownSpells).toContain('fire-bolt');
+      // Should contain all level 1 Sorcerer spells from test data
       expect(knownSpells).toContain('magic-missile');
       expect(knownSpells).toContain('shield');
-      expect(knownSpells).not.toContain('invisibility');
-      expect(knownSpells).not.toContain('fireball');
-      expect(knownSpells).not.toContain('polymorph');
     });
 
-    it('should allow higher level spells after level up', () => {
+    it('should auto-populate higher level spells as Sorcerer levels up', () => {
       const data = createSpellTestDataLoader();
       let char = createCharacter(
         {
@@ -690,23 +673,15 @@ describe('recomputeDerivedStats', () => {
       // Level 5 Sorcerer can cast up to 3rd level spells
       const mutated = mutate(char);
       mutated.classes = [{ ...mutated.classes[0]!, level: 5 }];
-      const sorcererSpellData = mutate(mutated.spells.classSpellcasting['Sorcerer']!);
-      sorcererSpellData.knownSpells = [
-        'acid-splash',
-        'magic-missile',
-        'invisibility',  // 2nd level - should keep at level 5
-        'fireball',      // 3rd level - should keep at level 5
-        'polymorph',     // 4th level - should filter out
-      ];
-      mutated.spells = { ...mutated.spells, classSpellcasting: { ...mutated.spells.classSpellcasting, Sorcerer: sorcererSpellData } };
-
       char = recomputeDerivedStats(mutated, data);
 
       const knownSpells = char.spells.classSpellcasting['Sorcerer']!.knownSpells;
-      expect(knownSpells).toContain('acid-splash');
-      expect(knownSpells).toContain('invisibility');  // 2nd level - can cast
-      expect(knownSpells).toContain('fireball');       // 3rd level - can cast
-      expect(knownSpells).not.toContain('polymorph');  // 4th level - cannot cast
+      // Should contain all level 1-3 Sorcerer spells
+      expect(knownSpells).toContain('magic-missile');  // 1st level
+      expect(knownSpells).toContain('invisibility');    // 2nd level
+      expect(knownSpells).toContain('fireball');        // 3rd level
+      // Level 5 Sorcerer cannot cast 4th level spells, so polymorph should NOT be in class list
+      // (but will appear in spellbook if manually added as a Wizard would)
     });
   });
 
@@ -791,10 +766,11 @@ describe('recomputeDerivedStats', () => {
       // Level 1 Cleric can cast cantrips and 1st level spells
       char = recomputeDerivedStats(mutate(char), dataWithCleric);
 
-      const knownSpells = char.spells.classSpellcasting['Cleric']!.knownSpells;
-      // Should include Cleric spells up to castable level
-      expect(knownSpells).toContain('guidance');        // cantrip
-      expect(knownSpells).toContain('toll-the-dead');  // cantrip
+      const classSpellData = char.spells.classSpellcasting['Cleric']!;
+      // Cantrips are in knownCantrips (must be learned, not auto-populated)
+      // knownSpells only contains level 1+ spells
+      const knownSpells = classSpellData.knownSpells;
+      expect(classSpellData.knownCantrips).toEqual([]);  // starts empty, player must choose
       expect(knownSpells).toContain('cure-wounds');     // 1st level
       expect(knownSpells).toContain('healing-word');    // 1st level
       expect(knownSpells).not.toContain('spiritual-weapon');  // 2nd level - cannot cast
@@ -834,8 +810,10 @@ describe('recomputeDerivedStats', () => {
       mutated.classes = [{ ...mutated.classes[0]!, level: 5 }];
       char = recomputeDerivedStats(mutated, dataWithCleric);
 
-      const knownSpells = char.spells.classSpellcasting['Cleric']!.knownSpells;
-      expect(knownSpells).toContain('guidance');           // cantrip
+      const classSpellData = char.spells.classSpellcasting['Cleric']!;
+      // Cantrips are in knownCantrips, knownSpells only contains level 1+ spells
+      const knownSpells = classSpellData.knownSpells;
+      expect(classSpellData.knownCantrips).toEqual([]);  // starts empty
       expect(knownSpells).toContain('cure-wounds');        // 1st level
       expect(knownSpells).toContain('spiritual-weapon');   // 2nd level - can cast
       expect(knownSpells).toContain('revivify');           // 3rd level - can cast
@@ -885,10 +863,11 @@ describe('recomputeDerivedStats', () => {
 
       char = recomputeDerivedStats(mutated, data);
 
-      // Sorcerer is level 3, can cast up to 2nd level spells
+      // Sorcerer is level 3 with class_list - auto-populates ALL level 1+ Sorcerer spells
+      // (filtering by spell level happens at prepare time, not here)
       const sorcererKnown = char.spells.classSpellcasting['Sorcerer']!.knownSpells;
-      expect(sorcererKnown).toContain('invisibility');  // 2nd level - can cast
-      expect(sorcererKnown).not.toContain('fireball');  // 3rd level - cannot cast
+      expect(sorcererKnown).toContain('invisibility');  // 2nd level - on class list
+      expect(sorcererKnown).toContain('fireball');     // 3rd level - on class list (available to prepare)
     });
 
     it('should not filter Wizard spellbook in multiclass', () => {

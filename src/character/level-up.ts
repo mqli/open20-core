@@ -4,6 +4,7 @@
 
 import type { AbilityName } from '../types/ability';
 import type { Character, CharacterClass } from '../types/character';
+import type { ClassSpellData } from '../types/spell';
 import type { DataLoader } from '../data/loader';
 import type { DieType } from '../types/dice';
 
@@ -112,24 +113,32 @@ export function levelUp(
   let newSpells = { ...char.spells };
   if (options.newSpells && options.newSpells.length > 0) {
     const classId = options.classId;
-    const existing = newSpells.classSpellcasting[classId] ?? {
-      classId,
-      spellcastingAbility: 'Intelligence' as const,
-      spellSaveDC: 0,
-      spellAttackBonus: 0,
-      knownSpells: [],
-      preparedSpells: [],
-      alwaysPreparedSpells: [],
-      maxPrepared: 0,
-    };
+    const existing = newSpells.classSpellcasting[classId];
+
+    // Build updated class spell data
+    const updatedSpellData: ClassSpellData = existing
+      ? {
+          ...existing,
+          knownSpells: [...existing.knownSpells, ...options.newSpells],
+        }
+      : {
+          classId,
+          spellcastingAbility: 'Intelligence' as const,
+          spellSaveDC: 0,
+          spellAttackBonus: 0,
+          knownCantrips: [],
+          maxCantripsKnown: 0,
+          knownSpells: options.newSpells,
+          preparedSpells: [],
+          alwaysPreparedSpells: [],
+          maxPrepared: 0,
+        };
+
     newSpells = {
       ...newSpells,
       classSpellcasting: {
         ...newSpells.classSpellcasting,
-        [classId]: {
-          ...existing,
-          knownSpells: [...existing.knownSpells, ...options.newSpells],
-        },
+        [classId]: updatedSpellData,
       },
     };
   }
@@ -241,27 +250,34 @@ function addNewClass(
 
       // Update or create class spell data
       const classId = options.classId;
-      const existing = newSpells.classSpellcasting[classId] ?? {
-        classId,
-        spellcastingAbility: 'Intelligence' as const,
-        spellSaveDC: 0,
-        spellAttackBonus: 0,
-        knownSpells: [],
-        preparedSpells: [],
-        alwaysPreparedSpells: [],
-        maxPrepared: 0,
-      };
+      const existing = newSpells.classSpellcasting[classId];
+
+      // Build updated spell data (avoid union type issue)
+      const updatedSpellData: ClassSpellData = existing
+        ? {
+            ...existing,
+            spellcastingAbility: ability,
+            spellSaveDC: 8 + newProficiencyBonus + abilityMod,
+            spellAttackBonus: newProficiencyBonus + abilityMod,
+          }
+        : {
+            classId,
+            spellcastingAbility: ability,
+            spellSaveDC: 8 + newProficiencyBonus + abilityMod,
+            spellAttackBonus: newProficiencyBonus + abilityMod,
+            knownCantrips: [],
+            maxCantripsKnown: 0,
+            knownSpells: [],
+            preparedSpells: [],
+            alwaysPreparedSpells: [],
+            maxPrepared: 0,
+          };
 
       newSpells = {
         ...newSpells,
         classSpellcasting: {
           ...newSpells.classSpellcasting,
-          [classId]: {
-            ...existing,
-            spellcastingAbility: ability,
-            spellSaveDC: 8 + newProficiencyBonus + abilityMod,
-            spellAttackBonus: newProficiencyBonus + abilityMod,
-          },
+          [classId]: updatedSpellData,
         },
         spellSlots,
       };

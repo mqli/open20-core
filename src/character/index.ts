@@ -36,6 +36,10 @@ export {
   unprepareSpell,
   prepareSpellForClass,
   unprepareSpellForClass,
+  learnCantrip,
+  replaceCantrip,
+  learnCantripForClass,
+  replaceCantripForClass,
   modifyCurrency,
 } from './mutate';
 

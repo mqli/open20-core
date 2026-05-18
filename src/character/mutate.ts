@@ -622,6 +622,120 @@ export function unprepareSpellForClass(
   });
 }
 
+/**
+ * Learn a cantrip for a specific class
+ * Cantrips are limited by maxCantripsKnown (from class table)
+ *
+ * @param char - The character
+ * @param classId - The class ID
+ * @param spellId - The cantrip ID to learn
+ * @param data - DataLoader for validation
+ * @returns Updated character
+ */
+export function learnCantripForClass(
+  char: Character,
+  classId: string,
+  spellId: string,
+  data: DataLoader
+): Character {
+  const classSpellcasting = { ...char.spells.classSpellcasting };
+  const classData = classSpellcasting[classId];
+
+  if (!classData) return char;
+
+  // Validate: must be a cantrip
+  const spell = data.getSpell(spellId);
+  if (!spell || !isCantripSpell(spell)) {
+    return char;
+  }
+
+  // Validate: must be on class spell list
+  if (!spell.classes?.includes(classId)) {
+    return char;
+  }
+
+  // Validate: not already known
+  if (classData.knownCantrips.includes(spellId)) {
+    return char;
+  }
+
+  // Validate: not over max
+  if (classData.knownCantrips.length >= classData.maxCantripsKnown) {
+    return char;
+  }
+
+  classSpellcasting[classId] = {
+    ...classData,
+    knownCantrips: [...classData.knownCantrips, spellId],
+  };
+
+  return withUpdate(char, {
+    spells: {
+      ...char.spells,
+      classSpellcasting,
+    },
+  });
+}
+
+/**
+ * Replace a known cantrip for a specific class
+ * Allows swapping one cantrip for another (typically on level up)
+ *
+ * @param char - The character
+ * @param classId - The class ID
+ * @param oldSpellId - The cantrip ID to replace
+ * @param newSpellId - The new cantrip ID
+ * @param data - DataLoader for validation
+ * @returns Updated character
+ */
+export function replaceCantripForClass(
+  char: Character,
+  classId: string,
+  oldSpellId: string,
+  newSpellId: string,
+  data: DataLoader
+): Character {
+  const classSpellcasting = { ...char.spells.classSpellcasting };
+  const classData = classSpellcasting[classId];
+
+  if (!classData) return char;
+
+  // Validate: old spell must be known
+  if (!classData.knownCantrips.includes(oldSpellId)) {
+    return char;
+  }
+
+  // Validate: new spell must be a cantrip
+  const newSpell = data.getSpell(newSpellId);
+  if (!newSpell || !isCantripSpell(newSpell)) {
+    return char;
+  }
+
+  // Validate: new spell must be on class spell list
+  if (!newSpell.classes?.includes(classId)) {
+    return char;
+  }
+
+  // Validate: new spell must not already be known
+  if (classData.knownCantrips.includes(newSpellId)) {
+    return char;
+  }
+
+  classSpellcasting[classId] = {
+    ...classData,
+    knownCantrips: classData.knownCantrips.map(id =>
+      id === oldSpellId ? newSpellId : id
+    ),
+  };
+
+  return withUpdate(char, {
+    spells: {
+      ...char.spells,
+      classSpellcasting,
+    },
+  });
+}
+
 // Backward-compatible versions (use first spellcasting class)
 function getFirstSpellcastingClassId(char: Character): string | null {
   const classIds = Object.keys(char.spells.classSpellcasting);
@@ -638,6 +752,23 @@ export function unprepareSpell(char: Character, spellId: string): Character {
   const classId = getFirstSpellcastingClassId(char);
   if (!classId) return char;
   return unprepareSpellForClass(char, classId, spellId);
+}
+
+export function learnCantrip(char: Character, spellId: string, data: DataLoader): Character {
+  const classId = getFirstSpellcastingClassId(char);
+  if (!classId) return char;
+  return learnCantripForClass(char, classId, spellId, data);
+}
+
+export function replaceCantrip(
+  char: Character,
+  oldSpellId: string,
+  newSpellId: string,
+  data: DataLoader
+): Character {
+  const classId = getFirstSpellcastingClassId(char);
+  if (!classId) return char;
+  return replaceCantripForClass(char, classId, oldSpellId, newSpellId, data);
 }
 
 // ── Currency Mutations ──────────────────────────────────────────

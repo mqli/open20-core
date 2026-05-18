@@ -331,13 +331,30 @@ export function buildInitialSpells(
   const slots = calculateSpellSlots(classData.id, 1, data);
   const maxSpellLevel = getMaxSpellLevel(slots);
 
-  // Auto-populate knownSpells for class_list casters (Cleric, Druid, etc.)
-  // Only include spells they can actually cast (cantrips + up to max spell level)
+  // Get max cantrips known from class table (SRD 5.2)
+  const level1Entry = classData.featuresByLevel.find(f => f.level === 1);
+  const maxCantripsKnown = level1Entry?.cantripsKnown ?? 0;
+
+  // For known casters (Sorcerer, Bard, Warlock):
+  // - knownSpells: chosen spells including cantrips (limited number)
+  // For class_list casters (Cleric, Druid):
+  // - knownCantrips: limited number (player must choose), starts empty
+  // - knownSpells: ALL level 1+ spells on class list (they "know" them all)
+  // For spellbook casters (Wizard):
+  // - knownCantrips: limited number, starts empty
+  // - knownSpells: only spells in spellbook
+  let knownCantrips: readonly string[] = [];
   let knownSpells: readonly string[] = [];
+
   if (spellcasting.knownSource === 'class_list') {
+    // Class list casters: auto-populate level 1+ spells from class list
     knownSpells = data.getAllSpells()
-      .filter(s => s.classes?.includes(classData.id) && (s.level === 0 || s.level <= maxSpellLevel))
+      .filter(s => s.classes?.includes(classData.id) && s.level >= 1 && s.level <= maxSpellLevel)
       .map(s => s.id);
+  } else if (spellcasting.knownSource === 'spellbook') {
+    // Wizard: starts with empty spellbook (cantrips and spells added separately)
+    knownCantrips = [];
+    knownSpells = [];
   }
 
   // Auto-populate alwaysPreparedSpells from subclass (domain/oath spells)
@@ -346,16 +363,16 @@ export function buildInitialSpells(
     alwaysPreparedSpells = getAlwaysPreparedSpellsFromSubclass(subclass, 1);
   }
 
-  // 构建该职业的法术数据
   // 从职业特性表中读取可准备法术数量（SRD 5.2 使用表格数值，非常规公式）
-  const level1Entry = classData.featuresByLevel.find(f => f.level === 1);
   const maxPrepared = level1Entry?.preparedSpells ?? 0;
-  
+
   const classSpellData: ClassSpellData = {
     classId: classData.id,
     spellcastingAbility: ability,
     spellSaveDC,
     spellAttackBonus,
+    knownCantrips,
+    maxCantripsKnown,
     knownSpells,
     preparedSpells: [],
     alwaysPreparedSpells,
@@ -556,12 +573,19 @@ function buildMulticlassSpells(
     const classSlots = calculateSpellSlots(charClass.classId, charClass.level, data);
     const classMaxSpellLevel = getMaxSpellLevel(classSlots);
 
-    // Auto-populate knownSpells for class_list casters (Cleric, Druid, etc.)
-    // Only include spells they can actually cast (cantrips + up to per-class max spell level)
+    // Get max cantrips known from class table (SRD 5.2)
+    const levelEntry = classData.featuresByLevel.find(f => f.level === charClass.level);
+    const maxCantripsKnown = levelEntry?.cantripsKnown ?? 0;
+
+    // For new classes, knownCantrips starts empty (player must choose)
+    let knownCantrips: readonly string[] = [];
     let knownSpells: readonly string[] = [];
+
+    // Auto-populate knownSpells for class_list casters (Cleric, Druid, etc.)
+    // Only include spells they can actually cast (level 1+ up to per-class max spell level)
     if (classData.spellcasting?.knownSource === 'class_list') {
       knownSpells = data.getAllSpells()
-        .filter(s => s.classes?.includes(charClass.classId) && (s.level === 0 || s.level <= classMaxSpellLevel))
+        .filter(s => s.classes?.includes(charClass.classId) && s.level >= 1 && s.level <= classMaxSpellLevel)
         .map(s => s.id);
     }
 
@@ -575,7 +599,6 @@ function buildMulticlassSpells(
     }
 
     // 从职业特性表中读取可准备法术数量（SRD 5.2 使用表格数值，非常规公式）
-    const levelEntry = classData.featuresByLevel.find(f => f.level === charClass.level);
     const maxPrepared = levelEntry?.preparedSpells ?? 0;
 
     classSpellcasting[charClass.classId] = {
@@ -583,6 +606,8 @@ function buildMulticlassSpells(
       spellcastingAbility: ability,
       spellSaveDC,
       spellAttackBonus,
+      knownCantrips,
+      maxCantripsKnown,
       knownSpells,
       preparedSpells: [],
       alwaysPreparedSpells,
