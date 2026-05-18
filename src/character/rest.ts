@@ -12,6 +12,9 @@ import type { SpellLevel } from '../types/spell';
 import { getModifier, getTotalScore } from '../engine/ability-modifier';
 import { getHitDieFixedValue } from '../engine/hp-calculator';
 
+import { withUpdate } from './mutate';
+import { getDieMax } from './level-up';
+
 // ── Random Provider Interface ──────────────────────────────────
 
 export interface RandomProvider {
@@ -21,20 +24,8 @@ export interface RandomProvider {
 
 // ── Helpers ────────────────────────────────────────────────────
 
-function getDieMax(die: DieType): number {
-  return parseInt(die.slice(1), 10);
-}
-
 function getConMod(char: Character): number {
   return getModifier(getTotalScore(char.abilityScores, 'Constitution'));
-}
-
-function withUpdate(char: Character, patch: Partial<Character>): Character {
-  return {
-    ...char,
-    ...patch,
-    updatedAt: new Date().toISOString(),
-  };
 }
 
 // ── Short Rest ─────────────────────────────────────────────────

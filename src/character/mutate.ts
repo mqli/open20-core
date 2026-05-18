@@ -27,7 +27,8 @@ import { recomputeDerivedStats } from './recompute';
 
 // ── Helper ──────────────────────────────────────────────────────
 
-function withUpdate(char: Character, patch: Partial<Character>): Character {
+/** @internal */
+export function withUpdate(char: Character, patch: Partial<Character>): Character {
   return {
     ...char,
     ...patch,
@@ -281,12 +282,8 @@ export function makeConcentrationCheck(
   // Calculate DC
   const dc = calculateConcentrationDC(damageAmount);
 
-  // Get Constitution modifier
-  const conScore = char.abilityScores.base.Constitution
-    + (char.abilityScores.racialBonuses.Constitution ?? 0)
-    + (char.abilityScores.featBonuses.Constitution ?? 0)
-    + (char.abilityScores.temporaryBonuses.Constitution ?? 0);
-  const conMod = Math.floor((conScore - 10) / 2);
+  // Get Constitution modifier using shared utility (respects all bonus sources)
+  const conMod = getModifier(getTotalScore(char.abilityScores, 'Constitution'));
 
   // Check if proficient in Constitution saves
   // A character is proficient if any of their classes has Con as a save proficiency

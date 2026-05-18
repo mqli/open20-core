@@ -197,7 +197,7 @@ function addNewClass(
   char: Character,
   options: LevelUpOptions,
   data: DataLoader,
-  _rng?: RandomProvider
+  rng?: RandomProvider
 ): Character {
   // Validate new class exists in data
   const classData = data.getClass(options.classId);
@@ -207,8 +207,14 @@ function addNewClass(
 
   // Calculate HP for the new class (level 1)
   const conMod = getModifier(getTotalScore(char.abilityScores, 'Constitution'));
-  const hpIncrease = getHitDieFixedValue(classData.hitDie) + conMod;
-  const newMaxHP = char.hitPoints.max + Math.max(1, hpIncrease);
+  let hpIncrease: number;
+  if (options.hpChoice === 'roll' && rng) {
+    hpIncrease = rng.d(getDieMax(classData.hitDie)) + conMod;
+  } else {
+    hpIncrease = getHitDieFixedValue(classData.hitDie) + conMod;
+  }
+  hpIncrease = Math.max(1, hpIncrease);
+  const newMaxHP = char.hitPoints.max + hpIncrease;
 
   // Create new CharacterClass
   const newClass: CharacterClass = {
@@ -323,7 +329,7 @@ function addNewClass(
 /**
  * 获取骰子最大值
  */
-function getDieMax(die: DieType): number {
+export function getDieMax(die: DieType): number {
   const map: Record<DieType, number> = {
     d4: 4,
     d6: 6,

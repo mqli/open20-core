@@ -276,13 +276,9 @@ export function isProficient(
   }
 
   // 职业特性中1级授予的技能熟练
-  const features = getFeaturesAtLevel(classData, 1);
-  for (const feature of features) {
-    if (feature.name === 'Skill Proficiencies' || feature.name === 'Class Skills') {
-      // 特性描述中可能包含技能列表，但这里我们依赖 skillChoices
-      // 职业特性本身可能包含固定技能（如 Rogue 的 Thieves' Tools）
-    }
-  }
+  // TODO: Parse feature.grantedSkills or similar field when Feature type supports it
+  // Currently, class features that grant fixed skill proficiencies (e.g., Rogue's Thieves' Tools)
+  // are not automatically detected. The caller must pass them via skillChoices.
 
   // 用户选择的职业技能
   if (skillChoices.includes(skillName)) {
