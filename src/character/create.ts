@@ -574,6 +574,10 @@ function buildMulticlassSpells(
       }
     }
 
+    // 从职业特性表中读取可准备法术数量（SRD 5.2 使用表格数值，非常规公式）
+    const levelEntry = classData.featuresByLevel.find(f => f.level === charClass.level);
+    const maxPrepared = levelEntry?.preparedSpells ?? 0;
+
     classSpellcasting[charClass.classId] = {
       classId: charClass.classId,
       spellcastingAbility: ability,
@@ -582,7 +586,7 @@ function buildMulticlassSpells(
       knownSpells,
       preparedSpells: [],
       alwaysPreparedSpells,
-      maxPrepared: charClass.level + abilityMod,
+      maxPrepared,
     };
   }
 

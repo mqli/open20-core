@@ -105,7 +105,8 @@ interface ClassSpellData {
   // Always prepared (Domain spells, etc.) — doesn't count against max
   alwaysPreparedSpells?: readonly string[];
 
-  // Max prepared = class level + ability mod (for preparation casters)
+  // Max prepared = from SRD 5.2 class table (not level + ability mod)
+  // SRD 5.2 uses table values instead of the conventional formula
   maxPrepared: number;
 }
 ```
