@@ -272,7 +272,7 @@ describe('recomputeDerivedStats', () => {
 
     // Add Alert feat
     const mutated = mutate(char);
-    mutated.feats = ['Alert'];
+    mutated.feats = [{ featId: 'Alert' }];
     char = recomputeDerivedStats(mutated, data);
     // Dex +2, Alert feat grants +PB (+2 for level 1) → total +4
     expect(char.combatStats.initiative).toBe(4);

@@ -222,10 +222,11 @@ export function validateCharacter(char: Character, data: DataLoader): Validation
 
   // 11. Feats
   for (let i = 0; i < char.feats.length; i++) {
-    const featId = char.feats[i]!;
+    const entry = char.feats[i]!;
+    const featId = entry.featId;
     if (!data.getFeat(featId)) {
       errors.push({
-        field: `feats[${i}]`,
+        field: `feats[${i}].featId`,
         message: `Feat "${featId}" not found in data`,
         severity: 'warning',
       });

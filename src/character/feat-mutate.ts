@@ -3,10 +3,39 @@
 // Handles feat selection, feat choices, and feat removal
 
 import type { Character } from '../types/character';
-import type { Feat, FeatSpellSelection } from '../types/feat';
+import type { Feat, FeatSpellSelection, CharacterFeatEntry } from '../types/feat';
 import type { DataLoader } from '../data/loader';
 import { validateFeatPrerequisites, canTakeFeat } from './feat-validator';
 import { recomputeDerivedStats } from './recompute';
+
+// ── Helpers ──────────────────────────────────────────
+
+/** Check if a character has a feat by featId. */
+function hasFeat(char: Character, featId: string): boolean {
+  return char.feats.some(f => f.featId === featId);
+}
+
+/** Find a feat entry by featId (returns undefined if not found). */
+function findFeatEntry(char: Character, featId: string): CharacterFeatEntry | undefined {
+  return char.feats.find(f => f.featId === featId);
+}
+
+/** Build a new feats array with one entry added or replaced. */
+function upsertFeatEntry(
+  feats: readonly CharacterFeatEntry[],
+  entry: CharacterFeatEntry
+): CharacterFeatEntry[] {
+  const filtered = feats.filter(f => f.featId !== entry.featId);
+  return [...filtered, entry];
+}
+
+/** Build a new feats array with one entry removed. */
+function removeFeatEntry(
+  feats: readonly CharacterFeatEntry[],
+  featId: string
+): CharacterFeatEntry[] {
+  return feats.filter(f => f.featId !== featId);
+}
 
 // ── Public Interface ──────────────────────────────────────
 
@@ -14,12 +43,10 @@ import { recomputeDerivedStats } from './recompute';
  * Options for adding a feat to a character.
  */
 export interface AddFeatOptions {
-  /**
-   * Player's choices for this feat.
-   * - readonly string[]: skill/tool choices (e.g., ["Athletics", "Stealth"])
-   * - Record<string, number>: ability bonus choices (e.g., { "Strength": 2 })
-   */
-  choices?: readonly string[] | Record<string, number>;
+  /** Skill/tool choices (e.g., ["Athletics", "Stealth"]) */
+  skillChoices?: readonly string[];
+  /** Ability bonus choices (e.g., { "Strength": 2 } or { "Strength": 1, "Dexterity": 1 }) */
+  abilityChoices?: Partial<Record<import('../types/ability').AbilityName, number>>;
   /** Spell choices for feats like Magic Initiate */
   spellSelection?: FeatSpellSelection;
 }
@@ -37,11 +64,11 @@ export interface AddFeatOptions {
  *
  * @example
  * // Add a feat with skill choices
- * addFeat(char, 'skilled', data, { choices: ['Athletics', 'Stealth', 'Perception'] });
+ * addFeat(char, 'skilled', data, { skillChoices: ['Athletics', 'Stealth', 'Perception'] });
  *
  * @example
  * // Add a feat with ability bonus choice
- * addFeat(char, 'ability-score-improvement', data, { choices: { Strength: 2 } });
+ * addFeat(char, 'ability-score-improvement', data, { abilityChoices: { Strength: 2 } });
  *
  * @example
  * // Add a feat with spell selection (Magic Initiate)
@@ -73,33 +100,23 @@ export function addFeat(
     );
   }
 
-  const { choices, spellSelection } = options ?? {};
+  const { skillChoices, abilityChoices, spellSelection } = options ?? {};
 
-  // Add feat ID
-  const newFeats = [...char.feats, featId];
+  // Build the new feat entry
+  const newEntry: CharacterFeatEntry = {
+    featId,
+    ...(skillChoices && skillChoices.length > 0 ? { skillChoices } : {}),
+    ...(abilityChoices && Object.keys(abilityChoices).length > 0 ? { abilityChoices } : {}),
+    ...(spellSelection ? { spellChoices: spellSelection } : {}),
+  };
 
-  // Add choices (if any)
-  const newFeatChoices = { ...char.featChoices };
-  if (choices !== undefined) {
-    // Handle both array (skill/tool choices) and object (ability bonus choices)
-    const isEmpty = Array.isArray(choices) ? choices.length === 0 : Object.keys(choices).length === 0;
-    if (!isEmpty) {
-      newFeatChoices[featId] = choices;
-    }
-  }
-
-  // Add spell selection (if any)
-  const newFeatSpellChoices = { ...char.featSpellChoices };
-  if (spellSelection) {
-    newFeatSpellChoices[featId] = spellSelection;
-  }
+  // Add feat entry
+  const newFeats = upsertFeatEntry(char.feats, newEntry);
 
   // Build new character and recompute
   const newChar: Character = {
     ...char,
     feats: newFeats,
-    featChoices: Object.keys(newFeatChoices).length > 0 ? newFeatChoices : undefined,
-    featSpellChoices: Object.keys(newFeatSpellChoices).length > 0 ? newFeatSpellChoices : undefined,
     updatedAt: new Date().toISOString(),
   };
 
@@ -121,27 +138,17 @@ export function removeFeat(
   featId: string,
   data: DataLoader
 ): Character {
-  if (!char.feats.includes(featId)) {
+  if (!hasFeat(char, featId)) {
     throw new Error(`Feat "${featId}" not found on character`);
   }
 
-  // Remove feat ID
-  const newFeats = char.feats.filter(id => id !== featId);
-
-  // Remove choices
-  const newFeatChoices = { ...char.featChoices };
-  delete newFeatChoices[featId];
-
-  // Remove spell choices
-  const newFeatSpellChoices = { ...char.featSpellChoices };
-  delete newFeatSpellChoices[featId];
+  // Remove feat entry
+  const newFeats = removeFeatEntry(char.feats, featId);
 
   // Build new character and recompute
   const newChar: Character = {
     ...char,
     feats: newFeats,
-    featChoices: Object.keys(newFeatChoices).length > 0 ? newFeatChoices : undefined,
-    featSpellChoices: Object.keys(newFeatSpellChoices).length > 0 ? newFeatSpellChoices : undefined,
     updatedAt: new Date().toISOString(),
   };
 
@@ -150,9 +157,6 @@ export function removeFeat(
 
 /**
  * Update choices for a feat (e.g., change which skills you chose for "Skilled").
- * Accepts both:
- * - readonly string[]: skill/tool choices (e.g., ["Athletics", "Stealth"])
- * - Record<string, number>: ability bonus choices (e.g., { "Strength": 2 })
  *
  * @param char - The character to modify
  * @param featId - The ID of the feat
@@ -163,10 +167,13 @@ export function removeFeat(
 export function updateFeatChoices(
   char: Character,
   featId: string,
-  choices: readonly string[] | Record<string, number>,
+  choices: {
+    skillChoices?: readonly string[];
+    abilityChoices?: Partial<Record<import('../types/ability').AbilityName, number>>;
+  },
   data: DataLoader
 ): Character {
-  if (!char.feats.includes(featId)) {
+  if (!hasFeat(char, featId)) {
     throw new Error(`Feat "${featId}" not found on character`);
   }
 
@@ -175,16 +182,30 @@ export function updateFeatChoices(
     throw new Error(`Feat "${featId}" not found in data`);
   }
 
-  // Update choices
-  const newFeatChoices = {
-    ...char.featChoices,
-    [featId]: choices,
+  const existing = findFeatEntry(char, featId);
+
+  // Build updated entry — spread {} conditionally to omit keys when not needed
+  const updatedEntry: CharacterFeatEntry = {
+    featId,
+    ...(choices.skillChoices && choices.skillChoices.length > 0
+      ? { skillChoices: choices.skillChoices }
+      : existing?.skillChoices && existing.skillChoices.length > 0
+        ? { skillChoices: existing.skillChoices }
+        : {}),
+    ...(choices.abilityChoices && Object.keys(choices.abilityChoices).length > 0
+      ? { abilityChoices: choices.abilityChoices }
+      : existing?.abilityChoices && Object.keys(existing.abilityChoices).length > 0
+        ? { abilityChoices: existing.abilityChoices }
+        : {}),
+    ...(existing?.spellChoices ? { spellChoices: existing.spellChoices } : {}),
   };
+
+  const newFeats = upsertFeatEntry(char.feats, updatedEntry);
 
   // Build new character and recompute
   const newChar: Character = {
     ...char,
-    featChoices: newFeatChoices,
+    feats: newFeats,
     updatedAt: new Date().toISOString(),
   };
 
@@ -206,7 +227,7 @@ export function updateFeatSpellChoices(
   spellSelection: FeatSpellSelection,
   data: DataLoader
 ): Character {
-  if (!char.feats.includes(featId)) {
+  if (!hasFeat(char, featId)) {
     throw new Error(`Feat "${featId}" not found on character`);
   }
 
@@ -219,16 +240,23 @@ export function updateFeatSpellChoices(
     throw new Error(`Feat "${featId}" does not have spell choices`);
   }
 
-  // Update spell choices
-  const newFeatSpellChoices = {
-    ...char.featSpellChoices,
-    [featId]: spellSelection,
+  // Get existing entry to preserve other choice types
+  const existing = findFeatEntry(char, featId);
+
+  // Build updated entry with spell choices
+  const updatedEntry: CharacterFeatEntry = {
+    featId,
+    ...(existing?.skillChoices ? { skillChoices: existing.skillChoices } : {}),
+    ...(existing?.abilityChoices ? { abilityChoices: existing.abilityChoices } : {}),
+    spellChoices: spellSelection,
   };
+
+  const newFeats = upsertFeatEntry(char.feats, updatedEntry);
 
   // Build new character and recompute
   const newChar: Character = {
     ...char,
-    featSpellChoices: newFeatSpellChoices,
+    feats: newFeats,
     updatedAt: new Date().toISOString(),
   };
 
@@ -249,8 +277,8 @@ export function getFeatSpecialAbilities(
 ): string[] {
   const abilities: string[] = [];
 
-  for (const featId of char.feats) {
-    const feat = data.getFeat(featId);
+  for (const entry of char.feats) {
+    const feat = data.getFeat(entry.featId);
     if (feat?.grants?.specialAbilities) {
       abilities.push(...feat.grants.specialAbilities);
     }

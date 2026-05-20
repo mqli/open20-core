@@ -177,7 +177,7 @@ export function canTakeFeat(
   feat: Feat
 ): boolean {
   // If feat is not in character's feat list, can take it
-  if (!char.feats.includes(feat.id)) {
+  if (!char.feats.some(f => f.featId === feat.id)) {
     return true;
   }
 

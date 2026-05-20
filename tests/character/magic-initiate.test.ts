@@ -134,7 +134,7 @@ function createMockDataLoader(spells: Record<string, { id: string; level: number
     }),
     getEquipment: () => null,
     getAllSpells: () => Object.values(allSpells),
-    getSpell: (id: string) => allSpells[id] ?? null,
+    getSpell: (id: string) => (allSpells as Record<string, typeof allSpells[keyof typeof allSpells]>)[id] ?? null,
   } as unknown as DataLoader;
 }
 
@@ -168,22 +168,22 @@ describe('Magic Initiate feat spell choices', () => {
     const updated = addFeat(char, 'magic-initiate', data, { spellSelection });
 
     // Check that feat was added
-    expect(updated.feats).toContain('magic-initiate');
+    expect(updated.feats.some(f => f.featId === 'magic-initiate')).toBe(true);
 
     // Check that spell choices are stored
-    expect(updated.featSpellChoices).toBeDefined();
-    expect(updated.featSpellChoices?.['magic-initiate']).toBeDefined();
-    expect(updated.featSpellChoices?.['magic-initiate'].classId).toBe('Wizard');
-    expect(updated.featSpellChoices?.['magic-initiate'].spells['cantrips']).toEqual(['fire-bolt', 'ray-of-frost']);
-    expect(updated.featSpellChoices?.['magic-initiate'].spells['level1Spell']).toEqual(['magic-missile']);
+    const miEntry = updated.feats.find(f => f.featId === 'magic-initiate');
+    expect(miEntry?.spellChoices).toBeDefined();
+    expect(miEntry?.spellChoices?.classId).toBe('Wizard');
+    expect(miEntry?.spellChoices?.spells['cantrips']).toEqual(['fire-bolt', 'ray-of-frost']);
+    expect(miEntry?.spellChoices?.spells['level1Spell']).toEqual(['magic-missile']);
 
     // Check that spells are added to spells.featSpells
     expect(updated.spells.featSpells).toBeDefined();
-    expect(updated.spells.featSpells?.['magic-initiate']).toBeDefined();
-    expect(updated.spells.featSpells?.['magic-initiate'].cantrips).toEqual(['fire-bolt', 'ray-of-frost']);
-    expect(updated.spells.featSpells?.['magic-initiate'].preparedSpells).toContain('magic-missile');
-    expect(updated.spells.featSpells?.['magic-initiate'].oncePerLongRest).toBeDefined();
-    expect(updated.spells.featSpells?.['magic-initiate'].oncePerLongRest?.['magic-missile']).toBe(true);
+    const featSpellsEntry = updated.spells.featSpells!['magic-initiate']!;
+    expect(featSpellsEntry.cantrips).toEqual(['fire-bolt', 'ray-of-frost']);
+    expect(featSpellsEntry.preparedSpells).toContain('magic-missile');
+    expect(featSpellsEntry.oncePerLongRest).toBeDefined();
+    expect(featSpellsEntry.oncePerLongRest?.['magic-missile']).toBe(true);
   });
 
   it('should add Magic Initiate with spell choices (Cleric)', () => {
@@ -215,14 +215,17 @@ describe('Magic Initiate feat spell choices', () => {
     const updated = addFeat(char, 'magic-initiate', data, { spellSelection });
 
     // Check that spell choices are stored
-    expect(updated.featSpellChoices?.['magic-initiate'].classId).toBe('Cleric');
+    const miEntry = updated.feats.find(f => f.featId === 'magic-initiate');
+    expect(miEntry?.spellChoices?.classId).toBe('Cleric');
 
     // Check that spells are added to spells.featSpells
-    expect(updated.spells.featSpells?.['magic-initiate'].cantrips).toEqual(['guidance', 'sacred-flame']);
-    expect(updated.spells.featSpells?.['magic-initiate'].preparedSpells).toContain('healing-word');
+    const clericFeatSpells = updated.spells.featSpells?.['magic-initiate'];
+    expect(clericFeatSpells).toBeDefined();
+    expect(clericFeatSpells!.cantrips).toEqual(['guidance', 'sacred-flame']);
+    expect(clericFeatSpells!.preparedSpells).toContain('healing-word');
 
     // Check that spellcasting ability is Wisdom for Cleric
-    expect(updated.spells.featSpells?.['magic-initiate'].spellcastingAbility).toBe('Wisdom');
+    expect(clericFeatSpells!.spellcastingAbility).toBe('Wisdom');
   });
 
   it('should update spell choices for Magic Initiate', () => {
@@ -266,13 +269,16 @@ describe('Magic Initiate feat spell choices', () => {
     const updated = updateFeatSpellChoices(withFeat, 'magic-initiate', newSelection, data);
 
     // Check that spell choices are updated
-    expect(updated.featSpellChoices?.['magic-initiate'].spells['cantrips']).toEqual(['shocking-grasp', 'ray-of-frost']);
-    expect(updated.featSpellChoices?.['magic-initiate'].spells['level1Spell']).toEqual(['shield']);
+    const miEntry = updated.feats.find(f => f.featId === 'magic-initiate');
+    expect(miEntry?.spellChoices?.spells['cantrips']).toEqual(['shocking-grasp', 'ray-of-frost']);
+    expect(miEntry?.spellChoices?.spells['level1Spell']).toEqual(['shield']);
 
     // Check that spells are updated in spells.featSpells
-    expect(updated.spells.featSpells?.['magic-initiate'].cantrips).toEqual(['shocking-grasp', 'ray-of-frost']);
-    expect(updated.spells.featSpells?.['magic-initiate'].preparedSpells).toContain('shield');
-    expect(updated.spells.featSpells?.['magic-initiate'].oncePerLongRest?.['shield']).toBe(true);
+    const updatedFeatSpells = updated.spells.featSpells?.['magic-initiate'];
+    expect(updatedFeatSpells).toBeDefined();
+    expect(updatedFeatSpells!.cantrips).toEqual(['shocking-grasp', 'ray-of-frost']);
+    expect(updatedFeatSpells!.preparedSpells).toContain('shield');
+    expect(updatedFeatSpells!.oncePerLongRest?.['shield']).toBe(true);
   });
 
   it('should remove Magic Initiate and its spell choices', () => {
@@ -304,17 +310,18 @@ describe('Magic Initiate feat spell choices', () => {
     const withFeat = addFeat(char, 'magic-initiate', data, { spellSelection });
 
     // Verify feat and spell choices are added
-    expect(withFeat.feats).toContain('magic-initiate');
-    expect(withFeat.featSpellChoices?.['magic-initiate']).toBeDefined();
+    expect(withFeat.feats.some(f => f.featId === 'magic-initiate')).toBe(true);
+    const miEntry = withFeat.feats.find(f => f.featId === 'magic-initiate');
+    expect(miEntry?.spellChoices).toBeDefined();
 
     // Remove the feat
     const removed = removeFeat(withFeat, 'magic-initiate', data);
 
     // Check that feat is removed
-    expect(removed.feats).not.toContain('magic-initiate');
+    expect(removed.feats.some(f => f.featId === 'magic-initiate')).toBe(false);
 
     // Check that spell choices are removed
-    expect(removed.featSpellChoices?.['magic-initiate']).toBeUndefined();
+    expect(removed.feats.find(f => f.featId === 'magic-initiate')).toBeUndefined();
 
     // Check that spells are removed from spells.featSpells
     expect(removed.spells.featSpells?.['magic-initiate']).toBeUndefined();
@@ -361,8 +368,9 @@ describe('Magic Initiate feat spell choices', () => {
     // Note: The current implementation doesn't track multiple instances of repeatable feats
     // This test might need adjustment based on how repeatable feats are handled
     // For now, just check that the first one works
-    expect(withWizard.featSpellChoices?.['magic-initiate']).toBeDefined();
-    expect(withWizard.spells.featSpells?.['magic-initiate']).toBeDefined();
+    expect(withWizard.feats.find(f => f.featId === 'magic-initiate')?.spellChoices).toBeDefined();
+    const wizardFeatSpells = withWizard.spells.featSpells?.['magic-initiate'];
+    expect(wizardFeatSpells).toBeDefined();
   });
 });
 
@@ -396,8 +404,9 @@ describe('Casting Magic Initiate spells', () => {
     const withFeat = addFeat(char, 'magic-initiate', data, { spellSelection });
 
     // Check that the cantrip is in featSpells
-    expect(withFeat.spells.featSpells?.['magic-initiate']).toBeDefined();
-    expect(withFeat.spells.featSpells?.['magic-initiate'].cantrips).toContain('fire-bolt');
+    const fighterFeatSpells = withFeat.spells.featSpells?.['magic-initiate'];
+    expect(fighterFeatSpells).toBeDefined();
+    expect(fighterFeatSpells!.cantrips).toContain('fire-bolt');
 
     // Check that canCastCantrip returns true
     const fireBolt = data.getSpell('fire-bolt');
@@ -476,7 +485,9 @@ describe('Casting Magic Initiate spells', () => {
     const withFeat = addFeat(char, 'magic-initiate', data, { spellSelection });
 
     // Check that the level 1 spell is in preparedSpells
-    expect(withFeat.spells.featSpells?.['magic-initiate'].preparedSpells).toContain('magic-missile');
+    const fighterFeatSpells2 = withFeat.spells.featSpells?.['magic-initiate'];
+    expect(fighterFeatSpells2).toBeDefined();
+    expect(fighterFeatSpells2!.preparedSpells).toContain('magic-missile');
 
     // Check that canCastSpell returns true for level 1 spell (once per long rest)
     const magicMissile = data.getSpell('magic-missile');

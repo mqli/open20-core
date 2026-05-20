@@ -40,7 +40,7 @@ function getFeatSpellEntriesForSpell(char: Character, spellId: string): FeatSpel
 export function canCastAsRitual(char: Character, spell: Spell, data: DataLoader): boolean {
   if (!spell.ritual) return false;
 
-  const hasRitualCasterFeat = char.feats?.includes('ritual-caster') ?? false;
+  const hasRitualCasterFeat = char.feats?.some(f => f.featId === 'ritual-caster') ?? false;
   if (hasRitualCasterFeat) return true;
 
   const ritualCastingClasses = ['bard', 'cleric', 'druid', 'wizard'];

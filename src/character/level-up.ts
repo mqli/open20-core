@@ -105,7 +105,7 @@ export function levelUp(
       }
       newAbilityScores = { ...newAbilityScores, featBonuses: newFeatBonuses };
     } else if (options.asiOrFeat.type === 'feat' && options.asiOrFeat.featId) {
-      newFeats = [...newFeats, options.asiOrFeat.featId];
+      newFeats = [...newFeats, { featId: options.asiOrFeat.featId }];
     }
   }
 
@@ -296,7 +296,7 @@ function addNewClass(
     classes: newClasses,
     feats:
       options.asiOrFeat?.type === 'feat' && options.asiOrFeat.featId
-        ? [...char.feats, options.asiOrFeat.featId]
+        ? [...char.feats, { featId: options.asiOrFeat.featId }]
         : char.feats,
     spells: newSpells,
     resources: newResources,

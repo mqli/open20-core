@@ -372,7 +372,7 @@ describe('createCharacter', () => {
       };
 
       const char = createCharacter(params, data);
-      expect(char.feats).toEqual(['Great Weapon Fighting', 'Alert']);
+      expect(char.feats).toEqual([{ featId: 'Great Weapon Fighting' }, { featId: 'Alert' }]);
     });
   });
 

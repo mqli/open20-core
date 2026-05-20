@@ -152,7 +152,7 @@ describe('feat choices', () => {
 
       // Add ASI feat with ability bonus choice: +2 to Strength
       const updated = addFeat(char, 'ability-score-improvement', data, {
-        choices: { Strength: 2 },
+        abilityChoices: { Strength: 2 },
       });
 
       // Check that featGrants has the bonus
@@ -180,7 +180,7 @@ describe('feat choices', () => {
 
       // Add ASI feat with ability bonus choices: +1 to Strength, +1 to Dexterity
       const updated = addFeat(char, 'ability-score-improvement', data, {
-        choices: { Strength: 1, Dexterity: 1 },
+        abilityChoices: { Strength: 1, Dexterity: 1 },
       });
 
       // Check featGrants
@@ -207,7 +207,7 @@ describe('feat choices', () => {
 
       // Add Grappler feat with ability bonus choice: +1 to Strength
       const updated = addFeat(char, 'grappler', data, {
-        choices: { Strength: 1 },
+        abilityChoices: { Strength: 1 },
       });
 
       // Check that featGrants has the bonus
@@ -232,7 +232,7 @@ describe('feat choices', () => {
 
       // Add Grappler feat with ability bonus choice: +1 to Dexterity
       const updated = addFeat(char, 'grappler', data, {
-        choices: { Dexterity: 1 },
+        abilityChoices: { Dexterity: 1 },
       });
 
       // Check that featGrants has the bonus
@@ -259,7 +259,7 @@ describe('feat choices', () => {
 
       // Add Skilled feat with choices: Athletics, Stealth, Perception
       const updated = addFeat(char, 'skilled', data, {
-        choices: ['Athletics', 'Stealth', 'Perception'],
+        skillChoices: ['Athletics', 'Stealth', 'Perception'],
       });
 
       const result = recomputeDerivedStats(updated, data);
@@ -288,7 +288,7 @@ describe('feat choices', () => {
 
       // Add Skilled feat with skill choices (different from background)
       const updated = addFeat(char, 'skilled', data, {
-        choices: ['Perception', 'Investigation', 'Nature'],
+        skillChoices: ['Perception', 'Investigation', 'Nature'],
       });
 
       const result = recomputeDerivedStats(updated, data);
@@ -324,12 +324,12 @@ describe('feat choices', () => {
       updated = updateFeatChoices(
         updated,
         'ability-score-improvement',
-        { Strength: 2 },
+        { abilityChoices: { Strength: 2 } },
         data
       );
 
       // Verify the choice was stored correctly
-      expect(updated.featChoices?.['ability-score-improvement']).toEqual({ Strength: 2 });
+      expect(updated.feats.find(f => f.featId === 'ability-score-improvement')?.abilityChoices).toEqual({ Strength: 2 });
 
       // Verify recompute applies the bonus
       const result = recomputeDerivedStats(updated, data);
@@ -354,19 +354,19 @@ describe('feat choices', () => {
 
       // Add Skilled feat with initial choices
       let updated = addFeat(char, 'skilled', data, {
-        choices: ['Athletics', 'Stealth'],
+        skillChoices: ['Athletics', 'Stealth'],
       });
 
       // Update choices
       updated = updateFeatChoices(
         updated,
         'skilled',
-        ['Perception', 'Investigation', 'Nature'],
+        { skillChoices: ['Perception', 'Investigation', 'Nature'] },
         data
       );
 
       // Verify the choices were updated
-      expect(updated.featChoices?.['skilled']).toEqual(['Perception', 'Investigation', 'Nature']);
+      expect(updated.feats.find(f => f.featId === 'skilled')?.skillChoices).toEqual(['Perception', 'Investigation', 'Nature']);
     });
   });
 
@@ -387,14 +387,14 @@ describe('feat choices', () => {
         },
       }, data);
 
-      // Add ASI feat: +2 to Strength (using choices in addFeat)
+      // Add ASI feat: +2 to Strength (using abilityChoices in addFeat)
       let updated = addFeat(char, 'ability-score-improvement', data, {
-        choices: { Strength: 2 },
+        abilityChoices: { Strength: 2 },
       });
 
-      // Add Grappler feat: +1 to Dexterity (using choices in addFeat)
+      // Add Grappler feat: +1 to Dexterity (using abilityChoices in addFeat)
       updated = addFeat(updated, 'grappler', data, {
-        choices: { Dexterity: 1 },
+        abilityChoices: { Dexterity: 1 },
       });
 
       const result = recomputeDerivedStats(updated, data);

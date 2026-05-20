@@ -352,7 +352,7 @@ describe('levelUp', () => {
     );
 
     expect(result.classes[0]!.level).toBe(8);
-    expect(result.feats).toContain('Tough');
+    expect(result.feats.some(f => f.featId === 'Tough')).toBe(true);
   });
 
   it('5. level up to subclass level: Fighter 2 → 3', () => {

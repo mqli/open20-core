@@ -8,7 +8,7 @@ export type { AbilityName, AbilityScores } from './types';
 export type { Species, SpeciesTrait, SpeciesSubtype } from './types';
 export type { Background } from './types';
 export type { Class, Subclass, Feature, Spellcasting } from './types';
-export type { Feat, FeatCategory, FeatSpellSelection, FeatSpellChoice } from './types/feat';
+export type { Feat, FeatCategory, FeatSpellSelection, FeatSpellChoice, CharacterFeatEntry } from './types/feat';
 export type { Weapon, Armor, GearItem, EquipmentItem } from './types';
 export type { Spell, CharacterSpells, ClassSpellData, AlwaysPreparedSpells, SpellSlotEntry, PactMagicSlots, FeatSpellsEntry } from './types/spell';
 export type { Resource, ResetType } from './types';

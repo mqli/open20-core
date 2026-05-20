@@ -352,13 +352,13 @@ describe('validateCharacter', () => {
 
   it('returns warning for invalid feat', () => {
     const char = createValidCharacter(data);
-    mutate(char).feats = ['NonExistentFeat'];
+    mutate(char).feats = [{ featId: 'NonExistentFeat' }];
     const result = validateCharacter(char, data);
     // Warning means valid is still true
     expect(result.valid).toBe(true);
     expect(result.errors).toContainEqual(
       expect.objectContaining({
-        field: 'feats[0]',
+        field: 'feats[0].featId',
         severity: 'warning',
         message: expect.stringContaining('NonExistentFeat'),
       })

@@ -13,6 +13,13 @@ export interface SchemaValidationResult {
 
 // ── Zod Schema (top-level structure validation) ───────────────────
 
+const FeatEntrySchema = z.object({
+  featId: z.string(),
+  skillChoices: z.array(z.string()).optional(),
+  abilityChoices: z.record(z.string(), z.number()).optional(),
+  spellChoices: z.any().optional(),
+});
+
 const CharacterSchema = z.object({
   schemaVersion: z.string(),
   name: z.string(),
@@ -29,7 +36,7 @@ const CharacterSchema = z.object({
     temporaryBonuses: z.record(z.string(), z.number()).optional(),
   }),
   skills: z.record(z.string(), z.any()),
-  feats: z.array(z.string()),
+  feats: z.array(z.union([z.string(), FeatEntrySchema])),
   equipment: z.array(z.any()),
   spells: z.any(),
   resources: z.array(z.any()),
@@ -100,6 +107,14 @@ export function deserialize(json: string): Character {
     }
   } else {
     throw new Error('Missing schemaVersion field');
+  }
+
+  // Migrate old feats format (string[]) to new format (CharacterFeatEntry[])
+  if (raw && typeof raw === 'object' && Array.isArray((raw as Record<string, unknown>).feats)) {
+    const feats = (raw as Record<string, unknown>).feats as unknown[];
+    if (feats.length > 0 && typeof feats[0] === 'string') {
+      (raw as Record<string, unknown>).feats = (feats as string[]).map(featId => ({ featId }));
+    }
   }
 
   return CharacterSchema.parse(raw) as Character;

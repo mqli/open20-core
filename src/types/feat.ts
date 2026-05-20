@@ -125,3 +125,16 @@ export interface FeatACBonus {
   readonly whileWearing?: readonly string[]; // 特定护甲类型
 }
 
+// ── Character Feat Entry (Consolidated) ─────────────────
+
+// A feat entry on a character, carrying all its choices in one place.
+export interface CharacterFeatEntry {
+  readonly featId: string;
+  // Skill/tool proficiency choices (e.g., Skilled: ["Athletics", "Stealth"])
+  readonly skillChoices?: readonly string[];
+  // Ability bonus choices (e.g., ASI: { "Strength": 2 } or { "Str": 1, "Dex": 1 })
+  readonly abilityChoices?: Partial<Record<import('./ability').AbilityName, number>>;
+  // Spell choices (e.g., Magic Initiate)
+  readonly spellChoices?: FeatSpellSelection;
+}
+
