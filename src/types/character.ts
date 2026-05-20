@@ -17,6 +17,12 @@ export interface Character {
   readonly abilityScores: import('./ability').AbilityScores;
   readonly skills: Record<string, import('./skill').SkillEntry>;
   readonly feats: readonly string[]; // Feat.id 列表
+  // 专长选择 — 支持两种格式：
+  // - readonly string[]: 技能/工具选择（如 ["Athletics", "Stealth"]）
+  // - Record<string, number>: 能力加值选择（如 { "Strength": 2 } 或 { "Strength": 1, "Dexterity": 1 }）
+  readonly featChoices?: Record<string, readonly string[] | Record<string, number>>;
+  // 专长法术选择（如 Magic Initiate 选择戏法和法术）
+  readonly featSpellChoices?: Record<string, import('./feat').FeatSpellSelection>;
   readonly equipment: readonly import('./equipment').EquipmentItem[];
   readonly spells: import('./spell').CharacterSpells;
   readonly resources: readonly import('./resource').Resource[];

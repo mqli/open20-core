@@ -5,8 +5,34 @@
 // Lives in character/ (not engine/) because it operates on Character state.
 
 import type { Spell, SpellLevel, ClassSpellData } from '../types';
+import type { FeatSpellsEntry } from '../types/spell';
 import type { Character } from '../types';
 import type { DataLoader } from '../data/loader';
+
+// ── Helper Functions ──────────────────────────────────────
+
+/** Check if a spell is in featSpells (e.g., Magic Initiate). */
+function isFeatSpell(char: Character, spellId: string): boolean {
+  if (!char.spells.featSpells) return false;
+  for (const featSpellEntry of Object.values(char.spells.featSpells) as FeatSpellsEntry[]) {
+    if (featSpellEntry.cantrips.includes(spellId) || featSpellEntry.preparedSpells.includes(spellId)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/** Get feat spell entries that contain a specific spell. */
+function getFeatSpellEntriesForSpell(char: Character, spellId: string): FeatSpellsEntry[] {
+  if (!char.spells.featSpells) return [];
+  const result: FeatSpellsEntry[] = [];
+  for (const featSpellEntry of Object.values(char.spells.featSpells) as FeatSpellsEntry[]) {
+    if (featSpellEntry.cantrips.includes(spellId) || featSpellEntry.preparedSpells.includes(spellId)) {
+      result.push(featSpellEntry);
+    }
+  }
+  return result;
+}
 
 // ── Ritual Casting ──────────────────────────────────────
 
@@ -58,11 +84,18 @@ export function isCantrip(spell: Spell): boolean {
   return spell.level === 0;
 }
 
+/** Check if character can cast a cantrip (including feat spells like Magic Initiate). */
 export function canCastCantrip(char: Character, spell: Spell, _data: DataLoader): boolean {
   if (!isCantrip(spell)) return false;
+
+  // Check class spellcasting (regular casters)
   for (const csd of Object.values(char.spells.classSpellcasting) as ClassSpellData[]) {
     if (csd.knownSpells.includes(spell.id)) return true;
   }
+
+  // Check feat spells (e.g., Magic Initiate cantrips)
+  if (isFeatSpell(char, spell.id)) return true;
+
   return false;
 }
 
@@ -79,8 +112,11 @@ export function getUpcastDescription(spell: Spell, slotLevel: SpellLevel): strin
   return spell.usingAHigherLevelSpellSlot![0];
 }
 
+/** Find all class spell data entries that can cast a spell. */
 function findCastingClasses(char: Character, spellId: string): ClassSpellData[] {
   const result: ClassSpellData[] = [];
+
+  // Check class spellcasting
   for (const csd of Object.values(char.spells.classSpellcasting) as ClassSpellData[]) {
     const knowsSpell =
       csd.knownSpells.includes(spellId) ||
@@ -88,6 +124,7 @@ function findCastingClasses(char: Character, spellId: string): ClassSpellData[] 
       (csd.alwaysPreparedSpells ?? []).includes(spellId);
     if (knowsSpell) result.push(csd);
   }
+
   return result;
 }
 
@@ -101,18 +138,48 @@ export function castSpell(
   const spell = data.getSpell(spellId);
   if (!spell) return { success: false, char, message: 'Spell not found.' };
 
+  // Check class spellcasting
   const castingClasses = findCastingClasses(char, spellId);
-  if (castingClasses.length === 0) {
+
+  // Check feat spells (e.g., Magic Initiate)
+  const featSpellEntries = getFeatSpellEntriesForSpell(char, spellId);
+
+  if (castingClasses.length === 0 && featSpellEntries.length === 0) {
     return { success: false, char, message: 'Character does not know this spell.' };
   }
 
+  // Handle cantrips (no slot needed)
   if (isCantrip(spell)) {
+    const castingClassId = castingClasses[0]?.classId ?? featSpellEntries[0]?.classId;
     return {
       success: true,
       char,
       message: `Cast ${spell.name} (cantrip, no slot used).`,
-      castingClassId: castingClasses[0]?.classId,
+      castingClassId,
     };
+  }
+
+  // Handle feat spells (level 1+ spells that can be cast once per long rest)
+  if (featSpellEntries.length > 0 && castingClasses.length === 0) {
+    // This is a feat spell (not from a class)
+    const featEntry = featSpellEntries[0]!;
+
+    // Check if it's once per long rest
+    if (featEntry.oncePerLongRest?.[spellId]) {
+      // TODO: Track usage in character state (long rest reset)
+      // For now, just allow casting
+      return {
+        success: true,
+        char,
+        message: `Cast ${spell.name} (once per long rest, no slot used).`,
+        castingClassId: featEntry.classId,
+      };
+    }
+  }
+
+  // Handle regular spell casting (requires spell slots)
+  if (castingClasses.length === 0) {
+    return { success: false, char, message: 'Character does not know this spell.' };
   }
 
   if (slotLevel < spell.level) {

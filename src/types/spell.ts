@@ -60,6 +60,23 @@ export interface CharacterSpells {
 
   // Warlock Pact Magic（独立于常规法术位）
   readonly pactMagicSlots: PactMagicSlots | null;
+
+  // 专长授予的法术（如 Magic Initiate 的戏法和法术）
+  readonly featSpells?: Record<string, FeatSpellsEntry>;
+}
+
+// 专长法术条目（存储专长授予的法术信息）
+export interface FeatSpellsEntry {
+  // 法术来源的职业（决定法术列表和施法关键属性）
+  readonly classId: string;
+  // 施法关键属性（由 classId 决定）
+  readonly spellcastingAbility: AbilityName;
+  // 已知的戏法
+  readonly cantrips: readonly string[];
+  // 已准备的法术（总是已准备）
+  readonly preparedSpells: readonly string[];
+  // 每日长休后恢复一次的法术（无法术位施法）
+  readonly oncePerLongRest?: Record<string, boolean>;
 }
 
 // 法术施法时间

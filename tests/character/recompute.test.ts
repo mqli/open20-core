@@ -274,7 +274,8 @@ describe('recomputeDerivedStats', () => {
     const mutated = mutate(char);
     mutated.feats = ['Alert'];
     char = recomputeDerivedStats(mutated, data);
-    expect(char.combatStats.initiative).toBe(7); // +2 + 5
+    // Dex +2, Alert feat grants +PB (+2 for level 1) → total +4
+    expect(char.combatStats.initiative).toBe(4);
   });
 
   it('recalculates passive perception', () => {

@@ -143,6 +143,7 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
     abilityScores,
     skills,
     feats: params.featIds ?? [],
+    featChoices: {},
     equipment: [],
     spells: emptyCharacterSpells(),
     resources,

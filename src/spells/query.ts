@@ -132,7 +132,7 @@ export function searchSpells(filter: SpellFilter, data: DataLoader): Spell[] {
 }
 
 /**
- * Get spells for a character (known by any class)
+ * Get spells for a character (known by any class or from feats)
  * Only returns spells the character can actually cast (cantrips + up to max spell level)
  *
  * @param char - Character object
@@ -154,6 +154,8 @@ export function getSpellsForCharacter(char: Character, data: DataLoader): Spell[
 
   // Collect known spells from all classes, filtered by castable level
   const knownSpellIds = new Set<string>();
+
+  // Add class spells
   for (const classSpellData of Object.values(char.spells.classSpellcasting)) {
     // Add cantrips (level 0) from knownCantrips
     for (const spellId of (classSpellData.knownCantrips ?? [])) {
@@ -164,6 +166,24 @@ export function getSpellsForCharacter(char: Character, data: DataLoader): Spell[
       const spell = data.getSpell(spellId);
       if (spell && spell.level <= maxSpellLevel) {
         knownSpellIds.add(spellId);
+      }
+    }
+  }
+
+  // Add feat spells (e.g., Magic Initiate cantrips and once-per-long-rest spells)
+  if (char.spells.featSpells) {
+    for (const featSpellEntry of Object.values(char.spells.featSpells)) {
+      // Add cantrips
+      for (const spellId of featSpellEntry.cantrips) {
+        knownSpellIds.add(spellId);
+      }
+      // Add prepared spells (level 1+ from feat)
+      for (const spellId of featSpellEntry.preparedSpells) {
+        const spell = data.getSpell(spellId);
+        // Feat spells can always be cast (once per long rest for level 1+)
+        if (spell) {
+          knownSpellIds.add(spellId);
+        }
       }
     }
   }
@@ -221,14 +241,16 @@ export function isSpellPrepared(char: Character, spellId: string): boolean {
 }
 
 /**
- * Check if a character knows a spell (in any class)
+ * Check if a character knows a spell (in any class or from feats)
  * Checks both knownCantrips (for cantrips) and knownSpells (for level 1+)
+ * Also checks featSpells (e.g., Magic Initiate)
  *
  * @param char - Character object
  * @param spellId - Spell ID
- * @returns True if the character knows the spell in any class
+ * @returns True if the character knows the spell in any class or from feats
  */
 export function knowsSpell(char: Character, spellId: string): boolean {
+  // Check class spellcasting
   for (const classSpellData of Object.values(char.spells.classSpellcasting)) {
     if (
       (classSpellData.knownCantrips ?? []).includes(spellId) ||
@@ -237,13 +259,26 @@ export function knowsSpell(char: Character, spellId: string): boolean {
       return true;
     }
   }
+
+  // Check feat spells (e.g., Magic Initiate)
+  if (char.spells.featSpells) {
+    for (const featSpellEntry of Object.values(char.spells.featSpells)) {
+      if (
+        featSpellEntry.cantrips.includes(spellId) ||
+        featSpellEntry.preparedSpells.includes(spellId)
+      ) {
+        return true;
+      }
+    }
+  }
+
   return false;
 }
 
 /**
  * Check if a character can cast a spell (cantrip or level 1+)
  * - Cantrips: check if known (can cast at will)
- * - Level 1+ spells: check if prepared
+ * - Level 1+ spells: check if prepared or from feat (once per long rest)
  *
  * @param char - Character object
  * @param spell - Spell to check
@@ -251,15 +286,26 @@ export function knowsSpell(char: Character, spellId: string): boolean {
  * @returns True if the character can cast the spell
  *
  * @example
- * canCastSpell(char, spell, data) // true if cantrip (known) or level 1+ (prepared)
+ * canCastSpell(char, spell, data) // true if cantrip (known) or level 1+ (prepared or feat spell)
  */
 export function canCastSpell(char: Character, spell: Spell, data: DataLoader): boolean {
   if (spell.level === 0) {
-    // Cantrip - check if known (in knownCantrips)
+    // Cantrip - check if known (in knownCantrips or featSpells)
     return knowsSpell(char, spell.id);
   }
-  // Level 1+ - check if prepared
-  return isSpellPrepared(char, spell.id);
+  // Level 1+ - check if prepared or from feat (once per long rest)
+  if (isSpellPrepared(char, spell.id)) return true;
+
+  // Check if it's a feat spell (e.g., Magic Initiate)
+  if (char.spells.featSpells) {
+    for (const featSpellEntry of Object.values(char.spells.featSpells)) {
+      if (featSpellEntry.preparedSpells.includes(spell.id)) {
+        return true; // Feat spells can always be cast (once per long rest)
+      }
+    }
+  }
+
+  return false;
 }
 
 /**

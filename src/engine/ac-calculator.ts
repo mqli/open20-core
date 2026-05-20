@@ -7,6 +7,7 @@ import type { AbilityScores } from '../types/ability';
 import type { Armor, EquipmentItem } from '../types/equipment';
 import type { Feature } from '../types/class';
 import type { DataLoader } from '../data/loader';
+import type { FeatACBonus } from '../types/feat';
 import { getModifier, getTotalScore } from './ability-modifier';
 
 /**
@@ -22,12 +23,14 @@ import { getModifier, getTotalScore } from './ability-modifier';
  * - 重甲: 护甲AC
  * - 盾牌: +2（与以上任何叠加）
  * - 多个AC来源时取最高值（不叠加）
+ * - 战斗风格专长：Defense +1 AC（当穿着护甲时）
  *
  * @param scores - 属性值对象
  * @param equipment - 装备列表
  * @param features - 角色拥有的特性列表
  * @param data - DataLoader（查护甲数据）
  * @param conditions - 角色当前状态列表（用于检测Mage Armor等，可选，默认空）
+ * @param featACBonuses - 专长给予的AC加值（可选，用于战斗风格）
  * @returns AC值
  */
 export function calculateAC(
@@ -35,7 +38,8 @@ export function calculateAC(
   equipment: readonly EquipmentItem[],
   features: readonly Feature[],
   data: DataLoader,
-  conditions: readonly { source?: string; id?: string }[] = []
+  conditions: readonly { source?: string; id?: string }[] = [],
+  featACBonuses?: readonly FeatACBonus[]
 ): number {
   const dexMod = getModifier(getTotalScore(scores, 'Dexterity'));
   const conMod = getModifier(getTotalScore(scores, 'Constitution'));
@@ -46,6 +50,7 @@ export function calculateAC(
   // 1. 收集所有装备的护甲和盾牌
   const equippedArmor = getEquippedArmor(equipment, data);
   const hasShield = hasEquippedShield(equipment, data);
+  const hasArmor = equippedArmor.length > 0;
 
   // 2. 计算所有可能的AC来源
   const acOptions: number[] = [];
@@ -86,6 +91,35 @@ export function calculateAC(
   // 4. 叠加盾牌
   if (hasShield) {
     ac += 2;
+  }
+
+  // 5. 应用专长AC加值（如 Defense 战斗风格 +1）
+  // Defense: +1 AC when wearing Light, Medium, or Heavy armor
+  if (featACBonuses && featACBonuses.length > 0 && hasArmor) {
+    for (const bonus of featACBonuses) {
+      // 检查是否穿着符合条件的护甲
+      const armorTypes = bonus.whileWearing ?? [];
+      const hasMatchingArmor = equippedArmor.some(a => {
+        if (armorTypes.includes('Light') && a.category === 'Light') return true;
+        if (armorTypes.includes('Medium') && a.category === 'Medium') return true;
+        if (armorTypes.includes('Heavy') && a.category === 'Heavy') return true;
+        return false;
+      });
+
+      if (hasMatchingArmor) {
+        // 应用对应的加值
+        if (bonus.lightArmor && equippedArmor.some(a => a.category === 'Light')) {
+          ac += bonus.lightArmor;
+        } else if (bonus.mediumArmor && equippedArmor.some(a => a.category === 'Medium')) {
+          ac += bonus.mediumArmor;
+        } else if (bonus.heavyArmor && equippedArmor.some(a => a.category === 'Heavy')) {
+          ac += bonus.heavyArmor;
+        } else if (bonus.lightArmor || bonus.mediumArmor || bonus.heavyArmor) {
+          // 如果只指定了一个通用加值，应用它
+          ac += (bonus.lightArmor ?? bonus.mediumArmor ?? bonus.heavyArmor ?? 0);
+        }
+      }
+    }
   }
 
   return ac;

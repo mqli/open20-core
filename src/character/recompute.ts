@@ -25,14 +25,20 @@ import { getAlwaysPreparedSpellsFromSubclass, gatherAllFeatures, getMaxSpellLeve
 
 /**
  * Compute ability score grants from feats.
+ * Handles both fixed bonuses (feat.grants.abilityBonus) and
+ * choice-based bonuses (char.featChoices).
  * Background ability score choices are stored in abilityScores.backgroundBonuses
  * and applied directly (set by player during character creation/level-up).
  */
 function computeFeatGrants(char: Character, data: DataLoader): Partial<Record<AbilityName, number>> {
   const featGrants: Partial<Record<AbilityName, number>> = {};
+
   for (const featId of char.feats) {
     const feat = data.getFeat(featId);
-    if (feat?.grants?.abilityBonus) {
+    if (!feat) continue;
+
+    // 1. Apply fixed ability bonuses (if any)
+    if (feat.grants?.abilityBonus) {
       for (const [ability, bonus] of Object.entries(feat.grants.abilityBonus)) {
         const numBonus = bonus as number;
         if (numBonus !== 0) {
@@ -41,8 +47,98 @@ function computeFeatGrants(char: Character, data: DataLoader): Partial<Record<Ab
         }
       }
     }
+
+    // 2. Apply choice-based ability bonuses from featChoices
+    const choices = char.featChoices?.[featId];
+    if (choices && typeof choices === 'object' && !Array.isArray(choices)) {
+      // choices is Record<string, number> — ability bonus choices
+      for (const [ability, bonus] of Object.entries(choices)) {
+        const numBonus = bonus as number;
+        if (numBonus !== 0) {
+          featGrants[ability as AbilityName] =
+            (featGrants[ability as AbilityName] ?? 0) + numBonus;
+        }
+      }
+    }
   }
+
   return featGrants;
+}
+
+/**
+ * Apply feat skill/tool proficiencies to the skills record.
+ * Feat choices are stored in char.featChoices.
+ * Handles both:
+ * - readonly string[]: skill/tool choices (e.g., ["Athletics", "Stealth"])
+ * - Record<string, number>: ability bonus choices (e.g., { "Strength": 2 })
+ */
+function applyFeatSkillProficiencies(
+  skills: Record<string, import('../types/skill').SkillEntry>,
+  featChoices: Record<string, readonly string[] | Record<string, number>> | undefined,
+  char: Character,
+  data: DataLoader
+): Record<string, import('../types/skill').SkillEntry> {
+  const updatedSkills = { ...skills };
+  const choices = featChoices ?? {};
+
+  for (const [featId, choicesForFeat] of Object.entries(choices)) {
+    // Only apply if character has this feat
+    if (!char.feats.includes(featId)) continue;
+
+    const feat = data.getFeat(featId);
+    if (!feat) continue;
+
+    // Skip ability bonus choices (handled by computeFeatGrants)
+    if (!Array.isArray(choicesForFeat)) continue;
+
+    // choicesForFeat is readonly string[] — skill/tool choices
+    const skillChoices = choicesForFeat as readonly string[];
+
+    // Apply predefined skill proficiencies from feat data
+    const skillProficiencies = feat.grants?.skillProficiencies ?? [];
+    for (const skill of skillProficiencies) {
+      if (updatedSkills[skill]) {
+        updatedSkills[skill] = { ...updatedSkills[skill], proficient: true };
+      }
+    }
+
+    // Apply player's choices for this feat
+    for (const choice of skillChoices) {
+      if (updatedSkills[choice]) {
+        updatedSkills[choice] = { ...updatedSkills[choice], proficient: true };
+      }
+    }
+  }
+
+  return updatedSkills;
+}
+
+/**
+ * Extract attack bonuses from feats (for Fighting Style feats like Archery).
+ */
+function computeFeatAttackBonuses(char: Character, data: DataLoader): readonly import('../types/feat').FeatAttackBonus[] {
+  const bonuses: import('../types/feat').FeatAttackBonus[] = [];
+  for (const featId of char.feats) {
+    const feat = data.getFeat(featId);
+    if (feat?.grants?.attackBonus) {
+      bonuses.push(feat.grants.attackBonus);
+    }
+  }
+  return bonuses;
+}
+
+/**
+ * Extract AC bonuses from feats (for Fighting Style feats like Defense).
+ */
+function computeFeatACBonuses(char: Character, data: DataLoader): readonly import('../types/feat').FeatACBonus[] {
+  const bonuses: import('../types/feat').FeatACBonus[] = [];
+  for (const featId of char.feats) {
+    const feat = data.getFeat(featId);
+    if (feat?.grants?.acBonus) {
+      bonuses.push(feat.grants.acBonus);
+    }
+  }
+  return bonuses;
 }
 
 // ── Feature Gathering ──────────────────────────────────────
@@ -75,10 +171,12 @@ function computeCombatStats(
   skills: Character['skills'],
   pb: number,
   weaponProficiencies: string[],
-  data: DataLoader
+  data: DataLoader,
+  featAttackBonuses: readonly import('../types/feat').FeatAttackBonus[],
+  featACBonuses: readonly import('../types/feat').FeatACBonus[]
 ) {
-  const newAC = calculateAC(abilityScores, equipment, features, data, conditions);
-  const newInitiative = calculateInitiative(abilityScores, feats, features);
+  const newAC = calculateAC(abilityScores, equipment, features, data, conditions, featACBonuses);
+  const newInitiative = calculateInitiative(abilityScores, feats, features, pb);
   const newPassivePerception = calculatePassivePerception(
     abilityScores,
     skills,
@@ -91,7 +189,8 @@ function computeCombatStats(
     pb,
     features,
     data,
-    weaponProficiencies
+    weaponProficiencies,
+    featAttackBonuses
   );
 
   return { newAC, newInitiative, newPassivePerception, newAttacks };
@@ -293,6 +392,66 @@ function computeSpellSlots(
   return updatedSlots;
 }
 
+// ── Feat Spells ──────────────────────────────────────────
+
+/**
+ * Compute feat spells from featSpellChoices.
+ * Populates spells.featSpells with spells granted by feats like Magic Initiate.
+ */
+function computeFeatSpells(
+  char: Character,
+  data: DataLoader,
+  pb: number
+): Record<string, import('../types/spell').FeatSpellsEntry> | undefined {
+  const featSpellChoices = char.featSpellChoices;
+  if (!featSpellChoices || Object.keys(featSpellChoices).length === 0) {
+    return undefined; // No feat spell choices, so no feat spells
+  }
+
+  const featSpells: Record<string, import('../types/spell').FeatSpellsEntry> = {};
+
+  for (const [featId, selection] of Object.entries(featSpellChoices)) {
+    // Check if character has this feat
+    if (!char.feats.includes(featId)) continue;
+
+    const feat = data.getFeat(featId);
+    if (!feat?.grants?.spellChoices) continue;
+
+    // Determine spellcasting ability from classId
+    const classData = data.getClass(selection.classId);
+    if (!classData?.spellcasting) continue;
+
+    const spellcastingAbility = classData.spellcasting.ability;
+
+    // Build the FeatSpellsEntry
+    const cantrips = selection.spells['cantrips'] ?? [];
+    const level1Spell = selection.spells['level1Spell'] ?? [];
+
+    // Determine which spells can be cast once per long rest
+    const oncePerLongRest: Record<string, boolean> = {};
+    if (feat.grants.spellChoices) {
+      for (const spellChoice of feat.grants.spellChoices) {
+        if (spellChoice.oncePerLongRest) {
+          const spellsForChoice = selection.spells[spellChoice.id] ?? [];
+          for (const spell of spellsForChoice) {
+            oncePerLongRest[spell] = true;
+          }
+        }
+      }
+    }
+
+    featSpells[featId] = {
+      classId: selection.classId,
+      spellcastingAbility,
+      cantrips,
+      preparedSpells: [...cantrips, ...level1Spell],
+      oncePerLongRest: Object.keys(oncePerLongRest).length > 0 ? oncePerLongRest : undefined,
+    };
+  }
+
+  return Object.keys(featSpells).length > 0 ? featSpells : undefined;
+}
+
 // ── Main Orchestrator ─────────────────────────────────────
 
 /**
@@ -307,10 +466,23 @@ function computeSpellSlots(
  * 6. Attacks
  * 7. Spell Save DC & Spell Attack Bonus (if spellcasting)
  * 8. Spell slot totals (preserving used counts where possible)
+ * 9. Apply feat skill/tool proficiencies
  */
 export function recomputeDerivedStats(char: Character, data: DataLoader): Character {
   // 1. Feat grants (single source of truth)
   const featGrants = computeFeatGrants(char, data);
+
+  // 1.5. Compute feat attack and AC bonuses (for Fighting Style feats)
+  const featAttackBonuses = computeFeatAttackBonuses(char, data);
+  const featACBonuses = computeFeatACBonuses(char, data);
+
+  // 1.6. Apply feat skill proficiencies
+  const updatedSkills = applyFeatSkillProficiencies(
+    char.skills,
+    char.featChoices,
+    char,
+    data
+  );
 
   // 2. Update abilityScores with computed grants
   const updatedAbilityScores: AbilityScores = {
@@ -334,10 +506,12 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
       features,
       char.conditions,
       char.feats,
-      char.skills,
+      updatedSkills,
       pb,
       weaponProficiencies,
-      data
+      data,
+      featAttackBonuses,
+      featACBonuses
     );
 
   // 5. Spell data (per-class)
@@ -356,6 +530,19 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     spellSlots: updatedSlots,
   };
 
+  // 7.5. Feat spells (e.g., Magic Initiate)
+  const featSpells = computeFeatSpells(char, data, pb);
+  if (featSpells) {
+    newSpells = {
+      ...newSpells,
+      featSpells,
+    };
+  } else {
+    // Remove featSpells if no longer applicable
+    const { featSpells: _, ...rest } = newSpells;
+    newSpells = rest as typeof newSpells;
+  }
+
   // 8. Max HP (cap current at new max; never heal via recompute)
   const newMaxHP = calculateMaxHP(char.classes, conMod, data);
   const newCurrent = Math.min(char.hitPoints.current, newMaxHP);
@@ -364,6 +551,7 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
   return {
     ...char,
     abilityScores: updatedAbilityScores,
+    skills: updatedSkills,
     hitPoints: {
       ...char.hitPoints,
       max: newMaxHP,

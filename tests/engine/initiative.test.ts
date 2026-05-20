@@ -56,16 +56,16 @@ describe('calculateInitiative', () => {
   });
 
   describe('feat bonuses (proficiency bonus)', () => {
-    it('should add +5 for Alert feat', () => {
+    it('should add proficiency bonus for Alert feat', () => {
       const scores = createAbilityScores({ Dexterity: 14 });
-      const result = calculateInitiative(scores, ['Alert'], []);
-      // Dex +2, Alert feat grants +5 → total +7
-      expect(result).toBe(7);
+      const result = calculateInitiative(scores, ['Alert'], [], 2);
+      // Dex +2, Alert feat grants +PB (+2) → total +4
+      expect(result).toBe(4);
     });
 
-    it('should not add bonus if no relevant feature', () => {
+    it('should not add bonus if no relevant feat', () => {
       const scores = createAbilityScores({ Dexterity: 14 });
-      const result = calculateInitiative(scores, ['Strength Feat'], []);
+      const result = calculateInitiative(scores, ['Strength Feat'], [], 2);
       // Only Dex mod, no Alert
       expect(result).toBe(2);
     });

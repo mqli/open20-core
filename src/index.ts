@@ -8,9 +8,9 @@ export type { AbilityName, AbilityScores } from './types';
 export type { Species, SpeciesTrait, SpeciesSubtype } from './types';
 export type { Background } from './types';
 export type { Class, Subclass, Feature, Spellcasting } from './types';
-export type { Feat, FeatCategory } from './types';
+export type { Feat, FeatCategory, FeatSpellSelection, FeatSpellChoice } from './types/feat';
 export type { Weapon, Armor, GearItem, EquipmentItem } from './types';
-export type { Spell, CharacterSpells, ClassSpellData, AlwaysPreparedSpells, SpellSlotEntry, PactMagicSlots } from './types';
+export type { Spell, CharacterSpells, ClassSpellData, AlwaysPreparedSpells, SpellSlotEntry, PactMagicSlots, FeatSpellsEntry } from './types/spell';
 export type { Resource, ResetType } from './types';
 export type { CombatStats, CharacterAttack, ActiveCondition, ConditionName } from './types';
 export type { BaseAttack } from './types';
@@ -123,6 +123,20 @@ export {
 } from './character';
 export { validateCharacter } from './character';
 export { recomputeDerivedStats } from './character';
+
+// ── Character: Feat Validation ─────────────────────────
+export type { FeatValidationResult } from './character/feat-validator';
+export { validateFeatPrerequisites, canTakeFeat } from './character/feat-validator';
+
+// ── Character: Feat Mutations ──────────────────────────
+export type { AddFeatOptions } from './character/feat-mutate';
+export {
+  addFeat,
+  removeFeat,
+  updateFeatChoices,
+  updateFeatSpellChoices,
+  getFeatSpecialAbilities,
+} from './character/feat-mutate';
 
 // ── Spells (query + preparation rules) ─────────────────
 export type { SpellFilter } from './spells';

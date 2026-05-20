@@ -7,6 +7,7 @@ import type { Weapon, EquipmentItem } from '../types/equipment';
 import type { Feature } from '../types/class';
 import type { CharacterAttack } from '../types/character';
 import type { DataLoader } from '../data/loader';
+import type { FeatAttackBonus } from '../types/feat';
 import { getModifier, getTotalScore } from './ability-modifier';
 
 /**
@@ -17,6 +18,7 @@ import { getModifier, getTotalScore } from './ability-modifier';
  * - Finesse武器：可选Str或Dex（取高者）
  * - 伤害 = 武器骰 + 属性调整值
  * - 武器精通属性从武器数据中获取
+ * - 战斗风格专长：Archery +2 远程攻击加值
  *
  * @param scores - 属性值对象
  * @param equipment - 装备列表
@@ -24,6 +26,7 @@ import { getModifier, getTotalScore } from './ability-modifier';
  * @param features - 角色特性列表
  * @param data - DataLoader
  * @param weaponProficiencies - 角色武器熟练项列表（可选，默认空）
+ * @param featAttackBonuses - 专长给予的攻击加值（可选，用于战斗风格）
  * @returns 攻击列表
  */
 export function calculateAttacks(
@@ -32,7 +35,8 @@ export function calculateAttacks(
   proficiencyBonus: number,
   features: readonly Feature[],
   data: DataLoader,
-  weaponProficiencies: readonly string[] = []
+  weaponProficiencies: readonly string[] = [],
+  featAttackBonuses?: readonly FeatAttackBonus[]
 ): CharacterAttack[] {
   const attacks: CharacterAttack[] = [];
 
@@ -47,7 +51,8 @@ export function calculateAttacks(
       scores,
       weapon,
       proficiencyBonus,
-      weaponProficiencies
+      weaponProficiencies,
+      featAttackBonuses
     );
 
     // 伤害字符串（使用 entries[0] 为基础伤害）
@@ -71,12 +76,14 @@ export function calculateAttacks(
 
 /**
  * 计算单件武器的攻击加值和伤害调整值
+ * @param featAttackBonuses - 专长给予的攻击加值（如 Archery +2 远程）
  */
 function calculateWeaponAttack(
   scores: AbilityScores,
   weapon: Weapon,
   proficiencyBonus: number,
-  weaponProficiencies: readonly string[]
+  weaponProficiencies: readonly string[],
+  featAttackBonuses?: readonly FeatAttackBonus[]
 ): { attackBonus: number; damageMod: number; abilityUsed: string } {
   const strMod = getModifier(getTotalScore(scores, 'Strength'));
   const dexMod = getModifier(getTotalScore(scores, 'Dexterity'));
@@ -115,7 +122,21 @@ function calculateWeaponAttack(
     weaponProficiencies.includes('Simple') && weapon.category === 'Simple' ||
     weaponProficiencies.includes('Martial') && weapon.category === 'Martial';
 
-  const attackBonus = (isProficient ? proficiencyBonus : 0) + abilityMod;
+  let attackBonus = (isProficient ? proficiencyBonus : 0) + abilityMod;
+
+  // 应用专长攻击加值（如 Archery +2 远程攻击）
+  if (featAttackBonuses && featAttackBonuses.length > 0) {
+    for (const bonus of featAttackBonuses) {
+      // 远程武器加值
+      if (bonus.ranged && (weapon.properties.includes('Range') || weapon.damage.ability === 'Dexterity')) {
+        attackBonus += bonus.ranged;
+      }
+      // 近战武器加值
+      if (bonus.melee && !weapon.properties.includes('Range')) {
+        attackBonus += bonus.melee;
+      }
+    }
+  }
 
   return {
     attackBonus,
