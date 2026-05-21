@@ -21,6 +21,7 @@
       "Sorcerer",
       "Wizard"
     ],
+    "cantripUpgradeText": "The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6).",
     "cantripUpgrade": [
       {
         "atCharacterLevel": 5,
@@ -83,6 +84,7 @@
       "Warlock",
       "Wizard"
     ],
+    "cantripUpgradeText": "The damage increases by 1d10 when you reach levels 5 (2d10), 11 (3d10), and 17 (4d10).",
     "cantripUpgrade": [
       {
         "atCharacterLevel": 5,
@@ -203,6 +205,7 @@
     "classes": [
       "Warlock"
     ],
+    "cantripUpgradeText": "The spell creates two beams at level 5, three beams at level 11, and four beams at level 17. You can direct the beams at the same target or at different ones. Make a separate attack roll for each beam.",
     "damage": {
       "entries": [
         {
@@ -269,6 +272,7 @@
       "Sorcerer",
       "Wizard"
     ],
+    "cantripUpgradeText": "The damage increases by 1d10 when you reach levels 5 (2d10), 11 (3d10), and 17 (4d10).",
     "cantripUpgrade": [
       {
         "atCharacterLevel": 5,
@@ -499,6 +503,7 @@
       "Warlock",
       "Wizard"
     ],
+    "cantripUpgradeText": "The damage increases by 1d12 when you reach levels 5 (2d12), 11 (3d12), and 17 (4d12).",
     "cantripUpgrade": [
       {
         "atCharacterLevel": 5,
@@ -598,6 +603,7 @@
     "classes": [
       "Druid"
     ],
+    "cantripUpgradeText": "The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).",
     "cantripUpgrade": [
       {
         "atCharacterLevel": 5,
@@ -659,6 +665,7 @@
       "Sorcerer",
       "Wizard"
     ],
+    "cantripUpgradeText": "The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).",
     "cantripUpgrade": [
       {
         "atCharacterLevel": 5,
@@ -739,6 +746,7 @@
     "classes": [
       "Cleric"
     ],
+    "cantripUpgradeText": "The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).",
     "cantripUpgrade": [
       {
         "atCharacterLevel": 5,
@@ -802,6 +810,7 @@
     "classes": [
       "Druid"
     ],
+    "cantripUpgradeText": "The damage die changes when you reach levels 5 (d10), 11 (d12), and 17 (2d6).",
     "cantripUpgrade": [
       {
         "atCharacterLevel": 5,
@@ -855,6 +864,7 @@
       "Sorcerer",
       "Wizard"
     ],
+    "cantripUpgradeText": "The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).",
     "cantripUpgrade": [
       {
         "atCharacterLevel": 5,
@@ -914,6 +924,7 @@
     "classes": [
       "Sorcerer"
     ],
+    "cantripUpgradeText": "The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).",
     "cantripUpgrade": [
       {
         "atCharacterLevel": 5,
@@ -966,7 +977,8 @@
     "classes": [
       "Cleric",
       "Druid"
-    ]
+    ],
+    "cantripUpgradeText": "The range doubles when you reach levels 5 (30 feet), 11 (60 feet), and 17 (120 feet)."
   },
   {
     "id": "starry-wisp",
@@ -990,6 +1002,7 @@
       "Bard",
       "Druid"
     ],
+    "cantripUpgradeText": "The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).",
     "cantripUpgrade": [
       {
         "atCharacterLevel": 5,
@@ -1087,6 +1100,7 @@
       "Warlock",
       "Wizard"
     ],
+    "cantripUpgradeText": "Whether you deal Radiant damage or the weapon's normal damage type, the attack deals extra Radiant damage when you reach levels 5 (1d6), 11 (2d6), and 17 (3d6).",
     "cantripUpgrade": [
       {
         "atCharacterLevel": 5,
@@ -1138,6 +1152,7 @@
     "classes": [
       "Bard"
     ],
+    "cantripUpgradeText": "The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6).",
     "cantripUpgrade": [
       {
         "atCharacterLevel": 5,

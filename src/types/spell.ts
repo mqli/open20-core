@@ -122,6 +122,7 @@ export interface Spell {
   readonly ritual: boolean;
   readonly description: readonly string[]; // 多段落描述
   readonly cantripUpgrade?: readonly CantripUpgradeEntry[]; // 戏法升级（0级法术）
+  readonly cantripUpgradeText?: string; // 原始升级文本（用于非伤害类升级，如 Eldritch Blast 增加光束数、Spare the Dying 扩大射程）
   readonly usingAHigherLevelSpellSlot?: readonly string[]; // 升环施法说明（1+级法术）
   readonly damage?: SpellDamage;
   readonly heal?: SpellHeal;

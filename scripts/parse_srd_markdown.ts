@@ -43,6 +43,7 @@ interface Spell {
   ritual: boolean;
   description: string[];
   cantripUpgrade?: CantripUpgradeEntry[];
+  cantripUpgradeText?: string;
   usingAHigherLevelSpellSlot?: string[];
   damage?: SpellDamage;
   heal?: SpellHeal;
@@ -394,10 +395,11 @@ export function transformSpell(parsed: ParsedSpell): Spell {
 
   if (parsed.classes) spell.classes = parsed.classes;
 
-  // Parse cantrip upgrade — only emit when we extracted at least one tier of damage scaling.
-  // Non-damage upgrades (extra beams, increased range) aren't representable in CantripUpgradeEntry
-  // and would otherwise produce a misleading empty array.
+  // Cantrip upgrade: always preserve the raw text when present (some upgrades scale beams or
+  // range rather than damage and can't be structured). Layer the parsed damage table on top
+  // when parseCantripUpgrade can extract one.
   if (cantripUpgradeText) {
+    spell.cantripUpgradeText = cantripUpgradeText;
     const entries = parseCantripUpgrade(cantripUpgradeText);
     if (entries.length > 0) spell.cantripUpgrade = entries;
   }
