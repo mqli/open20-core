@@ -23,6 +23,7 @@ interface SpellDamageEntry {
 interface SpellDamage {
   entries: SpellDamageEntry[];
   additional?: SpellDamageEntry[];
+  perSlot?: SpellDamageEntry[];
 }
 
 interface SpellHeal {
@@ -68,7 +69,7 @@ function slugify(name: string): string {
     .replace(/^-|-$/g, '');
 }
 
-function parseComponents(compStr: string): string[] {
+export function parseComponents(compStr: string): string[] {
   const comps: string[] = [];
   if (/V\b/i.test(compStr)) comps.push('V');
   if (/S\b/i.test(compStr)) comps.push('S');
@@ -107,8 +108,8 @@ function checkAttack(description: string): boolean {
   return /spell attack/i.test(description) || /make an? .*attack/i.test(description);
 }
 
-function extractDamage(description: string): SpellDamage | undefined {
-  const matches = [...description.matchAll(/(\d+d\d+(?:\s*\+\s*\d+)?)\s+(acid|cold|fire|force|lightning|necrotic|poison|radiant|thunder)/gi)];
+export function extractDamage(description: string): SpellDamage | undefined {
+  const matches = [...description.matchAll(/(\d+d\d+(?:\s*\+\s*\d+)?)\s+(acid|cold|fire|force|lightning|necrotic|poison|psychic|radiant|thunder)/gi)];
   if (matches.length === 0) return undefined;
   return {
     entries: matches.map(m => ({
@@ -126,7 +127,7 @@ function extractHeal(description: string): SpellHeal | undefined {
 
 // ── Cantrip Upgrade Parser ─────────────────────────────────────
 
-function parseCantripUpgrade(text: string): CantripUpgradeEntry[] {
+export function parseCantripUpgrade(text: string): CantripUpgradeEntry[] {
   const entries: CantripUpgradeEntry[] = [];
 
   // Pattern: "levels 5 (2d6), 11 (3d6), and 17 (4d6)" → extract dice inside parentheses
@@ -135,23 +136,26 @@ function parseCantripUpgrade(text: string): CantripUpgradeEntry[] {
 
   const damageByLevel: Map<number, string> = new Map();
 
-  // Match "level X (YdZ)" or "X (YdZ)"
-  const parenMatches = [...text.matchAll(/(?:level\s*)?(5|11|17)\s*\((\d+d\d+)\)/gi)];
+  // Normalize bare "dN" (e.g. Shillelagh's "(d10)") to "1dN" for consistency.
+  const normalizeDice = (d: string): string => (/^d\d+$/i.test(d) ? `1${d.toLowerCase()}` : d);
+
+  // Match "level X (YdZ)" or "X (YdZ)" — Y is optional to allow "(d10)".
+  const parenMatches = [...text.matchAll(/(?:level\s*)?(5|11|17)\s*\((\d*d\d+)\)/gi)];
   for (const m of parenMatches) {
-    damageByLevel.set(parseInt(m[1]), m[2]);
+    damageByLevel.set(parseInt(m[1]), normalizeDice(m[2]));
   }
 
   // If no parenthetical matches, try "at level 5, 2d6" pattern
   if (damageByLevel.size === 0) {
     for (const level of [5, 11, 17]) {
-      const regex = new RegExp(`(?:level\\s*${level}[^,\\d]*)((\\d+d\\d+))`, 'i');
+      const regex = new RegExp(`(?:level\\s*${level}[^,\\d]*)((\\d*d\\d+))`, 'i');
       const match = text.match(regex);
-      if (match) damageByLevel.set(level, match[1]);
+      if (match) damageByLevel.set(level, normalizeDice(match[1]));
     }
   }
 
   // Determine damage type from text (look for "Acid damage", "Fire damage", etc.)
-  const typeMatch = text.match(/(acid|cold|fire|force|lightning|necrotic|poison|radiant|thunder)/i);
+  const typeMatch = text.match(/(acid|cold|fire|force|lightning|necrotic|poison|psychic|radiant|thunder)/i);
   const type = typeMatch
     ? typeMatch[1].charAt(0).toUpperCase() + typeMatch[1].slice(1).toLowerCase()
     : 'Unknown';
@@ -174,7 +178,7 @@ function parsePerSlotDamage(text: string, defaultType: string): SpellDamageEntry
   if (!match) return undefined;
 
   // Try to find damage type in the text
-  const typeMatch = text.match(/(acid|cold|fire|force|lightning|necrotic|poison|radiant|thunder)/i);
+  const typeMatch = text.match(/(acid|cold|fire|force|lightning|necrotic|poison|psychic|radiant|thunder)/i);
   const type = typeMatch
     ? typeMatch[1].charAt(0).toUpperCase() + typeMatch[1].slice(1).toLowerCase()
     : defaultType;
@@ -184,7 +188,7 @@ function parsePerSlotDamage(text: string, defaultType: string): SpellDamageEntry
 
 // ── Markdown Parser ────────────────────────────────────────────
 
-interface ParsedSpell {
+export interface ParsedSpell {
   name: string;
   level: number;
   school: string;
@@ -200,7 +204,7 @@ interface ParsedSpell {
   usingAHigherLevelSpellSlotText?: string;
 }
 
-function parseMarkdown(content: string): ParsedSpell[] {
+export function parseMarkdown(content: string): ParsedSpell[] {
   const spells: ParsedSpell[] = [];
 
   // Split into lines and process
@@ -296,21 +300,21 @@ function parseMarkdown(content: string): ParsedSpell[] {
       continue;
     }
 
-    // Check for Cantrip Upgrade section
-    if (line.includes('**_Cantrip Upgrade') || line.includes('**_Cantrip Upgrade')) {
+    // Check for Cantrip Upgrade section (handles both **_Cantrip Upgrade._** and **Cantrip Upgrade.** variants)
+    if (/\*\*_?Cantrip Upgrade/i.test(line)) {
       currentSpell.cantripUpgradeText = line
         .replace(/\*\*/g, '')
-        .replace(/_Cantrip Upgrade[._]*/i, '')
+        .replace(/_?Cantrip Upgrade[._]*_?\s*/i, '')
         .trim();
       inDescription = false;
       continue;
     }
 
     // Check for Using a Higher-Level Spell Slot section
-    if (line.includes('**_Using a Higher-Level Spell Slot') || line.includes('**_Using a Higher-Level Spell Slot')) {
+    if (/\*\*_?Using a Higher-Level Spell Slot/i.test(line)) {
       currentSpell.usingAHigherLevelSpellSlotText = line
         .replace(/\*\*/g, '')
-        .replace(/_Using a Higher-Level Spell Slot[._]*/i, '')
+        .replace(/_?Using a Higher-Level Spell Slot[._]*_?\s*/i, '')
         .trim();
       inDescription = false;
       continue;
@@ -345,13 +349,14 @@ function parseMarkdown(content: string): ParsedSpell[] {
 
 // ── Transform to Spell ─────────────────────────────────────────
 
-function transformSpell(parsed: ParsedSpell): Spell {
+export function transformSpell(parsed: ParsedSpell): Spell {
   const descLines = parsed.descriptionLines || [];
   const mainDescription: string[] = [];
   let cantripUpgradeText = parsed.cantripUpgradeText || '';
   let usingAHigherLevelSpellSlotText = parsed.usingAHigherLevelSpellSlotText || '';
 
-  // Process description lines to extract special sections
+  // Process description lines (parseMarkdown already extracted Cantrip Upgrade /
+  // Using a Higher-Level Spell Slot sections, so this loop just builds the description).
   for (const line of descLines) {
     const trimmed = line.trim();
     if (!trimmed) {
@@ -361,27 +366,7 @@ function transformSpell(parsed: ParsedSpell): Spell {
       continue;
     }
 
-    // Check for Cantrip Upgrade section (handles **_text_** or _text_ formats)
-    if (/Cantrip Upgrade[._]*/i.test(trimmed)) {
-      cantripUpgradeText = trimmed
-        .replace(/\*\*_Cantrip Upgrade[._]*\*+_?\s*/i, '')
-        .replace(/_Cantrip Upgrade[._]*_\s*/i, '')
-        .replace(/\*\*Cantrip Upgrade[._]*\*\*\s*/i, '')
-        .trim();
-      continue;
-    }
-
-    // Check for Using a Higher-Level Spell Slot section
-    if (/Using a Higher-Level Spell Slot[._]*/i.test(trimmed)) {
-      usingAHigherLevelSpellSlotText = trimmed
-        .replace(/\*\*_Using a Higher-Level Spell Slot[._]*\*+_?\s*/i, '')
-        .replace(/_Using a Higher-Level Spell Slot[._]*_\s*/i, '')
-        .replace(/\*\*Using a Higher-Level Spell Slot[._]*\*\*\s*/i, '')
-        .trim();
-      continue;
-    }
-
-    if (trimmed) mainDescription.push(trimmed);
+    mainDescription.push(trimmed);
   }
 
   // Filter out empty strings at the end
@@ -409,9 +394,12 @@ function transformSpell(parsed: ParsedSpell): Spell {
 
   if (parsed.classes) spell.classes = parsed.classes;
 
-  // Parse cantrip upgrade
+  // Parse cantrip upgrade — only emit when we extracted at least one tier of damage scaling.
+  // Non-damage upgrades (extra beams, increased range) aren't representable in CantripUpgradeEntry
+  // and would otherwise produce a misleading empty array.
   if (cantripUpgradeText) {
-    spell.cantripUpgrade = parseCantripUpgrade(cantripUpgradeText);
+    const entries = parseCantripUpgrade(cantripUpgradeText);
+    if (entries.length > 0) spell.cantripUpgrade = entries;
   }
 
   // Parse using a higher level spell slot
@@ -495,4 +483,7 @@ function main(): void {
   console.log(`Spells with usingAHigherLevelSpellSlot: ${withHigherLevel}`);
 }
 
-main();
+// Only run as CLI when invoked directly (not when imported by tests).
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main();
+}

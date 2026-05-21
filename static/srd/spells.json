@@ -203,7 +203,6 @@
     "classes": [
       "Warlock"
     ],
-    "cantripUpgrade": [],
     "damage": {
       "entries": [
         {
@@ -805,6 +804,24 @@
     ],
     "cantripUpgrade": [
       {
+        "atCharacterLevel": 5,
+        "damage": [
+          {
+            "dice": "1d10",
+            "type": "Unknown"
+          }
+        ]
+      },
+      {
+        "atCharacterLevel": 11,
+        "damage": [
+          {
+            "dice": "1d12",
+            "type": "Unknown"
+          }
+        ]
+      },
+      {
         "atCharacterLevel": 17,
         "damage": [
           {
@@ -949,8 +966,7 @@
     "classes": [
       "Cleric",
       "Druid"
-    ],
-    "cantripUpgrade": []
+    ]
   },
   {
     "id": "starry-wisp",
@@ -1128,7 +1144,7 @@
         "damage": [
           {
             "dice": "2d6",
-            "type": "Unknown"
+            "type": "Psychic"
           }
         ]
       },
@@ -1137,7 +1153,7 @@
         "damage": [
           {
             "dice": "3d6",
-            "type": "Unknown"
+            "type": "Psychic"
           }
         ]
       },
@@ -1146,11 +1162,19 @@
         "damage": [
           {
             "dice": "4d6",
-            "type": "Unknown"
+            "type": "Psychic"
           }
         ]
       }
     ],
+    "damage": {
+      "entries": [
+        {
+          "dice": "1d6",
+          "type": "Psychic"
+        }
+      ]
+    },
     "save": "Wisdom"
   },
   {
@@ -1658,6 +1682,20 @@
     "usingAHigherLevelSpellSlot": [
       "The damage increases by 1d6 for each spell slot level above 1."
     ],
+    "damage": {
+      "entries": [
+        {
+          "dice": "3d6",
+          "type": "Psychic"
+        }
+      ],
+      "perSlot": [
+        {
+          "dice": "1d6",
+          "type": "Psychic"
+        }
+      ]
+    },
     "save": "Wisdom"
   },
   {
@@ -3998,6 +4036,20 @@
     "usingAHigherLevelSpellSlot": [
       "The damage increases by 1d8 for each spell slot level above 2."
     ],
+    "damage": {
+      "entries": [
+        {
+          "dice": "3d8",
+          "type": "Psychic"
+        }
+      ],
+      "perSlot": [
+        {
+          "dice": "1d8",
+          "type": "Psychic"
+        }
+      ]
+    },
     "save": "Wisdom"
   },
   {
@@ -4148,6 +4200,14 @@
       "Sorcerer",
       "Wizard"
     ],
+    "damage": {
+      "entries": [
+        {
+          "dice": "2d8",
+          "type": "Psychic"
+        }
+      ]
+    },
     "save": "Intelligence"
   },
   {
@@ -6823,6 +6883,20 @@
     "usingAHigherLevelSpellSlot": [
       "The damage increases by 1d10 for each spell slot level above 4."
     ],
+    "damage": {
+      "entries": [
+        {
+          "dice": "4d10",
+          "type": "Psychic"
+        }
+      ],
+      "perSlot": [
+        {
+          "dice": "1d10",
+          "type": "Psychic"
+        }
+      ]
+    },
     "save": "Wisdom"
   },
   {
@@ -7481,6 +7555,14 @@
       "Warlock",
       "Wizard"
     ],
+    "damage": {
+      "entries": [
+        {
+          "dice": "6d6",
+          "type": "Psychic"
+        }
+      ]
+    },
     "save": "Intelligence"
   },
   {
@@ -7646,6 +7728,14 @@
       "Warlock",
       "Wizard"
     ],
+    "damage": {
+      "entries": [
+        {
+          "dice": "3d6",
+          "type": "Psychic"
+        }
+      ]
+    },
     "save": "Wisdom"
   },
   {
@@ -7720,6 +7810,14 @@
     "usingAHigherLevelSpellSlot": [
       "If you use a level 7 or 8 spell slot, the duration is 365 days. If you use a level 9 spell slot, the spell lasts until it is ended by one of the spells mentioned above."
     ],
+    "damage": {
+      "entries": [
+        {
+          "dice": "5d10",
+          "type": "Psychic"
+        }
+      ]
+    },
     "save": "Wisdom"
   },
   {
@@ -8488,15 +8586,14 @@
     "description": [
       "You launch a lightning bolt toward a target you can see within range. Three bolts then leap from that target to as many as three other targets of your choice, each of which must be within 30 feet of the first target. A target can be a creature or an object and can be targeted by only one of the bolts.",
       "",
-      "Each target makes a Dexterity saving throw, taking 10d8 Lightning damage on a failed save or half as much damage on a successful one."
+      "Each target makes a Dexterity saving throw, taking 10d8 Lightning damage on a failed save or half as much damage on a successful one.",
+      "",
+      "*Using a Higher-Level Spell Slot.* One additional bolt leaps from the first target to another target for each spell slot level above 6."
     ],
     "source": "SRD 5.2",
     "classes": [
       "Sorcerer",
       "Wizard"
-    ],
-    "usingAHigherLevelSpellSlot": [
-      "*Using a Higher-Level Spell Slot.* One additional bolt leaps from the first target to another target for each spell slot level above 6."
     ],
     "damage": {
       "entries": [
@@ -10247,6 +10344,14 @@
       "Warlock",
       "Wizard"
     ],
+    "damage": {
+      "entries": [
+        {
+          "dice": "10d12",
+          "type": "Psychic"
+        }
+      ]
+    },
     "heal": {
       "dice": "10d12"
     },
@@ -10894,6 +10999,14 @@
       "Warlock",
       "Wizard"
     ],
+    "damage": {
+      "entries": [
+        {
+          "dice": "12d12",
+          "type": "Psychic"
+        }
+      ]
+    },
     "heal": {
       "dice": "12d12"
     }
@@ -11167,6 +11280,18 @@
       "Warlock",
       "Wizard"
     ],
+    "damage": {
+      "entries": [
+        {
+          "dice": "10d10",
+          "type": "Psychic"
+        },
+        {
+          "dice": "5d10",
+          "type": "Psychic"
+        }
+      ]
+    },
     "save": "Wisdom"
   },
   {
