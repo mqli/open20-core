@@ -58,6 +58,7 @@ function buildResource(feature: Feature, level: number, proficiencyBonus?: numbe
   const pb = proficiencyBonus ?? getProficiencyBonus(level);
   const def = RESOURCE_DEFS[resourceId];
   if (!def) {
+    console.warn(`[resource-builder] Unknown resource "${resourceId}" – skipped. Add it to RESOURCE_DEFS.`);
     return null;
   }
 

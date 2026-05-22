@@ -21,7 +21,7 @@ import { buildClassSpellData } from '../engine/spell-data';
 import type { ClassSpellData, SpellLevel, SpellSlotEntry } from '../types/spell';
 import type { Feature } from '../types/class';
 import { gatherAllFeatures } from './utils';
-import type { CharacterFeatEntry } from '../types/feat';
+import type { CharacterFeatEntry, FeatAttackBonus, FeatACBonus } from '../types/feat';
 
 // ── Grant Computation (Single Source of Truth) ─────────────────
 
@@ -104,8 +104,8 @@ function applyFeatSkillProficiencies(
 /**
  * Extract attack bonuses from feats (for Fighting Style feats like Archery).
  */
-function computeFeatAttackBonuses(char: Character, data: DataLoader): readonly import('../types/feat').FeatAttackBonus[] {
-  const bonuses: import('../types/feat').FeatAttackBonus[] = [];
+function computeFeatAttackBonuses(char: Character, data: DataLoader): readonly FeatAttackBonus[] {
+  const bonuses: FeatAttackBonus[] = [];
   for (const entry of char.feats) {
     const feat = data.getFeat(entry.featId);
     if (feat?.grants?.attackBonus) {
@@ -118,8 +118,8 @@ function computeFeatAttackBonuses(char: Character, data: DataLoader): readonly i
 /**
  * Extract AC bonuses from feats (for Fighting Style feats like Defense).
  */
-function computeFeatACBonuses(char: Character, data: DataLoader): readonly import('../types/feat').FeatACBonus[] {
-  const bonuses: import('../types/feat').FeatACBonus[] = [];
+function computeFeatACBonuses(char: Character, data: DataLoader): readonly FeatACBonus[] {
+  const bonuses: FeatACBonus[] = [];
   for (const entry of char.feats) {
     const feat = data.getFeat(entry.featId);
     if (feat?.grants?.acBonus) {
@@ -281,6 +281,7 @@ function computeFeatSpells(
   data: DataLoader,
   pb: number
 ): Record<string, import('../types/spell').FeatSpellsEntry> | undefined {
+  const existingFeatSpells = char.spells.featSpells;
   const featSpells: Record<string, import('../types/spell').FeatSpellsEntry> = {};
 
   for (const entry of char.feats) {
@@ -320,6 +321,7 @@ function computeFeatSpells(
       cantrips,
       preparedSpells: [...cantrips, ...level1Spell],
       oncePerLongRest: Object.keys(oncePerLongRest).length > 0 ? oncePerLongRest : undefined,
+      usedOncePerLongRest: existingFeatSpells?.[entry.featId]?.usedOncePerLongRest,
     };
   }
 
@@ -395,26 +397,15 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
   // 6. Pact Magic (Warlock)
   let newSpells = computePactMagic(char, data, char.spells.pactMagicSlots);
 
-  // 7. Regular spell slots
+  // 7. Regular spell slots + feat spells
   const updatedSlots = computeSpellSlots(char, data, classSpellcasting);
+  const featSpells = computeFeatSpells(char, data, pb);
   newSpells = {
     ...newSpells,
     classSpellcasting,
     spellSlots: updatedSlots,
+    featSpells,
   };
-
-  // 7.5. Feat spells (e.g., Magic Initiate)
-  const featSpells = computeFeatSpells(char, data, pb);
-  if (featSpells) {
-    newSpells = {
-      ...newSpells,
-      featSpells,
-    };
-  } else {
-    // Remove featSpells if no longer applicable
-    const { featSpells: _, ...rest } = newSpells;
-    newSpells = rest as typeof newSpells;
-  }
 
   // 8. Max HP (cap current at new max; never heal via recompute)
   const newMaxHP = calculateMaxHP(char.classes, conMod, data);

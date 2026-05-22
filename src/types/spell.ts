@@ -77,6 +77,8 @@ export interface FeatSpellsEntry {
   readonly preparedSpells: readonly string[];
   // 每日长休后恢复一次的法术（无法术位施法）
   readonly oncePerLongRest?: Record<string, boolean>;
+  // Tracks which once-per-long-rest spells have already been used this rest cycle
+  readonly usedOncePerLongRest?: Record<string, boolean>;
 }
 
 // 法术施法时间

@@ -280,30 +280,36 @@ export function replaceCantripForClass(
 }
 
 // ── Backward-Compatible Versions (use first spellcasting class) ───
+// @deprecated These always target the first spellcasting class and silently do nothing
+// for multiclass characters with multiple spellcasting classes. Use the *ForClass variants.
 
 function getFirstSpellcastingClassId(char: Character): string | null {
   const classIds = Object.keys(char.spells.classSpellcasting);
   return classIds.length > 0 ? classIds[0]! : null;
 }
 
+/** @deprecated Use prepareSpellForClass — this silently targets the first class for multiclass characters. */
 export function prepareSpell(char: Character, spellId: string): Character {
   const classId = getFirstSpellcastingClassId(char);
   if (!classId) return char;
   return prepareSpellForClass(char, classId, spellId);
 }
 
+/** @deprecated Use unprepareSpellForClass — this silently targets the first class for multiclass characters. */
 export function unprepareSpell(char: Character, spellId: string): Character {
   const classId = getFirstSpellcastingClassId(char);
   if (!classId) return char;
   return unprepareSpellForClass(char, classId, spellId);
 }
 
+/** @deprecated Use learnCantripForClass — this silently targets the first class for multiclass characters. */
 export function learnCantrip(char: Character, spellId: string, data: DataLoader): Character {
   const classId = getFirstSpellcastingClassId(char);
   if (!classId) return char;
   return learnCantripForClass(char, classId, spellId, data);
 }
 
+/** @deprecated Use replaceCantripForClass — this silently targets the first class for multiclass characters. */
 export function replaceCantrip(
   char: Character,
   oldSpellId: string,

@@ -309,7 +309,7 @@ function addNewClass(
     hitPoints: {
       ...char.hitPoints,
       max: newMaxHP,
-      current: char.hitPoints.current + Math.max(1, hpIncrease),
+      current: char.hitPoints.current + hpIncrease,
     },
     combatStats: {
       ...char.combatStats,

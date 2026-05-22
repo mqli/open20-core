@@ -22,13 +22,16 @@ function isFeatSpell(char: Character, spellId: string): boolean {
   return false;
 }
 
-/** Get feat spell entries that contain a specific spell. */
-function getFeatSpellEntriesForSpell(char: Character, spellId: string): FeatSpellsEntry[] {
+/** Get feat spell entries (with their feat IDs) that contain a specific spell. */
+function getFeatSpellEntriesForSpell(
+  char: Character,
+  spellId: string
+): { featId: string; entry: FeatSpellsEntry }[] {
   if (!char.spells.featSpells) return [];
-  const result: FeatSpellsEntry[] = [];
-  for (const featSpellEntry of Object.values(char.spells.featSpells) as FeatSpellsEntry[]) {
-    if (featSpellEntry.cantrips.includes(spellId) || featSpellEntry.preparedSpells.includes(spellId)) {
-      result.push(featSpellEntry);
+  const result: { featId: string; entry: FeatSpellsEntry }[] = [];
+  for (const [featId, entry] of Object.entries(char.spells.featSpells) as [string, FeatSpellsEntry][]) {
+    if (entry.cantrips.includes(spellId) || entry.preparedSpells.includes(spellId)) {
+      result.push({ featId, entry });
     }
   }
   return result;
@@ -109,7 +112,10 @@ export function canUpcast(spell: Spell): boolean {
 
 export function getUpcastDescription(spell: Spell, slotLevel: SpellLevel): string | undefined {
   if (!canUpcast(spell) || slotLevel <= spell.level) return undefined;
-  return spell.usingAHigherLevelSpellSlot![0];
+  // Index by how many levels above base (0-based). Fall back to first entry for spells
+  // with a single catch-all upcast description.
+  const idx = slotLevel - spell.level - 1;
+  return spell.usingAHigherLevelSpellSlot![idx] ?? spell.usingAHigherLevelSpellSlot![0];
 }
 
 /** Find all class spell data entries that can cast a spell. */
@@ -128,7 +134,11 @@ function findCastingClasses(char: Character, spellId: string): ClassSpellData[] 
   return result;
 }
 
-/** Cast a spell with a specific slot level (supports upcasting). */
+/** Cast a spell with a specific slot level (supports upcasting).
+ *
+ * Returns the updated Character on success — the spell slot (or feat-spell usage) is
+ * consumed inside this function so callers don't need a separate consumeSpellSlot call.
+ */
 export function castSpell(
   char: Character,
   spellId: string,
@@ -150,7 +160,7 @@ export function castSpell(
 
   // Handle cantrips (no slot needed)
   if (isCantrip(spell)) {
-    const castingClassId = castingClasses[0]?.classId ?? featSpellEntries[0]?.classId;
+    const castingClassId = castingClasses[0]?.classId ?? featSpellEntries[0]?.entry.classId;
     return {
       success: true,
       char,
@@ -161,16 +171,31 @@ export function castSpell(
 
   // Handle feat spells (level 1+ spells that can be cast once per long rest)
   if (featSpellEntries.length > 0 && castingClasses.length === 0) {
-    // This is a feat spell (not from a class)
-    const featEntry = featSpellEntries[0]!;
+    const { featId, entry: featEntry } = featSpellEntries[0]!;
 
-    // Check if it's once per long rest
     if (featEntry.oncePerLongRest?.[spellId]) {
-      // TODO: Track usage in character state (long rest reset)
-      // For now, just allow casting
+      if (featEntry.usedOncePerLongRest?.[spellId]) {
+        return {
+          success: false,
+          char,
+          message: `${spell.name} can only be cast once per long rest.`,
+        };
+      }
+
+      const updatedEntry: FeatSpellsEntry = {
+        ...featEntry,
+        usedOncePerLongRest: { ...featEntry.usedOncePerLongRest, [spellId]: true },
+      };
+      const updatedChar: Character = {
+        ...char,
+        spells: {
+          ...char.spells,
+          featSpells: { ...char.spells.featSpells!, [featId]: updatedEntry },
+        },
+      };
       return {
         success: true,
-        char,
+        char: updatedChar,
         message: `Cast ${spell.name} (once per long rest, no slot used).`,
         castingClassId: featEntry.classId,
       };
@@ -195,10 +220,21 @@ export function castSpell(
     return { success: false, char, message: `No level ${slotLevel} spell slots remaining.` };
   }
 
+  const updatedChar: Character = {
+    ...char,
+    spells: {
+      ...char.spells,
+      spellSlots: {
+        ...char.spells.spellSlots,
+        [slotLevel]: { ...slotEntry, used: slotEntry.used + 1 },
+      },
+    },
+  };
+
   const upcastDesc = getUpcastDescription(spell, slotLevel);
   return {
     success: true,
-    char,
+    char: updatedChar,
     message: `Cast ${spell.name} using a level ${slotLevel} slot.${upcastDesc ? ` ${upcastDesc}` : ''}`,
     castingClassId: castingClasses[0]?.classId,
   };

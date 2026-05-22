@@ -6,7 +6,7 @@ import type { Character, CharacterClass } from '../types/character';
 import type { Resource } from '../types/resource';
 import { ResetType } from '../types/resource';
 import type { DataLoader } from '../data/loader';
-import type { SpellLevel } from '../types/spell';
+import type { SpellLevel, FeatSpellsEntry } from '../types/spell';
 
 import { getModifier, getTotalScore } from '../engine/ability-modifier';
 import { getHitDieFixedValue } from '../engine/hp-calculator';
@@ -105,6 +105,7 @@ export function shortRest(
 
 // ── Long Rest ──────────────────────────────────────────────────
 
+// _data is intentionally kept for API consistency (future rules may need it, e.g. class-specific long rest benefits)
 export function longRest(char: Character, _data: DataLoader): Character {
   // 1. Regain all HP
   let result = withUpdate(char, {
@@ -123,7 +124,7 @@ export function longRest(char: Character, _data: DataLoader): Character {
 
   // 3. Regain all spell slots
   const newSpellSlots = { ...result.spells.spellSlots };
-  for (let level = 0; level <= 9; level++) {
+  for (let level = 1; level <= 9; level++) {
     const slot = newSpellSlots[level as SpellLevel];
     if (slot && slot.used > 0) {
       newSpellSlots[level as SpellLevel] = { ...slot, used: 0 };
@@ -151,6 +152,17 @@ export function longRest(char: Character, _data: DataLoader): Character {
     return r;
   });
   result = withUpdate(result, { resources: newResources });
+
+  // 6. Reset once-per-long-rest feat spell usage (e.g. Magic Initiate)
+  if (result.spells.featSpells) {
+    const resetFeatSpells: Record<string, FeatSpellsEntry> = {};
+    for (const [featId, entry] of Object.entries(result.spells.featSpells)) {
+      resetFeatSpells[featId] = { ...entry, usedOncePerLongRest: undefined };
+    }
+    result = withUpdate(result, {
+      spells: { ...result.spells, featSpells: resetFeatSpells },
+    });
+  }
 
   // 7. Reset death saves
   result = withUpdate(result, {

@@ -113,8 +113,7 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
   const resources: Resource[] = extractResources(classData, primaryLevel, pb);
   for (const additional of additionalClasses) {
     const acData = data.getClass(additional.classId)!;
-    const additionalPB = getProficiencyBonus(additional.level);
-    const additionalResources = extractResources(acData, additional.level, additionalPB);
+    const additionalResources = extractResources(acData, additional.level, pb);
     resources.push(...additionalResources);
   }
 
