@@ -172,10 +172,9 @@ export function prepareSpellForClass(
     if (spell && isCantripSpell(spell)) return char;
   }
 
-  // Check if we've hit the max prepared limit
-  const alwaysPrepared = classData.alwaysPreparedSpells ?? [];
-  const totalPrepared = classData.preparedSpells.length + alwaysPrepared.length;
-  if (totalPrepared >= classData.maxPrepared) return char;
+  // Check if we've hit the max prepared limit.
+  // 2024 PHB: always-prepared spells (subclass domain/oath) don't count toward the limit.
+  if (classData.preparedSpells.length >= classData.maxPrepared) return char;
 
   classSpellcasting[classId] = {
     ...classData,

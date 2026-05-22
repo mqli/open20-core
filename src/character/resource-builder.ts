@@ -6,6 +6,22 @@ import type { Feature, Class, Subclass } from '../types/class';
 import type { Resource } from '../types/resource';
 import { ResetType } from '../types/resource';
 import { getFeaturesAtLevel } from './utils';
+import { getProficiencyBonus } from '../engine/proficiency-bonus';
+
+// Default resource definitions (used when a feature doesn't specify values).
+// scaleWithPBByDefault: resource scales with PB even if the feature doesn't say so.
+const RESOURCE_DEFS: Record<string, { max: number; resetOn: ResetType; scaleWithPBByDefault?: boolean }> = {
+  'Second Wind': { max: 1, resetOn: ResetType.ShortRest, scaleWithPBByDefault: true },
+  Rage: { max: 2, resetOn: ResetType.LongRest },
+  'Lay on Hands': { max: 5, resetOn: ResetType.LongRest },
+  'Bardic Inspiration': { max: 1, resetOn: ResetType.LongRest },
+  'Channel Divinity': { max: 1, resetOn: ResetType.ShortRest },
+  'Wild Shape': { max: 2, resetOn: ResetType.ShortRest },
+  'Sorcery Points': { max: 1, resetOn: ResetType.LongRest },
+  'Focus Points': { max: 1, resetOn: ResetType.ShortRest },
+  'Action Surge': { max: 1, resetOn: ResetType.ShortRest, scaleWithPBByDefault: true },
+  Indomitable: { max: 1, resetOn: ResetType.LongRest, scaleWithPBByDefault: true },
+};
 
 /**
  * Extract resources from class features up to a given level.
@@ -39,24 +55,7 @@ export function extractResources(classData: Class | Subclass, level: number, pro
  */
 function buildResource(feature: Feature, level: number, proficiencyBonus?: number): Resource | null {
   const resourceId = feature.resourceId!;
-
-  // Default resource definitions (used when feature doesn't define values)
-  // scaleWithPBByDefault: resources that scale with PB even if feature doesn't say so
-  const RESOURCE_DEFS: Record<string, { max: number; resetOn: ResetType; scaleWithPBByDefault?: boolean }> = {
-    'Second Wind': { max: 1, resetOn: ResetType.ShortRest, scaleWithPBByDefault: true },
-    Rage: { max: 2, resetOn: ResetType.LongRest },
-    'Lay on Hands': { max: 5, resetOn: ResetType.LongRest },
-    'Bardic Inspiration': { max: 1, resetOn: ResetType.LongRest },
-    'Channel Divinity': { max: 1, resetOn: ResetType.ShortRest },
-    'Wild Shape': { max: 2, resetOn: ResetType.ShortRest },
-    'Sorcery Points': { max: 1, resetOn: ResetType.LongRest },
-    'Focus Points': { max: 1, resetOn: ResetType.ShortRest },
-    'Action Surge': { max: 1, resetOn: ResetType.ShortRest, scaleWithPBByDefault: true },
-    Indomitable: { max: 1, resetOn: ResetType.LongRest, scaleWithPBByDefault: true },
-  };
-
-  const pb = proficiencyBonus ?? (2 + Math.floor((level - 1) / 4));
-
+  const pb = proficiencyBonus ?? getProficiencyBonus(level);
   const def = RESOURCE_DEFS[resourceId];
   if (!def) {
     return null;

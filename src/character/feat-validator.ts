@@ -136,7 +136,7 @@ function checkFeaturePrerequisite(
     for (const levelFeatures of classData.featuresByLevel) {
       if (levelFeatures.level <= charClass.level) {
         for (const feature of levelFeatures.features) {
-          if (feature.name === featureName || feature.name.includes(featureName)) {
+          if (feature.name === featureName) {
             return true;
           }
         }
@@ -154,7 +154,7 @@ function checkFeaturePrerequisite(
     for (const levelFeatures of subclass.featuresByLevel) {
       if (levelFeatures.level <= charClass.level) {
         for (const feature of levelFeatures.features) {
-          if (feature.name === featureName || feature.name.includes(featureName)) {
+          if (feature.name === featureName) {
             return true;
           }
         }

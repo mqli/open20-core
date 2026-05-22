@@ -12,6 +12,7 @@ import { getModifier, getTotalScore } from '../engine/ability-modifier';
 import { getHitDieFixedValue } from '../engine/hp-calculator';
 import { getProficiencyBonus } from '../engine/proficiency-bonus';
 import { extractResources } from './resource-builder';
+import { recomputeDerivedStats } from './recompute';
 import {
   getMulticlassSpellcasterLevel,
   calculateMulticlassSpellSlots,
@@ -116,6 +117,7 @@ export function levelUp(
     const existing = newSpells.classSpellcasting[classId];
 
     // Build updated class spell data
+    const ability = classData.spellcasting?.ability ?? 'Intelligence';
     const updatedSpellData: ClassSpellData = existing
       ? {
           ...existing,
@@ -123,7 +125,7 @@ export function levelUp(
         }
       : {
           classId,
-          spellcastingAbility: 'Intelligence' as const,
+          spellcastingAbility: ability,
           spellSaveDC: 0,
           spellAttackBonus: 0,
           knownCantrips: [],
@@ -185,7 +187,11 @@ export function levelUp(
     },
   };
 
-  return result;
+  // Recompute derived stats (AC, initiative, perception, attacks, spell DCs, ...).
+  // Preserve hitPoints because recompute uses the fixed-die HP formula and would
+  // clobber rolled HP from this level-up.
+  const recomputed = recomputeDerivedStats(result, data);
+  return { ...recomputed, hitPoints: result.hitPoints };
 }
 
 // ── Multiclassing Support ─────────────────────────────────
@@ -321,7 +327,9 @@ function addNewClass(
     },
   };
 
-  return result;
+  // Recompute derived stats; preserve hitPoints (see levelUp above).
+  const recomputed = recomputeDerivedStats(result, data);
+  return { ...recomputed, hitPoints: result.hitPoints };
 }
 
 // ── Helper Functions ────────────────────────────────────

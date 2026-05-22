@@ -27,7 +27,7 @@ const mockSpell: Spell = {
   concentration: true,
   ritual: true,
   description: ['For the duration, you sense the presence of magic...'],
-  classes: ['bard', 'cleric', 'druid', 'sorcerer', 'wizard'],
+  classes: ['Bard', 'Cleric', 'Druid', 'Sorcerer', 'Wizard'],
   source: 'SRD 5.2',
 };
 
@@ -84,7 +84,7 @@ const mockWizardChar = {
   species: 'human',
   speciesSubtype: null,
   background: 'sage',
-  classes: [{ classId: 'wizard', level: 3, subclassId: null, subclassLevel: null, hitDice: { die: 6 as const, used: 0 } }],
+  classes: [{ classId: 'Wizard', level: 3, subclassId: null, subclassLevel: null, hitDice: { die: 6 as const, used: 0 } }],
   abilityScores: {
     base: { Strength: 10, Dexterity: 14, Constitution: 13, Intelligence: 15, Wisdom: 12, Charisma: 10 },
     racialBonuses: { Strength: 0, Dexterity: 0, Constitution: 0, Intelligence: 0, Wisdom: 0, Charisma: 0 },

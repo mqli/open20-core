@@ -331,13 +331,13 @@ function computePactMagic(
   data: DataLoader,
   existingSlots: Character['spells']['pactMagicSlots']
 ) {
-  const hasWarlock = char.classes.some(c => c.classId === 'warlock');
+  const hasWarlock = char.classes.some(c => c.classId === 'Warlock');
 
   if (!hasWarlock) {
     return { ...char.spells, pactMagicSlots: null };
   }
 
-  const warlockLevel = char.classes.find(c => c.classId === 'warlock')!.level;
+  const warlockLevel = char.classes.find(c => c.classId === 'Warlock')!.level;
   const pactResult = calculatePactMagic(warlockLevel, data);
   if (!pactResult) return char.spells;
 

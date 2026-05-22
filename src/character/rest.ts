@@ -59,7 +59,7 @@ export function shortRest(
         hpRecovered += rng.d(getDieMax(classData.hitDie)) + conMod;
       }
     } else {
-      // Fixed value: ceil(die/2) + Con mod
+      // Fixed value: floor(die/2) + 1 + Con mod
       const fixedPerDie = getHitDieFixedValue(classData.hitDie) + conMod;
       hpRecovered = fixedPerDie * toSpend;
     }
