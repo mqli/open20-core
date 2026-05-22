@@ -119,8 +119,8 @@ function calculateWeaponAttack(
   const isProficient =
     weaponProficiencies.includes(weapon.id) ||
     weaponProficiencies.includes(weapon.category) ||
-    weaponProficiencies.includes('Simple') && weapon.category === 'Simple' ||
-    weaponProficiencies.includes('Martial') && weapon.category === 'Martial';
+    (weaponProficiencies.includes('Simple') && weapon.category === 'Simple') ||
+    (weaponProficiencies.includes('Martial') && weapon.category === 'Martial');
 
   let attackBonus = (isProficient ? proficiencyBonus : 0) + abilityMod;
 

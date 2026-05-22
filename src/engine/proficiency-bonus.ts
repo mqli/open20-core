@@ -23,7 +23,6 @@
  * getProficiencyBonus(20)  // 6
  */
 export function getProficiencyBonus(level: number): number {
-  if (level < 1) return 2;
   if (level <= 4) return 2;
   if (level <= 8) return 3;
   if (level <= 12) return 4;

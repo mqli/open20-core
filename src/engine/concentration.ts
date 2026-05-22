@@ -41,9 +41,9 @@ export function getConcentratingSpellId(char: Character): string | null {
  * @returns The DC for the concentration check
  *
  * @example
- * calculateConcentrationDC(8)  // 10 (10 > 8/2)
- * calculateConcentrationDC(20) // 10 (10 > 20/2)
- * calculateConcentrationDC(25) // 13 (25/2 = 12.5, rounded up = 13 > 10)
+ * calculateConcentrationDC(8)  // 10 (10 > floor(8/2))
+ * calculateConcentrationDC(20) // 10 (10 == floor(20/2))
+ * calculateConcentrationDC(25) // 12 (floor(25/2) = 12 > 10)
  */
 export function calculateConcentrationDC(damageAmount: number): number {
   const halfDamage = Math.floor(damageAmount / 2);

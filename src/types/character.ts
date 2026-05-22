@@ -74,6 +74,8 @@ export interface ActiveCondition {
   readonly id: ConditionName;
   readonly source: string; // 来源（如 "Player A", "Hold Person"）
   readonly appliedAt: string; // ISO 8601
+  // Exhaustion 专用等级 (1-6)。其他状态忽略此字段；缺省视为 1。
+  readonly level?: number;
 }
 
 // 状态名称

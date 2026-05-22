@@ -73,9 +73,11 @@ export function calculateAC(
   }
 
   // Monk Unarmored Defense: 10 + Dex + Wis
+  // 2024 PHB: requires no armor AND no shield
   if (
-    featureNames.has('Unarmored Defense (Monk)') ||
-    featureNames.has('Unarmored Defense [Monk]')
+    !hasShield &&
+    (featureNames.has('Unarmored Defense (Monk)') ||
+      featureNames.has('Unarmored Defense [Monk]'))
   ) {
     acOptions.push(10 + dexMod + wisMod);
   }

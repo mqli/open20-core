@@ -32,9 +32,10 @@ function makeSkills(perception?: {
 function makeCondition(
   id: string,
   source = 'test',
-  appliedAt = '2024-01-01T00:00:00Z'
+  appliedAt = '2024-01-01T00:00:00Z',
+  level?: number
 ): ActiveCondition {
-  return { id: id as ActiveCondition['id'], source, appliedAt };
+  return { id: id as ActiveCondition['id'], source, appliedAt, ...(level != null ? { level } : {}) };
 }
 
 // ============================================================================
@@ -119,13 +120,31 @@ describe('calculatePassivePerception', () => {
   });
 
   describe('状态影响 (conditions)', () => {
-    it('用例6: 有 Exhaustion 状态时，被动感知 -5', () => {
+    it('用例6: Exhaustion level 1 (default) → -2 (2024 PHB)', () => {
       const scores = createAbilityScores({ Wisdom: 14 });
       const skills = makeSkills({ proficient: true, expertise: false });
       const conditions = [makeCondition('Exhaustion')];
       const result = calculatePassivePerception(scores, skills, 3, conditions);
-      // 15 - 5 = 10
-      expect(result).toBe(10);
+      // 15 - 2*1 = 13
+      expect(result).toBe(13);
+    });
+
+    it('用例6b: Exhaustion level 3 → -6', () => {
+      const scores = createAbilityScores({ Wisdom: 14 });
+      const skills = makeSkills({ proficient: true, expertise: false });
+      const conditions = [makeCondition('Exhaustion', 'test', '2024-01-01T00:00:00Z', 3)];
+      const result = calculatePassivePerception(scores, skills, 3, conditions);
+      // 15 - 2*3 = 9
+      expect(result).toBe(9);
+    });
+
+    it('用例6c: Exhaustion level 5 → -10', () => {
+      const scores = createAbilityScores({ Wisdom: 14 });
+      const skills = makeSkills({ proficient: true, expertise: false });
+      const conditions = [makeCondition('Exhaustion', 'test', '2024-01-01T00:00:00Z', 5)];
+      const result = calculatePassivePerception(scores, skills, 3, conditions);
+      // 15 - 2*5 = 5
+      expect(result).toBe(5);
     });
 
     it('用例7: 有多种状态但不包含 Exhaustion 时，无惩罚', () => {
@@ -149,7 +168,7 @@ describe('calculatePassivePerception', () => {
       expect(result).toBe(15);
     });
 
-    it('Exhaustion 和其他状态同时存在时，仍应用 -5 惩罚', () => {
+    it('Exhaustion 和其他状态同时存在时，仍应用 -2 惩罚', () => {
       const scores = createAbilityScores({ Wisdom: 14 });
       const skills = makeSkills({ proficient: true, expertise: false });
       const conditions = [
@@ -158,20 +177,20 @@ describe('calculatePassivePerception', () => {
         makeCondition('Poisoned'),
       ];
       const result = calculatePassivePerception(scores, skills, 3, conditions);
-      // 15 - 5 = 10
-      expect(result).toBe(10);
+      // 15 - 2*1 = 13
+      expect(result).toBe(13);
     });
 
-    it('多个 Exhaustion 条件（重复）只应用一次 -5 惩罚', () => {
+    it('多个 Exhaustion 条目（异常情况）取最高等级', () => {
       const scores = createAbilityScores({ Wisdom: 14 });
       const skills = makeSkills({ proficient: true, expertise: false });
       const conditions = [
-        makeCondition('Exhaustion', 'source1'),
-        makeCondition('Exhaustion', 'source2'),
+        makeCondition('Exhaustion', 'source1', '2024-01-01T00:00:00Z', 2),
+        makeCondition('Exhaustion', 'source2', '2024-01-01T00:00:00Z', 4),
       ];
       const result = calculatePassivePerception(scores, skills, 3, conditions);
-      // 15 - 5 = 10 (只减一次)
-      expect(result).toBe(10);
+      // 15 - 2*4 = 7（取 max level）
+      expect(result).toBe(7);
     });
   });
 
@@ -219,10 +238,10 @@ describe('calculatePassivePerception', () => {
     it('Exhaustion 导致负值的情况（理论边缘）', () => {
       const scores = createAbilityScores({ Wisdom: 8 }); // Wis -1
       const skills = makeSkills({ proficient: false, expertise: false });
-      const conditions = [makeCondition('Exhaustion')];
-      // 10 + (-1) - 5 = 4
+      const conditions = [makeCondition('Exhaustion', 'test', '2024-01-01T00:00:00Z', 6)];
+      // 10 + (-1) - 2*6 = -3
       const result = calculatePassivePerception(scores, skills, 3, conditions);
-      expect(result).toBe(4);
+      expect(result).toBe(-3);
     });
   });
 

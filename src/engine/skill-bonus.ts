@@ -2,7 +2,7 @@
 // 技能加值计算 — 纯函数
 // 对应 HLD §6.1 + PRD v4.0 §4.2
 
-import type { AbilityScores } from '../types/ability';
+import type { AbilityName, AbilityScores } from '../types/ability';
 import type { SkillEntry } from '../types/skill';
 import { getModifier, getTotalScore } from './ability-modifier';
 
@@ -32,7 +32,7 @@ import { getModifier, getTotalScore } from './ability-modifier';
 export function getSkillBonus(
   scores: AbilityScores,
   skill: SkillEntry,
-  abilityName: import('../types/ability').AbilityName,
+  abilityName: AbilityName,
   proficiencyBonus: number
 ): number {
   const abilityModifier = getModifier(getTotalScore(scores, abilityName));
@@ -58,7 +58,7 @@ export function getSkillBonus(
 export function getAllSkillBonuses(
   scores: AbilityScores,
   skills: Record<string, SkillEntry>,
-  skillAbilityMap: Record<string, import('../types/ability').AbilityName>,
+  skillAbilityMap: Record<string, AbilityName>,
   proficiencyBonus: number
 ): Record<string, number> {
   const result: Record<string, number> = {};

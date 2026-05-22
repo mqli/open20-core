@@ -10,7 +10,7 @@ import type { DataLoader } from '../data/loader';
 /**
  * 生命骰固定值对照表
  * d6 → 4, d8 → 5, d10 → 6, d12 → 7
- * 公式: ceil(maxFace / 2)
+ * 公式: floor(maxFace / 2) + 1（D&D 平均值向上取整）
  */
 const HIT_DIE_FIXED: Record<DieType, number> = {
   d4: 3,

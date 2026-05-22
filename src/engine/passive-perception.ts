@@ -9,12 +9,26 @@ import { getModifier, getTotalScore } from './ability-modifier';
 import { getSkillBonus } from './skill-bonus';
 
 /**
+ * 取出 Exhaustion 的最高等级（无该状态时返回 0）
+ * 2024 PHB: Exhaustion 是单一状态，不应有多个条目；
+ * 若意外出现多个，取最高等级以保证幂等。
+ */
+function getExhaustionLevel(conditions: readonly ActiveCondition[]): number {
+  let max = 0;
+  for (const c of conditions) {
+    if (c.id !== 'Exhaustion') continue;
+    const lvl = c.level ?? 1;
+    if (lvl > max) max = lvl;
+  }
+  return max;
+}
+
+/**
  * 计算被动感知(Passive Perception)
  *
- * 规则：
+ * 规则（2024 PHB）：
  * - 基础 = 10 + Perception技能加值
- * - 优势 = +5
- * - 劣势 = -5
+ * - Exhaustion: D20 Test 减去 2 × Exhaustion 等级；被动检定同样受影响
  *
  * @param scores - 属性值对象
  * @param skills - 全部技能条目
@@ -26,6 +40,9 @@ import { getSkillBonus } from './skill-bonus';
  * // Wis 14(+2), proficient, proficiency +3
  * calculatePassivePerception(scores, { Perception: { proficient: true, expertise: false } }, 3, [])
  * // 15 = 10 + (2 + 3)
+ *
+ * // 同上 + Exhaustion level 2
+ * // 15 - 2*2 = 11
  */
 export function calculatePassivePerception(
   scores: AbilityScores,
@@ -36,27 +53,11 @@ export function calculatePassivePerception(
   const perceptionSkill = skills['Perception'];
   const base = 10;
 
-  if (!perceptionSkill) {
-    // 没有Perception技能条目，仅用Wis调整值
-    const wisMod = getModifier(getTotalScore(scores, 'Wisdom'));
-    return base + wisMod;
-  }
+  const perceptionBonus = perceptionSkill
+    ? getSkillBonus(scores, perceptionSkill, 'Wisdom', proficiencyBonus)
+    : getModifier(getTotalScore(scores, 'Wisdom'));
 
-  const perceptionBonus = getSkillBonus(scores, perceptionSkill, 'Wisdom', proficiencyBonus);
+  const exhaustion = getExhaustionLevel(conditions);
 
-  let passive = base + perceptionBonus;
-
-  // 状态影响
-  const conditionNames = new Set(conditions.map(c => c.id));
-
-  // Blinded: 被动感知-10（实际上无法用视觉感知）
-  // 这里简化处理：不自动减10，因为被动感知可能不依赖视觉
-  // 但如果DM判定完全依赖视觉，则-10
-
-  // Exhaustion 1级: 技能检定劣势 → 被动-5
-  if (conditionNames.has('Exhaustion')) {
-    passive -= 5;
-  }
-
-  return passive;
+  return base + perceptionBonus - 2 * exhaustion;
 }

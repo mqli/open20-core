@@ -230,13 +230,6 @@ function isRaging(char: Character): boolean {
 }
 
 /**
- * Check if character has a specific class at minimum level
- */
-function _hasClassLevel(char: Character, classId: string, minLevel: number): boolean {
-  return char.classes.some(c => c.classId === classId && c.level >= minLevel);
-}
-
-/**
  * Get damage defenses from species features
  */
 function getSpeciesDefenses(char: Character, dataLoader: DataLoader): DamageDefenseSource | null {
@@ -367,27 +360,6 @@ function getEquipmentDefenses(char: Character): DamageDefenseSource[] {
 }
 
 /**
- * Get damage defenses from active conditions
- */
-function getConditionDefenses(char: Character): DamageDefenseSource[] {
-  const sources: DamageDefenseSource[] = [];
-
-  for (const condition of char.conditions) {
-    // Check for spells/effects that grant defenses
-    // This would be expanded with actual spell effect data
-    // For now, we handle known defensive conditions
-
-    // Example: Protection from Energy grants chosen damage type resistance
-    if (condition.id === 'Concentrating' && condition.source.includes('Protection from Energy')) {
-      // Would need additional data to determine which type
-      // Placeholder - actual implementation would track this
-    }
-  }
-
-  return sources;
-}
-
-/**
  * Aggregate all damage defenses from character sources
  * Returns both aggregated defenses and detailed sources for debugging
  *
@@ -413,9 +385,6 @@ export function getActiveDamageDefenses(
 
   const equipmentSources = getEquipmentDefenses(char);
   allSources.push(...equipmentSources);
-
-  const conditionSources = getConditionDefenses(char);
-  allSources.push(...conditionSources);
 
   // Include character's custom persistent defenses (only if non-empty)
   const { damageDefenses } = char;
