@@ -23,6 +23,12 @@ export type { SpellSlotEntry, PactMagicResult } from './spell-slots';
 export { calculateInitiative } from './initiative';
 export { calculatePassivePerception } from './passive-perception';
 export { calculateAttacks } from './attack-calculator';
+export {
+  buildClassSpellData,
+  getMaxSpellLevel,
+  getAlwaysPreparedSpellsFromSubclass,
+} from './spell-data';
+export type { BuildClassSpellDataOpts } from './spell-data';
 
 // ── Dice System (New Layered Architecture) ─────────────
 // Import from dice/ folder

@@ -1,9 +1,12 @@
 // character/utils.ts
-// Shared pure helpers used by create.ts, recompute.ts, level-up.ts, spells-init.ts
-// Breaking circular dependencies between character/ modules
+// Shared pure helpers used by create.ts, recompute.ts, level-up.ts.
+// Breaking circular dependencies between character/ modules.
 
 import type { Feature, Class, Subclass } from '../types/class';
 import type { DataLoader } from '../data/loader';
+
+// ── Re-exports from engine (single source of truth) ──────────────
+export { getMaxSpellLevel, getAlwaysPreparedSpellsFromSubclass } from '../engine/spell-data';
 
 // ── Feature Helpers ──────────────────────────────────
 
@@ -14,21 +17,6 @@ export function getFeaturesAtLevel(
 ): readonly Feature[] {
   const entry = classData.featuresByLevel.find(f => f.level === level);
   return entry?.features ?? [];
-}
-
-/** Get always-prepared spells from a subclass up to a given class level. */
-export function getAlwaysPreparedSpellsFromSubclass(
-  subclass: Subclass,
-  classLevel: number
-): string[] {
-  if (!subclass.alwaysPreparedSpells) return [];
-  const spells: string[] = [];
-  for (const entry of subclass.alwaysPreparedSpells) {
-    if (classLevel >= entry.level) {
-      spells.push(...entry.spells);
-    }
-  }
-  return spells;
 }
 
 // ── Feature Gathering ──────────────────────────────────
@@ -59,18 +47,4 @@ export function gatherAllFeatures(
     }
   }
   return features;
-}
-
-// ── Spell Helpers ──────────────────────────────────────
-
-/** Get the highest spell level with non-zero slots. */
-export function getMaxSpellLevel(
-  slots: Record<number, import('../types/spell').SpellSlotEntry>
-): number {
-  let max = 0;
-  for (let level = 1; level <= 9; level++) {
-    const entry = slots[level];
-    if (entry && entry.total > 0) max = level;
-  }
-  return max;
 }

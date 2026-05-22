@@ -6,7 +6,6 @@ import {
   createCharacter,
   getFeaturesAtLevel,
   isProficient,
-  buildInitialSpells,
   emptyCharacterSpells,
   extractResources,
   getAlwaysPreparedSpellsFromSubclass,
@@ -736,10 +735,15 @@ describe('isProficient', () => {
   });
 });
 
-describe('buildInitialSpells', () => {
+describe('wizard spell data (via createCharacter)', () => {
   it('calculates spell save DC and attack bonus correctly', () => {
-    const abilityScores = {
-      base: {
+    const data = createMockDataLoaderExtended();
+    const params: CreateCharacterParams = {
+      name: 'Gandalf',
+      speciesId: 'Human',
+      backgroundId: 'Sage',
+      classId: 'Wizard',
+      abilityScores: {
         Strength: 10,
         Dexterity: 10,
         Constitution: 10,
@@ -747,19 +751,16 @@ describe('buildInitialSpells', () => {
         Wisdom: 10,
         Charisma: 10,
       },
-      racialBonuses: {},
-      featBonuses: {},
-      temporaryBonuses: {},
     };
 
-    const result = buildInitialSpells(WIZARD_CLASS, abilityScores, createMockDataLoader());
+    const char = createCharacter(params, data);
+    const wizard = char.spells.classSpellcasting['Wizard'];
+
     // Int 16 → +3, PB = 2
-    // DC = 8 + 2 + 3 = 13
-    expect(result.classSpellcasting['Wizard']).toBeDefined();
-    expect(result.classSpellcasting['Wizard']!.spellSaveDC).toBe(13);
-    // Attack = 2 + 3 = 5
-    expect(result.classSpellcasting['Wizard']!.spellAttackBonus).toBe(5);
-    expect(result.classSpellcasting['Wizard']!.spellcastingAbility).toBe('Intelligence');
+    expect(wizard).toBeDefined();
+    expect(wizard!.spellSaveDC).toBe(13); // 8 + 2 + 3
+    expect(wizard!.spellAttackBonus).toBe(5); // 2 + 3
+    expect(wizard!.spellcastingAbility).toBe('Intelligence');
   });
 });
 

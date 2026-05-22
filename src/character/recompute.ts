@@ -16,10 +16,11 @@ import { calculateInitiative } from '../engine/initiative';
 import { calculatePassivePerception } from '../engine/passive-perception';
 import { calculateAttacks } from '../engine/attack-calculator';
 import { calculateMaxHP } from '../engine/hp-calculator';
-import { calculatePactMagic, calculateSpellSlots, calculateSpellSlotsFromClasses } from '../engine/spell-slots';
-import type { SpellLevel, SpellSlotEntry } from '../types/spell';
+import { calculatePactMagic, calculateSpellSlotsFromClasses } from '../engine/spell-slots';
+import { buildClassSpellData } from '../engine/spell-data';
+import type { ClassSpellData, SpellLevel, SpellSlotEntry } from '../types/spell';
 import type { Feature } from '../types/class';
-import { getAlwaysPreparedSpellsFromSubclass, gatherAllFeatures, getMaxSpellLevel } from './utils';
+import { gatherAllFeatures } from './utils';
 import type { CharacterFeatEntry } from '../types/feat';
 
 // ── Grant Computation (Single Source of Truth) ─────────────────
@@ -187,140 +188,30 @@ function computeCombatStats(
 
 /**
  * Compute per-class spell data (DC, attack bonus, known/cantrip/prepared spells).
- * Handles both updating existing entries and adding new spellcasting classes.
+ * Delegates per-class computation to engine/spell-data.buildClassSpellData.
+ * Any class no longer on `char.classes` (or no longer spellcasting) is dropped.
  */
 function computeClassSpellData(
   char: Character,
   data: DataLoader,
   pb: number,
-  updatedAbilityScores: AbilityScores,
-  existingClassSpellcasting: Record<string, Character['spells']['classSpellcasting'][string]>
-): Record<string, Character['spells']['classSpellcasting'][string]> {
-  const classSpellcasting = { ...existingClassSpellcasting };
-
-  // Update existing spellcasting classes
-  for (const [classId, classSpellData] of Object.entries(classSpellcasting)) {
-    const classData = data.getClass(classId);
-    if (!classData?.spellcasting) {
-      delete classSpellcasting[classId];
-      continue;
-    }
-
-    const ability = classData.spellcasting.ability;
-    const abilityMod = getModifier(getTotalScore(updatedAbilityScores, ability));
-    const charClass = char.classes.find(c => c.classId === classId);
-    const classLevel = charClass?.level ?? 1;
-
-    const classSlots = calculateSpellSlots(classId, classLevel, data);
-    const classMaxSpellLevel = getMaxSpellLevel(classSlots);
-
-    // Auto-populate knownSpells / cantrips based on caster type
-    const { knownSpells, knownCantrips, maxCantripsKnown } =
-      computeKnownSpellsForClass(classId, classData, classLevel, classMaxSpellLevel, classSpellData, data);
-
-    // Auto-populate alwaysPreparedSpells from subclass
-    const alwaysPreparedSpells = computeAlwaysPreparedSpells(charClass, data);
-
-    const levelEntry = classData.featuresByLevel.find(f => f.level === classLevel);
-    const maxPrepared = levelEntry?.preparedSpells ?? 0;
-
-    classSpellcasting[classId] = {
-      ...classSpellData,
-      spellcastingAbility: ability,
-      spellSaveDC: 8 + pb + abilityMod,
-      spellAttackBonus: pb + abilityMod,
-      knownCantrips: knownCantrips,
-      maxCantripsKnown,
-      knownSpells,
-      alwaysPreparedSpells,
-      maxPrepared,
-    };
-  }
-
-  // Add new spellcasting classes not yet tracked
+  abilityScores: AbilityScores,
+  existing: Record<string, ClassSpellData>
+): Record<string, ClassSpellData> {
+  const result: Record<string, ClassSpellData> = {};
   for (const charClass of char.classes) {
-    const classData = data.getClass(charClass.classId);
-    if (!classData?.spellcasting) continue;
-    if (classSpellcasting[charClass.classId]) continue;
-
-    const ability = classData.spellcasting.ability;
-    const abilityMod = getModifier(getTotalScore(updatedAbilityScores, ability));
-
-    const classSlots = calculateSpellSlots(charClass.classId, charClass.level, data);
-    const classMaxSpellLevel = getMaxSpellLevel(classSlots);
-
-    const levelEntry = classData.featuresByLevel.find(f => f.level === charClass.level);
-    const maxCantripsKnown = levelEntry?.cantripsKnown ?? 0;
-
-    const { knownSpells, knownCantrips } =
-      computeKnownSpellsForClass(charClass.classId, classData, charClass.level, classMaxSpellLevel, undefined, data);
-
-    const alwaysPreparedSpells = computeAlwaysPreparedSpells(charClass, data);
-
-    const maxPrepared = levelEntry?.preparedSpells ?? 0;
-
-    classSpellcasting[charClass.classId] = {
+    const built = buildClassSpellData({
       classId: charClass.classId,
-      spellcastingAbility: ability,
-      spellSaveDC: 8 + pb + abilityMod,
-      spellAttackBonus: pb + abilityMod,
-      knownCantrips,
-      maxCantripsKnown,
-      knownSpells,
-      preparedSpells: [],
-      alwaysPreparedSpells,
-      maxPrepared,
-    };
+      classLevel: charClass.level,
+      subclassId: charClass.subclassId,
+      abilityScores,
+      proficiencyBonus: pb,
+      existing: existing[charClass.classId],
+      data,
+    });
+    if (built) result[charClass.classId] = built;
   }
-
-  return classSpellcasting;
-}
-
-/**
- * Compute known spells and cantrips for a class based on caster type.
- * - class_list casters: auto-populate all level 1+ spells on class list
- * - spellbook casters (Wizard): preserve existing known spells
- */
-function computeKnownSpellsForClass(
-  classId: string,
-  classData: import('../types/class').Class,
-  classLevel: number,
-  classMaxSpellLevel: number,
-  existing: Character['spells']['classSpellcasting'][string] | undefined,
-  data: DataLoader
-): {
-  knownSpells: readonly string[];
-  knownCantrips: readonly string[];
-  maxCantripsKnown: number;
-} {
-  const levelEntry = classData.featuresByLevel.find(f => f.level === classLevel);
-  const maxCantripsKnown = levelEntry?.cantripsKnown ?? (existing?.maxCantripsKnown ?? 0);
-
-  if (classData.spellcasting?.knownSource === 'class_list') {
-    const knownCantrips = existing?.knownCantrips ?? [];
-    const knownSpells = data.getAllSpells()
-      .filter(s => s.classes?.includes(classId) && s.level >= 1 && s.level <= classMaxSpellLevel)
-      .map(s => s.id);
-    return { knownSpells, knownCantrips, maxCantripsKnown };
-  }
-
-  // spellbook caster (Wizard): preserve existing
-  return {
-    knownSpells: existing?.knownSpells ?? [],
-    knownCantrips: existing?.knownCantrips ?? [],
-    maxCantripsKnown,
-  };
-}
-
-/** Compute always-prepared spells from subclass (domain/oath spells). */
-function computeAlwaysPreparedSpells(
-  charClass: Character['classes'][number] | undefined,
-  data: DataLoader
-): readonly string[] {
-  if (!charClass?.subclassId) return [];
-  const subclass = data.getSubclass(charClass.subclassId);
-  if (!subclass) return [];
-  return getAlwaysPreparedSpellsFromSubclass(subclass, charClass.level);
+  return result;
 }
 
 // ── Pact Magic ────────────────────────────────────────────

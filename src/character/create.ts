@@ -24,7 +24,7 @@ import { extractResources } from './resource-builder';
 // Re-export for backward compatibility (tests import from create.ts)
 export { getFeaturesAtLevel, getAlwaysPreparedSpellsFromSubclass } from './utils';
 export { extractResources } from './resource-builder';
-export { emptyCharacterSpells, buildInitialSpells, buildMulticlassSpells } from './spells-init';
+export { emptyCharacterSpells } from './spells-init';
 
 // ── 公共接口 ────────────────────────────────────────────
 
