@@ -10,6 +10,8 @@ import {
   rollDice,
   rollExpression,
   parseDiceExpression,
+  isCriticalHit as detectCrit,
+  isCriticalFail as detectCritFail,
   type DiceRollResult,
   type RandomProvider,
 } from './core';
@@ -209,8 +211,8 @@ export function rollAttack(params: AttackRollParams): AttackRollResult {
   const rawRoll = d20Result.total;
   const total = rawRoll + attackBonus;
 
-  const isCritical = rawRoll === 20;
-  const isCriticalFail = rawRoll === 1;
+  const isCritical = detectCrit(rawRoll);
+  const isCriticalFail = detectCritFail(rawRoll);
 
   // Nat 20 always hits, nat 1 always misses (in some house rules)
   let hit: boolean | undefined;
@@ -317,12 +319,12 @@ export function rollDamage(params: DamageRollParams): DamageRollResult {
   let diceTotal = 0;
 
   // Process each damage entry
-  for (let i = 0; i < entryParams.length; i++) {
-    const entryParam = entryParams[i]!;
+  for (const entryParam of entryParams) {
     let diceStr = entryParam.dice;
 
-    // For critical hits, double the dice count of the first entry
-    if (i === 0 && isCritical) {
+    // For critical hits, double the dice count (ALL entries, not just the first)
+    // D&D 5e: critical hits double ALL damage dice, regardless of source
+    if (isCritical) {
       const match = diceStr.match(/^(\d+)d(\d+)$/);
       if (match) {
         const count = parseInt(match[1]!, 10) * 2;
@@ -370,14 +372,6 @@ export function rollDamage(params: DamageRollParams): DamageRollResult {
     total,
     typedDamage,
   };
-}
-
-/**
- * Roll damage from a dice expression (supports complex expressions)
- */
-function rollDiceExpression(rng: RandomProvider, exprStr: string): DiceRollResult {
-  const expr = parseDiceExpression(exprStr);
-  return rollExpression(rng, expr);
 }
 
 // ── Initiative Roll ──────────────────────────────────────────────

@@ -245,30 +245,17 @@ export function parseDiceExpression(expr: string): DiceExpression {
  */
 export function rollExpression(rng: RandomProvider, expr: DiceExpression): DiceRollResult {
   const allRolls: number[] = [];
-  let diceTotal = 0;
   let modifier = 0;
 
   for (const term of expr.terms) {
-    if (term.count > 0 && term.die) {
-      // Roll dice
+    if (term.count !== 0 && term.die) {
+      // Dice term (positive or negative count)
       const sides = DIE_SIDES[term.die];
+      const sign = term.count > 0 ? 1 : -1;
       for (let i = 0; i < Math.abs(term.count); i++) {
         const roll = rng.roll(1, sides);
-        allRolls.push(roll);
+        allRolls.push(sign * roll);
       }
-      // For negative count, subtract from total
-      if (term.count > 0) {
-        // Already added above
-      }
-      diceTotal = allRolls.reduce((sum, r) => sum + r, 0);
-    } else if (term.count < 0 && term.die) {
-      // Negative dice (rare, but possible)
-      const sides = DIE_SIDES[term.die];
-      for (let i = 0; i < Math.abs(term.count); i++) {
-        const roll = rng.roll(1, sides);
-        allRolls.push(-roll);
-      }
-      diceTotal = allRolls.reduce((sum, r) => sum + r, 0);
     }
 
     // Add flat modifier
