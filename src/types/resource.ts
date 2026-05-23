@@ -31,14 +31,14 @@ export interface Resource {
 
 // 2024 各职业资源清单（参考，非类型定义）：
 // Barbarian: Rage (LongRest)
-// Bard: Bardic Inspiration (LongRest, 5级后ShortRest)
+// Bard: Bardic Inspiration (LongRest; switches to ShortRest at level 5 — not yet supported)
 // Cleric: Channel Divinity (ShortRest)
 // Druid: Wild Shape (ShortRest)
 // Fighter: Second Wind (ShortRest), Action Surge (ShortRest), Indomitable (LongRest)
 // Monk: Focus Points (ShortRest)
 // Paladin: Channel Divinity (ShortRest), Lay on Hands (LongRest)
 // Ranger: Favored Enemy (LongRest)
-// Rogue: Sneak Attack (PerTurn - 实际不计次，只是伤害加成)
+// Rogue: Sneak Attack (no resource — unlimited per turn, damage bonus only)
 // Sorcerer: Sorcery Points (LongRest)
 // Warlock: Pact Magic (ShortRest)
 // Wizard: Arcane Recovery (LongRest)

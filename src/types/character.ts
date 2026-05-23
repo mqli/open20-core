@@ -78,7 +78,10 @@ export interface ActiveCondition {
   readonly level?: number;
 }
 
-// 状态名称
+// 状态名称 — 标准 D&D 条件 + 引擎追踪状态
+// NOTE: 'Raging' and 'Concentrating' are not standard D&D conditions;
+// they are engine-level state trackers mixed in for convenience.
+// Future refactor: separate into ConditionName | FeatureState | ActiveEffect.
 export type ConditionName =
   | 'Blinded'
   | 'Charmed'

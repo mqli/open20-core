@@ -7,7 +7,7 @@ import type { DamageType } from './damage';
 export interface EquipmentItem {
   readonly id: string;
   readonly name: string;
-  readonly type: 'weapon' | 'armor' | 'shield' | 'gear' | 'consumable';
+  readonly type: 'weapon' | 'armor' | 'gear' | 'consumable';
   readonly source?: string; // '2024 PHB' | '2014 PHB' | 'SRD 5.2' | ...（可选，测试中可以省略）
   readonly weight: number; // 重量（磅），0=无重量
   readonly cost?: string; // 价格（如 "15 gp"）
@@ -21,7 +21,7 @@ export interface Weapon extends EquipmentItem {
   readonly category: 'Simple' | 'Martial';
   readonly damage: WeaponDamage;
   readonly properties: readonly WeaponProperty[];
-  readonly mastery?: WeaponMasteryProperty; // 2024 武器精通属性
+  readonly mastery?: readonly WeaponMasteryProperty[]; // 2024 武器精通属性（9级Fighter可多选）
   readonly range?: WeaponRange;
   readonly versatileDamage?: string; // 双手使用时伤害（如 "1d10"）
 }

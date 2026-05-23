@@ -99,5 +99,7 @@ export interface Subclass {
 // 多维职业法术位查询表条目
 export interface MulticlassSpellSlotEntry {
   readonly totalSpellcastingLevel: number;
-  readonly slotsByLevel: ReadonlyArray<number>; // index = 法术等级 0-9
+  // slotsByLevel: indexed by spell level (1-9), index 0 = level 1 slots, index 8 = level 9 slots.
+  // Cantrips (level 0) are not included since they don't consume slots.
+  readonly slotsByLevel: ReadonlyArray<number>;
 }

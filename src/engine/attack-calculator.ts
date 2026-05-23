@@ -67,7 +67,7 @@ export function calculateAttacks(
       attackBonus,
       damage: damageStr,
       damageType: baseEntry?.type ?? 'Slashing', // 从武器数据获取伤害类型
-      mastery: weapon.mastery ? [weapon.mastery] : [],
+      mastery: weapon.mastery ?? [],
     });
   }
 
