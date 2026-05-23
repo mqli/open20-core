@@ -42,7 +42,6 @@ const VALID_SKILLS = [
 const VALID_FEAT_CATEGORIES = ['Origin', 'General', 'Fighting Style', 'Epic Boon'];
 const VALID_HIT_DICE = ['d6', 'd8', 'd10', 'd12'];
 const VALID_DAMAGE_TYPES = ['bludgeoning', 'piercing', 'slashing'];
-const VALID_CASTER_TYPES = ['Wizard', 'Cleric', 'Druid', 'Sorcerer', 'Bard', 'Paladin', 'Ranger'];
 
 const EXPECTED_WEAPON_MASTERY_PROPERTIES = ['Push', 'Slow', 'Topple', 'Vex', 'Sap', 'Graze', 'Nick', 'Cleave'];
 const EXPECTED_CONDITIONS = [

@@ -4,9 +4,8 @@
 import { describe, it, expect } from 'vitest';
 import { createCharacter } from '../../src/character/create';
 import type { CreateCharacterParams } from '../../src/character/create';
-import type { DataLoader } from '../../src/data/loader';
 import type { AbilityName } from '../../src/types/ability';
-import type { EquipmentItem } from '../../src/types/equipment';
+import type { EquipmentItem, Armor } from '../../src/types/equipment';
 import type { ConditionName } from '../../src/types/character';
 
 import {
@@ -19,8 +18,6 @@ import {
   toggleCondition,
   equipItem,
   unequipItem,
-  prepareSpell,
-  unprepareSpell,
   prepareSpellForClass,
   unprepareSpellForClass,
   addKnownSpell,
@@ -39,9 +36,7 @@ import {
 import {
   HUMAN_SPECIES,
   SOLDIER_BACKGROUND,
-  FIGHTER_FEATURES_L1,
   FIGHTER_CLASS,
-  WIZARD_FEATURES_L1,
   WIZARD_CLASS,
 } from '../fixtures/characters';
 
@@ -127,10 +122,13 @@ const SWORD: EquipmentItem = {
   equipped: false,
 };
 
-const SHIELD: EquipmentItem = {
+const SHIELD: Armor = {
   id: 'shield-1',
   name: 'Shield',
-  type: 'shield',
+  type: 'armor',
+  category: 'Shield',
+  baseAC: 2,
+  dexBonus: false,
   weight: 6,
   equipped: true,
 };
@@ -374,31 +372,31 @@ describe('equipItem / unequipItem', () => {
   });
 });
 
-describe('prepareSpell / unprepareSpell', () => {
+describe('prepareSpellForClass / unprepareSpellForClass (deprecated API tests)', () => {
   it('prepares new spell: added to preparedSpells', () => {
     const char = makeWizard();
-    const result = prepareSpell(char, 'fireball');
+    const result = prepareSpellForClass(char, 'Wizard', 'fireball');
     // Check per-class prepared spells
     expect(result.spells.classSpellcasting['Wizard']!.preparedSpells).toContain('fireball');
   });
 
   it('prepares already prepared spell: no change', () => {
     const char = makeWizard();
-    const prepared = prepareSpell(char, 'fireball');
-    const result = prepareSpell(prepared, 'fireball');
+    const prepared = prepareSpellForClass(char, 'Wizard', 'fireball');
+    const result = prepareSpellForClass(prepared, 'Wizard', 'fireball');
     expect(result.spells.classSpellcasting['Wizard']!.preparedSpells.filter(id => id === 'fireball')).toHaveLength(1);
   });
 
   it('unprepares prepared spell: removed from preparedSpells', () => {
     const char = makeWizard();
-    const prepared = prepareSpell(char, 'fireball');
-    const result = unprepareSpell(prepared, 'fireball');
+    const prepared = prepareSpellForClass(char, 'Wizard', 'fireball');
+    const result = unprepareSpellForClass(prepared, 'Wizard', 'fireball');
     expect(result.spells.classSpellcasting['Wizard']!.preparedSpells).not.toContain('fireball');
   });
 
   it('unprepares non-prepared spell: no change', () => {
     const char = makeWizard();
-    const result = unprepareSpell(char, 'fireball');
+    const result = unprepareSpellForClass(char, 'Wizard', 'fireball');
     expect(result.spells.classSpellcasting['Wizard']!.preparedSpells).toEqual(char.spells.classSpellcasting['Wizard']!.preparedSpells);
   });
 });

@@ -9,7 +9,7 @@ import type { SkillEntry } from './skill';
 import type { CharacterFeatEntry } from './feat';
 import type { EquipmentItem } from './equipment';
 import type { CharacterSpells } from './spell';
-import type { Resource, CharacterClassResources } from './resource';
+import type { CharacterClassResources } from './resource';
 export type { DamageDefenses };
 
 // 角色核心接口 — 所有字段均为 readonly（不可变）

@@ -12,9 +12,6 @@ import {
 } from '../../src/character/create';
 import type { CreateCharacterParams } from '../../src/character/create';
 import type { DataLoader } from '../../src/data/loader';
-import type { Species } from '../../src/types/species';
-import type { Background } from '../../src/types/background';
-import type { Class, Feature, Subclass } from '../../src/types/class';
 import type { AbilityName } from '../../src/types/ability';
 
 // ── Shared Fixtures ──────────────────────────────────────────────
@@ -26,8 +23,6 @@ import {
   ELF_SPECIES,
   SOLDIER_BACKGROUND,
   SAGE_BACKGROUND,
-  FIGHTER_FEATURES_L1,
-  FIGHTER_FEATURES_L2,
   FIGHTER_CLASS,
   BARBARIAN_CLASS,
   WIZARD_CLASS,
@@ -36,20 +31,6 @@ import {
   CLERIC_CLASS,
   LIFE_DOMAIN_SUBCLASS,
 } from '../fixtures/characters';
-
-// ── Additional Test Data ──────────────────────────────────────
-
-const CHAMPION_FEATURES_L3: Feature[] = [
-  { name: 'Improved Critical', description: 'Crit on 19-20', level: 3 },
-];
-
-const CHAMPION_FEATURES_L7: Feature[] = [
-  {
-    name: 'Remarkable Athlete',
-    description: 'Add half proficiency to Str/Dex/Con checks',
-    level: 7,
-  },
-];
 
 // ── Mock DataLoader ────────────────────────────────────────────
 

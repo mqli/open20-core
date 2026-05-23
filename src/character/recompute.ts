@@ -22,7 +22,7 @@ import type { ClassSpellData, SpellLevel, SpellSlotEntry } from '../types/spell'
 import type { Feature } from '../types/class';
 import { gatherAllFeatures } from './utils';
 import { recomputeResources } from './resource-builder';
-import type { CharacterFeatEntry, FeatAttackBonus, FeatACBonus } from '../types/feat';
+import type { FeatAttackBonus, FeatACBonus } from '../types/feat';
 
 // ── Grant Computation (Single Source of Truth) ─────────────────
 
@@ -249,8 +249,7 @@ function computePactMagic(
 /** Recalculate regular spell slots, preserving used counts. */
 function computeSpellSlots(
   char: Character,
-  data: DataLoader,
-  classSpellcasting: Record<string, Character['spells']['classSpellcasting'][string]>
+  data: DataLoader
 ) {
   const newSlots = calculateSpellSlotsFromClasses(char.classes, data);
   const hasNonZero = Object.values(newSlots).some(entry => entry.total > 0);
@@ -398,7 +397,7 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
   let newSpells = computePactMagic(char, data, char.spells.pactMagicSlots);
 
   // 7. Regular spell slots + feat spells
-  const updatedSlots = computeSpellSlots(char, data, classSpellcasting);
+  const updatedSlots = computeSpellSlots(char, data);
   const featSpells = computeFeatSpells(char, data);
   newSpells = {
     ...newSpells,

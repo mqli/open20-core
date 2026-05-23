@@ -39,7 +39,7 @@ const CharacterSchema = z.object({
   feats: z.array(z.union([z.string(), FeatEntrySchema])),
   equipment: z.array(z.any()),
   spells: z.any(),
-  resources: z.union([z.array(z.any()), z.record(z.any())]),
+  resources: z.union([z.array(z.any()), z.record(z.string(), z.any())]),
   hitPoints: z.object({
     max: z.number(),
     current: z.number(),

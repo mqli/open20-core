@@ -195,21 +195,23 @@ export function validateCharacter(char: Character, data: DataLoader): Validation
   }
 
   // 9. Resources
-  for (let i = 0; i < char.resources.length; i++) {
-    const resource = char.resources[i]!;
-    if (resource.used < 0) {
-      errors.push({
-        field: `resources[${i}].used`,
-        message: `Resource "${resource.id}" used must be >= 0, got ${resource.used}`,
-        severity: 'error',
-      });
-    }
-    if (resource.used > resource.max) {
-      errors.push({
-        field: `resources[${i}].used`,
-        message: `Resource "${resource.id}" used (${resource.used}) must be <= max (${resource.max})`,
-        severity: 'error',
-      });
+  for (const [classId, classResources] of Object.entries(char.resources)) {
+    for (let i = 0; i < classResources.resources.length; i++) {
+      const resource = classResources.resources[i]!;
+      if (resource.used < 0) {
+        errors.push({
+          field: `resources.${classId}.resources[${i}].used`,
+          message: `Resource "${resource.id}" used must be >= 0, got ${resource.used}`,
+          severity: 'error',
+        });
+      }
+      if (resource.used > resource.max) {
+        errors.push({
+          field: `resources.${classId}.resources[${i}].used`,
+          message: `Resource "${resource.id}" used (${resource.used}) must be <= max (${resource.max})`,
+          severity: 'error',
+        });
+      }
     }
   }
 

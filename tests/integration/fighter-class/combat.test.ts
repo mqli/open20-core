@@ -3,7 +3,7 @@ import { createDataLoader } from '../../../src/data/loader';
 import { createCharacter } from '../../../src/character/create';
 import { applyTypedDamage } from '../../../src/character/mutate';
 import { consumeResource } from '../../../src/character/mutate/resources';
-import { shortRest, longRest } from '../../../src/character/rest';
+import { shortRest } from '../../../src/character/rest';
 
 const dataLoader = createDataLoader();
 
