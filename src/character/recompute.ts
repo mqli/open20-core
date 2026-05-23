@@ -278,8 +278,7 @@ function computeSpellSlots(
  */
 function computeFeatSpells(
   char: Character,
-  data: DataLoader,
-  pb: number
+  data: DataLoader
 ): Record<string, import('../types/spell').FeatSpellsEntry> | undefined {
   const existingFeatSpells = char.spells.featSpells;
   const featSpells: Record<string, import('../types/spell').FeatSpellsEntry> = {};
@@ -399,7 +398,7 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
 
   // 7. Regular spell slots + feat spells
   const updatedSlots = computeSpellSlots(char, data, classSpellcasting);
-  const featSpells = computeFeatSpells(char, data, pb);
+  const featSpells = computeFeatSpells(char, data);
   newSpells = {
     ...newSpells,
     classSpellcasting,

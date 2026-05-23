@@ -83,13 +83,7 @@ export function levelUp(
 
   // 2. HP increase
   const conMod = getModifier(getTotalScore(char.abilityScores, 'Constitution'));
-  let hpIncrease: number;
-  if (options.hpChoice === 'roll' && rng) {
-    hpIncrease = rng.d(getDieMax(classData.hitDie)) + conMod;
-  } else {
-    hpIncrease = getHitDieFixedValue(classData.hitDie) + conMod;
-  }
-  hpIncrease = Math.max(1, hpIncrease); // HP increase is at least 1 per level
+  const hpIncrease = calcHPIncrease(classData.hitDie, conMod, options, rng);
   const newMaxHP = char.hitPoints.max + hpIncrease;
 
   // 3. ASI or Feat
@@ -211,15 +205,10 @@ function addNewClass(
     throw new Error(`Class ${options.classId} not found in data`);
   }
 
-  // Calculate HP for the new class (level 1)
+  // Calculate HP for the new class (level 1).
+  // Multiclass rules: subsequent classes use average/rolled HP, not max (PHB 2024 p.43-44).
   const conMod = getModifier(getTotalScore(char.abilityScores, 'Constitution'));
-  let hpIncrease: number;
-  if (options.hpChoice === 'roll' && rng) {
-    hpIncrease = rng.d(getDieMax(classData.hitDie)) + conMod;
-  } else {
-    hpIncrease = getHitDieFixedValue(classData.hitDie) + conMod;
-  }
-  hpIncrease = Math.max(1, hpIncrease);
+  const hpIncrease = calcHPIncrease(classData.hitDie, conMod, options, rng);
   const newMaxHP = char.hitPoints.max + hpIncrease;
 
   // Create new CharacterClass
@@ -333,6 +322,25 @@ function addNewClass(
 }
 
 // ── Helper Functions ────────────────────────────────────
+
+/**
+ * Calculate HP increase for one level-up, shared by levelUp and addNewClass.
+ * HP increase minimum is 1 per level (PHB 2024 p.38).
+ */
+function calcHPIncrease(
+  die: DieType,
+  conMod: number,
+  options: LevelUpOptions,
+  rng?: RandomProvider
+): number {
+  let increase: number;
+  if (options.hpChoice === 'roll' && rng) {
+    increase = rng.d(getDieMax(die)) + conMod;
+  } else {
+    increase = getHitDieFixedValue(die) + conMod;
+  }
+  return Math.max(1, increase);
+}
 
 /**
  * 获取骰子最大值

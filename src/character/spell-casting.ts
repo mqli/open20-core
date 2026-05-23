@@ -40,7 +40,7 @@ function getFeatSpellEntriesForSpell(
 // ── Ritual Casting ──────────────────────────────────────
 
 /** Check if a character can cast a spell as a ritual. */
-export function canCastAsRitual(char: Character, spell: Spell, data: DataLoader): boolean {
+export function canCastAsRitual(char: Character, spell: Spell, _data: DataLoader): boolean {
   if (!spell.ritual) return false;
 
   const hasRitualCasterFeat = char.feats?.some(f => f.featId === 'ritual-caster') ?? false;
@@ -205,6 +205,36 @@ export function castSpell(
   // Handle regular spell casting (requires spell slots)
   if (castingClasses.length === 0) {
     return { success: false, char, message: 'Character does not know this spell.' };
+  }
+
+  // Warlock Pact Magic: Warlock spells use pact magic slots, not regular spell slots
+  const isWarlockCaster = castingClasses.some(csd => csd.classId === 'Warlock');
+  if (isWarlockCaster && char.spells.pactMagicSlots) {
+    const pact = char.spells.pactMagicSlots;
+    if (pact.used >= pact.total) {
+      return { success: false, char, message: 'No Pact Magic slots remaining.' };
+    }
+    if (spell.level > pact.level) {
+      return {
+        success: false,
+        char,
+        message: `Cannot cast ${spell.name} (level ${spell.level}) — Pact Magic slots are only level ${pact.level}.`,
+      };
+    }
+
+    const updatedChar: Character = {
+      ...char,
+      spells: {
+        ...char.spells,
+        pactMagicSlots: { ...pact, used: pact.used + 1 },
+      },
+    };
+    return {
+      success: true,
+      char: updatedChar,
+      message: `Cast ${spell.name} using a Pact Magic slot (level ${pact.level}).`,
+      castingClassId: 'Warlock',
+    };
   }
 
   if (slotLevel < spell.level) {

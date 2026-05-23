@@ -87,6 +87,11 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
       classId: params.classId,
       level: primaryLevel,
       subclassId: params.subclassId ?? null,
+      // subclassLevel: the level at which this subclass was chosen/assigned.
+      // When creating a character above level 1, the subclass was actually
+      // unlocked at an earlier level (e.g., level 3 for most 2024 PHB classes),
+      // but we record the creation level since the exact unlock level depends
+      // on the class and is not needed for any computation.
       subclassLevel: params.subclassId ? primaryLevel : null,
       hitDice: { die: classData.hitDie, used: 0 },
     },
@@ -182,7 +187,7 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
 export function isProficient(
   skillName: string,
   backgroundSkillProficiencies: readonly string[],
-  classData: Class,
+  _classData: Class,
   skillChoices: readonly string[]
 ): boolean {
   if (backgroundSkillProficiencies.includes(skillName)) return true;

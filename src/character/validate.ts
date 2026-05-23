@@ -93,6 +93,15 @@ export function validateCharacter(char: Character, data: DataLoader): Validation
       });
     }
 
+    // Validate subclass
+    if (charClass.subclassId && !data.getSubclass(charClass.subclassId)) {
+      errors.push({
+        field: `classes[${i}].subclassId`,
+        message: `Subclass "${charClass.subclassId}" not found in data`,
+        severity: 'error',
+      });
+    }
+
     totalLevel += charClass.level;
   }
 
@@ -161,6 +170,30 @@ export function validateCharacter(char: Character, data: DataLoader): Validation
     });
   }
 
+  if (char.hitPoints.temporary < 0) {
+    errors.push({
+      field: 'hitPoints.temporary',
+      message: 'Temporary HP must be >= 0',
+      severity: 'error',
+    });
+  }
+
+  // Death saves range check
+  if (char.hitPoints.deathSaves.successes < 0 || char.hitPoints.deathSaves.successes > 3) {
+    errors.push({
+      field: 'hitPoints.deathSaves.successes',
+      message: 'Death save successes must be between 0 and 3',
+      severity: 'error',
+    });
+  }
+  if (char.hitPoints.deathSaves.failures < 0 || char.hitPoints.deathSaves.failures > 3) {
+    errors.push({
+      field: 'hitPoints.deathSaves.failures',
+      message: 'Death save failures must be between 0 and 3',
+      severity: 'error',
+    });
+  }
+
   // 9. Resources
   for (let i = 0; i < char.resources.length; i++) {
     const resource = char.resources[i]!;
@@ -220,7 +253,16 @@ export function validateCharacter(char: Character, data: DataLoader): Validation
     }
   }
 
-  // 11. Feats
+  // 11. Combat stats
+  if (char.combatStats.speed < 0) {
+    errors.push({
+      field: 'combatStats.speed',
+      message: 'Speed must be >= 0',
+      severity: 'error',
+    });
+  }
+
+  // 12. Feats
   for (let i = 0; i < char.feats.length; i++) {
     const entry = char.feats[i]!;
     const featId = entry.featId;
