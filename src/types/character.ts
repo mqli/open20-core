@@ -4,6 +4,12 @@
 import type { DieType } from './dice';
 import type { DamageDefenses } from './damage';
 import type { BaseAttack } from './attack';
+import type { AbilityScores } from './ability';
+import type { SkillEntry } from './skill';
+import type { CharacterFeatEntry } from './feat';
+import type { EquipmentItem } from './equipment';
+import type { CharacterSpells } from './spell';
+import type { Resource } from './resource';
 export type { DamageDefenses };
 
 // 角色核心接口 — 所有字段均为 readonly（不可变）
@@ -14,12 +20,12 @@ export interface Character {
   readonly speciesSubtype: string | null; // 物种变体（如 "Mountain Dwarf"）
   readonly background: string; // Background.id
   readonly classes: readonly CharacterClass[]; // 支持多维职业
-  readonly abilityScores: import('./ability').AbilityScores;
-  readonly skills: Record<string, import('./skill').SkillEntry>;
-  readonly feats: readonly import('./feat').CharacterFeatEntry[];
-  readonly equipment: readonly import('./equipment').EquipmentItem[];
-  readonly spells: import('./spell').CharacterSpells;
-  readonly resources: readonly import('./resource').Resource[];
+  readonly abilityScores: AbilityScores;
+  readonly skills: Record<string, SkillEntry>;
+  readonly feats: readonly CharacterFeatEntry[];
+  readonly equipment: readonly EquipmentItem[];
+  readonly spells: CharacterSpells;
+  readonly resources: readonly Resource[];
   readonly hitPoints: HitPoints;
   readonly combatStats: CombatStats;
   readonly currency: Currency;

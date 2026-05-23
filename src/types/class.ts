@@ -4,6 +4,7 @@
 import type { ResetType } from './resource';
 import type { AbilityName } from './ability';
 import type { AlwaysPreparedSpells } from './spell';
+import type { DieType } from './dice';
 
 // 法术施法方式（SRD 5.2）
 // 所有施法者都有准备法术（Prepared Spells）
@@ -51,8 +52,8 @@ export interface Class {
   readonly id: string;
   readonly name: string;
   readonly source: string; // '2024 PHB' | '2014 PHB' | 'SRD 5.2' | ...
-  readonly hitDie: import('./dice').DieType;
-  readonly savingThrowProficiencies: readonly import('./ability').AbilityName[];
+  readonly hitDie: DieType;
+  readonly savingThrowProficiencies: readonly AbilityName[];
   readonly armorTraining: readonly string[]; // 许可的护甲类型
   readonly weaponProficiencies?: readonly string[]; // 武器熟练项（如 "Simple", "Martial", "Longsword"）
   readonly weaponMastery: boolean; // 是否有Weapon Mastery

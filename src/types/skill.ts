@@ -1,6 +1,8 @@
 // types/skill.ts
 // 技能相关类型定义（零依赖）
 
+import type { AbilityName } from './ability';
+
 // 技能名 — 字符串字面量联合类型（18个标准技能）
 export type SkillName =
   | 'Athletics' // Strength
@@ -45,7 +47,7 @@ export const SKILL_NAMES: readonly SkillName[] = [
 ] as const;
 
 // 技能 → 属性的映射
-export const SKILL_ABILITY_MAP: Record<SkillName, import('./ability').AbilityName> = {
+export const SKILL_ABILITY_MAP: Record<SkillName, AbilityName> = {
   Athletics: 'Strength',
   Acrobatics: 'Dexterity',
   'Sleight of Hand': 'Dexterity',

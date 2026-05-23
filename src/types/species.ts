@@ -1,6 +1,8 @@
 // types/species.ts
 // 物种相关类型（零依赖）
 
+import type { AbilityName } from './ability';
+
 // 物种特性条目
 export interface SpeciesTrait {
   readonly name: string;
@@ -34,7 +36,7 @@ export interface Species {
   readonly size: 'Small' | 'Medium';
   readonly speed: number; // 尺（如30）
   readonly languages: readonly string[];
-  readonly abilityBonuses: Partial<Record<import('./ability').AbilityName, number>>;
+  readonly abilityBonuses: Partial<Record<AbilityName, number>>;
   readonly baseTraits: readonly SpeciesTrait[];
   readonly subtypes?: readonly SpeciesSubtype[]; // 如有变体
   readonly darkvision?: number; // 黑暗视觉尺数（如有）

@@ -1,6 +1,8 @@
 // types/feat.ts
 // 专长相关类型（零依赖）
 
+import type { AbilityName } from './ability';
+
 // 专长类别 — 字符串字面量联合类型
 export type FeatCategory = 'Origin' | 'General' | 'Fighting Style' | 'Epic Boon';
 
@@ -18,7 +20,7 @@ export interface Feat {
 
 // 专长前提
 export interface FeatPrerequisite {
-  readonly ability?: Partial<Record<import('./ability').AbilityName, number>>;
+  readonly ability?: Partial<Record<AbilityName, number>>;
   readonly level?: number;
   readonly classId?: string;
   readonly subclassId?: string;
@@ -30,7 +32,7 @@ export interface FeatPrerequisite {
 export interface FeatGrant {
   // 固定能力加值（无选择）
   // 注意：大多数专长的能力加值是选择性的，应使用 abilityBonusChoice
-  readonly abilityBonus?: Partial<Record<import('./ability').AbilityName, number>>;
+  readonly abilityBonus?: Partial<Record<AbilityName, number>>;
 
   // 固定技能/工具熟练
   readonly skillProficiencies?: readonly string[];
@@ -65,7 +67,7 @@ export interface FeatGrant {
 // 能力加值选择定义
 export interface FeatAbilityBonusChoice {
   // 可以选择的能力列表（空 = 所有能力）
-  readonly options: readonly import('./ability').AbilityName[];
+  readonly options: readonly AbilityName[];
   // 每个选择增加的数值（如 2 表示 +2）
   readonly valuePerChoice: number;
   // 可以选择的次数
@@ -133,7 +135,7 @@ export interface CharacterFeatEntry {
   // Skill/tool proficiency choices (e.g., Skilled: ["Athletics", "Stealth"])
   readonly skillChoices?: readonly string[];
   // Ability bonus choices (e.g., ASI: { "Strength": 2 } or { "Str": 1, "Dex": 1 })
-  readonly abilityChoices?: Partial<Record<import('./ability').AbilityName, number>>;
+  readonly abilityChoices?: Partial<Record<AbilityName, number>>;
   // Spell choices (e.g., Magic Initiate)
   readonly spellChoices?: FeatSpellSelection;
 }

@@ -2,6 +2,7 @@
 // 装备相关类型定义（零依赖）
 
 import type { DamageType } from './damage';
+import type { AbilityName } from './ability';
 
 // 装备条目基础接口
 export interface EquipmentItem {
@@ -35,7 +36,7 @@ export interface WeaponDamageEntry {
 // 武器伤害（统一使用 entries 数组）
 export interface WeaponDamage {
   readonly entries: readonly WeaponDamageEntry[]; // 所有伤害条目，第一条为基础伤害（应用能力加值）
-  readonly ability: import('./ability').AbilityName;
+  readonly ability: AbilityName;
   readonly bonus: number;
 }
 
