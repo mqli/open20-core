@@ -3,7 +3,7 @@
 // Corresponds to HLD §6.2
 
 import type { Character, CharacterClass } from '../types/character';
-import type { Resource } from '../types/resource';
+import type { Resource, CharacterClassResources } from '../types/resource';
 import { ResetType } from '../types/resource';
 import type { DataLoader } from '../data/loader';
 import type { SpellLevel, FeatSpellsEntry } from '../types/spell';
@@ -13,6 +13,25 @@ import { getHitDieFixedValue } from '../engine/hp-calculator';
 
 import { withUpdate } from './mutate';
 import { getDieMax } from './level-up';
+
+/**
+ * Reset resources in a CharacterClassResources record.
+ * Returns a new Record with resources reset according to the filter.
+ */
+function resetClassResources(
+  classResources: Record<string, CharacterClassResources>,
+  shouldReset: (r: Resource) => boolean,
+): Record<string, CharacterClassResources> {
+  const result: Record<string, CharacterClassResources> = {};
+  for (const [classId, ccr] of Object.entries(classResources)) {
+    const newResources = ccr.resources.map(r => {
+      if (shouldReset(r)) return { ...r, used: 0 };
+      return r;
+    });
+    result[classId] = { classId, resources: Object.freeze(newResources) };
+  }
+  return result;
+}
 
 // ── Random Provider Interface ──────────────────────────────────
 
@@ -83,12 +102,11 @@ export function shortRest(
     remainingToSpend -= toSpend;
   }
 
-  // 2. Reset short rest resources
-  const newResources = result.resources.map((r: Resource) => {
-    if (r.resetOn === ResetType.ShortRest) return { ...r, used: 0 };
-    return r;
-  });
-  result = withUpdate(result, { resources: newResources });
+  // 2. Reset short rest resources (per-class model)
+  const resetShortRest = resetClassResources(result.resources,
+    (r: Resource) => r.resetOn === ResetType.ShortRest
+  );
+  result = withUpdate(result, { resources: resetShortRest });
 
   // 3. Recover pact magic slots
   if (result.spells.pactMagicSlots) {
@@ -144,14 +162,11 @@ export function longRest(char: Character, _data: DataLoader): Character {
     });
   }
 
-  // 5. Reset Long Rest and Short Rest resources
-  const newResources = result.resources.map((r: Resource) => {
-    if (r.resetOn === ResetType.LongRest || r.resetOn === ResetType.ShortRest) {
-      return { ...r, used: 0 };
-    }
-    return r;
-  });
-  result = withUpdate(result, { resources: newResources });
+  // 5. Reset Long Rest and Short Rest resources (per-class model)
+  const resetLongRest = resetClassResources(result.resources,
+    (r: Resource) => r.resetOn === ResetType.LongRest || r.resetOn === ResetType.ShortRest
+  );
+  result = withUpdate(result, { resources: resetLongRest });
 
   // 6. Reset once-per-long-rest feat spell usage (e.g. Magic Initiate)
   if (result.spells.featSpells) {

@@ -20,7 +20,16 @@
           {
             "name": "Rage",
             "description": "You can imbue yourself with a primal power called Rage, a force that grants you extraordinary might and resilience. You can enter it as a Bonus Action or as a Reaction in response to taking damage from a creature in the same turn. While Raging, you gain the following benefits: Advantage on Strength checks and Strength saving throws; Resistance to Bludgeoning, Piercing, and Slashing damage; Increased damage with melee weapons. Your Rage lasts for 1 minute or until you end it as a Bonus Action. It also ends early if you are Incapacitated or haven't attacked a creature or taken damage since your last turn.",
-            "resourceId": "Rage"
+            "resourceId": "Rage",
+            "resourceMaxByLevel": {
+              "1": 2,
+              "3": 3,
+              "6": 4,
+              "12": 5,
+              "17": 6
+            },
+            "resourceResetOn": "Long Rest",
+            "displayType": "Dots"
           },
           {
             "name": "Unarmored Defense",
@@ -190,7 +199,11 @@
           {
             "name": "Bardic Inspiration",
             "description": "You can supernaturally inspire others through words, music, or dance. As a Bonus Action, you can inspire another creature within 60 feet of yourself who can see or hear you. That creature gains one of your Bardic Inspiration dice. A creature can have only one Bardic Inspiration die at a time. Once within the next hour when the creature fails a D20 Test, the creature can roll the Bardic Inspiration die and add the number rolled to the d20, potentially turning the failure into a success. A Bardic Inspiration die is expended when it's rolled.",
-            "resourceId": "Bardic Inspiration"
+            "resourceId": "Bardic Inspiration",
+            "resourceResetOn": "Long Rest",
+            "displayType": "Points",
+            "resourceMax": 1,
+            "resourceScaleWithPB": false
           },
           {
             "name": "Spellcasting",
@@ -343,7 +356,10 @@
           {
             "name": "Channel Divinity",
             "description": "You can channel divine energy directly from your deity. You start with two effects: Turn Undead and Divine Spark. You also gain an additional Channel Divinity option from your Divine Order at level 2 (if applicable). You can use your Channel Divinity a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
-            "resourceId": "Channel Divinity"
+            "resourceId": "Channel Divinity",
+            "resourceScaleWithPB": true,
+            "resourceResetOn": "Long Rest",
+            "displayType": "Counter"
           }
         ],
         "cantripsKnown": 3
@@ -563,7 +579,10 @@
           {
             "name": "Wild Shape",
             "description": "You can channel your primal power to transform into a Beast. As a Bonus Action, you shape-shift into a Beast creature. You can use this feature a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
-            "resourceId": "Wild Shape"
+            "resourceId": "Wild Shape",
+            "resourceScaleWithPB": true,
+            "resourceResetOn": "Short Rest",
+            "displayType": "Dots"
           },
           {
             "name": "Wild Companion",
@@ -775,7 +794,8 @@
             "description": "You can use a Bonus Action to regain Hit Points equal to 1d10 + your Fighter level. You can use this feature a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
             "resourceId": "Second Wind",
             "resourceResetOn": "Short Rest",
-            "resourceScaleWithPB": true
+            "resourceScaleWithPB": true,
+            "displayType": "Counter"
           },
           {
             "name": "Weapon Mastery",
@@ -791,7 +811,8 @@
             "description": "You can push yourself beyond your normal limits for a moment. On your turn, you can take one additional Action, and you can do so a number of times per Long Rest equal to your Proficiency Bonus.",
             "resourceId": "Action Surge",
             "resourceResetOn": "Short Rest",
-            "resourceScaleWithPB": true
+            "resourceScaleWithPB": true,
+            "displayType": "Counter"
           },
           {
             "name": "Tactical Mind",
@@ -838,7 +859,8 @@
             "description": "You can reroll a saving throw that you fail. If you do so, you must use the new roll, and you can't use this feature again until you finish a Long Rest. You can use this feature a number of times equal to your Proficiency Bonus.",
             "resourceId": "Indomitable",
             "resourceResetOn": "Long Rest",
-            "resourceScaleWithPB": true
+            "resourceScaleWithPB": true,
+            "displayType": "Counter"
           },
           {
             "name": "Tactical Master",
@@ -919,7 +941,30 @@
           {
             "name": "Monk's Focus",
             "description": "Your focus allows you to harness your ki. You can use your Flurry of Blows, Patient Defense, and Step of the Wind features a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Short or Long Rest.",
-            "resourceId": "Monk's Focus"
+            "resourceId": "Monk's Focus",
+            "resourceMaxByLevel": {
+              "2": 2,
+              "3": 3,
+              "4": 4,
+              "5": 5,
+              "6": 6,
+              "7": 7,
+              "8": 8,
+              "9": 9,
+              "10": 10,
+              "11": 11,
+              "12": 12,
+              "13": 13,
+              "14": 14,
+              "15": 15,
+              "16": 16,
+              "17": 17,
+              "18": 18,
+              "19": 19,
+              "20": 20
+            },
+            "resourceResetOn": "Short Rest",
+            "displayType": "Points"
           },
           {
             "name": "Unarmored Movement",
@@ -1093,8 +1138,32 @@
         "features": [
           {
             "name": "Lay On Hands",
-            "description": "You can heal wounds through touch. You have a pool of healing power that can restore a total number of Hit Points equal to your Paladin level \u00d7 5. As an Action, you can touch a creature and restore any number of Hit Points to it, up to the maximum amount remaining in your pool. You can also use this feature to cure a disease or neutralize a poison affecting the creature you touch. You regain all expended uses when you finish a Long Rest.",
-            "resourceId": "Lay On Hands"
+            "description": "You can heal wounds through touch. You have a pool of healing power that can restore a total number of Hit Points equal to your Paladin level × 5. As an Action, you can touch a creature and restore any number of Hit Points to it, up to the maximum amount remaining in your pool. You can also use this feature to cure a disease or neutralize a poison affecting the creature you touch. You regain all expended uses when you finish a Long Rest.",
+            "resourceId": "Lay On Hands",
+            "resourceMaxByLevel": {
+              "1": 5,
+              "2": 10,
+              "3": 15,
+              "4": 20,
+              "5": 25,
+              "6": 30,
+              "7": 35,
+              "8": 40,
+              "9": 45,
+              "10": 50,
+              "11": 55,
+              "12": 60,
+              "13": 65,
+              "14": 70,
+              "15": 75,
+              "16": 80,
+              "17": 85,
+              "18": 90,
+              "19": 95,
+              "20": 100
+            },
+            "resourceResetOn": "Long Rest",
+            "displayType": "Points"
           },
           {
             "name": "Spellcasting",
@@ -1127,7 +1196,10 @@
           {
             "name": "Channel Divinity",
             "description": "You can channel divine energy directly from your deity. You start with one effect: Divine Sense. You also gain an additional Channel Divinity option from your Paladin Subclass at level 3. You can use your Channel Divinity a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
-            "resourceId": "Channel Divinity"
+            "resourceId": "Channel Divinity",
+            "resourceScaleWithPB": true,
+            "resourceResetOn": "Long Rest",
+            "displayType": "Counter"
           },
           {
             "name": "Paladin Subclass",
@@ -1530,8 +1602,7 @@
           },
           {
             "name": "Sneak Attack",
-            "description": "You know how to strike subtly and exploit a foe's distraction. Once per turn, you can deal an extra 1d6 damage to one creature you hit with an attack if you have Advantage on the attack roll or if another enemy of the target is within 5 feet of it and you don't have Disadvantage on the attack roll. The amount of the extra damage increases as you gain levels as a Rogue, as shown in the Sneak Attack column of the Rogue table.",
-            "resourceId": "Sneak Attack"
+            "description": "You know how to strike subtly and exploit a foe's distraction. Once per turn, you can deal an extra 1d6 damage to one creature you hit with an attack if you have Advantage on the attack roll or if another enemy of the target is within 5 feet of it and you don't have Disadvantage on the attack roll. The amount of the extra damage increases as you gain levels as a Rogue, as shown in the Sneak Attack column of the Rogue table."
           },
           {
             "name": "Thieves' Cant",
@@ -1684,7 +1755,10 @@
           {
             "name": "Innate Sorcery",
             "description": "You can tap into the magic within yourself. As a Bonus Action, you can unleash your innate magic for 1 minute. During that time, you gain a bonus to your spell attack rolls and the saving throw DCs of your Sorcerer spells equal to your Proficiency Bonus. You can use this feature a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
-            "resourceId": "Innate Sorcery"
+            "resourceId": "Innate Sorcery",
+            "resourceScaleWithPB": true,
+            "resourceResetOn": "Long Rest",
+            "displayType": "Counter"
           }
         ],
         "cantripsKnown": 4
@@ -1695,7 +1769,30 @@
           {
             "name": "Font of Magic",
             "description": "You can tap into a wellspring of magic to alter your spells. You gain Sorcery Points equal to your Proficiency Bonus. You can use Sorcery Points to create Spell Slots or convert Spell Slots into Sorcery Points. You regain all expended Sorcery Points when you finish a Long Rest.",
-            "resourceId": "Font of Magic"
+            "resourceId": "Font of Magic",
+            "resourceMaxByLevel": {
+              "2": 2,
+              "3": 3,
+              "4": 4,
+              "5": 5,
+              "6": 6,
+              "7": 7,
+              "8": 8,
+              "9": 9,
+              "10": 10,
+              "11": 11,
+              "12": 12,
+              "13": 13,
+              "14": 14,
+              "15": 15,
+              "16": 16,
+              "17": 17,
+              "18": 18,
+              "19": 19,
+              "20": 20
+            },
+            "resourceResetOn": "Long Rest",
+            "displayType": "Points"
           },
           {
             "name": "Metamagic",
@@ -1810,7 +1907,10 @@
           {
             "name": "Magical Cunning",
             "description": "As a Magic action, you can regain expended Pact Magic spell slots. You can do so a number of times per Long Rest equal to your Proficiency Bonus.",
-            "resourceId": "Magical Cunning"
+            "resourceId": "Magical Cunning",
+            "resourceScaleWithPB": true,
+            "resourceResetOn": "Long Rest",
+            "displayType": "Counter"
           }
         ],
         "cantripsKnown": 2
@@ -1917,7 +2017,9 @@
           {
             "name": "Arcane Recovery",
             "description": "You can regain expended spell slots. As a Magic action, you can choose expended spell slots to recover. The spell slots can have a combined level equal to or less than half your Wizard level (round up), and none of the slots can be level 6 or higher. Once you use this feature, you can't use it again until you finish a Long Rest.",
-            "resourceId": "Arcane Recovery"
+            "resourceId": "Arcane Recovery",
+            "resourceResetOn": "Long Rest",
+            "displayType": "Counter"
           }
         ],
         "cantripsKnown": 3

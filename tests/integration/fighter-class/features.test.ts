@@ -6,6 +6,13 @@ import { shortRest, longRest } from '../../../src/character/rest';
 
 const dataLoader = createDataLoader();
 
+// Helper: get a resource by id from the per-class Record
+function getResource(char: any, classId: string, resourceId: string) {
+  const ccr = char.resources[classId];
+  if (!ccr) return undefined;
+  return ccr.resources.find((r: any) => r.id === resourceId);
+}
+
 describe('D&D SRD 5.2 - Fighter Class: Level 1-4 Features', () => {
   // ============================================================
   // SECOND WIND (PHB p.72, SRD)
@@ -30,7 +37,7 @@ describe('D&D SRD 5.2 - Fighter Class: Level 1-4 Features', () => {
         dataLoader
       );
 
-      const secondWind = fighter.resources.find(r => r.id === 'Second Wind');
+      const secondWind = getResource(fighter, 'Fighter', 'Second Wind');
       expect(secondWind).toBeDefined();
       expect(secondWind!.max).toBe(2);
       expect(secondWind!.used).toBe(0);
@@ -56,12 +63,12 @@ describe('D&D SRD 5.2 - Fighter Class: Level 1-4 Features', () => {
         dataLoader
       );
 
-      const secondWind = fighter.resources.find(r => r.id === 'Second Wind');
+      const secondWind = getResource(fighter, 'Fighter', 'Second Wind');
       (secondWind as any).used = 1;
       expect(secondWind!.used).toBe(1);
 
       fighter = shortRest(fighter, 1, dataLoader);
-      const afterRest = fighter.resources.find(r => r.id === 'Second Wind');
+      const afterRest = getResource(fighter, 'Fighter', 'Second Wind');
       expect(afterRest!.used).toBe(0);
     });
 
@@ -84,11 +91,11 @@ describe('D&D SRD 5.2 - Fighter Class: Level 1-4 Features', () => {
         dataLoader
       );
 
-      const secondWind = fighter.resources.find(r => r.id === 'Second Wind');
+      const secondWind = getResource(fighter, 'Fighter', 'Second Wind');
       (secondWind as any).used = 1;
 
       fighter = longRest(fighter, dataLoader);
-      const afterRest = fighter.resources.find(r => r.id === 'Second Wind');
+      const afterRest = getResource(fighter, 'Fighter', 'Second Wind');
       expect(afterRest!.used).toBe(0);
     });
 
@@ -115,7 +122,7 @@ describe('D&D SRD 5.2 - Fighter Class: Level 1-4 Features', () => {
       const hpAfterDamage = fighter.hitPoints.current;
       expect(hpAfterDamage).toBeLessThan(fighter.hitPoints.max);
 
-      const secondWind = fighter.resources.find(r => r.id === 'Second Wind');
+      const secondWind = getResource(fighter, 'Fighter', 'Second Wind');
       expect(secondWind).toBeDefined();
     });
   });
@@ -146,7 +153,7 @@ describe('D&D SRD 5.2 - Fighter Class: Level 5-10 Features', () => {
         dataLoader
       );
 
-      const actionSurge = fighter.resources.find(r => r.id === 'Action Surge');
+      const actionSurge = getResource(fighter, 'Fighter', 'Action Surge');
       expect(actionSurge).toBeDefined();
       expect(actionSurge!.max).toBe(3);
       expect(actionSurge!.used).toBe(0);
@@ -173,7 +180,7 @@ describe('D&D SRD 5.2 - Fighter Class: Level 5-10 Features', () => {
         dataLoader
       );
 
-      const actionSurge = fighter.resources.find(r => r.id === 'Action Surge');
+      const actionSurge = getResource(fighter, 'Fighter', 'Action Surge');
       expect(actionSurge).toBeDefined();
       expect(actionSurge!.max).toBe(6);
     });
@@ -280,7 +287,7 @@ describe('D&D SRD 5.2 - Fighter Class: Level 5-10 Features', () => {
   // INDOMITABLE (PHB p.72, SRD)
   // ============================================================
   describe('Fighter: Indomitable (Level 9, 13, 17)', () => {
-    it('should have Indomitable at level 9 with correct max (PB=3)', () => {
+    it('should have Indomitable at level 9 with correct max (PB=4)', () => {
       const fighter = createCharacter(
         {
           name: 'Veteran',
@@ -300,8 +307,9 @@ describe('D&D SRD 5.2 - Fighter Class: Level 5-10 Features', () => {
         dataLoader
       );
 
-      const indomitable = fighter.resources.find(r => r.id === 'Indomitable');
+      const indomitable = getResource(fighter, 'Fighter', 'Indomitable');
       expect(indomitable).toBeDefined();
+      // PB at level 9 = 4 (levels 9-12)
       expect(indomitable!.max).toBe(4);
       expect(indomitable!.resetOn).toBe('Long Rest');
     });
@@ -326,8 +334,9 @@ describe('D&D SRD 5.2 - Fighter Class: Level 5-10 Features', () => {
         dataLoader
       );
 
-      const indomitable = fighter.resources.find(r => r.id === 'Indomitable');
+      const indomitable = getResource(fighter, 'Fighter', 'Indomitable');
       expect(indomitable).toBeDefined();
+      // PB at level 17 = 6
       expect(indomitable!.max).toBe(6);
     });
   });

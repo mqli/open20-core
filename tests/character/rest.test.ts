@@ -217,7 +217,12 @@ function makeFighterWithResources(): Character {
         hitDice: { die: 'd10', used: 2 },
       },
     ],
-    resources: [shortRestResource, longRestResource, perTurnResource],
+    resources: {
+      'Fighter': {
+        classId: 'Fighter',
+        resources: [shortRestResource, longRestResource, perTurnResource],
+      },
+    },
   });
 }
 
@@ -279,6 +284,15 @@ function makeWarlock(): Character {
   });
 }
 
+// ── Helper ─────────────────────────────────────────────────────
+
+/** Get a resource by id from the per-class Record */
+function getResource(char: Character, classId: string, resourceId: string): Resource | undefined {
+  const ccr = char.resources[classId];
+  if (!ccr) return undefined;
+  return ccr.resources.find(r => r.id === resourceId);
+}
+
 // ── Tests ──────────────────────────────────────────────────────
 
 describe('shortRest', () => {
@@ -301,14 +315,14 @@ describe('shortRest', () => {
     expect(result.hitPoints.current).toBe(25); // unchanged
     expect(result.classes[0]!.hitDice.used).toBe(2); // unchanged
     // Short rest resource still resets
-    expect(result.resources.find(r => r.id === 'Second Wind')!.used).toBe(0);
+    expect(getResource(result, 'Fighter', 'Second Wind')!.used).toBe(0);
   });
 
   it('resets short rest resources (Second Wind)', () => {
     const char = makeFighterWithResources();
     const result = shortRest(char, 0, data);
 
-    const secondWind = result.resources.find(r => r.id === 'Second Wind')!;
+    const secondWind = getResource(result, 'Fighter', 'Second Wind')!;
     expect(secondWind.used).toBe(0);
   });
 
@@ -316,7 +330,7 @@ describe('shortRest', () => {
     const char = makeFighterWithResources();
     const result = shortRest(char, 0, data);
 
-    const indomitable = result.resources.find(r => r.id === 'Indomitable')!;
+    const indomitable = getResource(result, 'Fighter', 'Indomitable')!;
     expect(indomitable.used).toBe(1); // still used
   });
 
@@ -324,7 +338,7 @@ describe('shortRest', () => {
     const char = makeFighterWithResources();
     const result = shortRest(char, 0, data);
 
-    const sneakAttack = result.resources.find(r => r.id === 'Sneak Attack')!;
+    const sneakAttack = getResource(result, 'Fighter', 'Sneak Attack')!;
     expect(sneakAttack.used).toBe(1); // still used
   });
 
@@ -469,7 +483,7 @@ describe('longRest', () => {
     const char = makeFighterWithResources();
     const result = longRest(char, data);
 
-    const indomitable = result.resources.find(r => r.id === 'Indomitable')!;
+    const indomitable = getResource(result, 'Fighter', 'Indomitable')!;
     expect(indomitable.used).toBe(0);
   });
 
@@ -477,7 +491,7 @@ describe('longRest', () => {
     const char = makeFighterWithResources();
     const result = longRest(char, data);
 
-    const secondWind = result.resources.find(r => r.id === 'Second Wind')!;
+    const secondWind = getResource(result, 'Fighter', 'Second Wind')!;
     expect(secondWind.used).toBe(0);
   });
 
@@ -485,7 +499,7 @@ describe('longRest', () => {
     const char = makeFighterWithResources();
     const result = longRest(char, data);
 
-    const sneakAttack = result.resources.find(r => r.id === 'Sneak Attack')!;
+    const sneakAttack = getResource(result, 'Fighter', 'Sneak Attack')!;
     expect(sneakAttack.used).toBe(1); // still used
   });
 

@@ -11,7 +11,7 @@ import type { DieType } from '../types/dice';
 import { getModifier, getTotalScore } from '../engine/ability-modifier';
 import { getHitDieFixedValue } from '../engine/hp-calculator';
 import { getProficiencyBonus } from '../engine/proficiency-bonus';
-import { extractResources } from './resource-builder';
+import { recomputeResources } from './resource-builder';
 import { recomputeDerivedStats } from './recompute';
 import {
   getMulticlassSpellcasterLevel,
@@ -143,14 +143,13 @@ export function levelUp(
   const totalLevel = newClasses.reduce((sum, c) => sum + c.level, 0);
   const newProficiencyBonus = getProficiencyBonus(totalLevel);
 
-  // 6. New resources from features at new level (pass PB for scaling resources)
-  const levelResources = extractResources(classData, newLevel, newProficiencyBonus);
-  const newResources = [...char.resources];
-  for (const resource of levelResources) {
-    if (!newResources.some(r => r.id === resource.id)) {
-      newResources.push(resource);
-    }
-  }
+  // 6. Recompute resources for this class (per-class model)
+  const newResources = recomputeResources(
+    char.resources,
+    newClasses,
+    newAbilityScores,
+    data,
+  );
 
   // Build result
   let result: Character = {
@@ -227,14 +226,9 @@ function addNewClass(
   const totalLevel = newClasses.reduce((sum, c) => sum + c.level, 0);
   const newProficiencyBonus = getProficiencyBonus(totalLevel);
 
-  // Add resources from new class (pass total PB for scaling resources)
-  const newResources = [...char.resources];
-  const classResources = extractResources(classData, 1, newProficiencyBonus);
-  for (const resource of classResources) {
-    if (!newResources.some(r => r.id === resource.id)) {
-      newResources.push(resource);
-    }
-  }
+  // Recompute resources with per-class model (preserves used counts from existing classes)
+  // Note: addNewClass doesn't apply feat grants (done in recomputeDerivedStats)
+  const newResources = recomputeResources(char.resources, newClasses, char.abilityScores, data);
 
   // Handle spellcasting for multiclass (per-class tracking)
   let newSpells = { ...char.spells };

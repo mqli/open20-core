@@ -13,17 +13,16 @@ import type {
   DamageDefenses,
 } from '../types/character';
 import type { Class } from '../types/class';
-import type { Resource } from '../types/resource';
 import type { DataLoader } from '../data/loader';
 
 import { getProficiencyBonus } from '../engine/proficiency-bonus';
 import { emptyCharacterSpells } from './spells-init';
 import { recomputeDerivedStats } from './recompute';
-import { extractResources } from './resource-builder';
+import { extractAllClassResources } from './resource-builder';
 
 // Re-export for backward compatibility (tests import from create.ts)
 export { getFeaturesAtLevel, getAlwaysPreparedSpellsFromSubclass } from './utils';
-export { extractResources } from './resource-builder';
+export { extractAllClassResources } from './resource-builder';
 export { emptyCharacterSpells } from './spells-init';
 
 // ── 公共接口 ────────────────────────────────────────────
@@ -114,13 +113,8 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
     params.skillChoices ?? []
   );
 
-  // 5. Build Resources (not handled by recompute — only added on creation/level-up)
-  const resources: Resource[] = extractResources(classData, primaryLevel, pb);
-  for (const additional of additionalClasses) {
-    const acData = data.getClass(additional.classId)!;
-    const additionalResources = extractResources(acData, additional.level, pb);
-    resources.push(...additionalResources);
-  }
+  // 5. Build Resources (per-class tracking, same pattern as classSpellcasting)
+  const resources = extractAllClassResources(charClasses, abilityScores, data);
 
   // 6. Build Currency
   const currency: Currency = {
@@ -149,7 +143,7 @@ export function createCharacter(params: CreateCharacterParams, data: DataLoader)
     feats: (params.featIds ?? []).map(featId => ({ featId })),
     equipment: [],
     spells: emptyCharacterSpells(),
-    resources,
+    resources,  // Record<string, CharacterClassResources>
     hitPoints: {
       max: 0, current: 0, temporary: 0,
       deathSaves: { successes: 0, failures: 0, isStable: false },

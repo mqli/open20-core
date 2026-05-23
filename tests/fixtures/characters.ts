@@ -81,7 +81,7 @@ export const SAGE_BACKGROUND: Background = {
 
 export const FIGHTER_FEATURES_L1: Feature[] = [
   { name: 'Fighting Style', description: 'Choose a fighting style', level: 1 },
-  { name: 'Second Wind', description: 'Heal yourself', resourceId: 'Second Wind', level: 1 },
+  { name: 'Second Wind', description: 'Heal yourself', resourceId: 'Second Wind', resourceScaleWithPB: true, resourceResetOn: 'Short Rest', level: 1 },
   { name: 'Weapon Mastery', description: 'Master weapons', level: 1 },
 ];
 
@@ -96,7 +96,7 @@ export const FIGHTER_FEATURES_L5: Feature[] = [
 ];
 
 export const BARBARIAN_FEATURES_L1: Feature[] = [
-  { name: 'Rage', description: 'Enter a rage', resourceId: 'Rage', level: 1 },
+  { name: 'Rage', description: 'Enter a rage', resourceId: 'Rage', resourceMaxByLevel: { "1": 2, "3": 3, "6": 4, "9": 4, "12": 5, "15": 5, "17": 6, "20": 6 }, resourceResetOn: 'Long Rest', level: 1 },
   { name: 'Unarmored Defense', description: 'AC = 10 + Dex + Con', level: 1 },
   { name: 'Weapon Mastery', description: 'Master weapons', level: 1 },
 ];

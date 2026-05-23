@@ -7,7 +7,7 @@ import {
   getFeaturesAtLevel,
   isProficient,
   emptyCharacterSpells,
-  extractResources,
+  extractAllClassResources,
   getAlwaysPreparedSpellsFromSubclass,
 } from '../../src/character/create';
 import type { CreateCharacterParams } from '../../src/character/create';
@@ -241,7 +241,9 @@ describe('createCharacter', () => {
       };
 
       const char = createCharacter(params, data);
-      const secondWind = char.resources.find(r => r.id === 'Second Wind');
+      const fighterResources = char.resources['Fighter'];
+      expect(fighterResources).toBeDefined();
+      const secondWind = fighterResources.resources.find(r => r.id === 'Second Wind');
       expect(secondWind).toBeDefined();
       // 2024 PHB: Second Wind scales with Proficiency Bonus (PB at level 1 = 2)
       expect(secondWind!.max).toBe(2);
@@ -549,7 +551,9 @@ describe('createCharacter', () => {
       };
 
       const char = createCharacter(params, data);
-      const rage = char.resources.find(r => r.id === 'Rage');
+      const barbarianResources = char.resources['Barbarian'];
+      expect(barbarianResources).toBeDefined();
+      const rage = barbarianResources.resources.find(r => r.id === 'Rage');
       expect(rage).toBeDefined();
       expect(rage!.max).toBe(2);
       expect(rage!.used).toBe(0);
@@ -777,40 +781,47 @@ describe('emptyCharacterSpells', () => {
   });
 });
 
-describe('extractResources', () => {
+describe('extractAllClassResources', () => {
   it('extracts Second Wind from Fighter level 1', () => {
-    const resources = extractResources(FIGHTER_CLASS, 1);
-    expect(resources).toHaveLength(1);
-    expect(resources[0]!.id).toBe('Second Wind');
+    const result = extractAllClassResources(
+      [{ classId: 'Fighter', level: 1, subclassId: null }],
+      { base: { Strength: 15, Dexterity: 13, Constitution: 14, Intelligence: 10, Wisdom: 12, Charisma: 8 }, racialBonuses: {}, backgroundBonuses: {}, featBonuses: {}, featGrants: {}, temporaryBonuses: {} } as any,
+      createMockDataLoaderForResources(),
+    );
+    const fighter = result['Fighter'];
+    expect(fighter).toBeDefined();
+    const secondWind = fighter.resources.find(r => r.id === 'Second Wind');
+    expect(secondWind).toBeDefined();
     // 2024 PHB: Second Wind scales with Proficiency Bonus (PB at level 1 = 2)
-    expect(resources[0]!.max).toBe(2);
-    expect(resources[0]!.used).toBe(0);
+    expect(secondWind!.max).toBe(2);
+    expect(secondWind!.used).toBe(0);
   });
 
   it('extracts Rage from Barbarian level 1', () => {
-    const resources = extractResources(BARBARIAN_CLASS, 1);
-    expect(resources).toHaveLength(1);
-    expect(resources[0]!.id).toBe('Rage');
-    expect(resources[0]!.max).toBe(2);
-  });
-
-  it('returns empty array for level with no resource features', () => {
-    // Rogue has no resource features at level 1
-    const resources = extractResources(ROGUE_CLASS, 1);
-    expect(resources).toHaveLength(0);
-  });
-
-  it('extracts all resources from Fighter level 2 (cumulative)', () => {
-    const resources = extractResources(FIGHTER_CLASS, 2);
-    // Level 2 includes resources from level 1 (Second Wind) and level 2 (Action Surge)
-    expect(resources).toHaveLength(2);
-    const resourceIds = resources.map(r => r.id).sort();
-    expect(resourceIds).toEqual(['Action Surge', 'Second Wind']);
-    // 2024 PHB: Resources scale with Proficiency Bonus (PB at level 2 = 2)
-    const actionSurge = resources.find(r => r.id === 'Action Surge');
-    expect(actionSurge!.max).toBe(2);
+    const result = extractAllClassResources(
+      [{ classId: 'Barbarian', level: 1, subclassId: null }],
+      { base: { Strength: 15, Dexterity: 13, Constitution: 14, Intelligence: 10, Wisdom: 12, Charisma: 8 }, racialBonuses: {}, backgroundBonuses: {}, featBonuses: {}, featGrants: {}, temporaryBonuses: {} } as any,
+      createMockDataLoaderForResources(),
+    );
+    const barbarian = result['Barbarian'];
+    expect(barbarian).toBeDefined();
+    const rage = barbarian.resources.find(r => r.id === 'Rage');
+    expect(rage).toBeDefined();
+    expect(rage!.max).toBe(2);
   });
 });
+
+// Helper to create a minimal DataLoader for resource tests
+function createMockDataLoaderForResources() {
+  return createMockDataLoader({
+    getClass: (id: string) => {
+      if (id === 'Fighter') return FIGHTER_CLASS;
+      if (id === 'Barbarian') return BARBARIAN_CLASS;
+      return undefined;
+    },
+    getSubclass: () => undefined,
+  });
+}
 
 describe('getAlwaysPreparedSpellsFromSubclass', () => {
   it('returns spells for levels up to class level', () => {

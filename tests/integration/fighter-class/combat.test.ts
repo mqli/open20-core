@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createDataLoader } from '../../../src/data/loader';
 import { createCharacter } from '../../../src/character/create';
 import { applyTypedDamage } from '../../../src/character/mutate';
+import { consumeResource } from '../../../src/character/mutate/resources';
 import { shortRest, longRest } from '../../../src/character/rest';
 
 const dataLoader = createDataLoader();
@@ -35,7 +36,7 @@ describe('D&D SRD 5.2 - Fighter Class: Combat Scenarios', () => {
       expect(fighter.classes[0]!.level).toBe(10);
       expect(fighter.combatStats.proficiencyBonus).toBe(4);
 
-      if (fighter.resources.length === 0) {
+      if (Object.keys(fighter.resources).length === 0) {
         console.log('Level 10 Fighter has no resources');
       }
 
@@ -49,15 +50,20 @@ describe('D&D SRD 5.2 - Fighter Class: Combat Scenarios', () => {
       fighter = result.char;
       expect(fighter.hitPoints.current).toBeLessThan(initialHP);
 
-      const secondWind = fighter.resources.find(r => r.id === 'Second Wind');
-      if (secondWind) {
-        (secondWind as any).used = 1;
-        expect(secondWind.used).toBe(1);
+      const fighterResources = fighter.resources['Fighter'];
+      if (fighterResources) {
+        const secondWind = fighterResources.resources.find(r => r.id === 'Second Wind');
+        if (secondWind) {
+          // Consume Second Wind
+          fighter = consumeResource(fighter, 'Fighter', 'Second Wind');
+          const swAfterConsume = fighter.resources['Fighter'].resources.find(r => r.id === 'Second Wind');
+          expect(swAfterConsume!.used).toBe(1);
 
-        fighter = shortRest(fighter, 1, dataLoader);
+          fighter = shortRest(fighter, 1, dataLoader);
 
-        const afterRest = fighter.resources.find(r => r.id === 'Second Wind');
-        expect(afterRest!.used).toBe(0);
+          const afterRest = fighter.resources['Fighter'].resources.find(r => r.id === 'Second Wind');
+          expect(afterRest!.used).toBe(0);
+        }
       }
     });
 

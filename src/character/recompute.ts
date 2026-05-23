@@ -21,6 +21,7 @@ import { buildClassSpellData } from '../engine/spell-data';
 import type { ClassSpellData, SpellLevel, SpellSlotEntry } from '../types/spell';
 import type { Feature } from '../types/class';
 import { gatherAllFeatures } from './utils';
+import { recomputeResources } from './resource-builder';
 import type { CharacterFeatEntry, FeatAttackBonus, FeatACBonus } from '../types/feat';
 
 // ── Grant Computation (Single Source of Truth) ─────────────────
@@ -406,15 +407,24 @@ export function recomputeDerivedStats(char: Character, data: DataLoader): Charac
     featSpells,
   };
 
-  // 8. Max HP (cap current at new max; never heal via recompute)
+  // 8. Recompute resource max values (per-class, preserves used counts)
+  const updatedResources = recomputeResources(
+    char.resources,
+    char.classes,
+    updatedAbilityScores,
+    data,
+  );
+
+  // 9. Max HP (cap current at new max; never heal via recompute)
   const newMaxHP = calculateMaxHP(char.classes, conMod, data);
   const newCurrent = Math.min(char.hitPoints.current, newMaxHP);
 
-  // 9. Assemble result
+  // 10. Assemble result
   return {
     ...char,
     abilityScores: updatedAbilityScores,
     skills: updatedSkills,
+    resources: updatedResources,
     hitPoints: {
       ...char.hitPoints,
       max: newMaxHP,

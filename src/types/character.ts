@@ -9,7 +9,7 @@ import type { SkillEntry } from './skill';
 import type { CharacterFeatEntry } from './feat';
 import type { EquipmentItem } from './equipment';
 import type { CharacterSpells } from './spell';
-import type { Resource } from './resource';
+import type { Resource, CharacterClassResources } from './resource';
 export type { DamageDefenses };
 
 // 角色核心接口 — 所有字段均为 readonly（不可变）
@@ -25,7 +25,8 @@ export interface Character {
   readonly feats: readonly CharacterFeatEntry[];
   readonly equipment: readonly EquipmentItem[];
   readonly spells: CharacterSpells;
-  readonly resources: readonly Resource[];
+  // 按职业分类的资源追踪（类似 classSpellcasting 模式）
+  readonly resources: Record<string, CharacterClassResources>;
   readonly hitPoints: HitPoints;
   readonly combatStats: CombatStats;
   readonly currency: Currency;

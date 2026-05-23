@@ -1,7 +1,7 @@
 // types/class.ts
 // 职业与子职业相关类型（零依赖）
 
-import type { ResetType } from './resource';
+import type { DisplayType, ResetType } from './resource';
 import type { AbilityName } from './ability';
 import type { AlwaysPreparedSpells } from './spell';
 import type { DieType } from './dice';
@@ -42,9 +42,12 @@ export interface Feature {
   readonly resourceId?: string; // 关联的资源ID（如有）
   readonly level?: number; // 获得该特性的等级
   // 资源属性（可选，如果定义则优先使用）
-  readonly resourceMax?: number; // 资源最大使用次数
+  // 用法：resourceMax 用于固定值；resourceMaxByLevel 用于按等级查表（Option B）
+  readonly resourceMax?: number; // 资源最大使用次数（固定值）
+  readonly resourceMaxByLevel?: Record<number, number>; // 按等级查表，key=等级，value=最大值
   readonly resourceResetOn?: ResetType; // 重置时机
   readonly resourceScaleWithPB?: boolean; // 是否随熟练加值变化
+  readonly displayType?: DisplayType; // UI 显示类型（Counter / Dots / Points）
 }
 
 // 职业类型

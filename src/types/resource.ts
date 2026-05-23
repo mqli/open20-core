@@ -17,6 +17,12 @@ export enum DisplayType {
   Points = 'Points', // 点数显示（如 Sorcery Points 3/3）
 }
 
+// 按职业分类的资源条目（类似 classSpellcasting）
+export interface CharacterClassResources {
+  readonly classId: string;
+  readonly resources: readonly Resource[];
+}
+
 // 资源条目
 export interface Resource {
   readonly id: string; // 资源ID（如 "Second Wind"）
