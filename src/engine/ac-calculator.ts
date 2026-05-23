@@ -68,7 +68,11 @@ export function calculateAC(
   }
 
   // Barbarian Unarmored Defense: 10 + Dex + Con
-  if (featureNames.has('Unarmored Defense') || featureNames.has('Unarmored Defense (Barbarian)')) {
+  // 2024 PHB: requires no armor AND no shield (same as Monk)
+  if (
+    !hasShield &&
+    (featureNames.has('Unarmored Defense') || featureNames.has('Unarmored Defense (Barbarian)'))
+  ) {
     acOptions.push(10 + dexMod + conMod);
   }
 

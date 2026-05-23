@@ -102,19 +102,27 @@ export function calculateMaxHP(
 
   let maxHP = 0;
 
-  for (const charClass of classes) {
+  // 多维职业规则: 只有第一个职业的1级取生命骰最大值
+  // PHB 2024 p.43-44: 后续职业的 HP 增量也取固定值（或掷骰）
+  for (let i = 0; i < classes.length; i++) {
+    const charClass = classes[i]!;
     const classData = data.getClass(charClass.classId);
     if (!classData) continue;
 
     const die = classData.hitDie;
     const level = charClass.level;
 
-    // 1级: 最大值 + Con
-    maxHP += calculateHPAtLevel1(die, conModifier);
-
-    // 2级到当前等级: 固定值 + Con
-    for (let lv = 2; lv <= level; lv++) {
-      maxHP += calculateHPIncrement(die, conModifier);
+    if (i === 0) {
+      // 第一个职业: 1级取满 + Con，后续等级取固定值 + Con
+      maxHP += calculateHPAtLevel1(die, conModifier);
+      for (let lv = 2; lv <= level; lv++) {
+        maxHP += calculateHPIncrement(die, conModifier);
+      }
+    } else {
+      // 多维职业的额外职业: 所有等级都取固定值 + Con
+      for (let lv = 1; lv <= level; lv++) {
+        maxHP += calculateHPIncrement(die, conModifier);
+      }
     }
   }
 

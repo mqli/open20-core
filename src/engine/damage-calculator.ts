@@ -87,42 +87,13 @@ export function calculateTypedDamage(
  * Returns null if not a valid damage type
  */
 export function parseDamageType(value: string): DamageType | null {
-  const normalized = value.trim();
-  const damageTypes: DamageType[] = [
-    'Bludgeoning',
-    'Piercing',
-    'Slashing',
-    'Fire',
-    'Cold',
-    'Lightning',
-    'Thunder',
-    'Acid',
-    'Poison',
-    'Psychic',
-    'Force',
-    'Necrotic',
-    'Radiant',
-  ];
+  const lower = value.trim().toLowerCase();
 
-  // Try exact match first (case-sensitive)
-  if (damageTypes.includes(normalized as DamageType)) {
-    return normalized as DamageType;
-  }
-
-  // Try case-insensitive match
-  const lower = normalized.toLowerCase();
-  for (const dt of damageTypes) {
-    if (dt.toLowerCase() === lower) {
-      return dt;
-    }
-  }
-
-  // Handle common aliases
-  const aliases: Record<string, DamageType> = {
+  // Standard damage types with recognized aliases
+  const typeMap: Record<string, DamageType> = {
     bludgeoning: 'Bludgeoning',
     piercing: 'Piercing',
     slashing: 'Slashing',
-    physical: 'Slashing', // Generic, default to Slashing
     fire: 'Fire',
     cold: 'Cold',
     lightning: 'Lightning',
@@ -133,11 +104,12 @@ export function parseDamageType(value: string): DamageType | null {
     force: 'Force',
     necrotic: 'Necrotic',
     radiant: 'Radiant',
-    magical: 'Force', // Generic magical, default to Force
+    physical: 'Slashing',      // Generic physical, default to Slashing
+    magical: 'Force',          // Generic magical, default to Force
     'non-magical': 'Bludgeoning', // Generic physical
   };
 
-  return aliases[lower] ?? null;
+  return typeMap[lower] ?? null;
 }
 
 /**
@@ -171,8 +143,8 @@ export const ALL_DAMAGE_TYPES: readonly DamageType[] = [
  */
 export const DAMAGE_TYPE_CATEGORIES = {
   physical: ['Bludgeoning', 'Piercing', 'Slashing'] as const,
-  elemental: ['Fire', 'Cold', 'Lightning', 'Thunder', 'Acid'] as const,
-  magical: ['Psychic', 'Force', 'Necrotic', 'Radiant', 'Poison'] as const,
+  elemental: ['Fire', 'Cold', 'Lightning', 'Thunder', 'Acid', 'Poison'] as const,
+  magical: ['Psychic', 'Force', 'Necrotic', 'Radiant'] as const,
 } as const;
 
 // ── Damage Defense Aggregation ────────────────────────────────────────

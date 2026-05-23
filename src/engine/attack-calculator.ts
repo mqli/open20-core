@@ -101,12 +101,20 @@ function calculateWeaponAttack(
       abilityMod = strMod;
       abilityUsed = 'Strength';
     }
-  } else if (weapon.properties.includes('Range') || weapon.damage.ability === 'Dexterity') {
-    // 远程武器：使用Dex
+  } else if (
+    weapon.properties.includes('Range') &&
+    !weapon.properties.includes('Thrown')
+  ) {
+    // 远程武器（非投掷）：使用Dex
+    // 有 Thrown 属性的近战武器（如 Javelin）仍使用 Str
+    abilityMod = dexMod;
+    abilityUsed = 'Dexterity';
+  } else if (weapon.damage.ability === 'Dexterity') {
+    // 显式声明 Dex 加值的武器
     abilityMod = dexMod;
     abilityUsed = 'Dexterity';
   } else {
-    // 近战武器：使用Str
+    // 近战武器（含投掷武器）：使用Str
     abilityMod = strMod;
     abilityUsed = 'Strength';
   }
