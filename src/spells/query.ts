@@ -3,7 +3,7 @@
 // Corresponds to requirement R11
 
 import type { Spell, SpellLevel, SpellSchool, CastingTime, ClassSpellData } from '../types/spell';
-import type { DamageType } from '../types/damage';
+
 import type { Character } from '../types/character';
 import type { Class } from '../types/class';
 import type { DataLoader } from '../data/loader';
@@ -38,7 +38,7 @@ export interface SpellFilter {
   level?: SpellLevel[];
   school?: SpellSchool[];
   class?: string[];              // Filter by which class can cast
-  damageType?: DamageType[];     // Filter by damage type
+  damageType?: string[];     // Filter by damage type
   castingTime?: CastingTime[];  // Filter by casting time
   range?: string;                // Filter by range
   concentration?: boolean;
@@ -93,15 +93,15 @@ export function searchSpells(filter: SpellFilter, data: DataLoader): Spell[] {
   }
 
   if (filter.class && filter.class.length > 0) {
-    const classSet = new Set(filter.class);
-    spells = spells.filter(s => s.classes?.some(c => classSet.has(c)));
+    const classSet = new Set(filter.class.map(c => c.toLowerCase()));
+    spells = spells.filter(s => s.classes?.some(c => classSet.has(c.toLowerCase())));
   }
 
   if (filter.damageType && filter.damageType.length > 0) {
-    const damageTypeSet = new Set(filter.damageType);
+    const damageTypeSet = new Set<string>(filter.damageType);
     spells = spells.filter(s =>
-      s.damage?.entries.some(e => damageTypeSet.has(e.type as DamageType)) ||
-      s.damage?.additional?.some(e => damageTypeSet.has(e.type as DamageType))
+      s.damage?.entries.some(e => damageTypeSet.has(e.type)) ||
+      s.damage?.additional?.some(e => damageTypeSet.has(e.type))
     );
   }
 
@@ -112,7 +112,7 @@ export function searchSpells(filter: SpellFilter, data: DataLoader): Spell[] {
 
   if (filter.range) {
     const rangeLower = filter.range.toLowerCase();
-    spells = spells.filter(s => s.range.toLowerCase().includes(rangeLower));
+    spells = spells.filter(s => s.range.toLowerCase() === rangeLower);
   }
 
   if (filter.concentration !== undefined) {
