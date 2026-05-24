@@ -86,7 +86,7 @@ function createMockCharacter(): Character {
       >,
       pactMagicSlots: null,
     },
-    resources: [],
+    resources: {},
     hitPoints: {
       max: 44,
       current: 44,

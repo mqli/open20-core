@@ -49,7 +49,7 @@ function createMinimalCharacter(overrides?: Partial<Character>): Character {
       spellSlots: {} as Record<import('../../src/types/spell').SpellLevel, import('../../src/types/spell').SpellSlotEntry>,
       pactMagicSlots: null,
     },
-    resources: [],
+    resources: {},
     hitPoints: {
       max: 13,
       current: 13,

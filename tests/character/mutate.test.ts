@@ -221,7 +221,7 @@ describe('consumeResource', () => {
     const char = makeFighter();
     // Fighter has Second Wind (max: 1 at level 1, used: 0)
     const result = consumeResource(char, 'Fighter', 'Second Wind');
-    const sw = result.resources['Fighter'].resources.find(r => r.id === 'Second Wind');
+    const sw = result.resources['Fighter']!.resources.find(r => r.id === 'Second Wind');
     expect(sw!.used).toBe(1);
   });
 
@@ -232,7 +232,7 @@ describe('consumeResource', () => {
     consumed = consumeResource(consumed, 'Fighter', 'Second Wind');
     // Second Wind max=2, used=2 after two consumes
     const result = consumeResource(consumed, 'Fighter', 'Second Wind');
-    const sw = result.resources['Fighter'].resources.find(r => r.id === 'Second Wind');
+    const sw = result.resources['Fighter']!.resources.find(r => r.id === 'Second Wind');
     expect(sw!.used).toBe(2); // still 2 (maxed)
   });
 
@@ -253,16 +253,16 @@ describe('recoverResource', () => {
   it('recovers used resource: used decrements', () => {
     const char = makeFighter();
     const consumed = consumeResource(char, 'Fighter', 'Second Wind');
-    expect(consumed.resources['Fighter'].resources.find(r => r.id === 'Second Wind')!.used).toBe(1);
+    expect(consumed.resources['Fighter']!.resources.find(r => r.id === 'Second Wind')!.used).toBe(1);
 
     const recovered = recoverResource(consumed, 'Fighter', 'Second Wind');
-    expect(recovered.resources['Fighter'].resources.find(r => r.id === 'Second Wind')!.used).toBe(0);
+    expect(recovered.resources['Fighter']!.resources.find(r => r.id === 'Second Wind')!.used).toBe(0);
   });
 
   it('recovers fully-recovered resource: no change (used=0)', () => {
     const char = makeFighter();
     const result = recoverResource(char, 'Fighter', 'Second Wind');
-    const sw = result.resources['Fighter'].resources.find(r => r.id === 'Second Wind');
+    const sw = result.resources['Fighter']!.resources.find(r => r.id === 'Second Wind');
     expect(sw!.used).toBe(0);
   });
 

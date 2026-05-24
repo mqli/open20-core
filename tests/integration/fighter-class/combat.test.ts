@@ -56,12 +56,12 @@ describe('D&D SRD 5.2 - Fighter Class: Combat Scenarios', () => {
         if (secondWind) {
           // Consume Second Wind
           fighter = consumeResource(fighter, 'Fighter', 'Second Wind');
-          const swAfterConsume = fighter.resources['Fighter'].resources.find(r => r.id === 'Second Wind');
+          const swAfterConsume = fighter.resources['Fighter']!.resources.find(r => r.id === 'Second Wind');
           expect(swAfterConsume!.used).toBe(1);
 
           fighter = shortRest(fighter, 1, dataLoader);
 
-          const afterRest = fighter.resources['Fighter'].resources.find(r => r.id === 'Second Wind');
+          const afterRest = fighter.resources['Fighter']!.resources.find(r => r.id === 'Second Wind');
           expect(afterRest!.used).toBe(0);
         }
       }

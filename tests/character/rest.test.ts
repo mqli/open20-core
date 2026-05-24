@@ -153,7 +153,7 @@ function makeCharacter(overrides: Partial<Character> = {}): Character {
       spellSlots: {} as Record<SpellLevel, SpellSlotEntry>,
       pactMagicSlots: null,
     },
-    resources: [],
+    resources: {},
     hitPoints: {
       max: 49,
       current: 49,

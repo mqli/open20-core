@@ -82,7 +82,7 @@ export const LONGSWORD: Weapon = {
   damage: { entries: [{ dice: 'd8', type: 'Slashing' }], ability: 'Strength', bonus: 0 },
   properties: ['Versatile'],
   versatileDamage: 'd10',
-  mastery: 'Topple',
+  mastery: ['Topple'],
 };
 
 export const DAGGER: Weapon = {
@@ -95,7 +95,7 @@ export const DAGGER: Weapon = {
   equipped: false,
   damage: { entries: [{ dice: 'd4', type: 'Piercing' }], ability: 'Strength', bonus: 0 },
   properties: ['Finesse', 'Light', 'Thrown'],
-  mastery: 'Nick',
+  mastery: ['Nick'],
 };
 
 export const SHORTBOW: Weapon = {
@@ -108,7 +108,7 @@ export const SHORTBOW: Weapon = {
   equipped: false,
   damage: { entries: [{ dice: 'd6', type: 'Piercing' }], ability: 'Dexterity', bonus: 0 },
   properties: ['Ammunition', 'Two-Handed'],
-  mastery: 'Vex',
+  mastery: ['Vex'],
 };
 
 export const QUARTERSTAFF: Weapon = {
@@ -123,7 +123,7 @@ export const QUARTERSTAFF: Weapon = {
   damage: { entries: [{ dice: 'd6', type: 'Bludgeoning' }], ability: 'Strength', bonus: 0 },
   properties: ['Versatile'],
   versatileDamage: 'd8',
-  mastery: 'Sap',
+  mastery: ['Sap'],
 };
 
 export const GREATAXE: Weapon = {
@@ -136,7 +136,7 @@ export const GREATAXE: Weapon = {
   equipped: false,
   damage: { entries: [{ dice: 'd12', type: 'Slashing' }], ability: 'Strength', bonus: 0 },
   properties: ['Heavy', 'Two-Handed'],
-  mastery: 'Cleave',
+  mastery: ['Cleave'],
 };
 
 // ── Helper Functions ────────────────────────────────────

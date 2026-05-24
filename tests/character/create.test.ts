@@ -224,7 +224,7 @@ describe('createCharacter', () => {
       const char = createCharacter(params, data);
       const fighterResources = char.resources['Fighter'];
       expect(fighterResources).toBeDefined();
-      const secondWind = fighterResources.resources.find(r => r.id === 'Second Wind');
+      const secondWind = fighterResources!.resources.find(r => r.id === 'Second Wind');
       expect(secondWind).toBeDefined();
       // 2024 PHB: Second Wind scales with Proficiency Bonus (PB at level 1 = 2)
       expect(secondWind!.max).toBe(2);
@@ -534,7 +534,7 @@ describe('createCharacter', () => {
       const char = createCharacter(params, data);
       const barbarianResources = char.resources['Barbarian'];
       expect(barbarianResources).toBeDefined();
-      const rage = barbarianResources.resources.find(r => r.id === 'Rage');
+      const rage = barbarianResources!.resources.find(r => r.id === 'Rage');
       expect(rage).toBeDefined();
       expect(rage!.max).toBe(2);
       expect(rage!.used).toBe(0);
@@ -771,7 +771,7 @@ describe('extractAllClassResources', () => {
     );
     const fighter = result['Fighter'];
     expect(fighter).toBeDefined();
-    const secondWind = fighter.resources.find(r => r.id === 'Second Wind');
+    const secondWind = fighter!.resources.find(r => r.id === 'Second Wind');
     expect(secondWind).toBeDefined();
     // 2024 PHB: Second Wind scales with Proficiency Bonus (PB at level 1 = 2)
     expect(secondWind!.max).toBe(2);
@@ -786,7 +786,7 @@ describe('extractAllClassResources', () => {
     );
     const barbarian = result['Barbarian'];
     expect(barbarian).toBeDefined();
-    const rage = barbarian.resources.find(r => r.id === 'Rage');
+    const rage = barbarian!.resources.find(r => r.id === 'Rage');
     expect(rage).toBeDefined();
     expect(rage!.max).toBe(2);
   });

@@ -340,13 +340,18 @@ describe('validateCharacter', () => {
 
   it('returns error for resource used > max', () => {
     const char = createValidCharacter(data);
-    mutate(char).resources = [
-      { id: 'Second Wind', name: 'Second Wind', max: 1, used: 3, resetOn: ResetType.ShortRest },
-    ];
+    mutate(char).resources = {
+      'Fighter': {
+        classId: 'Fighter',
+        resources: [
+          { id: 'Second Wind', name: 'Second Wind', max: 1, used: 3, resetOn: ResetType.ShortRest },
+        ],
+      },
+    };
     const result = validateCharacter(char, data);
     expect(result.valid).toBe(false);
     expect(result.errors).toContainEqual(
-      expect.objectContaining({ field: 'resources[0].used', severity: 'error' })
+      expect.objectContaining({ field: 'resources.Fighter.resources[0].used', severity: 'error' })
     );
   });
 
