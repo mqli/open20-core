@@ -2,7 +2,7 @@
 // Spell query functions — filter, search, and retrieve spells
 // Corresponds to requirement R11
 
-import type { Spell, SpellLevel, SpellSchool, CastingTime } from '../types/spell';
+import type { Spell, SpellLevel, SpellSchool, CastingTime, ClassSpellData } from '../types/spell';
 import type { DamageType } from '../types/damage';
 import type { Character } from '../types/character';
 import type { Class } from '../types/class';
@@ -288,7 +288,7 @@ export function knowsSpell(char: Character, spellId: string): boolean {
  * @example
  * canCastSpell(char, spell, data) // true if cantrip (known) or level 1+ (prepared or feat spell)
  */
-export function canCastSpell(char: Character, spell: Spell, data: DataLoader): boolean {
+export function canCastSpell(char: Character, spell: Spell): boolean {
   if (spell.level === 0) {
     // Cantrip - check if known (in knownCantrips or featSpells)
     return knowsSpell(char, spell.id);
@@ -318,7 +318,7 @@ export function canCastSpell(char: Character, spell: Spell, data: DataLoader): b
 export function getClassSpellData(
   char: Character,
   classId: string
-): import('../types/spell').ClassSpellData | undefined {
+): ClassSpellData | undefined {
   return char.spells.classSpellcasting[classId];
 }
 

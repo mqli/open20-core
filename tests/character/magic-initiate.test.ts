@@ -417,7 +417,7 @@ describe('Casting Magic Initiate spells', () => {
     expect(knowsSpell(withFeat, 'fire-bolt')).toBe(true);
 
     // Check that canCastSpell returns true for cantrip
-    expect(canCastSpell(withFeat, fireBolt!, data)).toBe(true);
+    expect(canCastSpell(withFeat, fireBolt!)).toBe(true);
   });
 
   it('should successfully cast Magic Initiate cantrip', () => {
@@ -492,7 +492,7 @@ describe('Casting Magic Initiate spells', () => {
     // Check that canCastSpell returns true for level 1 spell (once per long rest)
     const magicMissile = data.getSpell('magic-missile');
     expect(magicMissile).toBeDefined();
-    expect(canCastSpell(withFeat, magicMissile!, data)).toBe(true);
+    expect(canCastSpell(withFeat, magicMissile!)).toBe(true);
   });
 });
 
