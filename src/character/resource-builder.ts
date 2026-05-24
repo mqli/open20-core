@@ -5,7 +5,7 @@
 
 import type { Feature, Class, Subclass } from '../types/class';
 import type { Resource, CharacterClassResources } from '../types/resource';
-import { ResetType, DisplayType } from '../types/resource';
+import { ResetType } from '../types/resource';
 import { getProficiencyBonus } from '../engine/proficiency-bonus';
 import { getModifier, getTotalScore } from '../engine/ability-modifier';
 import type { AbilityScores } from '../types/ability';
@@ -105,8 +105,8 @@ function gatherFeaturesUpToLevel(
 
 /**
  * Build a Resource object from a feature definition.
- * Reads resourceMaxByLevel, resourceMax, resourceScaleWithPB, resourceResetOn, displayType
- * from the feature JSON. Falls back to defaults from RESOURCE_DEFS.
+ * Reads resourceMaxByLevel, resourceMax, resourceScaleWithPB, resourceResetOn
+ * from the feature JSON. Falls back to defaults.
  */
 function buildResourceFromFeature(
   feature: Feature,
@@ -132,7 +132,6 @@ function buildResourceFromFeature(
   }
 
   const resetOn = parseResetType(feature.resourceResetOn);
-  const displayType = parseDisplayType(feature.displayType);
 
   return {
     id: resourceId,
@@ -140,7 +139,6 @@ function buildResourceFromFeature(
     max,
     used: 0,
     resetOn,
-    displayType,
   };
 }
 
@@ -209,19 +207,6 @@ function parseResetType(value: string | ResetType | undefined): ResetType {
       case 'Daily': return ResetType.Daily;
       case 'Never': return ResetType.Never;
       default: return ResetType.LongRest;
-    }
-  }
-  return value;
-}
-
-function parseDisplayType(value: string | DisplayType | undefined): DisplayType | undefined {
-  if (value === undefined) return undefined;
-  if (typeof value === 'string') {
-    switch (value) {
-      case 'Counter': return DisplayType.Counter;
-      case 'Dots': return DisplayType.Dots;
-      case 'Points': return DisplayType.Points;
-      default: return undefined;
     }
   }
   return value;

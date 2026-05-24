@@ -28,9 +28,7 @@
               "12": 5,
               "17": 6
             },
-            "resourceResetOn": "Long Rest",
-            "displayType": "Dots"
-          },
+            "resourceResetOn": "Long Rest"},
           {
             "name": "Unarmored Defense",
             "description": "While you aren't wearing armor, your base Armor Class equals 10 + your Dexterity modifier + your Constitution modifier."
@@ -201,7 +199,6 @@
             "description": "You can supernaturally inspire others through words, music, or dance. As a Bonus Action, you can inspire another creature within 60 feet of yourself who can see or hear you. That creature gains one of your Bardic Inspiration dice. A creature can have only one Bardic Inspiration die at a time. Once within the next hour when the creature fails a D20 Test, the creature can roll the Bardic Inspiration die and add the number rolled to the d20, potentially turning the failure into a success. A Bardic Inspiration die is expended when it's rolled.",
             "resourceId": "Bardic Inspiration",
             "resourceResetOn": "Long Rest",
-            "displayType": "Points",
             "resourceMax": 1,
             "resourceScaleWithPB": false
           },
@@ -308,7 +305,6 @@
       }
     ],
     "spellcasting": {
-      "type": "preparation",
       "ability": "Charisma",
       "knownSource": "class_list",
       "preparationTiming": "level_up",
@@ -358,9 +354,7 @@
             "description": "You can channel divine energy directly from your deity. You start with two effects: Turn Undead and Divine Spark. You also gain an additional Channel Divinity option from your Divine Order at level 2 (if applicable). You can use your Channel Divinity a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
             "resourceId": "Channel Divinity",
             "resourceScaleWithPB": true,
-            "resourceResetOn": "Long Rest",
-            "displayType": "Counter"
-          }
+            "resourceResetOn": "Long Rest"}
         ],
         "cantripsKnown": 3
       },
@@ -529,7 +523,6 @@
       }
     ],
     "spellcasting": {
-      "type": "preparation",
       "ability": "Wisdom",
       "knownSource": "class_list",
       "changesPerRest": "all"
@@ -581,9 +574,7 @@
             "description": "You can channel your primal power to transform into a Beast. As a Bonus Action, you shape-shift into a Beast creature. You can use this feature a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
             "resourceId": "Wild Shape",
             "resourceScaleWithPB": true,
-            "resourceResetOn": "Short Rest",
-            "displayType": "Dots"
-          },
+            "resourceResetOn": "Short Rest"},
           {
             "name": "Wild Companion",
             "description": "You can summon a nature spirit to bolster your constitution. As a Magic action, you can expend a spell slot to cast the *Find Familiar* spell, but the familiar must be a Beast and must be Small or Smaller."
@@ -756,7 +747,6 @@
       }
     ],
     "spellcasting": {
-      "type": "preparation",
       "ability": "Wisdom",
       "knownSource": "class_list",
       "changesPerRest": "all"
@@ -794,9 +784,7 @@
             "description": "You can use a Bonus Action to regain Hit Points equal to 1d10 + your Fighter level. You can use this feature a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
             "resourceId": "Second Wind",
             "resourceResetOn": "Short Rest",
-            "resourceScaleWithPB": true,
-            "displayType": "Counter"
-          },
+            "resourceScaleWithPB": true},
           {
             "name": "Weapon Mastery",
             "description": "Your training with weapons allows you to use the Mastery property of three weapons you are proficient with. Whenever you finish a Long Rest, you can change the list of weapons you chose for this feature."
@@ -811,9 +799,7 @@
             "description": "You can push yourself beyond your normal limits for a moment. On your turn, you can take one additional Action, and you can do so a number of times per Long Rest equal to your Proficiency Bonus.",
             "resourceId": "Action Surge",
             "resourceResetOn": "Short Rest",
-            "resourceScaleWithPB": true,
-            "displayType": "Counter"
-          },
+            "resourceScaleWithPB": true},
           {
             "name": "Tactical Mind",
             "description": "You can use your tactical insight to turn failure into success. If you fail an ability check, you can expend a use of your Second Wind to roll the d10 and add the number rolled to the ability check, potentially turning it into a success."
@@ -859,9 +845,7 @@
             "description": "You can reroll a saving throw that you fail. If you do so, you must use the new roll, and you can't use this feature again until you finish a Long Rest. You can use this feature a number of times equal to your Proficiency Bonus.",
             "resourceId": "Indomitable",
             "resourceResetOn": "Long Rest",
-            "resourceScaleWithPB": true,
-            "displayType": "Counter"
-          },
+            "resourceScaleWithPB": true},
           {
             "name": "Tactical Master",
             "description": "When you use your Second Wind, you can also give yourself Advantage on attack rolls until the start of your next turn."
@@ -963,9 +947,7 @@
               "19": 19,
               "20": 20
             },
-            "resourceResetOn": "Short Rest",
-            "displayType": "Points"
-          },
+            "resourceResetOn": "Short Rest"},
           {
             "name": "Unarmored Movement",
             "description": "Your speed increases by 10 feet while you aren't wearing armor or wielding a Shield. This increase applies even if you cast a spell or use an ability that gives you a different speed, such as the Fly spell."
@@ -1162,9 +1144,7 @@
               "19": 95,
               "20": 100
             },
-            "resourceResetOn": "Long Rest",
-            "displayType": "Points"
-          },
+            "resourceResetOn": "Long Rest"},
           {
             "name": "Spellcasting",
             "description": "You can cast Paladin spells using Charisma as your spellcasting ability. You prepare the list of Paladin spells that are available for you to cast, choosing from the Paladin spell list. The number of spells you can prepare is shown in the Prepared Spells column of the Paladin Features table."
@@ -1198,9 +1178,7 @@
             "description": "You can channel divine energy directly from your deity. You start with one effect: Divine Sense. You also gain an additional Channel Divinity option from your Paladin Subclass at level 3. You can use your Channel Divinity a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
             "resourceId": "Channel Divinity",
             "resourceScaleWithPB": true,
-            "resourceResetOn": "Long Rest",
-            "displayType": "Counter"
-          },
+            "resourceResetOn": "Long Rest"},
           {
             "name": "Paladin Subclass",
             "description": "You gain a subclass feature. You choose a Paladin subclass, such as Oath of Devotion. Your subclass also grants you features at level 7, 9, 15, 18, and 20."
@@ -1353,7 +1331,6 @@
       }
     ],
     "spellcasting": {
-      "type": "preparation",
       "ability": "Charisma",
       "knownSource": "class_list",
       "changesPerRest": 1
@@ -1567,7 +1544,6 @@
       }
     ],
     "spellcasting": {
-      "type": "preparation",
       "ability": "Wisdom",
       "knownSource": "class_list",
       "changesPerRest": 1
@@ -1757,9 +1733,7 @@
             "description": "You can tap into the magic within yourself. As a Bonus Action, you can unleash your innate magic for 1 minute. During that time, you gain a bonus to your spell attack rolls and the saving throw DCs of your Sorcerer spells equal to your Proficiency Bonus. You can use this feature a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
             "resourceId": "Innate Sorcery",
             "resourceScaleWithPB": true,
-            "resourceResetOn": "Long Rest",
-            "displayType": "Counter"
-          }
+            "resourceResetOn": "Long Rest"}
         ],
         "cantripsKnown": 4
       },
@@ -1791,9 +1765,7 @@
               "19": 19,
               "20": 20
             },
-            "resourceResetOn": "Long Rest",
-            "displayType": "Points"
-          },
+            "resourceResetOn": "Long Rest"},
           {
             "name": "Metamagic",
             "description": "You gain the ability to twist your spells to suit your needs. You gain two Metamagic options of your choice. You can use one Metamagic option on a spell when you cast it, unless the option specifies otherwise. You gain additional Metamagic options at higher levels."
@@ -1863,7 +1835,6 @@
       }
     ],
     "spellcasting": {
-      "type": "preparation",
       "ability": "Charisma",
       "knownSource": "class_list",
       "preparationTiming": "level_up",
@@ -1909,9 +1880,7 @@
             "description": "As a Magic action, you can regain expended Pact Magic spell slots. You can do so a number of times per Long Rest equal to your Proficiency Bonus.",
             "resourceId": "Magical Cunning",
             "resourceScaleWithPB": true,
-            "resourceResetOn": "Long Rest",
-            "displayType": "Counter"
-          }
+            "resourceResetOn": "Long Rest"}
         ],
         "cantripsKnown": 2
       },
@@ -1977,7 +1946,6 @@
       }
     ],
     "spellcasting": {
-      "type": "preparation",
       "ability": "Charisma",
       "knownSource": "class_list",
       "preparationTiming": "level_up",
@@ -2018,9 +1986,7 @@
             "name": "Arcane Recovery",
             "description": "You can regain expended spell slots. As a Magic action, you can choose expended spell slots to recover. The spell slots can have a combined level equal to or less than half your Wizard level (round up), and none of the slots can be level 6 or higher. Once you use this feature, you can't use it again until you finish a Long Rest.",
             "resourceId": "Arcane Recovery",
-            "resourceResetOn": "Long Rest",
-            "displayType": "Counter"
-          }
+            "resourceResetOn": "Long Rest"}
         ],
         "cantripsKnown": 3
       },
@@ -2185,7 +2151,6 @@
       }
     ],
     "spellcasting": {
-      "type": "preparation",
       "ability": "Intelligence",
       "knownSource": "spellbook",
       "changesPerRest": "all"

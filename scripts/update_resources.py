@@ -61,99 +61,85 @@ def main():
         # Barbarian Rage
         ('Barbarian', 'Rage', 1, {
             'resourceMaxByLevel': {'1': 2, '3': 3, '6': 4, '12': 5, '17': 6},
-            'resourceResetOn': 'Long Rest',
-            'displayType': 'Dots'
+            'resourceResetOn': 'Long Rest'
         }),
         
         # Bard Bardic Inspiration
         ('Bard', 'Bardic Inspiration', 1, {
             'resourceMax': 1,
             'resourceScaleWithPB': False,
-            'resourceResetOn': 'Long Rest',
-            'displayType': 'Points'
+            'resourceResetOn': 'Long Rest'
         }),
         
         # Cleric Channel Divinity
         ('Cleric', 'Channel Divinity', 2, {
             'resourceScaleWithPB': True,
-            'resourceResetOn': 'Long Rest',
-            'displayType': 'Counter'
+            'resourceResetOn': 'Long Rest'
         }),
         
         # Druid Wild Shape - already has fields
         ('Druid', 'Wild Shape', 2, {
             'resourceScaleWithPB': True,
-            'resourceResetOn': 'Short Rest',
-            'displayType': 'Dots'
+            'resourceResetOn': 'Short Rest'
         }),
         
         # Fighter Second Wind
         ('Fighter', 'Second Wind', 1, {
             'resourceScaleWithPB': True,
-            'resourceResetOn': 'Short Rest',
-            'displayType': 'Counter'
+            'resourceResetOn': 'Short Rest'
         }),
         
         # Fighter Action Surge
         ('Fighter', 'Action Surge', 2, {
             'resourceScaleWithPB': True,
-            'resourceResetOn': 'Short Rest',
-            'displayType': 'Counter'
+            'resourceResetOn': 'Short Rest'
         }),
         
         # Fighter Indomitable
         ('Fighter', 'Indomitable', 9, {
             'resourceScaleWithPB': True,
-            'resourceResetOn': 'Long Rest',
-            'displayType': 'Counter'
+            'resourceResetOn': 'Long Rest'
         }),
         
         # Monk Monk's Focus (Focus Points)
         ('Monk', 'Monk\'s Focus', 2, {
             'resourceMaxByLevel': monk_focus_max,
-            'resourceResetOn': 'Short Rest',
-            'displayType': 'Points'
+            'resourceResetOn': 'Short Rest'
         }),
         
         # Paladin Lay On Hands (points pool = paladin level x 5)
         ('Paladin', 'Lay On Hands', 1, {
             'resourceMaxByLevel': paladin_layonhands_max,
-            'resourceResetOn': 'Long Rest',
-            'displayType': 'Points'
+            'resourceResetOn': 'Long Rest'
         }),
         
         # Paladin Channel Divinity
         ('Paladin', 'Channel Divinity', 3, {
             'resourceScaleWithPB': True,
-            'resourceResetOn': 'Long Rest',
-            'displayType': 'Counter'
+            'resourceResetOn': 'Long Rest'
         }),
         
         # Sorcerer Innate Sorcery
         ('Sorcerer', 'Innate Sorcery', 1, {
             'resourceScaleWithPB': True,
-            'resourceResetOn': 'Long Rest',
-            'displayType': 'Counter'
+            'resourceResetOn': 'Long Rest'
         }),
         
         # Sorcerer Font of Magic (Sorcery Points = Sorcerer level)
         ('Sorcerer', 'Font of Magic', 2, {
             'resourceMaxByLevel': sorcerer_font_max,
-            'resourceResetOn': 'Long Rest',
-            'displayType': 'Points'
+            'resourceResetOn': 'Long Rest'
         }),
         
         # Warlock Magical Cunning
         ('Warlock', 'Magical Cunning', 2, {
             'resourceScaleWithPB': True,
-            'resourceResetOn': 'Long Rest',
-            'displayType': 'Counter'
+            'resourceResetOn': 'Long Rest'
         }),
         
         # Wizard Arcane Recovery
         ('Wizard', 'Arcane Recovery', 1, {
-            'resourceResetOn': 'Long Rest',
-            'displayType': 'Counter'
+            'resourceResetOn': 'Long Rest'
         }),
     ]
     

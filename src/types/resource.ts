@@ -10,13 +10,6 @@ export enum ResetType {
   Never = 'Never',
 }
 
-// 资源显示类型（UI层用）
-export enum DisplayType {
-  Counter = 'Counter', // 数字计数器（如 Second Wind 1/1）
-  Dots = 'Dots', // 圆点显示（如 Rage ●●○）
-  Points = 'Points', // 点数显示（如 Sorcery Points 3/3）
-}
-
 // 按职业分类的资源条目（类似 classSpellcasting）
 export interface CharacterClassResources {
   readonly classId: string;
@@ -31,8 +24,6 @@ export interface Resource {
   readonly max: number;
   readonly used: number;
   readonly resetOn: ResetType;
-  readonly displayType?: DisplayType;
-  readonly displayName?: string; // 显示名称（如 "Rage 1/3"）
 }
 
 // 2024 各职业资源清单（参考，非类型定义）：

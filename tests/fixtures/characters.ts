@@ -150,7 +150,7 @@ export const WIZARD_CLASS: Class = {
   armorTraining: [],
   weaponMastery: false,
   featuresByLevel: [{ level: 1, preparedSpells: 4, features: WIZARD_FEATURES_L1 }],
-  spellcasting: { type: 'preparation', ability: 'Intelligence', knownSource: 'spellbook', preparationTiming: 'long_rest', changesPerPreparation: 'all' },
+  spellcasting: {ability: 'Intelligence', knownSource: 'spellbook', preparationTiming: 'long_rest', changesPerPreparation: 'all' },
 };
 
 export const ROGUE_CLASS: Class = {
@@ -202,7 +202,7 @@ export const CLERIC_CLASS: Class = {
   weaponProficiencies: ['Simple'],
   weaponMastery: false,
   featuresByLevel: [{ level: 1, preparedSpells: 4, features: CLERIC_FEATURES_L1 }],
-  spellcasting: { type: 'preparation', ability: 'Wisdom', knownSource: 'class_list', preparationTiming: 'long_rest', changesPerPreparation: 'all' },
+  spellcasting: {ability: 'Wisdom', knownSource: 'class_list', preparationTiming: 'long_rest', changesPerPreparation: 'all' },
 };
 
 export const LIFE_DOMAIN_SUBCLASS: Subclass = {

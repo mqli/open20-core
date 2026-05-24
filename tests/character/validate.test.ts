@@ -75,7 +75,7 @@ const WIZARD_CLASS: Class = {
   armorTraining: [],
   weaponMastery: false,
   featuresByLevel: [{ level: 1, features: WIZARD_FEATURES_L1 }],
-  spellcasting: { type: 'preparation', ability: 'Intelligence', knownSource: 'spellbook', preparationTiming: 'long_rest', changesPerPreparation: 'all' },
+  spellcasting: {ability: 'Intelligence', knownSource: 'spellbook', preparationTiming: 'long_rest', changesPerPreparation: 'all' },
 };
 
 const ALERT_FEAT: Feat = {

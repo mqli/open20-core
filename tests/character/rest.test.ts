@@ -59,7 +59,7 @@ function makeMockClass(id: string, hitDie: DieType): Class {
     armorTraining: [],
     weaponMastery: false,
     featuresByLevel: [],
-    spellcasting: id === 'Warlock' ? { type: 'known', ability: 'Charisma', preparationTiming: 'level_up', changesPerPreparation: 1, pactMagic: true } : null,
+    spellcasting: id === 'Warlock' ? {ability: 'Charisma', preparationTiming: 'level_up', changesPerPreparation: 1, pactMagic: true } : null,
   };
 }
 

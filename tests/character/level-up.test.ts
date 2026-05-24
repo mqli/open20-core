@@ -72,7 +72,7 @@ function makeWizardClass(): Class {
       { level: 1, features: [{ name: 'Spellcasting', description: 'Cast wizard spells', resourceId: 'Arcane Recovery' }] },
       { level: 2, features: [{ name: 'Scholar', description: 'Gain expertise in a skill' }] },
     ],
-    spellcasting: { type: 'preparation', ability: 'Intelligence', knownSource: 'spellbook', preparationTiming: 'long_rest', changesPerPreparation: 'all' },
+    spellcasting: {ability: 'Intelligence', knownSource: 'spellbook', preparationTiming: 'long_rest', changesPerPreparation: 'all' },
   };
 }
 

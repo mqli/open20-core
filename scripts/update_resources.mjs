@@ -73,73 +73,59 @@ function main() {
     // [classId, featureName, level, updates]
     ['Barbarian', 'Rage', 1, {
       resourceMaxByLevel: {'1': 2, '3': 3, '6': 4, '12': 5, '17': 6},
-      resourceResetOn: 'Long Rest',
-      displayType: 'Dots'
+      resourceResetOn: 'Long Rest'
     }],
     ['Bard', 'Bardic Inspiration', 1, {
       resourceMax: 1,
       resourceScaleWithPB: false,
-      resourceResetOn: 'Long Rest',
-      displayType: 'Points'
+      resourceResetOn: 'Long Rest'
     }],
     ['Cleric', 'Channel Divinity', 2, {
       resourceScaleWithPB: true,
-      resourceResetOn: 'Long Rest',
-      displayType: 'Counter'
+      resourceResetOn: 'Long Rest'
     }],
     ['Druid', 'Wild Shape', 2, {
       resourceScaleWithPB: true,
-      resourceResetOn: 'Short Rest',
-      displayType: 'Dots'
+      resourceResetOn: 'Short Rest'
     }],
     ['Fighter', 'Second Wind', 1, {
       resourceScaleWithPB: true,
-      resourceResetOn: 'Short Rest',
-      displayType: 'Counter'
+      resourceResetOn: 'Short Rest'
     }],
     ['Fighter', 'Action Surge', 2, {
       resourceScaleWithPB: true,
-      resourceResetOn: 'Short Rest',
-      displayType: 'Counter'
+      resourceResetOn: 'Short Rest'
     }],
     ['Fighter', 'Indomitable', 9, {
       resourceScaleWithPB: true,
-      resourceResetOn: 'Long Rest',
-      displayType: 'Counter'
+      resourceResetOn: 'Long Rest'
     }],
     ['Monk', 'Monk\'s Focus', 2, {
       resourceMaxByLevel: monkFocusMax,
-      resourceResetOn: 'Short Rest',
-      displayType: 'Points'
+      resourceResetOn: 'Short Rest'
     }],
     ['Paladin', 'Lay On Hands', 1, {
       resourceMaxByLevel: paladinLayOnHandsMax,
-      resourceResetOn: 'Long Rest',
-      displayType: 'Points'
+      resourceResetOn: 'Long Rest'
     }],
     ['Paladin', 'Channel Divinity', 3, {
       resourceScaleWithPB: true,
-      resourceResetOn: 'Long Rest',
-      displayType: 'Counter'
+      resourceResetOn: 'Long Rest'
     }],
     ['Sorcerer', 'Innate Sorcery', 1, {
       resourceScaleWithPB: true,
-      resourceResetOn: 'Long Rest',
-      displayType: 'Counter'
+      resourceResetOn: 'Long Rest'
     }],
     ['Sorcerer', 'Font of Magic', 2, {
       resourceMaxByLevel: sorcererFontMax,
-      resourceResetOn: 'Long Rest',
-      displayType: 'Points'
+      resourceResetOn: 'Long Rest'
     }],
     ['Warlock', 'Magical Cunning', 2, {
       resourceScaleWithPB: true,
-      resourceResetOn: 'Long Rest',
-      displayType: 'Counter'
+      resourceResetOn: 'Long Rest'
     }],
     ['Wizard', 'Arcane Recovery', 1, {
-      resourceResetOn: 'Long Rest',
-      displayType: 'Counter'
+      resourceResetOn: 'Long Rest'
     }],
   ];
 

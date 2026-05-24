@@ -1,7 +1,7 @@
 // types/class.ts
 // 职业与子职业相关类型（零依赖）
 
-import type { DisplayType, ResetType } from './resource';
+import type { ResetType } from './resource';
 import type { AbilityName } from './ability';
 import type { AlwaysPreparedSpells } from './spell';
 import type { DieType } from './dice';
@@ -11,9 +11,6 @@ import type { DieType } from './dice';
 // 区别仅在于：如何知道法术 + 何时可以更换 + 法术位系统
 export interface Spellcasting {
   readonly ability: AbilityName;
-
-  // 施法类型（SRD 5.2 统一为 preparation）
-  readonly type: 'preparation' | 'known';
 
   // 如何"知道"法术：
   // - 'class_list' → 大多数职业：自动知道职业法术列表
@@ -47,7 +44,6 @@ export interface Feature {
   readonly resourceMaxByLevel?: Record<number, number>; // 按等级查表，key=等级，value=最大值
   readonly resourceResetOn?: ResetType; // 重置时机
   readonly resourceScaleWithPB?: boolean; // 是否随熟练加值变化
-  readonly displayType?: DisplayType; // UI 显示类型（Counter / Dots / Points）
 }
 
 // 职业类型

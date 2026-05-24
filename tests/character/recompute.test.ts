@@ -35,9 +35,7 @@ const MOCK_SORCERER_CLASS: Class = {
   weaponProficiencies: ['Simple'],
   weaponMastery: false,
   featuresByLevel: [],
-  spellcasting: {
-    type: 'preparation',
-    ability: 'Charisma' as any,
+  spellcasting: {    ability: 'Charisma' as any,
     knownSource: 'class_list',
     preparationTiming: 'level_up',
     changesPerPreparation: 'all',
@@ -54,9 +52,7 @@ const MOCK_CLERIC_CLASS: Class = {
   weaponProficiencies: ['Simple'],
   weaponMastery: false,
   featuresByLevel: [],
-  spellcasting: {
-    type: 'preparation',
-    ability: 'Wisdom' as any,
+  spellcasting: {    ability: 'Wisdom' as any,
     knownSource: 'class_list',
     preparationTiming: 'long_rest',
     changesPerPreparation: 'all',
@@ -98,9 +94,7 @@ const WARLOCK_CLASS: Class = {
   armorTraining: ['Light'],
   weaponMastery: false,
   featuresByLevel: [{ level: 1, features: WARLOCK_FEATURES_L1 }],
-  spellcasting: { 
-    type: 'preparation',
-    ability: 'Charisma' as any,
+  spellcasting: {     ability: 'Charisma' as any,
     knownSource: 'class_list',
     preparationTiming: 'level_up',
     changesPerPreparation: 'all',

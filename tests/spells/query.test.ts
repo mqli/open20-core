@@ -110,9 +110,7 @@ const MOCK_WIZARD_CLASS: Class = {
   weaponProficiencies: [],
   weaponMastery: false,
   featuresByLevel: [],
-  spellcasting: {
-    type: 'preparation',
-    ability: 'Intelligence' as any,
+  spellcasting: {    ability: 'Intelligence' as any,
     knownSource: 'spellbook',
     preparationTiming: 'long_rest',
     changesPerPreparation: 'all',
@@ -129,9 +127,7 @@ const MOCK_CLERIC_CLASS: Class = {
   weaponProficiencies: ['Simple'],
   weaponMastery: false,
   featuresByLevel: [],
-  spellcasting: {
-    type: 'preparation',
-    ability: 'Wisdom' as any,
+  spellcasting: {    ability: 'Wisdom' as any,
     knownSource: 'class_list',
     preparationTiming: 'long_rest',
     changesPerPreparation: 'all',
@@ -148,9 +144,7 @@ const MOCK_BARD_CLASS: Class = {
   weaponProficiencies: ['Simple', 'Hand Crossbow', 'Longsword', 'Rapier', 'Shortsword'],
   weaponMastery: false,
   featuresByLevel: [],
-  spellcasting: {
-    type: 'known',
-    ability: 'Charisma' as any,
+  spellcasting: {    ability: 'Charisma' as any,
     knownSource: 'class_list',
     preparationTiming: 'level_up',
     changesPerPreparation: 'all',
@@ -514,9 +508,7 @@ const MOCK_SORCERER_CLASS: Class = {
   weaponProficiencies: ['Simple'],
   weaponMastery: false,
   featuresByLevel: [],
-  spellcasting: {
-    type: 'known',
-    ability: 'Charisma' as any,
+  spellcasting: {    ability: 'Charisma' as any,
     preparationTiming: 'level_up',
     changesPerPreparation: 1,
   },
